@@ -9,7 +9,12 @@ const http = axios.create({
   });
 
 export async function listGames() {
-    const response = http.post("/games/list");
-    //const response = await fetch('/api/v1/games/list');
-    return await response.json();
+    const response = await http.get("/games/list");
+
+    console.log('Response');
+    console.log('--------');
+    console.log(response.data.data);
+    console.log('--------');
+
+    return response.data.data;
 }
