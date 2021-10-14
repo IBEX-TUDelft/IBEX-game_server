@@ -27,18 +27,18 @@ if (isNaN(saltRounds)) {
 
 export default {
     client: new Client({
-        user: VUE_APP_PGUSER,
-        host: VUE_APP_PGHOST,
-        database: VUE_APP_PGDATABASE,
-        password: VUE_APP_PGPASSWORD,
-        port: VUE_APP_PGPORT
+        user: process.env.VUE_APP_PGUSER,
+        host: process.env.VUE_APP_PGHOST,
+        database: process.env.VUE_APP_PGDATABASE,
+        password: process.env.VUE_APP_PGPASSWORD,
+        port: process.env.VUE_APP_PGPORT
     }),
     pool: new Pool({
-        user: VUE_APP_PGUSER,
-        host: VUE_APP_PGHOST,
-        database: VUE_APP_PGDATABASE,
-        password: VUE_APP_PGPASSWORD,
-        port: VUE_APP_PGPORT
+        user: process.env.VUE_APP_PGUSER,
+        host: process.env.VUE_APP_PGHOST,
+        database: process.env.VUE_APP_PGDATABASE,
+        password: process.env.VUE_APP_PGPASSWORD,
+        port: process.env.VUE_APP_PGPORT
     }),
     SALT_ROUNDS: saltRounds,
     create: async function(parameters) {
