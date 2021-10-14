@@ -8,12 +8,10 @@ Vue.config.productionTip = false
 
 Vue.use(BootstrapVue);
 
-/*const base = axios.create({
-  baseURL: "http://localhost:8080/api/v1" // replace on production env
-});*/
+console.log('API: ' + process.env.VUE_APP_API);
 
 const base = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: process.env.VUE_APP_API,
   responseType: "json",
   headers: {
     Accept: "application/json"
