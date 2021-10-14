@@ -45,8 +45,17 @@ app.post('/api/v1/auth/login', async (req, res) => {
 
   console.log(req.body);
 
-
-  const user = await users.login(req.body);
+  let user;
+  
+  try {
+    user = await users.login(req.body);
+  } catch(e) {
+    return res.status(401).json({
+      data: {},
+      status: true,
+      message: 'Login failed'
+    });    
+  }
 
   if (user == null) {
     return res.status(401).json({

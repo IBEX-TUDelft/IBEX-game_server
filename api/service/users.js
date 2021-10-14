@@ -26,8 +26,20 @@ if (isNaN(saltRounds)) {
 }
 
 export default {
-    client: new Client(),
-    pool: new Pool(),
+    client: new Client({
+        user: VUE_APP_PGUSER,
+        host: VUE_APP_PGHOST,
+        database: VUE_APP_PGDATABASE,
+        password: VUE_APP_PGPASSWORD,
+        port: VUE_APP_PGPORT
+    }),
+    pool: new Pool({
+        user: VUE_APP_PGUSER,
+        host: VUE_APP_PGHOST,
+        database: VUE_APP_PGDATABASE,
+        password: VUE_APP_PGPASSWORD,
+        port: VUE_APP_PGPORT
+    }),
     SALT_ROUNDS: saltRounds,
     create: async function(parameters) {
         if (parameters == null) {
@@ -68,6 +80,8 @@ export default {
         return record;
     },
     loginWithPassword: async function(username, password) {
+        console.log();
+
         const self = this;
 
         const record = await new Promise((resolve, reject) => {
@@ -89,11 +103,9 @@ export default {
             bcrypt.compare(password, record.passwd, function(err, result) {
                 console.log('Compared');
                 if (err) {
-                    console.log('1');
                     reject(err);
                 } else {
                     if (result) {
-                        console.log('2');
                         return resolve ({
                             username: record.username,
                             role: record.user_role,
@@ -101,8 +113,7 @@ export default {
                         });
                     }
 
-                    console.log('3');
-                    throw new Error('Could not login (wrong username or password)');
+                    resolve(null);
                 }
             });
         });

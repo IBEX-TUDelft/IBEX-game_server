@@ -7,8 +7,20 @@ import PG from 'pg';
 const { Pool, Client } = PG;
 
 export default {
-    client: new Client(),
-    pool: new Pool(),
+    client: new Client({
+        user: VUE_APP_PGUSER,
+        host: VUE_APP_PGHOST,
+        database: VUE_APP_PGDATABASE,
+        password: VUE_APP_PGPASSWORD,
+        port: VUE_APP_PGPORT
+    }),
+    pool: new Pool({
+        user: VUE_APP_PGUSER,
+        host: VUE_APP_PGHOST,
+        database: VUE_APP_PGDATABASE,
+        password: VUE_APP_PGPASSWORD,
+        port: VUE_APP_PGPORT
+    }),
     create: async function(parameters) {
         if (parameters == null) {
             throw new Error('Cannot create a new user without parameters');
