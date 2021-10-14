@@ -47,7 +47,6 @@ export default {
   methods: {
     getAllData: async function () {
       getAllUsers().then(response => {
-        console.log(response)
         this.users = response
         this.numberOfUsers = this.users.length
       });

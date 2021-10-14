@@ -59,7 +59,6 @@ export default {
     async loginUser() {
       this.$http.post("/auth/login", this.login)
       .then(response => {
-        console.log(response.data.data.user);
 
         localStorage.setItem("username", response.data.data.user.username);
         localStorage.setItem("role", response.data.data.user.role);
@@ -69,6 +68,15 @@ export default {
         this.$router.push("/me");
       })
       .catch(e => console.log(e));
+    }
+  },
+  mounted () {
+    const token = localStorage.getItem("token");
+
+    if (token != null) {
+      this.$http.get("/auth/check", { params: { token }}).then(() => {
+        this.$router.push("/me");
+      });
     }
   }
 };

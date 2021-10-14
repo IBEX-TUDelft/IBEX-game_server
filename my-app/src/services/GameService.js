@@ -9,12 +9,12 @@ const http = axios.create({
   });
 
 export async function listGames() {
-    const response = await http.get("/games/list");
-
-    console.log('Response');
-    console.log('--------');
-    console.log(response.data.data);
-    console.log('--------');
-
+    const token = localStorage.getItem("token");
+    const response = await http.get("/games/list", {
+        params: {
+            token
+        }
+    });
+    
     return response.data.data;
 }

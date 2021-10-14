@@ -23,8 +23,17 @@ app.get('/api/users', (req, res) => {
 
 app.get('/api/v1/games/list', async (req, res) => {
   console.log('Retrieving games');
+  console.log(req.query);
   
   try {
+    const verification = Utils.verifyJWT(req.query.token);
+
+    console.log(verification);
+
+    if (verification == null || verification.role != 0)  {
+      throw new Error('Could not verify your token');
+    }
+    
     const records = await games.list();
 
     return res.status(200).json({
@@ -34,6 +43,24 @@ app.get('/api/v1/games/list', async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({
+      data: {},
+      status: true,
+      message: err
+    });
+  }
+});
+
+app.get('/api/v1/auth/check', async (req, res) => {
+  try {
+    const verification = Utils.verifyJWT(req.query.token);
+
+    return res.status(200).json({
+      data: verification,
+      status: true,
+      message: 'Data found'
+    });
+  } catch(e) {
+    return res.status(401).json({
       data: {},
       status: true,
       message: err

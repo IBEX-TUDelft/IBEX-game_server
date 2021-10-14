@@ -22,30 +22,30 @@ const saltRounds = 10
 const salt = bcrypt.genSaltSync(saltRounds)
 
 
-	const generateJWT = (payload) => {
-		const signOptions = {
-			issuer: i,
-			subject: s,
-			audience: a,
-			expiresIn: '8784h',
-			algorithm: 'RS256',
-		}
-
-		const options = signOptions
-		if (payload && payload.exp) {
-			delete options.expiresIn
-		}
-		return jwt.sign(payload, privateKEY, options)
+const generateJWT = (payload) => {
+	const signOptions = {
+		issuer: i,
+		subject: s,
+		audience: a,
+		expiresIn: '8784h',
+		algorithm: 'RS256',
 	}
 
-	const verifyJWT = (payload) => {
-		return jwt.verify(payload, publicKEY, verifyOptions)
+	const options = signOptions
+	if (payload && payload.exp) {
+		delete options.expiresIn
 	}
+	return jwt.sign(payload, privateKEY, options)
+}
 
-	const hashPassword = (password) => {
-		const hash = bcrypt.hashSync(password, salt)
-		return hash
-	}
+const verifyJWT = (payload) => {
+	return jwt.verify(payload, publicKEY, verifyOptions)
+}
+
+const hashPassword = (password) => {
+	const hash = bcrypt.hashSync(password, salt)
+	return hash
+}
 
 
 export default {

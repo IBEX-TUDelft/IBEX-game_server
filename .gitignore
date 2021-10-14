@@ -4,3 +4,4 @@ api/.env
 my-app/.env
 api/app.err
 api/app.log
+api/APP_SERVER.PID
