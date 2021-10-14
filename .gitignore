@@ -2,3 +2,5 @@ node_modules
 dist
 api/.env
 my-app/.env
+api/app.err
+api/app.log
