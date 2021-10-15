@@ -13,7 +13,7 @@ const routes = [
     component: Login
   },
   {
-    path: '/me',
+    path: '/dashboard',
     name: 'Home',
     component: Dashboard,
     meta: {
@@ -22,7 +22,7 @@ const routes = [
   },
   {
     path: '/newgame',
-    name: 'CreateGame',
+    name: 'Create a Game',
     component: CreateGame,
     meta: {
       requiresAuth: true

@@ -28,8 +28,6 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     const user = localStorage.getItem("username");
 
-    console.log('Needs to be logged in: ' + user)
-    console.log(user);
     if (user == null) {
       next({
         path: "/"

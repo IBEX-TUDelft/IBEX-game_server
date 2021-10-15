@@ -65,7 +65,7 @@ export default {
         localStorage.setItem("id", response.data.data.user.id);
         localStorage.setItem("token", response.data.data.token);
 
-        this.$router.push("/me");
+        this.$router.push("/dashboard");
       })
       .catch(e => console.log(e));
     }
@@ -75,7 +75,7 @@ export default {
 
     if (token != null) {
       this.$http.get("/auth/check", { params: { token }}).then(() => {
-        this.$router.push("/me");
+        this.$router.push("/dashboard");
       });
     }
   }

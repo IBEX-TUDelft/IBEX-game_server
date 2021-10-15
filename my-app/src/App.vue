@@ -1,21 +1,16 @@
 <template>
-  <div id="app">
-    <!--Dashboard /-->
+  <div id="app" class="container-fluid" style="padding: 0px;">
     <router-view/>
   </div>
 </template>
 
 <script>
+
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-//import Dashboard from './components/Dashboard.vue'
-
 export default {
-  name: 'App',
-  components: {
-    //Dashboard
-  }
+  name: 'App'
 }
 </script>
 

@@ -2,8 +2,13 @@
   <div>
     <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
       <b-navbar-brand href="#" @click="dashboard">
-          Dashboard
+          Back Home
       </b-navbar-brand>
+      <div class="container justify-content-center">
+        <b-navbar-brand>
+            {{ $route.name }}
+        </b-navbar-brand>
+      </div>
       <b-navbar-nav class="ml-auto">
         <b-nav-text>{{ username }} | </b-nav-text>
         <b-nav-item @click="newGame" active>New Game | </b-nav-item>
@@ -27,7 +32,6 @@ export default {
       let token = localStorage.getItem("token");
       try {
         let decoded = VueJwtDecode.decode(token);
-        console.log(decoded, "----------");
         this.user = decoded;
       } catch (error) {
         // return error in production env
@@ -45,7 +49,7 @@ export default {
       this.$router.push("/newgame");
     },
     dashboard() {
-      this.$router.push("/me");
+      this.$router.push("/dashboard");
     }
   },
   created() {

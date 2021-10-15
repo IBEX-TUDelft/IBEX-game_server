@@ -5,8 +5,10 @@ import randomId from 'random-id';
 import Utils from './helpers/utils.js';
 import moment from 'moment';
 
-import users from './service/users.js';
-import games from './service/games.js';
+import users from './repositories/userRepository.js';
+import games from './repositories/gameRepository.js';
+
+import gameService from './services/gameService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,14 +23,40 @@ app.get('/api/users', (req, res) => {
   res.json();
 });
 
+app.post('/api/v1/games/create', async (req, res) => {
+  console.log(req.body);
+
+  try {
+    const verification = Utils.verifyJWT(req.body.token);
+
+    if (verification == null || verification.role != 0)  {
+      throw new Error('Could not verify your token');
+    }
+
+    const gameId = await gameService.createGame(req.body.gameParameters);
+
+    return res.status(200).json({
+      data: { id : gameId },
+      status: true,
+      message: 'Game created'
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      data: {},
+      status: true,
+      message: err
+    });
+  }
+});
+
 app.get('/api/v1/games/list', async (req, res) => {
   console.log('Retrieving games');
   console.log(req.query);
   
   try {
     const verification = Utils.verifyJWT(req.query.token);
-
-    console.log(verification);
 
     if (verification == null || verification.role != 0)  {
       throw new Error('Could not verify your token');
@@ -42,6 +70,8 @@ app.get('/api/v1/games/list', async (req, res) => {
       message: 'Data found'
     });
   } catch (err) {
+    console.log(err);
+
     return res.status(500).json({
       data: {},
       status: true,

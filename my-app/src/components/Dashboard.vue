@@ -1,28 +1,23 @@
 <template>
-  <div class="hello">
+  <div>
     <Header />
-    <div class="container mrgnbtm">
+    <!--div class="container mrgnbtm">
           <div class="row">
             <div class="col-md-8">
                 <CreateUser @createUser="userCreate($event)" />
             </div>
-            <div class="col-md-4">
-                <DisplayBoard :numberOfUsers="numberOfUsers" @getAllUsers="getAllUsers()" />
-            </div>
           </div>
-    </div>
-    <div class="row mrgnbtm">
-        <Users v-if="users.length > 0" :users="users" />
+    </div-->
+    <div>
         <Games v-if="games.length > 0" :games="games" />
+        <div v-else><p>No games to display. Click &quot;<b>New Game</b>&quot; on the right top menu to create a new one.</p></div>
     </div>
   </div>
 </template>
 
 <script>
 import Header from './Header.vue'
-import CreateUser from './CreateUser.vue'
-import DisplayBoard from './DisplayBoard.vue'
-import Users from './Users.vue'
+//import CreateUser from './CreateUser.vue'
 import Games from './Games.vue'
 import { getAllUsers, createUser } from '../services/UserService'
 import { listGames } from '../services/GameService'
@@ -31,9 +26,7 @@ export default {
   name: 'Dashboard',
   components: {
     Header,
-    CreateUser,
-    DisplayBoard,
-    Users,
+//    CreateUser,
     Games
   },
   data() {
@@ -51,7 +44,14 @@ export default {
         this.numberOfUsers = this.users.length
       });
 
-      const gameRecords = await listGames();
+      let gameRecords;
+
+      try {
+        gameRecords = await listGames();
+      } catch(e) {
+        console.log(e);
+      }
+      
 
       this.games = gameRecords;
       this.numberOfGames = gameRecords.length;

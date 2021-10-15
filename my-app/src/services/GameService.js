@@ -18,3 +18,16 @@ export async function listGames() {
     
     return response.data.data;
 }
+
+export async function createGame(gameParameters) {
+  const token = localStorage.getItem("token");
+
+  const parameters = {
+    token,
+    "gameParameters": gameParameters
+  }
+
+  const response = await http.post("/games/create", parameters);
+  
+  return response.data.data;
+}
