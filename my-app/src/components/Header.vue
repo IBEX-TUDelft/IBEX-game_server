@@ -1,11 +1,12 @@
 <template>
   <div>
     <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
-      <b-navbar-brand href="#">
-          Conditional Harberger Taxation
+      <b-navbar-brand href="#" @click="dashboard">
+          Dashboard
       </b-navbar-brand>
       <b-navbar-nav class="ml-auto">
         <b-nav-text>{{ username }} | </b-nav-text>
+        <b-nav-item @click="newGame" active>New Game | </b-nav-item>
         <b-nav-item @click="logUserOut" active>Logout</b-nav-item>
       </b-navbar-nav>
     </b-navbar>
@@ -39,6 +40,12 @@ export default {
       localStorage.removeItem("role");
       localStorage.removeItem("id");
       this.$router.push("/");
+    },
+    newGame() {
+      this.$router.push("/newgame");
+    },
+    dashboard() {
+      this.$router.push("/me");
     }
   },
   created() {

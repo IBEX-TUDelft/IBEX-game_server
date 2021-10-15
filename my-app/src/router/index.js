@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Dashboard from '../components/Dashboard.vue'
 import Login from '../components/Login.vue';
+import CreateGame from '../components/CreateGame.vue';
 
 Vue.use(VueRouter)
 
@@ -15,6 +16,14 @@ const routes = [
     path: '/me',
     name: 'Home',
     component: Dashboard,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/newgame',
+    name: 'CreateGame',
+    component: CreateGame,
     meta: {
       requiresAuth: true
     }

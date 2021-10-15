@@ -5,3 +5,4 @@ PID=$!
 disown $PID
 echo $PID > APP_SERVER.PID
 
+less +F app.log
