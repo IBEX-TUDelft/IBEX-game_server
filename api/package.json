@@ -28,7 +28,8 @@
     "moment": "^2.29.1",
     "pg": "^8.7.1",
     "random-id": "^1.0.4",
-    "unique-names-generator": "^4.6.0"
+    "unique-names-generator": "^4.6.0",
+    "ws": "^8.2.3"
   },
   "devDependencies": {
     "del": "^5.1.0",

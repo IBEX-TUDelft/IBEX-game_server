@@ -56,7 +56,7 @@ export default {
             parameter_key as key, 
             parameter_type as type,
             parameter_value as value,
-        FROM game_parameters WHERE game_id = ${game.id} ORDER BY id DESC;`, (err, res) => {
+        FROM game_parameters WHERE game_id = ${gameId} ORDER BY id DESC;`, (err, res) => {
                 if (err) {
                     reject(err);
                 } else {

@@ -4,11 +4,8 @@ import { fileURLToPath } from 'url';
 import randomId from 'random-id';
 import Utils from './helpers/utils.js';
 import moment from 'moment';
-
+import GameController from './controllers/gameController.js';
 import users from './repositories/userRepository.js';
-import games from './repositories/gameRepository.js';
-
-import gameService from './services/gameService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,65 +16,10 @@ const port = 3080;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../my-app/dist')));
 
+GameController.apply(app);
+
 app.get('/api/users', (req, res) => {
   res.json();
-});
-
-app.post('/api/v1/games/create', async (req, res) => {
-  console.log(req.body);
-
-  try {
-    const verification = Utils.verifyJWT(req.body.token);
-
-    if (verification == null || verification.role != 0)  {
-      throw new Error('Could not verify your token');
-    }
-
-    const gameId = await gameService.createGame(req.body.gameParameters);
-
-    return res.status(200).json({
-      data: { id : gameId },
-      status: true,
-      message: 'Game created'
-    });
-  } catch (err) {
-    console.log(err);
-
-    return res.status(500).json({
-      data: {},
-      status: true,
-      message: err
-    });
-  }
-});
-
-app.get('/api/v1/games/list', async (req, res) => {
-  console.log('Retrieving games');
-  console.log(req.query);
-  
-  try {
-    const verification = Utils.verifyJWT(req.query.token);
-
-    if (verification == null || verification.role != 0)  {
-      throw new Error('Could not verify your token');
-    }
-    
-    const records = await games.list();
-
-    return res.status(200).json({
-      data: records,
-      status: true,
-      message: 'Data found'
-    });
-  } catch (err) {
-    console.log(err);
-
-    return res.status(500).json({
-      data: {},
-      status: true,
-      message: err
-    });
-  }
 });
 
 app.get('/api/v1/auth/check', async (req, res) => {
