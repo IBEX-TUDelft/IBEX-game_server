@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-
+import Database from '../helpers/database.js'
 dotenv.config();
 
 import PG from 'pg';
@@ -21,6 +21,10 @@ export default {
         password: process.env.VUE_APP_PGPASSWORD,
         port: process.env.VUE_APP_PGPORT
     }),
+    queries: {
+        "create": "INSERT INTO games (title) VALUES ($1) RETURNING id;",
+        "deleteById": "DELETE FROM games WHERE id = $1;"
+    },
     create: async function(gameParameters) {
         if (gameParameters == null) {
             throw new Error('Cannot create a new user without game parameters');
@@ -45,9 +49,33 @@ export default {
         });
     },
     list: async function(parameters) {
+        return await Database.execute(`SELECT g.id, g.title, g.created_at, g.updated_at, g.ended_at 
+            FROM games g ORDER BY id DESC LIMIT 50;`);
+    },
+    findOne: async function(gameId) {
+        console.log('Game ID: ' + gameId + " Typeof: " + typeof gameId);
+        
         return await new Promise((resolve, reject) => {
-            this.pool.query(`SELECT g.id, g.title, g.created_at, g.updated_at, g.ended_at 
-            FROM games g ORDER BY id DESC LIMIT 50;`, (err, res) => {
+            this.pool.query(
+                `SELECT id, title, created_at, updated_at, ended_at FROM games WHERE id = ${gameId};`,
+                (err, res) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        if (res.rows == null || res.rows.length === 0) {
+                            resolve(null);
+                        } else if (res.rows.length === 1) {
+                            resolve(res.rows[0]);
+                        } else {
+                            console.error(`${res.rows.length} games found with id ${gameId}. RED ALERT: check the database.`);
+                        }
+                    }
+            });
+        });
+    },
+    deleteById: async function(gameId) {
+        return await new Promise((resolve, reject) => {
+            this.pool.query(`DELETE FROM games WHERE id = ${gameId};`, (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -55,11 +83,5 @@ export default {
                 }
             });
         });
-
-        /*for (let i = 0; i < games.length; i++) {
-            const game = games[i];
-
-            game.parameters = await gameParameterRepository.list(game.id);
-        }*/
     }
 }

@@ -12,6 +12,7 @@
       <b-navbar-nav class="ml-auto">
         <b-nav-text>{{ username }} | </b-nav-text>
         <b-nav-item @click="newGame" active>New Game | </b-nav-item>
+        <b-nav-item @click="lobby" active>Game Lobby | </b-nav-item>
         <b-nav-item @click="logUserOut" active>Logout</b-nav-item>
       </b-navbar-nav>
     </b-navbar>
@@ -47,6 +48,9 @@ export default {
     },
     newGame() {
       this.$router.push("/newgame");
+    },
+    lobby() {
+      this.$router.push("/lobby");
     },
     dashboard() {
       this.$router.push("/dashboard");

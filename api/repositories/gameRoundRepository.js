@@ -22,7 +22,7 @@ export default {
         port: process.env.VUE_APP_PGPORT
     }),
     queries: {
-        "deleteByGameId": "DELETE FROM game_parameters WHERE game_id = $1;"
+        "deleteByGameId": "DELETE FROM game_rounds WHERE game_id = $1;"
     },
     create: async function(parameters) {
         if (parameters == null) {
@@ -32,16 +32,16 @@ export default {
         //TODO: game parameters validation
 
         return await new Promise((resolve, reject) => {
-            this.pool.query(`INSERT INTO game_parameters (
+            this.pool.query(`INSERT INTO game_rounds (
+                round_number,
+                phase_number,
                 game_id,
-                parameter_key,
-                parameter_type,
-                parameter_value
+                updated_at
             ) VALUES (
+                '${parameters.number}',
+                '${parameters.phase}',
                 '${parameters.gameId}',
-                '${parameters.key}',
-                '${parameters.type}',
-                '${parameters.value}'
+                CURRENT_TIMESTAMP
             ) RETURNING id;`,
                 (err, res) => {
                     if (err) {
@@ -56,10 +56,25 @@ export default {
     findByGameId: async function(gameId) {
         return await new Promise((resolve, reject) => {
             this.pool.query(`SELECT 
-            parameter_key as key, 
-            parameter_type as type,
-            parameter_value as value
-        FROM game_parameters WHERE game_id = ${gameId} ORDER BY id DESC;`, (err, res) => {
+            round_number as number,
+            phase_number as phase,
+            game_id as gameId,
+            updated_at as updatedAt,
+            round_data as data
+        FROM game_rounds WHERE game_id = ${gameId} ORDER BY id DESC;`, (err, res) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(res.rows);
+                }
+            });
+        });
+    },
+    updateDataById: async function(id, data) {
+        return await new Promise((resolve, reject) => {
+            this.pool.query(`UPDATE game_rounds 
+            SET round_data = '${JSON.stringify(data)}'
+            WHERE id = ${id};`, (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -70,7 +85,7 @@ export default {
     },
     deleteByGameId: async function(gameId) {
         return await new Promise((resolve, reject) => {
-            this.pool.query(`DELETE FROM game_parameters WHERE game_id = ${gameId};`, (err, res) => {
+            this.pool.query(`DELETE FROM game_rounds WHERE game_id = ${gameId};`, (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -80,3 +95,18 @@ export default {
         });
     }
 }
+
+/**
+ * CREATE TABLE IF NOT EXISTS game_rounds (
+    id SERIAL PRIMARY KEY,
+    round_number SMALLINT NOT NULL DEFAULT 1,
+    phase_number SMALLINT NOT NULL DEFAULT 1,
+    player_turn SMALLINT NOT NULL DEFAULT 1,
+    notes TEXT,
+    game_id BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    ended_at TIMESTAMP,
+    round_data TEXT
+);
+ */

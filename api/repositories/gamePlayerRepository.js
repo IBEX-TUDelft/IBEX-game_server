@@ -21,6 +21,9 @@ export default {
         password: process.env.VUE_APP_PGPASSWORD,
         port: process.env.VUE_APP_PGPORT
     }),
+    queries: {
+        "deleteByGameId": "DELETE FROM game_players WHERE game_id = $1;"
+    },
     create: async function(parameters) {
         if (parameters == null) {
             throw new Error('Cannot create a new user without game parameters');
@@ -56,10 +59,21 @@ export default {
             );
         });
     },
-    list: async function(parameters) { //TODO change, this is copied and pasted
+    findByGameId: async function(gameId) {
         return await new Promise((resolve, reject) => {
-            this.pool.query(`SELECT g.id, g.title, g.created_at, g.updated_at, g.ended_at, p.phase_number 
-            FROM games g, game_rounds p WHERE g.id = p.game_id AND p.ended_at IS NULL;`, (err, res) => {
+            this.pool.query(`SELECT id, name, recovery_string as recoveryString, game_id as gameId, player_number as number, balance, shares, player_role as role 
+            FROM game_players WHERE game_id = ${gameId};`, (err, res) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(res.rows);
+                }
+            });
+        });
+    },
+    deleteByGameId: async function(gameId) {
+        return await new Promise((resolve, reject) => {
+            this.pool.query(`DELETE FROM game_players WHERE game_id = ${gameId};`, (err, res) => {
                 if (err) {
                     reject(err);
                 } else {

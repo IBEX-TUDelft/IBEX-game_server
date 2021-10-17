@@ -11,7 +11,7 @@ const handleGenericError = function(res, error, status) {
 const handleServerError = function (res, error) {
     console.log(error);
 
-    return Controller.handleGenericError(res, error, 500);
+    return handleGenericError(res, error, 500);
 }
 
 const handlePermissionError = function(res, error) {

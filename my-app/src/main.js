@@ -8,8 +8,6 @@ Vue.config.productionTip = false
 
 Vue.use(BootstrapVue);
 
-console.log('API: ' + process.env.VUE_APP_API);
-
 const base = axios.create({
   baseURL: process.env.VUE_APP_API,
   responseType: "json",

@@ -23,7 +23,7 @@
                             <button type="button" @click='detailGame()' class="btn btn-primary mr-1">Details</button>
                             <button v-if="item.round_number == null || item.round_number == 0" type="button" @click="startGame(item.id)" class="btn btn-success mr-1">Start</button>
                             <button v-if="item.round_number != null && item.ended_at != null" type="button" @click='endGame()' class="btn btn-warning mr-1">Force End</button>
-                            <button type="button" @click='deleteGame()' class="btn btn-danger">Delete</button>
+                            <button type="button" @click='deleteGame(item.id)' class="btn btn-danger">Delete</button>
                         </div>
                     </td>
                 </tr>
@@ -50,8 +50,10 @@
                             game_id: id
                         }
                     });
+
                     console.log('Game ' + id + ' started.'),
-                    this.$router.push("/dashboard");
+
+                    this.$router.push(`/masterboard/${id}`);
                 } catch (e) {
                     console.log(e);
                 }
@@ -59,8 +61,25 @@
             endGame() {
 
             },
-            deleteGame() {
+            deleteGame: async function(id) {
+                const token = localStorage.getItem("token");
 
+                try {
+                    const records = await this.$http.get("/games/delete", {
+                        params: {
+                            token,
+                            game_id: id
+                        }
+                    });
+
+                    this.games = records.data.data;
+
+                    console.log('Game ' + id + ' deleted.');
+
+                    //this.$router.go();
+                } catch (e) {
+                    console.log(e);
+                }
             }
         }
      }

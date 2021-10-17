@@ -2,6 +2,8 @@ import gameRepository from '../repositories/gameRepository.js';
 import gameParameterRepository from '../repositories/gameParameterRepository.js';
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
 import gamePlayerRepository from '../repositories/gamePlayerRepository.js';
+import gameRoundRepository from '../repositories/gameRoundRepository.js';
+import Database from '../helpers/database.js'
 
 export default {
     createGame: async function (gameParameters) {
@@ -95,7 +97,12 @@ export default {
                     dictionaries: [adjectives, animals],
                     style: "lowerCase",
                     separator: " "
-                }),
+                }),        /* Roles:
+                *
+                * 1: Speculator
+                * 2: Developer
+                * 3: Owner
+                */
                 game_id: gameId,
                 player_number: i + 1,
                 balance: balance,
@@ -107,5 +114,22 @@ export default {
         }
 
         return gameId;
+    },
+    deleteById: async function(gameId) {
+        return await Database.transaction([
+            {
+                "query": gameRoundRepository.queries.deleteByGameId,
+                "params": [gameId]
+            },{
+                "query": gamePlayerRepository.queries.deleteByGameId,
+                "params": [gameId]
+            },{
+                "query": gameParameterRepository.queries.deleteByGameId,
+                "params": [gameId]
+            },{
+                "query": gameRepository.queries.deleteById,
+                "params": [gameId]
+            }
+        ]);
     }
 }

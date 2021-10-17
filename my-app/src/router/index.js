@@ -3,6 +3,9 @@ import VueRouter from 'vue-router'
 import Dashboard from '../components/Dashboard.vue'
 import Login from '../components/Login.vue';
 import CreateGame from '../components/CreateGame.vue';
+import GameMasterBoard from '../components/GameMasterBoard';
+import GameBoard from '../components/GameBoard';
+import GameLobby from '../components/GameLobby';
 
 Vue.use(VueRouter)
 
@@ -27,6 +30,24 @@ const routes = [
     meta: {
       requiresAuth: true
     }
+  },
+  {
+    path: '/masterboard/:id',
+    name: 'Game Master Board',
+    component: GameMasterBoard,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/board/:id',
+    name: 'Game Board',
+    component: GameBoard
+  },
+  {
+    path: '/lobby',
+    name: 'Game Lobby',
+    component: GameLobby
   }
 ]
 
