@@ -6,6 +6,12 @@ import Phase1 from './phases/1.js';
 
 export default {
     create(data) {
+        //Creating the properties 1 per owner
+
+        data.players.forEach(player => {
+
+        });
+
         return {
             phases: [Phase0, Phase1],
             data: data,
@@ -59,7 +65,7 @@ export default {
                 
                 await this.data.currentPhase.onEnter();
 
-                const err = this.wss.broadcastEvent(data.id, "phase-transition", {
+                let err = this.wss.broadcastEvent(data.id, "phase-transition", {
                     "round": this.data.currentRound.number,
                     "phase": this.data.currentRound.phase
                 });
@@ -68,7 +74,7 @@ export default {
                     console.error(err);
                 }
 
-                const err = this.wss.broadcastNotice(data.id, `Phase ${this.data.currentRound.phase} has begun.`);
+                err = this.wss.broadcastNotice(data.id, `Phase ${this.data.currentRound.phase} has begun.`);
 
                 if (err != null) {
                     console.error(err);
