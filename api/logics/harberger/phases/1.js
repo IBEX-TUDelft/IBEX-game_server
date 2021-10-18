@@ -11,14 +11,33 @@ export default {
 
                 const self = this;
 
-                this.game.players.forEach(player => {
+                for (let i = 0; i < this.game.players.length; i++) {
+                    const player = this.game.players[i];
+
+                    const v = {};
+
+                    const properties = this.game.properties.map(property => {
+                        return {
+                            id: property.id,
+                            name: property.name,
+                            v: property.v[i],
+                            owner: property.owner
+                        }
+                    })
+
                     console.log(`Sending role to ${player.name}: ${player.role}`);
-                    const err = self.wss.sendEvent(self.game.id, player.number, "assign-role", {role: player.role});
+
+                    const err = self.wss.sendEvent(self.game.id, player.number, "assign-role", {
+                        "role": player.role,
+                        "balance": player.balance,
+                        "shares": player.shares,
+                        "properties": properties
+                    });
 
                     if (err != null) {
                         console.error(err);
                     }
-                });
+                }
             },
             onExit: async function () {
                 

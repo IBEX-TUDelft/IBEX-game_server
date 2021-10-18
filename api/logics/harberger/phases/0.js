@@ -59,7 +59,10 @@ export default {
 
                         self.wss.joinGame(ws, game.id, player.role, player.number);
 
-                        WS.sendEvent(ws, "assign-name", {"name" : player.name});
+                        WS.sendEvent(ws, "assign-name", {
+                            "name" : player.name,
+                            "ruleset": self.game.type
+                        });
 
                         self.wss.broadcastInfo(game.id, `Player ${player.name} joined. We have now ${self.game.assignedPlayers} players in the game.`, null);
                     }

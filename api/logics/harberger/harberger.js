@@ -4,12 +4,52 @@ import WS from '../../helpers/websocket.js';
 import Phase0 from './phases/0.js';
 import Phase1 from './phases/1.js';
 
+import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
+
 export default {
     create(data) {
         //Creating the properties 1 per owner
 
-        data.players.forEach(player => {
+        data.properties = [];
 
+        data.type = 'Harberger';
+
+        data.players.forEach(player => {
+            if (player.role === 3) {
+                const property = {
+                    id: data.properties.length + 1,
+                    value: 100000,
+                    owner: player.number,
+                    name: uniqueNamesGenerator({
+                        dictionaries: [adjectives, animals],
+                        separator: " ",
+                        style: "capital"
+                    }) + " Estate",
+                    v: []
+                }
+
+                player.property = property;
+
+                for (let i = 0; i < data.players.length; i++) {
+                    const guesser = data.players[i];
+
+                    const vi = [];
+
+                    for (let j = 0; j < 3; j++) {
+                        if (guesser.role === 1) {
+                            vi.push(0);
+                        } else {
+                            const delta = Math.round((property.value / 5 * 2) * Math.random() - property.value / 5);
+
+                            vi.push(property.value + delta);
+                        }
+                    }
+
+                    property.v.push(vi);
+                }
+
+                data.properties.push(property);
+            }
         });
 
         return {
