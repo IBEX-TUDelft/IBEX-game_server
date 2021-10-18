@@ -113,7 +113,7 @@ export default {
                     });
                 }, process.env.VUE_APP_WSS_PING_INTERVAL);
             },
-            broadcastGame: function(id, data, role) {
+            broadcastEvent: function(id, type, data, role) {
                 const game = this.games.find(g => g.id = id);
 
                 if (game == null) {
@@ -122,12 +122,60 @@ export default {
 
                 game.players.forEach(ws => {
                     if (role == null || ws.player.role === role) {
-                        WS.send(ws, data);
+                        WS.sendEvent(ws, type, data);
                     }
                 });
 
                 game.watchers.forEach(ws => {
-                    WS.send(ws, data);
+                    WS.sendEvent(ws, type, data);
+                });
+            },
+            sendEvent(gameId, playerNumber, type, data) {
+                const game = this.games.find(g => g.id = gameId);
+
+                if (game == null) {
+                    return `Game ${gameId} not found`;
+                }
+
+                const ws = game.players.find(ws => ws.player.number === playerNumber);
+
+                if (ws == null) {
+                    return `Game ${gameId}: player ${playerNumber}'s connection not found`;
+                }
+
+                WS.sendEvent(ws, type, data);
+
+            },
+            broadcastInfo(id, message, role) {
+                this.broadcastMessage(id, "info", message, role);
+            },
+            broadcastNotice(id, message, role) {
+                this.broadcastMessage(id, "notice", message, role);
+            },
+            broadcastWarning(id, message, role) {
+                this.broadcastMessage(id, "warning", message, role);
+            },
+            broadcastError(id, message, role) {
+                this.broadcastMessage(id, "error", message, role);
+            },
+            broadcastFatal(id, message, role) {
+                this.broadcastMessage(id, "fatal", message, role);
+            },
+            broadcastMessage: function(id, type, message, role) {
+                const game = this.games.find(g => g.id = id);
+
+                if (game == null) {
+                    return `Game ${id} not found`;
+                }
+
+                game.players.forEach(ws => {
+                    if (role == null || ws.player.role === role) {
+                        WS.sendMessage(ws, type, message);
+                    }
+                });
+
+                game.watchers.forEach(ws => {
+                    WS.sendMessage(ws, type, message);
                 });
             },
             joinGame: function (ws, id, role, number) {

@@ -39,5 +39,23 @@ export default {
     },
     fatal (ws, msg, handleException) {
         message(ws, "fatal", msg, handleException);
+    },
+    sendMessage(ws, type, msg, handleException) {
+        message(ws, type, msg, handleException);
+    },
+    sendEvent (ws, type, data, handleException) {
+        try {
+            ws.send(JSON.stringify({
+                "type": "event",
+                "eventType": type,
+                "data": data
+            }));
+        } catch (e) {
+            console.error(e);
+            
+            if (handleException != null) {
+                handleException(e);
+            }
+        }
     }
 }

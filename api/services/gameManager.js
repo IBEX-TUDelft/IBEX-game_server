@@ -126,7 +126,7 @@ export default {
                 await game.pushMessage(ws, message);
             },
             deleteGame: function (gameId) {
-                const game = this.games.find(g => g.id  === message.gameId);
+                const game = this.games.find(g => g.id  === gameId);
 
                 if (game == null) {
                     return `The game manager does not know of game ${gameId}`;

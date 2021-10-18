@@ -2,10 +2,12 @@ import gameRoundRepository from "../../repositories/gameRoundRepository.js";
 import Utils from '../../helpers/utils.js';
 import WS from '../../helpers/websocket.js';
 import Phase0 from './phases/0.js';
+import Phase1 from './phases/1.js';
 
 export default {
     create(data) {
         return {
+            phases: [Phase0, Phase1],
             data: data,
             wss: null,
             pushMessage: async function(ws, message) {
@@ -36,16 +38,52 @@ export default {
             nextPhase: async function() {
                 await this.data.currentPhase.onExit();
 
-                //TODO
+                if (this.data.currentRound.phase == 9) {
+                    this.wss.broadcastEvent(data.id, "round-end", {
+                        "round": this.data.currentRound.number
+                    });
+                    return;
+                }
+
+                this.data.currentRound.phase += 1;
+
+                console.log(`Preparing phase ${this.data.currentRound.phase}`);
+
+                console.log(this.phases);
+
+                const Phase = this.phases[this.data.currentRound.phase];
+
+                console.log(Phase);
+
+                this.data.currentPhase = Phase.create(this.data, this.wss);
+                
+                await this.data.currentPhase.onEnter();
+
+                const err = this.wss.broadcastEvent(data.id, "phase-transition", {
+                    "round": this.data.currentRound.number,
+                    "phase": this.data.currentRound.phase
+                });
+
+                if (err != null) {
+                    console.error(err);
+                }
+
+                const err = this.wss.broadcastNotice(data.id, `Phase ${this.data.currentRound.phase} has begun.`);
+
+                if (err != null) {
+                    console.error(err);
+                }
             },
             beginRound: async function() {
                 let number = 1;
 
-                if (data.currentRound != null) {
-                    number = data.currentRound.number + 1;
+                if (this.data.currentRound != null) {
+                    number = this.data.currentRound.number + 1;
 
                     this.data.rounds.push(this.data.currentRound);
                 }
+
+                const data = this.data;
 
                 const roundId = await gameRoundRepository.create({
                     "number": number,

@@ -7,13 +7,24 @@ export default {
             game: game,
             wss: wss,
             onEnter: async function () {
-                console.log('PHASE 0');
+                console.log('PHASE 1');
+
+                const self = this;
+
+                this.game.players.forEach(player => {
+                    console.log(`Sending role to ${player.name}: ${player.role}`);
+                    const err = self.wss.sendEvent(self.game.id, player.number, "assign-role", {role: player.role});
+
+                    if (err != null) {
+                        console.error(err);
+                    }
+                });
             },
             onExit: async function () {
                 
             },
             testComplete: async function () {
-                return this.game.assignedPlayers === this.game.parameters.total_players;
+                return false;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
@@ -59,9 +70,10 @@ export default {
 
                         self.wss.joinGame(ws, game.id, player.role, player.number);
 
-                        WS.sendEvent(ws, "assign-name", {"name" : player.name});
-
-                        self.wss.broadcastInfo(game.id, `Player ${player.name} joined. We have now ${self.game.assignedPlayers} players in the game.`, null);
+                        self.wss.broadcastGame(game.id, {
+                            "type": "info",
+                            "message": `Player ${player.name} joined. We have now ${self.game.assignedPlayers} players in the game.`
+                        }, null);
                     }
                 });
             },
