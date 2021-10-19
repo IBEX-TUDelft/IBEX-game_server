@@ -4,6 +4,7 @@ import WS from '../../helpers/websocket.js';
 import Phase0 from './phases/0.js';
 import Phase1 from './phases/1.js';
 import Phase2 from './phases/2.js';
+import Phase3 from './phases/3.js';
 
 import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
 
@@ -16,47 +17,76 @@ export default {
         data.type = 'Harberger';
 
         data.players.forEach(player => {
-            if (player.role === 3) {
-                const property = {
-                    id: data.properties.length + 1,
-                    value: 100000,
-                    owner: player.number,
-                    name: uniqueNamesGenerator({
-                        dictionaries: [adjectives, animals],
-                        separator: " ",
-                        style: "capital"
-                    }) + " Lot",
-                    v: []
-                }
-
-                player.property = property;
-
-                for (let i = 0; i < data.players.length; i++) {
-                    const guesser = data.players[i];
-
-                    const vi = [];
-
-                    for (let j = 0; j < 3; j++) {
-                        if (guesser.role === 1) {
-                            vi.push(0);
-                        } else {
-                            const delta = Math.round((property.value / 5 * 2) * Math.random() - property.value / 5);
-
-                            vi.push(property.value + delta);
-                        }
-                    }
-
-                    property.v.push(vi);
-                }
-
-                data.properties.push(property);
+            if (player.role != 2 && player.role != 3) {
+                console.log(`Not assigning a property to ${player.name}, because its role (${player.role}, ${typeof player.role}) is not 2 or 3`);
+                return;
             }
+
+            const property = {
+                id: data.properties.length + 1,
+                owner: player.number,
+                name: uniqueNamesGenerator({
+                    dictionaries: [adjectives, animals],
+                    separator: " ",
+                    style: "capital"
+                }) + " Lot",
+                v: []
+            }
+
+            player.property = property;
+
+            let value;
+
+            if (player.role === 2) {
+                value = {
+                    noProject: {
+                        low: data.parameters.developer_no_project_low,
+                        high: data.parameters.developer_no_project_high
+                    },
+                    projectA: {
+                        low: data.parameters.developer_project_a_low,
+                        high: data.parameters.developer_project_a_high
+                    },
+                    projectB: {
+                        low: data.parameters.developer_project_b_low,
+                        high: data.parameters.developer_project_b_high
+                    }
+                }
+            } else if (player.role === 3) {
+                value = {
+                    noProject: {
+                        low: data.parameters.owner_no_project_low,
+                        high: data.parameters.owner_no_project_high
+                    },
+                    projectA: {
+                        low: data.parameters.owner_project_a_low,
+                        high: data.parameters.owner_project_a_high
+                    },
+                    projectB: {
+                        low: data.parameters.owner_project_b_low,
+                        high: data.parameters.owner_project_b_high
+                    }
+                }
+            }
+
+            const conditions = ['noProject', 'projectA', 'projectB'];
+
+            for (let j = 0; j < 3; j++) {
+                const boundaries = value[conditions[j]];
+
+                const vj = boundaries.low + Math.round((boundaries.high - boundaries.low) / 5000 * Math.random()) * 5000;
+
+                property.v.push(vj);
+            }
+
+            data.properties.push(property);
         });
 
         return {
-            phases: [Phase0, Phase1, Phase2],
+            phases: [Phase0, Phase1, Phase2, Phase3],
             data: data,
             wss: null,
+            phaseCheckingInterval: null,
             pushMessage: async function(ws, message) {
                 if (message.type === 'watch') {
                     const verification = Utils.verifyJWT(message.token);
@@ -83,6 +113,10 @@ export default {
                 await this.beginRound();
             },
             nextPhase: async function() {
+                if (this.phaseCheckingInterval != null) {
+                    clearInterval(this.phaseCheckingInterval);
+                }
+
                 await this.data.currentPhase.onExit();
 
                 if (this.data.currentRound.phase == 9) {
@@ -96,11 +130,7 @@ export default {
 
                 console.log(`Preparing phase ${this.data.currentRound.phase}`);
 
-                console.log(this.phases);
-
                 const Phase = this.phases[this.data.currentRound.phase];
-
-                console.log(Phase);
 
                 this.data.currentPhase = Phase.create(this.data, this.wss);
                 
@@ -120,6 +150,20 @@ export default {
                 if (err != null) {
                     console.error(err);
                 }
+
+                const self = this;
+
+                this.phaseCheckingInterval = setInterval(async () => {
+                    const transition = await self.data.currentPhase.testComplete();
+
+                    if (transition) {
+                        try {
+                            await self.nextPhase();
+                        } catch(e) {
+                            console.error(`Could not transition to phase ${self.data.currentRound.phase}`, e);
+                        }
+                    }
+                }, 5000);
             },
             beginRound: async function() {
                 let number = 1;

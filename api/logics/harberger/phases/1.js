@@ -6,6 +6,7 @@ export default {
         const phase = {
             game: game,
             wss: wss,
+            complete: false,
             onEnter: async function () {
                 console.log('PHASE 1');
 
@@ -14,36 +15,33 @@ export default {
                 for (let i = 0; i < this.game.players.length; i++) {
                     const player = this.game.players[i];
 
-                    const v = {};
-
-                    const properties = this.game.properties.map(property => {
-                        return {
-                            id: property.id,
-                            name: property.name,
-                            v: property.v[i],
-                            owner: property.owner
-                        }
-                    })
-
-                    console.log(`Sending role to ${player.name}: ${player.role}`);
-
                     const err = self.wss.sendEvent(self.game.id, player.number, "assign-role", {
                         "role": player.role,
                         "balance": player.balance,
                         "shares": player.shares,
-                        "properties": properties
+                        "property": player.property
                     });
 
                     if (err != null) {
                         console.error(err);
                     }
                 }
+
+                self.wss.broadcastInfo(self.game.id, 'Wait for the developers and the owners to become acquainted with their property', 1);
+                self.wss.broadcastInfo(self.game.id, 'Get acquainted with your property, starting any project may be quite profitable for you', 2);
+                self.wss.broadcastInfo(self.game.id, 'Get acquainted with your property, notice that if a project will start, its value will decrease', 3);
+
+                setTimeout(() => {
+                    self.complete = true;
+                }, 15000);
+
+                console.log(this.game.players);
             },
             onExit: async function () {
                 
             },
             testComplete: async function () {
-                return false;
+                return this.complete;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);

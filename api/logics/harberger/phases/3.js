@@ -7,21 +7,21 @@ export default {
             game: game,
             wss: wss,
             onEnter: async function () {
-                console.log('PHASE 2');
+                console.log('PHASE 3');
 
                 const self = this;
 
-                self.wss.broadcastInfo(self.game.id, 'Wait for the developers and the owners to declare their property public values', 1);
-                self.wss.broadcastInfo(self.game.id, 'Declare the values you assign to your property under each condition', 2);
-                self.wss.broadcastInfo(self.game.id, 'Declare the values you assign to your property under each condition', 3);
-
-                console.log(this.game.players);
+                self.wss.broadcastInfo(self.game.id, 'Click on the properties you are interested in. Mind the order! you compete with others who want the same thing: your first orders are most likely to be fulfilled', 1);
+                self.wss.broadcastInfo(self.game.id, 'Check the table of declared values. If you think some property is undervalued, you can buy it and make profit', 1);
+                self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 2);
+                self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 3);
             },
             onExit: async function () {
                 
             },
             testComplete: async function () {
-                return game.properties.find(p => p.d == null) == null; //true when all properties have a declaration
+                //return game.properties.find(p => p.d == null) == null; //true when all properties have a declaration
+                return false;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
@@ -58,7 +58,7 @@ export default {
                     "type": "declare",
                     "role": [2,3],
                     "action": function(ws, message) {
-                        const player = self.game.players.find(p => p.number === ws.player.number);
+                        const player = self.game.players.find(p => p.number = ws.player.number);
 
                         if (player == null) {
                             WS.error(ws, `Game ${message.gameId}: player ${ws.player.number} not found`);

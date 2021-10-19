@@ -8,6 +8,8 @@ export default {
             wss: wss,
             onEnter: async function () {
                 console.log('PHASE 0');
+
+                console.log(this.game.players);
             },
             onExit: async function () {
                 

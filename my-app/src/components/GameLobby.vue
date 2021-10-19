@@ -52,7 +52,10 @@ export default {
     methods: {
         joinGame: async function (id) {
             try {
-                this.$router.push(`/board/${id}`);
+                const routeData = this.$router.resolve({path: `/board/${id}`});
+                console.log('HRef:' + routeData.href);
+                window.open(routeData.href, '_blank');
+                //this.$router.push(`/board/${id}`);
             } catch (e) {
                 console.log(e);
             }

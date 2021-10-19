@@ -125,7 +125,7 @@ export default {
 
                 switch(message.type) {
                     case 'rejoin':
-                        const player = game.players.find(p => p.recoveryString === message.recoveryString);
+                        const player = game.data.players.find(p => p.recoveryString === message.recoveryString);
 
                         if (player == null) {
                             WS.send(ws, {
