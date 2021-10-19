@@ -72,29 +72,6 @@ export default {
                 return await this.testComplete();
             },
             init: function () {
-                const self = this;
-
-                this.handlers.push({
-                    "type": "join",
-                    "role": null,
-                    "action": function(ws, message) {
-                        if (self.game.assignedPlayers === self.game.parameters.total_players) {
-                            WS.error(ws, `Game ${message.gameId} is full. You cannot join`);
-                            return;
-                        }
-
-                        const player = self.game.players[self.game.assignedPlayers];
-
-                        self.game.assignedPlayers++;
-
-                        self.wss.joinGame(ws, game.id, player.role, player.number);
-
-                        self.wss.broadcastGame(game.id, {
-                            "type": "info",
-                            "message": `Player ${player.name} joined. We have now ${self.game.assignedPlayers} players in the game.`
-                        }, null);
-                    }
-                });
             },
             handlers: []
         }

@@ -61,7 +61,7 @@ export default {
     },
     findByGameId: async function(gameId) {
         return await new Promise((resolve, reject) => {
-            this.pool.query(`SELECT id, name, recovery_string as recoveryString, game_id as gameId, player_number as number, balance, shares, player_role as role 
+            this.pool.query(`SELECT id, name, recovery_string as recovery, game_id, player_number as number, balance, shares, player_role as role 
             FROM game_players WHERE game_id = ${gameId};`, (err, res) => {
                 if (err) {
                     reject(err);

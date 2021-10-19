@@ -16,15 +16,37 @@ export default {
             {key: "game_type", type: "string", value: gameParameters.game_type},
             {key: "round_count", type: "number", value: gameParameters.round_count},
             {key: "minutes_for_trading", type: "number", value: gameParameters.minutes_for_trading},
+            {key: "tax_rate_initial", type: "number", value: gameParameters.tax_rate.initial},
+            {key: "tax_rate_final", type: "number", value: gameParameters.tax_rate.final},
+            {key: "signal_low", type: "float", value: gameParameters.signal.low},
+            {key: "signal_high", type: "float", value: gameParameters.signal.high},
+
             {key: "speculators_count", type: "number", value: gameParameters.speculators.count},
             {key: "speculator_balance", type: "number", value: gameParameters.speculators.balance},
             {key: "speculator_shares", type: "number", value: gameParameters.speculators.shares},
+            {key: "max_lot_purchases", type: "number", value: gameParameters.speculators.max_lot_purchases},
+
             {key: "developers_count", type: "number", value: gameParameters.developers.count},
             {key: "developer_balance", type: "number", value: gameParameters.developers.balance},
             {key: "developer_shares", type: "number", value: gameParameters.developers.shares},
+            {key: "developer_no_project_low", type: "number", value: gameParameters.developers.profit.no_project.low},
+            {key: "developer_no_project_high", type: "number", value: gameParameters.developers.profit.no_project.high},
+            {key: "developer_project_a_low", type: "number", value: gameParameters.developers.profit.project_a.low},
+            {key: "developer_project_a_high", type: "number", value: gameParameters.developers.profit.project_a.high},
+            {key: "developer_project_b_low", type: "number", value: gameParameters.developers.profit.project_b.low},
+            {key: "developer_project_b_high", type: "number", value: gameParameters.developers.profit.project_b.high},
+
             {key: "owners_count", type: "number", value: gameParameters.owners.count},
             {key: "owner_balance", type: "number", value: gameParameters.owners.balance},
             {key: "owner_shares", type: "number", value: gameParameters.owners.shares},
+            {key: "owner_no_project_low", type: "number", value: gameParameters.owners.profit.no_project.low},
+            {key: "owner_no_project_high", type: "number", value: gameParameters.owners.profit.no_project.high},
+            {key: "owner_project_a_low", type: "number", value: gameParameters.owners.profit.project_a.low},
+            {key: "owner_project_a_high", type: "number", value: gameParameters.owners.profit.project_a.high},
+            {key: "owner_project_b_low", type: "number", value: gameParameters.owners.profit.project_b.low},
+            {key: "owner_project_b_high", type: "number", value: gameParameters.owners.profit.project_b.high}
+
+
         ];
 
         for (let i = 0; i < parameters.length; i++) {

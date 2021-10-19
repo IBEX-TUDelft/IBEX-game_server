@@ -123,7 +123,23 @@ export default {
                     return;
                 }
 
-                await game.pushMessage(ws, message);
+                switch(message.type) {
+                    case 'rejoin':
+                        const player = game.players.find(p => p.recoveryString === message.recoveryString);
+
+                        if (player == null) {
+                            WS.send(ws, {
+                                "error": `Cannot rejoin game ${message.gameId}: invalid recovery string`
+                            });
+                            return;
+                        }
+
+                        this.wssManager.joinGame(ws, message.gameId, player.role, player.number);
+
+                        break;
+                    default:
+                        await game.pushMessage(ws, message);
+                }
             },
             deleteGame: function (gameId) {
                 const game = this.games.find(g => g.id  === gameId);

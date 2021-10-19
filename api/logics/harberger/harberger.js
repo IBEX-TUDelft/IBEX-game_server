@@ -3,8 +3,9 @@ import Utils from '../../helpers/utils.js';
 import WS from '../../helpers/websocket.js';
 import Phase0 from './phases/0.js';
 import Phase1 from './phases/1.js';
+import Phase2 from './phases/2.js';
 
-import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
+import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
 
 export default {
     create(data) {
@@ -24,7 +25,7 @@ export default {
                         dictionaries: [adjectives, animals],
                         separator: " ",
                         style: "capital"
-                    }) + " Estate",
+                    }) + " Lot",
                     v: []
                 }
 
@@ -53,7 +54,7 @@ export default {
         });
 
         return {
-            phases: [Phase0, Phase1],
+            phases: [Phase0, Phase1, Phase2],
             data: data,
             wss: null,
             pushMessage: async function(ws, message) {

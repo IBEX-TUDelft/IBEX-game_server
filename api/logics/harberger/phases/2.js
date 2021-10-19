@@ -7,13 +7,15 @@ export default {
             game: game,
             wss: wss,
             onEnter: async function () {
-                console.log('PHASE 0');
+                console.log('PHASE 2');
+
+                const self = this;
             },
             onExit: async function () {
                 
             },
             testComplete: async function () {
-                return this.game.assignedPlayers === this.game.parameters.total_players;
+                return false;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
@@ -59,15 +61,10 @@ export default {
 
                         self.wss.joinGame(ws, game.id, player.role, player.number);
 
-                        console.log(player);
-
-                        WS.sendEvent(ws, "assign-name", {
-                            "name" : player.name,
-                            "recoveryString": player.recovery,
-                            "ruleset": self.game.type
-                        });
-
-                        self.wss.broadcastInfo(game.id, `Player ${player.name} joined. We have now ${self.game.assignedPlayers} players in the game.`, null);
+                        self.wss.broadcastGame(game.id, {
+                            "type": "info",
+                            "message": `Player ${player.name} joined. We have now ${self.game.assignedPlayers} players in the game.`
+                        }, null);
                     }
                 });
             },

@@ -11,10 +11,10 @@
                     </b-navbar-brand>
                 </div>
                 <b-navbar-nav class="ml-auto">
-                    <b-nav-item active>Round: {{ game.round }}</b-nav-item>
-                    <b-nav-item active>Phase: {{ game.phase }}</b-nav-item>
-                    <b-nav-item active>Balance: {{ player.balance }}</b-nav-item>
-                    <b-nav-item active>Shares: {{ player.shares }}</b-nav-item>
+                    <b-nav-item active >Round: {{ game.round }}</b-nav-item>
+                    <b-nav-item active >Phase: {{ game.phase }}</b-nav-item>
+                    <b-nav-item active v-if="game.phase === 6">Balance: {{ player.balance }}</b-nav-item>
+                    <b-nav-item active v-if="game.phase === 6">Shares: {{ player.shares }}</b-nav-item>
                 </b-navbar-nav>
             </b-navbar>
         </div>
@@ -34,8 +34,8 @@
                     <th scope="col">Id</th>
                     <th scope="col">Name</th>
                     <th scope="col">No Development</th>
-                    <th scope="col">Solar</th>
-                    <th scope="col">Wind</th>
+                    <th scope="col">Project A</th>
+                    <th scope="col">Project B</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -52,8 +52,6 @@
     </div>
 </template>
 <script>
-    //import Header from './Header.vue';
-
     const roleMap = {
         1: "Speculator",
         2: "Owner",
@@ -71,6 +69,7 @@
     export default {
         data() {
             return {
+                firstConnection: true,
                 connection: null,
                 lastThreeMessages: [],
                 messages: [],
@@ -83,6 +82,7 @@
                 player: {
                     title: "Joining ...",
                     name: "",
+                    recoveryString: null,
                     role: null,
                     balance: 0,
                     shares: 0
@@ -90,70 +90,88 @@
             };
         },
         components: {
-            //Header
         },
         name: 'GameBoard',
-        methods: {
+        created() {
+            window.addEventListener("load", this.openWebSocket);
         },
-        mounted () {
-            const self = this;
+        methods: {
+            sendMessage(msg) {
+                this.connection.send(JSON.stringify(msg));
+            },
+            openWebSocket() {
+                const self = this;
 
-            this.game.id = parseInt(this.$route.params.id);
+                this.connection = new WebSocket(process.env.VUE_APP_WSS);
 
-            this.connection = new WebSocket(process.env.VUE_APP_WSS);
+                this.connection.onmessage = function(event) {
+                    const ev = JSON.parse(event.data);
 
-            this.connection.onmessage = function(event) {
-                const ev = JSON.parse(event.data);
+                    if (ev.type === "event") {
+                        //TODO: give structure to this logic
+                        switch(ev.eventType) {
+                            case "assign-name":
+                                self.player.name = ev.data.name;
+                                self.player.title = ev.data.name;
+                                self.player.recoveryString = ev.data.recoveryString;
+                                self.game.ruleset = ev.data.ruleset;
+                                console.log('Recovery string: ' + self.player.recoveryString);
+                                break;
+                            case "assign-role":
+                                self.player.role = ev.data.role;
+                                self.player.title += ` (${roleMap[ev.data.role]})`;
+                                self.player.balance = ev.data.balance;
+                                self.player.shares = ev.data.shares;
+                                self.game.properties = ev.data.properties;
+                                break;
+                            case "phase-transition":
+                                self.game.round = ev.data.round;
+                                self.game.phase = ev.data.phase;
+                                break;
+                            default:
+                                console.error(`Type ${ev.type} was not understood`);
+                        }
+                    } else { //it is a mesasge
+                        self.messages.push({
+                            id: self.messages.length,
+                            type: ev.type,
+                            message: ev.message,
+                            style: styleMap[ev.type]
+                        });
 
-                if (ev.type === "event") {
-                    //TODO: give structure to this logic
-                    switch(ev.eventType) {
-                        case "assign-name":
-                            self.player.name = ev.data.name;
-                            self.player.title = ev.data.name;
-                            self.game.ruleset = ev.data.ruleset;
-                            break;
-                        case "assign-role":
-                            self.player.role = ev.data.role;
-                            self.player.title += ` (${roleMap[ev.data.role]})`;
-                            self.player.balance = ev.data.balance;
-                            self.player.shares = ev.data.shares;
-                            self.game.properties = ev.data.properties;
-                            break;
-                        case "phase-transition":
-                            self.game.round = ev.data.round;
-                            self.game.phase = ev.data.phase;
-                            break;
-                        default:
-                            console.error(`Type ${ev.type} was not understood`);
-                    }
-                } else { //it is a mesasge
-                    self.messages.push({
-                        id: self.messages.length,
-                        type: ev.type,
-                        message: ev.message,
-                        style: styleMap[ev.type]
-                    });
-
-                    if (self.lastThreeMessages.length < 3) {
-                        self.lastThreeMessages = [self.messages[self.messages.length - 1], ...self.lastThreeMessages];
-                    } else if (self.lastThreeMessages.length >= 3) {
-                        self.lastThreeMessages = [self.messages[self.messages.length - 1], self.lastThreeMessages[0], self.lastThreeMessages[1]];
+                        if (self.lastThreeMessages.length < 3) {
+                            self.lastThreeMessages = [self.messages[self.messages.length - 1], ...self.lastThreeMessages];
+                        } else if (self.lastThreeMessages.length >= 3) {
+                            self.lastThreeMessages = [self.messages[self.messages.length - 1], self.lastThreeMessages[0], self.lastThreeMessages[1]];
+                        }
                     }
                 }
-            }
 
-            this.connection.onopen = function(event) {
-                console.log(event)
-                console.log("Successfully connected to the websocket server...");
+                this.connection.onopen = function() {
+                    console.log("Successfully connected to the websocket server...");
 
-                const msg = JSON.stringify({
-                    "gameId": self.game.id,
-                    "type": "join"
-                });
-                
-                self.connection.send(msg);
+                    if (self.firstConnection) {
+                        self.sendMessage({
+                            "gameId": self.game.id,
+                            "type": "join"
+                        });
+                        self.firstConnection = false;
+                    } else {
+                        self.sendMessage({
+                            "gameId": self.game.id,
+                            "type": "rejoin",
+                            "recoveryString": self.player.recoveryString
+                        });
+                    }
+                }
+
+                this.connection.onclose = function() {
+                    self.openWebSocket();
+                }
             }
+        },
+        mounted () {
+            this.game.id = parseInt(this.$route.params.id);
         }
     }
 </script>
