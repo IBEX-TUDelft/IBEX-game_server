@@ -142,13 +142,7 @@ export default {
                 }
             },
             deleteGame: function (gameId) {
-                const game = this.games.find(g => g.id  === gameId);
-
-                if (game == null) {
-                    return `The game manager does not know of game ${gameId}`;
-                }
-
-                this.games.splice(this.games.indexOf(game), 1);
+                this.games = this.games.filter(g => g.data.id  != gameId);
             }
         }
     }
