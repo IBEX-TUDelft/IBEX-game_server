@@ -5,6 +5,7 @@ import Phase0 from './phases/0.js';
 import Phase1 from './phases/1.js';
 import Phase2 from './phases/2.js';
 import Phase3 from './phases/3.js';
+import Phase4 from './phases/4.js';
 
 import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
 
@@ -83,7 +84,7 @@ export default {
         });
 
         return {
-            phases: [Phase0, Phase1, Phase2, Phase3],
+            phases: [Phase0, Phase1, Phase2, Phase3, Phase4],
             data: data,
             wss: null,
             phaseCheckingInterval: null,

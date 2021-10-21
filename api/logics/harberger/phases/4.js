@@ -6,42 +6,26 @@ export default {
         const phase = {
             game: game,
             wss: wss,
-            complete: false,
             onEnter: async function () {
-                console.log('PHASE 1');
+                console.log('PHASE 4');
 
                 const self = this;
 
-                for (let i = 0; i < this.game.players.length; i++) {
-                    const player = this.game.players[i];
+                self.wss.broadcastInfo(self.game.id, 'Reconciliation in progress ...');
 
-                    const err = self.wss.sendEvent(self.game.id, player.number, "assign-role", {
-                        "role": player.role,
-                        "balance": player.balance,
-                        "shares": player.shares,
-                        "property": player.property
-                    });
-
-                    if (err != null) {
-                        console.error(err);
-                    }
-                }
-
-                self.wss.broadcastInfo(self.game.id, 'Wait for the developers and the owners to become acquainted with their property', 1);
-                self.wss.broadcastInfo(self.game.id, 'Get acquainted with your property, starting any project may be quite profitable for you', 2);
-                self.wss.broadcastInfo(self.game.id, 'Get acquainted with your property, notice that if a project will start, its value will decrease', 3);
-
-                setTimeout(() => {
-                    self.complete = true;
-                }, 5000);
-
-                console.log(this.game.players);
+                //TODO
+                // 1. calculate D
+                // 2. determine the winning condition
+                // 3. resell lot under that condition
+                // 4. transition to the next phase
             },
             onExit: async function () {
-                
+                this.game.player.filter(p => p.role === 1).forEach(p => { p.doneSpeculating = false; });
+                this.game.properties.forEach(p => { p.speculators = null; });
             },
             testComplete: async function () {
-                return this.complete;
+                //return game.properties.find(p => p.d == null) == null; //true when all properties have a declaration
+                return false;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
@@ -52,10 +36,12 @@ export default {
                 }
 
                 if (handler.role != null) {
-                    if (handler.role != ws.player.role) {
+                    if (!handler.role.includes(ws.player.role)) {
                         WS.error(ws, `Game ${message.gameId}: only ${handler.role} can send this message in this phase. You are ${ws.player.role}.`);
                         return;
-                    } if (handler.role === 0) {
+                    }
+                    
+                    if (ws.player.role === 0) {
                         const verification = Utils.verifyJWT(message.token);
     
                         if (verification == null || verification.role != 0)  {

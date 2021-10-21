@@ -65,6 +65,8 @@ export default {
                             return;
                         }
 
+                        console.log(`New Declaration from ${player.name}`);
+                        
                         player.property.d = message.declaration;
 
                         self.wss.broadcastInfo(game.id, `Player ${player.name} submitted a declaration of values.`, null);

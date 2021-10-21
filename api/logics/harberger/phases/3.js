@@ -11,17 +11,43 @@ export default {
 
                 const self = this;
 
+                self.game.players.filter(p => p.role === 1).forEach(p => {p.doneSpeculating = false});
+
                 self.wss.broadcastInfo(self.game.id, 'Click on the properties you are interested in. Mind the order! you compete with others who want the same thing: your first orders are most likely to be fulfilled', 1);
                 self.wss.broadcastInfo(self.game.id, 'Check the table of declared values. If you think some property is undervalued, you can buy it and make profit', 1);
                 self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 2);
                 self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 3);
+
+                const declatationData = [];
+
+                game.players.forEach(p => {
+                    const property = p.property;
+
+                    if (property != null) {
+                        declatationData.push({
+                            "id": property.id,
+                            "name": property.name,
+                            "owner": p.name,
+                            "d": property.d,
+                            "available": [true, true, true]
+                        });
+                    }
+                });
+
+                const err = self.wss.broadcastEvent(
+                    game.id,
+                    "declarations-published",
+                    declatationData
+                );
+
+                if (err != null) {
+                    console.log(err);
+                }
             },
             onExit: async function () {
-                
             },
             testComplete: async function () {
-                //return game.properties.find(p => p.d == null) == null; //true when all properties have a declaration
-                return false;
+                return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
@@ -55,19 +81,59 @@ export default {
                 const self = this;
 
                 this.handlers.push({
-                    "type": "declare",
-                    "role": [2,3],
+                    "type": "purchase-lot",
+                    "role": [1],
                     "action": function(ws, message) {
-                        const player = self.game.players.find(p => p.number = ws.player.number);
+                        const player = self.game.players.find(p => p.number === ws.player.number);
 
                         if (player == null) {
                             WS.error(ws, `Game ${message.gameId}: player ${ws.player.number} not found`);
                             return;
                         }
 
-                        player.property.d = message.declaration;
+                        const lot = self.game.properties.find(p => p.id === message.lot.id);
 
-                        self.wss.broadcastInfo(game.id, `Player ${player.name} submitted a declaration of values.`, null);
+                        if (lot == null) {
+                            WS.error(ws, `Game ${message.gameId}: lot ${message.lot.id}} not found`);
+                            return;
+                        }
+
+                        if (lot.speculators == null) {
+                            lot.speculators = [null, null, null];
+                        }
+
+                        if (lot.speculators[message.lot.condition] != null) {
+                            WS.error(ws, `Game ${message.gameId}: lot ${message.lot.id} is not for sale any more`);
+                            return;
+                        }
+
+                        lot.speculators[message.lot.condition] = player.number;
+
+                        console.log(`Property ${lot.name} was bought by a speculator: ${player.name} under condition ${message.lot.condition}`);
+
+                        self.wss.broadcastEvent (
+                            game.id,
+                            "lot-sold-to-speculator",
+                            {
+                                "id": lot.id,
+                                "condition": message.lot.condition
+                            }
+                        );
+                    }
+                }, {
+                    "type": "done-speculating",
+                    "role": [1],
+                    "action": function(ws, message) {
+                        const player = self.game.players.find(p => p.number === ws.player.number);
+
+                        if (player == null) {
+                            WS.error(ws, `Game ${message.gameId}: player ${ws.player.number} not found`);
+                            return;
+                        }
+
+                        console.log(`Player ${player.name} is done speculating`);
+
+                        player.doneSpeculating = true;
                     }
                 });
             },

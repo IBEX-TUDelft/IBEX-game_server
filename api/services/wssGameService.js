@@ -55,50 +55,6 @@ export default {
                         const game = self.games.find(g => g.id  === message.gameId);
     
                         self.gameManager.handleMessage(ws, message);
-
-                        /* switch (message.type)  {
-                            case "watch":
-                                const verification = Utils.verifyJWT(message.token);
-    
-                                if (verification == null || verification.role != 0)  {
-                                    WS.send(ws, {
-                                        "error": 'Could not verify your token'
-                                    });
-                                    return;
-                                }
-    
-                                game.watchers.push(ws); //This admin ws will receive updates
-    
-                                break;
-                            case "join":
-                                const player = game.players.find(p => p.ws === null);
-    
-                                if (player == null) {
-                                    WS.send(ws, {
-                                        "error": `Game ${message.gameId} is full. You cannot join`
-                                    });
-                                    return;
-                                }
-    
-                                player.ws = ws;
-                                ws.player = player;
-    
-                                WS.send(ws, {
-                                    "player" : {
-                                        "name": player.name
-                                    },
-                                    "message": `Welcome to game ${message.gameId}. Your role will be communicated in phase 1.`
-                                });
-    
-                                break;
-                            default: 
-                                console.log(`Type ${message.type} not understood`);
-                                WS.send(ws, {
-                                    "error": `Type ${message.type} not understood`
-                                });
-                                break;
-                        }*/
-    
                     });
                 });
 

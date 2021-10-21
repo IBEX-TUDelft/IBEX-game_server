@@ -78,59 +78,51 @@
                         <th scope="col">Project B</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody :key="updateSpeculationTable">
                     <tr v-for="declaration in game.declarations" :key="declaration.id">
                         <td>{{ declaration.name }}</td>
                         <td>{{ declaration.owner }}</td>
                         <td>
-                            {{ formatNumber(declaration.d[0]) }}
-                            <button v-if="purchaseListIncludes(declaration.id, 0)" type="button" @click='addToPurchaseList(declaration.id, 0)' class="btn btn-primary">Buy</button>
+                            <div class="row">
+                                <div class="col">
+                                    {{ formatNumber(declaration.d[0]) }}
+                                </div>
+                                <div class="col">
+                                    <button v-if="declaration.available[0]" type="button" @click='sendPurchaseIntention(declaration.id, 0)' class="btn btn-primary">Buy</button>
+                                    <p v-if="!declaration.available[0]">Sold</p>
+                                </div>
+                            </div>
                         </td>
                         <td>
-                            {{ formatNumber(declaration.d[1]) }}
-                            <button v-if="purchaseListIncludes(declaration.id, 1)" type="button" @click='addToPurchaseList(declaration.id, 1)' class="btn btn-primary">Buy</button>
+                            <div class="row">
+                                <div class="col">
+                                    {{ formatNumber(declaration.d[1]) }}
+                                </div>
+                                <div class="col">
+                                    <button v-if="declaration.available[1]" type="button" @click='sendPurchaseIntention(declaration.id, 1)' class="btn btn-primary">Buy</button>
+                                    <p v-if="!declaration.available[1]">Sold</p>
+                                </div>
+                            </div>
                         </td>
                         <td>
-                            {{ formatNumber(declaration.d[2]) }}
-                            <button v-if="purchaseListIncludes(declaration.id, 2)" type="button" @click='addToPurchaseList(declaration.id, 2)' class="btn btn-primary">Buy</button>
+                            <div class="row">
+                                <div class="col">
+                                    {{ formatNumber(declaration.d[2]) }}
+                                </div>
+                                <div class="col">
+                                    <button v-if="declaration.available[2]" type="button" @click='sendPurchaseIntention(declaration.id, 2)' class="btn btn-primary">Buy</button>
+                                    <p v-if="!declaration.available[2]">Sold</p>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
+            <div class="container justify-content-center">
+                <p style="text-align:center;"><button type="button" @click='doneSpeculating()' class="btn btn-primary">I Finished Speculating</button></p>
+            </div>
         </div>
 
-        <div class="mt-1 mx-5 mp-1" v-if="(game.phase === 3 || game.phase === 8) && player.role === 1 && game.declarations != null">
-            <div class="container justify-content-center">
-                <p style="text-align:center;">Purchase Priority List</p>
-            </div>
-            <table class="table table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Property</th>
-                        <th scope="col">Condition</th>
-                        <th scope="col">Declared Value</th>
-                        <th scope="col">Controls</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="order in player.lotPurchaseList" :key="order.id">
-                        <td>{{ order.name }}</td>
-                        <td>{{ conditionToString(order.condition) }}</td>
-                        <td>{{ formatNumber(order.declaredValue) }}</td>
-                        <td>
-                            <button type="button" @click='moveUp(order.id, order.condition)' class="btn btn-success">Up</button>
-                            <button type="button" @click='moveDown(order.id, order.condition)' class="btn btn-warning">Down</button>
-                            <button type="button" @click='removeFromPurchaseList(order.id, order.condition)' class="btn btn-error">Remove</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="5">
-                            <button type="button" @click='submitPurchaseList()' class="btn btn-danger">Submit Purchase List</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
     </div>
 </template>
 <script>
@@ -157,6 +149,7 @@
     export default {
         data() {
             return {
+                updateSpeculationTable: 0,
                 firstConnection: true,
                 connection: null,
                 lastThreeMessages: [],
@@ -188,23 +181,25 @@
             window.addEventListener("load", this.openWebSocket);
         },
         methods: {
-            addToPurchaseList(id, condition) {
-                //TODO
+            sendPurchaseIntention(id, condition) {
+                const self = this;
+
+                self.sendMessage({
+                    "gameId": self.game.id,
+                    "type": "purchase-lot",
+                    "lot": {
+                        "id": id,
+                        "condition": condition
+                    }
+                });
             },
-            moveUp(id, condition) {
-                //TODO
-            },
-            moveDown(id, condition) {
-                //TODO
-            },
-            removeFromPurchaseList(id, condition) {
-                //TODO
-            },
-            purchaseListIncludes(id, condition) {
-                //TODO
-            },
-            submitPurchaseList() {
-                //TODO
+            doneSpeculating() {
+                const self = this;
+
+                self.sendMessage({
+                    "gameId": self.game.id,
+                    "type": "done-speculating"
+                });
             },
             conditionToString(c) {
                 return conditionMap[c];
@@ -234,7 +229,10 @@
 
                     if (ev.type === "event") {
                         //TODO: give structure to this logic
-                        switch(ev.eventType) {
+                        console.log(`New event: ${ev.eventType}`);
+                        console.log(ev.data);
+
+                        switch(ev.eventType) {    
                             case "assign-name":
                                 self.player.name = ev.data.name;
                                 self.player.title = ev.data.name;
@@ -247,20 +245,37 @@
                                 self.player.title += ` (${roleMap[ev.data.role]})`;
                                 self.player.balance = ev.data.balance;
                                 self.player.shares = ev.data.shares;
-                                self.player.property = ev.data.property;
-                                self.player.declaration[0] = ev.data.property.v[0];
-                                self.player.declaration[1] = ev.data.property.v[1];
-                                self.player.declaration[2] = ev.data.property.v[2];
-                                console.log(ev.data.property);
+                                if (ev.data.property != null) {
+                                    self.player.property = ev.data.property;
+                                    self.player.declaration[0] = ev.data.property.v[0];
+                                    self.player.declaration[1] = ev.data.property.v[1];
+                                    self.player.declaration[2] = ev.data.property.v[2];
+                                    console.log(ev.data.property);
+                                }
                                 break;
                             case "phase-transition":
                                 self.game.round = ev.data.round;
                                 self.game.phase = ev.data.phase;
                                 break;
                             case "declarations-published":
-                                self.game.declarations = ev.data.declarations;
+                                self.game.declarations = ev.data;
+                                console.log(self.game.declarations);
                                 //TODO
                                 break;
+                            case "lot-sold-to-speculator": {
+                                const declaration = self.game.declarations.find(d => d.id === ev.data.id);
+
+                                if (declaration != null) {
+                                    declaration.available[ev.data.condition] = false;
+                                    console.log(`Property ${declaration.name} is not available any more under condition ${conditionMap[ev.data.condition]}`);
+                                } else {
+                                    console.error(`Declaration ${ev.data.id} not found.`);
+                                }
+
+                                self.updateSpeculationTable ++;
+
+                                break;
+                            }
                             default:
                                 console.error(`Type ${ev.type} was not understood`);
                         }
