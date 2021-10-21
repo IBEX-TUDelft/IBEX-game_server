@@ -7,7 +7,7 @@ export default {
             game: game,
             wss: wss,
             onEnter: async function () {
-                console.log('PHASE 3');
+                console.log('PHASE 8');
 
                 const self = this;
 
