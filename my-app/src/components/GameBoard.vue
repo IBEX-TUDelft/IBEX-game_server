@@ -367,6 +367,16 @@
 
                                 break;
                             }
+                            case "tax-income":
+                                self.pushMessage("info", `You have made a tax income of ${ev.data.amount}`);
+                                break;
+                            case "total-profit":
+                                if (ev.data.amount >= 0) {
+                                    self.pushMessage("success", `You have made a total profit of ${ev.data.amount}`);
+                                } else {
+                                    self.pushMessage("error", `You have made a total loss of ${-ev.data.amount}`);
+                                }
+                                break;
                             default:
                                 console.error(`Type ${ev.type} was not understood`);
                         }

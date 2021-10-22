@@ -78,6 +78,7 @@ export default {
                 gamePlayers.forEach(p => {
                     p.shares = parseInt(p.shares);
                     p.balance = parseInt(p.balance);
+                    p.game_id = parseInt(p.game_id);
                 })
 
                 gameData.parameters.total_players = gameData.parameters.speculators_count + gameData.parameters.owners_count + gameData.parameters.developers_count;

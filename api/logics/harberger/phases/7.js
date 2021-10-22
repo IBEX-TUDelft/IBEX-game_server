@@ -11,17 +11,20 @@ export default {
 
                 const self = this;
 
+                
                 self.wss.broadcastInfo(self.game.id, 'Wait for the developers and the owners to declare their property public values', 1);
                 self.wss.broadcastInfo(self.game.id, 'Declare the values you assign to your property under each condition', 2);
                 self.wss.broadcastInfo(self.game.id, 'Declare the values you assign to your property under each condition', 3);
 
-                console.log(this.game.players);
+                this.game.properties.forEach(p => {
+                    p.d = null;
+                });
             },
             onExit: async function () {
                 
             },
             testComplete: async function () {
-                return game.properties.find(p => p.d == null) == null; //true when all properties have a declaration
+                return this.game.properties.find(p => p.d == null) == null; //true when all properties have a declaration
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);

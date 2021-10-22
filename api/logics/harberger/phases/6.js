@@ -18,7 +18,7 @@ export default {
 
                 setTimeout(() => {
                     self.complete = true;
-                }, 60000 * 5);
+                }, 60000 * 1);
             },
             onExit: async function () {
             },
