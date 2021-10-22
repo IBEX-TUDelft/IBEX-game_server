@@ -6,20 +6,33 @@ export default {
         const phase = {
             game: game,
             wss: wss,
+            complete: false,
             onEnter: async function () {
                 console.log('PHASE 5');
 
                 const self = this;
 
-                self.wss.broadcastInfo(self.game.id, 'Prepare for the trading phase');
+                this.game.players.forEach(player => {
+                    self.wss.sendEvent(
+                        self.game.id,
+                        player.number,
+                        "value-signals",
+                        {
+                            "signals": player.S
+                        }
+                    );
+                });
 
-                //TODO
-                // 1. calculate signal, send to each trader
+                self.wss.broadcastInfo(self.game.id, `Prepare for the trading phase`);
+
+                setTimeout(() => {
+                    self.complete = true;
+                }, 5000);
             },
             onExit: async function () {
             },
             testComplete: async function () {
-                return false;
+                return this.complete;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);

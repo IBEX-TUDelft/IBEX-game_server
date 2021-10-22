@@ -75,6 +75,11 @@ export default {
 
                 const gamePlayers = await gamePlayerRepository.findByGameId(gameRecord.id);
 
+                gamePlayers.forEach(p => {
+                    p.shares = parseInt(p.shares);
+                    p.balance = parseInt(p.balance);
+                })
+
                 gameData.parameters.total_players = gameData.parameters.speculators_count + gameData.parameters.owners_count + gameData.parameters.developers_count;
 
                 if (gamePlayers.length != gameData.parameters.total_players) {

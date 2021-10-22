@@ -23,6 +23,8 @@ export default {
         data.type = 'Harberger';
 
         data.players.forEach(player => {
+            player.S = [0, 0, 0];
+
             if (player.role != 2 && player.role != 3) {
                 console.log(`Not assigning a property to ${player.name}, because its role (${player.role}, ${typeof player.role}) is not 2 or 3`);
                 return;
@@ -87,6 +89,33 @@ export default {
 
             data.properties.push(property);
         });
+
+        data.V = [0, 0, 0];
+
+        data.properties.forEach(p => {
+            for (let j = 0; j < 3; j++) {
+                data.V[j] += p.v[j];
+            }    
+        });
+
+        console.log(`V = ${data.V}`);
+
+        //TODO: for the moment the signals are pregenerated and last for the whole game. Shall we regenerate them at each turn?
+        for (let i = 0; i < data.players.length; i++) {
+            const player = data.players[i];
+
+            for (let j = 0; j < 3; j++) {
+                const delta = (data.parameters.signal_high - data.parameters.signal_low) * Math.random();
+
+                const coefficient = data.parameters.signal_low + delta;
+
+                console.log(`delta1 = ${delta}, coefficient1 = ${coefficient}`);
+
+                player.S[j] = Math.round(data.V[j] * coefficient);
+            }
+
+            console.log(`${player.name} S = ${player.S}`);
+        }
 
         return {
             phases: [Phase0, Phase1, Phase2, Phase3, Phase4,

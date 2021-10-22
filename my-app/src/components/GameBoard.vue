@@ -11,10 +11,10 @@
                     </b-navbar-brand>
                 </div>
                 <b-navbar-nav class="ml-auto">
-                    <b-nav-item active >Round: {{ game.round }}</b-nav-item>
-                    <b-nav-item active >Phase: {{ game.phase }}</b-nav-item>
                     <b-nav-item active v-if="game.phase === 6">Balance: {{ player.balance }}</b-nav-item>
                     <b-nav-item active v-if="game.phase === 6">Shares: {{ player.shares }}</b-nav-item>
+                    <b-nav-item active >Round: {{ game.round }}</b-nav-item>
+                    <b-nav-item active >Phase: {{ game.phase }}</b-nav-item>
                 </b-navbar-nav>
             </b-navbar>
         </div>
@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <div class="mt-1 mx-5 mp-1" v-if="game.phase > 0 && player.role > 1">
+        <div class="mt-1 mx-5 mp-1" v-if="![0,6,9].includes(game.phase) && player.role > 1">
             <div class="container justify-content-center">
                 <p style="text-align:center;">Your Property Values Under Different Conditions</p>
             </div>
@@ -123,9 +123,34 @@
             </div>
         </div>
 
+        <div class="mt-1 mx-5 mp-1" v-if="game.phase === 6 && player.signals != null">
+            <div class="container justify-content-center">
+                <p style="text-align:center;">Signals</p>
+            </div>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">No Project</th>
+                        <th scope="col">Project A</th>
+                        <th scope="col">Project B</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ formatNumber(player.signals[0]) }}</td>
+                        <td>{{ formatNumber(player.signals[1]) }}</td>
+                        <td>{{ formatNumber(player.signals[2]) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <DoubleAuctionMarket v-if="game.phase === 6 && player.signals != null" ref="doubleAuctionMarket" />
     </div>
 </template>
 <script>
+    import DoubleAuctionMarket from './DoubleAuctionMarket.vue';
+
     const roleMap = {
         1: "Speculator",
         2: "Developer",
@@ -133,6 +158,7 @@
     };
 
     const styleMap = {
+        "success": "alert-success",
         "info": "alert-secondary",
         "notice": "alert-primary",
         "warning": "alert-warning",
@@ -164,17 +190,18 @@
                 player: {
                     title: "Joining ...",
                     name: "",
+                    number: 0,
                     recoveryString: null,
                     role: null,
                     balance: 0,
                     shares: 0,
                     property: null,
-                    declaration: [0, 0, 0],
-                    lotPurchaseList: null
+                    declaration: [0, 0, 0]
                 },
             };
         },
         components: {
+            DoubleAuctionMarket
         },
         name: 'GameBoard',
         created() {
@@ -210,7 +237,11 @@
                 self.sendMessage({
                     "gameId": self.game.id,
                     "type": "declare",
-                    "declaration": self.player.declaration
+                    "declaration": [
+                        parseInt(self.player.declaration[0]),
+                        parseInt(self.player.declaration[1]),
+                        parseInt(self.player.declaration[2])
+                    ]
                 });
             },
             formatNumber(num) {
@@ -218,6 +249,22 @@
             },
             sendMessage(msg) {
                 this.connection.send(JSON.stringify(msg));
+            },
+            pushMessage(type, content) {
+                const self = this;
+
+                self.messages.push({
+                    id: self.messages.length,
+                    type: type,
+                    message: content,
+                    style: styleMap[type]
+                });
+
+                if (self.lastThreeMessages.length < 3) {
+                    self.lastThreeMessages = [self.messages[self.messages.length - 1], ...self.lastThreeMessages];
+                } else if (self.lastThreeMessages.length >= 3) {
+                    self.lastThreeMessages = [self.messages[self.messages.length - 1], self.lastThreeMessages[0], self.lastThreeMessages[1]];
+                }
             },
             openWebSocket() {
                 const self = this;
@@ -236,6 +283,7 @@
                             case "assign-name":
                                 self.player.name = ev.data.name;
                                 self.player.title = ev.data.name;
+                                self.player.number = ev.data.number;
                                 self.player.recoveryString = ev.data.recoveryString;
                                 self.game.ruleset = ev.data.ruleset;
                                 console.log('Recovery string: ' + self.player.recoveryString);
@@ -276,22 +324,54 @@
 
                                 break;
                             }
+                            case "speculation-with-profit": {
+                                let msgContent = "";
+                                let msgType = ""
+
+                                if (ev.data.profit > 0) {
+                                    msgType = "success";
+                                    msgContent = `You have just realised a profit of ${ev.data.profit} on the speculation on ${ev.data.property.name}`;
+                                } else {
+                                    msgType = "warning";
+                                    msgContent = `You have just realised a loss of ${-ev.data.profit} on the speculation on ${ev.data.property.name}`;
+                                }
+
+                                self.pushMessage(msgType, msgContent);
+                                break;
+                            }
+                            case "value-signals": {
+                                self.player.signals = ev.data.signals;
+                                self.pushMessage("info", `Your signals: ${ev.data.signals}`);
+                                break;
+                            }
+                            case "add-order":
+                                self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "add");
+                                break;
+                            case "delete-order":
+                                self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "delete");
+                                break;
+                            case "update-order":
+                                self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "update");
+                                break;
+                            case "asset-movement": {
+                                self.player.balance = ev.data.balance;
+                                self.player.shares = ev.data.shares;
+
+                                const movement = ev.data.movement;
+
+                                if (movement.type == "purchase") {
+                                    self.pushMessage("info", `Your bought ${movement.quantity} at ${movement.price} per shares for a total of ${movement.total}`);
+                                } else if (movement.type == "sale") {
+                                    self.pushMessage("info", `Your sold ${movement.quantity} at ${movement.price} per shares for a total of ${movement.total}`);
+                                }
+
+                                break;
+                            }
                             default:
                                 console.error(`Type ${ev.type} was not understood`);
                         }
-                    } else { //it is a mesasge
-                        self.messages.push({
-                            id: self.messages.length,
-                            type: ev.type,
-                            message: ev.message,
-                            style: styleMap[ev.type]
-                        });
-
-                        if (self.lastThreeMessages.length < 3) {
-                            self.lastThreeMessages = [self.messages[self.messages.length - 1], ...self.lastThreeMessages];
-                        } else if (self.lastThreeMessages.length >= 3) {
-                            self.lastThreeMessages = [self.messages[self.messages.length - 1], self.lastThreeMessages[0], self.lastThreeMessages[1]];
-                        }
+                    } else { //it is a message
+                        self.pushMessage(ev.type, ev.message);
                     }
                 }
 

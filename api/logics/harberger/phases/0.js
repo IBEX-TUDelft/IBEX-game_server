@@ -65,6 +65,7 @@ export default {
 
                         WS.sendEvent(ws, "assign-name", {
                             "name" : player.name,
+                            "number": player.number,
                             "recoveryString": player.recovery,
                             "ruleset": self.game.type
                         });
