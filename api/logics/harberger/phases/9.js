@@ -28,15 +28,8 @@ export default {
 
                 // b. determine the winning condition
 
-                let winningCondition = null;
-                let winningSum = 0;
-
-                for(let j = 0; j < 3; j++) {
-                    if (self.game.D[j] > winningSum) {
-                        winningSum = self.game.D[j];
-                        winningCondition = j;
-                    }
-                }
+                let winningCondition = self.game.winningCondition;
+                let winningSum = self.game.D[winningCondition];;
 
                 console.log(`The winning condition is ${winningCondition}, with a sum of ${winningSum}. Here the full list: ${self.game.D}`);
 

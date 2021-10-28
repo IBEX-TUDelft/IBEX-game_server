@@ -89,7 +89,7 @@
                                 </div>
                                 <div class="col">
                                     <button v-if="declaration.available[0]" type="button" @click='sendPurchaseIntention(declaration.id, 0)' class="btn btn-primary">Buy</button>
-                                    <p v-if="!declaration.available[0]">Sold</p>
+                                    <p v-if="!declaration.available[0]">Unavailable</p>
                                 </div>
                             </div>
                         </td>
@@ -100,7 +100,7 @@
                                 </div>
                                 <div class="col">
                                     <button v-if="declaration.available[1]" type="button" @click='sendPurchaseIntention(declaration.id, 1)' class="btn btn-primary">Buy</button>
-                                    <p v-if="!declaration.available[1]">Sold</p>
+                                    <p v-if="!declaration.available[1]">Unavailable</p>
                                 </div>
                             </div>
                         </td>
@@ -111,7 +111,7 @@
                                 </div>
                                 <div class="col">
                                     <button v-if="declaration.available[2]" type="button" @click='sendPurchaseIntention(declaration.id, 2)' class="btn btn-primary">Buy</button>
-                                    <p v-if="!declaration.available[2]">Sold</p>
+                                    <p v-if="!declaration.available[2]">Unavailable</p>
                                 </div>
                             </div>
                         </td>
@@ -377,7 +377,7 @@
                                 }
                                 break;
                             case "round-end":
-                                self.round.phase = "-";
+                                self.game.round.phase = "-";
                                 break;
                             default:
                                 console.error(`Type ${ev.type} was not understood`);
