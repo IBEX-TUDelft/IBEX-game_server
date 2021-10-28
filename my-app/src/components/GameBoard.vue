@@ -377,7 +377,7 @@
                                 }
                                 break;
                             case "round-end":
-                                self.game.round.phase = "-";
+                                self.game.phase = "-";
                                 break;
                             default:
                                 console.error(`Type ${ev.type} was not understood`);
