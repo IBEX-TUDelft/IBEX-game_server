@@ -18,7 +18,8 @@ export default {
                         player.number,
                         "value-signals",
                         {
-                            "signals": player.S
+                            "signals": player.S,
+                            "condition": self.game.winningCondition
                         }
                     );
                 });
@@ -28,6 +29,9 @@ export default {
                 setTimeout(() => {
                     self.complete = true;
                 }, 5000);
+            },
+            getData() {
+                return {};
             },
             onExit: async function () {
             },

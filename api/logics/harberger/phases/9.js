@@ -6,6 +6,7 @@ export default {
         const phase = {
             game: game,
             wss: wss,
+            complete: false,
             onEnter: async function () {
                 console.log('PHASE 9');
 
@@ -187,11 +188,24 @@ export default {
                         }
                     );
                 });
+
+                setTimeout(() => {
+                    self.complete = true;
+                }, 15000);
+            },
+            getData() {
+                return this.game.players.map(p => {
+                    return {
+                        "id": p.id,
+                        "name": p.name,
+                        "profit": p.profit,
+                    }
+                });
             },
             onExit: async function () {
             },
             testComplete: async function () {
-                return false;
+                return this.complete;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);

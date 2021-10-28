@@ -37,6 +37,9 @@ export default {
 
                 console.log(this.game.players);
             },
+            getData() {
+                return {}
+            },            
             onExit: async function () {
                 
             },

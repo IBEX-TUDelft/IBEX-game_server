@@ -44,6 +44,15 @@ export default {
                     console.log(err);
                 }
             },
+            getData() {
+                return game.properties.map(p => {
+                    return {
+                        "id": p.id,
+                        "name": p.name,
+                        "speculators": p.speculators,
+                    }
+                });
+            },
             onExit: async function () {
             },
             testComplete: async function () {

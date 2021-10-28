@@ -24,13 +24,17 @@ export default {
                     const property = p.property;
 
                     if (property != null) {
-                        declatationData.push({
+                        const declaration = {
                             "id": property.id,
                             "name": property.name,
                             "owner": p.name,
                             "d": property.d,
-                            "available": [true, true, true]
-                        });
+                            "available": [false, false, false]
+                        };
+
+                        declaration.available[self.game.winningCondition] = true;
+
+                        declatationData.push(declaration);
                     }
                 });
 
@@ -43,6 +47,15 @@ export default {
                 if (err != null) {
                     console.log(err);
                 }
+            },
+            getData() {
+                return game.properties.map(p => {
+                    return {
+                        "id": p.id,
+                        "name": p.name,
+                        "speculators": p.speculators,
+                    }
+                });
             },
             onExit: async function () {
             },

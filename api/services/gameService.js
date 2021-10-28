@@ -153,5 +153,39 @@ export default {
                 "params": [gameId]
             }
         ]);
+    },
+    addPhaseData: async function(roundId, phaseNumber, phaseData) {
+        try {
+            const round = await gameRoundRepository.findById(roundId);
+
+            if (round == null) {
+                return `Round ${roundId} not found`;
+            }
+
+            const currentData = JSON.parse(round.data);
+
+            if (currentData.phases == null) {
+                currentData.phases = [];
+            }
+
+            currentData.phases.push({
+                "number": phaseNumber,
+                "data": phaseData
+            });
+
+            await gameRoundRepository.updateDataById(roundId, currentData);
+        } catch (e) {
+            console.error(`Could not update data of round ${roundId}`, e);
+            if (round != null) {
+                console.error('Previous data:');
+                console.error(round.data);
+            }
+            console.error('Data to be integrated:');
+            console.error(phaseData);
+
+            return e.message;
+        }
+
+        return null;
     }
 }

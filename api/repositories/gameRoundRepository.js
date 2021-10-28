@@ -22,7 +22,16 @@ export default {
         port: process.env.VUE_APP_PGPORT
     }),
     queries: {
-        "deleteByGameId": "DELETE FROM game_rounds WHERE game_id = $1;"
+        "deleteByGameId": "DELETE FROM game_rounds WHERE game_id = $1;",
+        "findById": `SELECT 
+                round_number as number,
+                phase_number as phase,
+                game_id as gameId,
+                updated_at as updatedAt,
+                round_data as data 
+            FROM game_rounds 
+            WHERE id = $1;`,
+        "updateDataById": "UPDATE game_rounds SET round_data = $2 WHERE id = $1;"
     },
     create: async function(parameters) {
         if (parameters == null) {
@@ -36,12 +45,14 @@ export default {
                 round_number,
                 phase_number,
                 game_id,
-                updated_at
+                updated_at,
+                round_data
             ) VALUES (
                 '${parameters.number}',
                 '${parameters.phase}',
                 '${parameters.gameId}',
-                CURRENT_TIMESTAMP
+                CURRENT_TIMESTAMP,
+                '{}'
             ) RETURNING id;`,
                 (err, res) => {
                     if (err) {
@@ -51,6 +62,29 @@ export default {
                     }
                 }
             );
+        });
+    },
+    findById: async function(id) {
+        return await new Promise((resolve, reject) => {
+            this.pool.query(`SELECT 
+            round_number as number,
+            phase_number as phase,
+            game_id as gameId,
+            updated_at as updatedAt,
+            round_data as data
+        FROM game_rounds WHERE id = ${id};`, (err, res) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    if (res.rows.length === 0) {
+                        reject(`Round ${id} not found`);
+                    } else if (res.rows.length > 1) {
+                        reject(`Round ${id} matched ${res.rows.length} records, one only was expected. Check the database`);
+                    } else {
+                        resolve(res.rows[0]);
+                    }
+                }
+            });
         });
     },
     findByGameId: async function(gameId) {

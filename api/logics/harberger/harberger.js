@@ -1,4 +1,5 @@
 import gameRoundRepository from "../../repositories/gameRoundRepository.js";
+import gameService from "../../services/gameService.js";
 import Utils from '../../helpers/utils.js';
 import WS from '../../helpers/websocket.js';
 import Phase0 from './phases/0.js';
@@ -154,6 +155,12 @@ export default {
                 }
 
                 await this.data.currentPhase.onExit();
+
+                await gameService.addPhaseData(
+                    this.data.currentRound.id,
+                    this.data.currentRound.phase,
+                    this.data.currentPhase.getData()
+                );
 
                 if (this.data.currentRound.phase == 9) {
                     this.wss.broadcastEvent(data.id, "round-end", {

@@ -26,6 +26,15 @@ export default {
             testComplete: async function () {
                 return this.game.properties.find(p => p.d == null) == null; //true when all properties have a declaration
             },
+            getData() {
+                return game.properties.map(p => {
+                    return {
+                        "id": p.id,
+                        "name": p.name,
+                        "declarations": p.d,
+                    }
+                });
+            },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
 

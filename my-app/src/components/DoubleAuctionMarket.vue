@@ -37,7 +37,7 @@
                             <td>{{ formatNumber(ask.quantity) }}</td>
                             <td>
                                 <button v-if="ask.sender == $parent.player.number" type="button" @click='removeOrder(ask.id)' class="btn btn-danger">Remove</button>
-                                <button v-if="ask.sender != $parent.player.number" type="button" @click='actuateOrder(ask.id, "ask")' class="btn btn-primary">Buy</button>
+                                <button v-if="ask.sender != $parent.player.number" type="button" @click='fillOrder(ask.id, "ask")' class="btn btn-primary">Buy</button>
                             </td>
                         </tr>
                     </tbody>
@@ -81,7 +81,7 @@
                             <td>{{ formatNumber(bid.quantity) }}</td>
                             <td>
                                 <button v-if="bid.sender == $parent.player.number" type="button" @click='removeOrder(bid.id)' class="btn btn-danger">Remove</button>
-                                <button v-if="bid.sender != $parent.player.number" type="button" @click='actuateOrder(bid.id, "bid")' class="btn btn-primary">Sell</button>
+                                <button v-if="bid.sender != $parent.player.number" type="button" @click='fillOrder(bid.id, "bid")' class="btn btn-primary">Sell</button>
                             </td>
                         </tr>
                     </tbody>
@@ -120,7 +120,7 @@ export default {
                 }
             });
         },
-        actuateOrder(id, type) {
+        fillOrder(id, type) {
             //let list;
 
             console.log(id);

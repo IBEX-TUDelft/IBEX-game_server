@@ -6,6 +6,8 @@ export default {
         const phase = {
             game: game,
             wss: wss,
+            orderList: [],
+            movementList: [],
             orders: [],
             nextOrderId: 1,
             complete: false,
@@ -18,12 +20,20 @@ export default {
 
                 setTimeout(() => {
                     self.complete = true;
-                }, 60000 * 1);
+                }, 60000 * 5); //TODO use the configuration
             },
             onExit: async function () {
             },
             testComplete: async function () {
                 return this.complete;
+            },
+            getData() {
+                const self = this;
+
+                return {
+                    "orders": self.orderList,
+                    "movements": self.movementList
+                };
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
@@ -72,6 +82,14 @@ export default {
                         console.log(message);
                         console.log(order);
 
+                        self.orderList.push({
+                            "id": self.nextOrderId + 1,
+                            "sender": player.number,
+                            "price": order.price,
+                            "quantity": order.quantity,
+                            "type": order.type
+                        });
+                        
                         const result = self.fulfillOrder(order, player.number);
 
                         if (result.type == "error") {
@@ -120,6 +138,11 @@ export default {
                         }
 
                         const err = self.removeOrder (order.id);
+
+                        self.orderList.push({
+                            "id": message.order.id,
+                            "type": "cancel"
+                        });
 
                         if (err != null) {
                             WS.error(ws, err);
@@ -315,6 +338,8 @@ export default {
                 }
             },
             transferShares (from, to, quantity, price) {
+                const self = this;
+
                 const fromPlayer = this.game.players.find(p => p.number === from);
 
                 if (fromPlayer == null) {
@@ -375,6 +400,25 @@ export default {
                         "shares" : toPlayer.shares
                     }
                 );
+
+                this.movementList.push({
+                    "movement": {
+                        "order": self.orderList[self.orderList.length - 1],
+                        "quantity": quantity,
+                        "price": price,
+                        "total": quantity * price
+                    },
+                    "from": {
+                        "number": fromPlayer.number,
+                        "balance": fromPlayer.balance,
+                        "shares" : fromPlayer.shares
+                    },
+                    "to": {
+                        "number": toPlayer.number,
+                        "balance": toPlayer.balance,
+                        "shares" : toPlayer.shares
+                    }
+                });
 
                 console.log(fromPlayer);
                 console.log(toPlayer);

@@ -17,6 +17,9 @@ export default {
             testComplete: async function () {
                 return this.game.assignedPlayers === this.game.parameters.total_players;
             },
+            getData() {
+                return game.players;
+            },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
 

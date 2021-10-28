@@ -307,8 +307,6 @@
                                 break;
                             case "declarations-published":
                                 self.game.declarations = ev.data;
-                                console.log(self.game.declarations);
-                                //TODO
                                 break;
                             case "lot-sold-to-speculator": {
                                 const declaration = self.game.declarations.find(d => d.id === ev.data.id);
@@ -341,6 +339,7 @@
                             }
                             case "value-signals": {
                                 self.player.signals = ev.data.signals;
+                                self.game.winningCondition = ev.data.condition;
                                 self.pushMessage("info", `Your signals: ${ev.data.signals}`);
                                 break;
                             }
@@ -376,6 +375,9 @@
                                 } else {
                                     self.pushMessage("error", `You have made a total loss of ${-ev.data.amount}`);
                                 }
+                                break;
+                            case "round-end":
+                                self.round.phase = "-";
                                 break;
                             default:
                                 console.error(`Type ${ev.type} was not understood`);

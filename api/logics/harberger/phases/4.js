@@ -36,6 +36,8 @@ export default {
                     }
                 }
 
+                this.game.winningCondition = winningCondition;
+                
                 console.log(`The winning condition is ${winningCondition}, with a sum of ${winningSum}. Here the full list: ${self.game.D}`);
 
                 // 3. resell lot under that condition
@@ -142,6 +144,9 @@ export default {
                 setTimeout(() => {
                     self.complete = true;
                 }, 5000);
+            },
+            getData() {
+                return {};
             },
             onExit: async function () {
                 this.game.players.filter(p => p.role === 1).forEach(p => { p.doneSpeculating = false; });
