@@ -218,6 +218,26 @@ export default {
                         }
                     );
 
+                    const taxProfit = Math.round(taxPot * player.shares / totalShares + player.balance - self.game.parameters.owner_balance);
+
+                    const taxProfitBill = {
+                        "round": self.game.currentRound.number,
+                        "phase": 9,
+                        "condition": winningCondition,
+                        "owner": player.number,
+                        "role": player.role,
+                        "taxes": 0,
+                        "snipeProfit": (player.role === 1 ? taxProfit : 0),
+                        "total": (player.role === 1 ? 0: taxProfit)
+                    }
+
+                    self.wss.sendEvent(
+                        self.game.id,
+                        player.number,
+                        "profit",
+                        taxProfitBill
+                    );
+
                     console.log(player.profit);
                 });
 
