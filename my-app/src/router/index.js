@@ -4,8 +4,10 @@ import Dashboard from '../components/Dashboard.vue'
 import Login from '../components/Login.vue';
 import CreateGame from '../components/CreateGame.vue';
 import GameMasterBoard from '../components/GameMasterBoard';
-import GameBoard from '../components/GameBoard';
+//import GameBoard from '../components/GameBoard';
+import GameBoardChicago from '../components/GameBoardChicago';
 import GameLobby from '../components/GameLobby';
+import GameAnalysis from '../components/GameAnalysis';
 
 Vue.use(VueRouter)
 
@@ -42,12 +44,17 @@ const routes = [
   {
     path: '/board/:id',
     name: 'Game Board',
-    component: GameBoard
+    component: GameBoardChicago
   },
   {
     path: '/lobby',
     name: 'Game Lobby',
     component: GameLobby
+  },
+  {
+    path: '/analyse/:id',
+    name: 'Game Analysis',
+    component: GameAnalysis
   }
 ]
 

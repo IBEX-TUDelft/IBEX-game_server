@@ -12,6 +12,37 @@ export default {
 
                 const self = this;
 
+                const boundaries = {
+                    developer: {
+                        noProject: {
+                            low: self.game.parameters.developer_no_project_low,
+                            high: self.game.parameters.developer_no_project_high
+                        },
+                        projectA: {
+                            low: self.game.parameters.developer_project_a_low,
+                            high: self.game.parameters.developer_project_a_high
+                        },
+                        projectB: {
+                            low: self.game.parameters.developer_project_b_low,
+                            high: self.game.parameters.developer_project_b_high
+                        }
+                    },
+                    owner: {
+                        noProject: {
+                            low: self.game.parameters.owner_no_project_low,
+                            high: self.game.parameters.owner_no_project_high
+                        },
+                        projectA: {
+                            low: self.game.parameters.owner_project_a_low,
+                            high: self.game.parameters.owner_project_a_high
+                        },
+                        projectB: {
+                            low: self.game.parameters.owner_project_b_low,
+                            high: self.game.parameters.owner_project_b_high
+                        }
+                    }
+                }
+
                 for (let i = 0; i < this.game.players.length; i++) {
                     const player = this.game.players[i];
 
@@ -19,7 +50,9 @@ export default {
                         "role": player.role,
                         "balance": player.balance,
                         "shares": player.shares,
-                        "property": player.property
+                        "property": player.property,
+                        "boundaries": boundaries,
+                        "taxRate": self.game.parameters.tax_rate_initial
                     });
 
                     if (err != null) {

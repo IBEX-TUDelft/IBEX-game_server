@@ -20,7 +20,7 @@ export default {
 
                 setTimeout(() => {
                     self.complete = true;
-                }, 60000 * 5); //TODO use the configuration
+                }, 6000 * 5); //TODO use the configuration
             },
             onExit: async function () {
             },
@@ -398,6 +398,16 @@ export default {
                         },
                         "balance": toPlayer.balance,
                         "shares" : toPlayer.shares
+                    }
+                );
+
+                self.wss.broadcastEvent (
+                    self.game.id,
+                    "contract-fulfilled",
+                    {
+                        "from": fromPlayer.number,
+                        "to": toPlayer.number,
+                        "price": price
                     }
                 );
 

@@ -18,7 +18,7 @@ export default {
                 self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 2);
                 self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 3);
 
-                const declatationData = [];
+                const declarationData = [];
 
                 game.players.forEach(p => {
                     const property = p.property;
@@ -28,20 +28,31 @@ export default {
                             "id": property.id,
                             "name": property.name,
                             "owner": p.name,
+                            "role": p.role,
+                            "number": p.number,
                             "d": property.d,
                             "available": [false, false, false]
                         };
 
                         declaration.available[self.game.winningCondition] = true;
 
-                        declatationData.push(declaration);
+                        console.log('Winning condition declaration made available for sniping');
+
+                        declarationData.push(declaration);
+
+                        console.log('Declaration pushed');
                     }
                 });
+
+                console.log('Broadcasting declarations');
 
                 const err = self.wss.broadcastEvent(
                     game.id,
                     "declarations-published",
-                    declatationData
+                    {
+                        "declarations": declarationData,
+                        "winningCondition": self.game.winningCondition
+                    }
                 );
 
                 if (err != null) {
@@ -145,6 +156,46 @@ export default {
                         }
 
                         console.log(`Player ${player.name} is done speculating`);
+
+                        console.log(message.snipe);
+                        console.log(typeof message.snipe);
+                        console.log(Array.isArray(message.snipe));
+                        console.log(message.snipe.length);
+
+                        if (message.snipe != null && message.snipe.length > 0) {
+                            message.snipe.forEach(id => {
+                                const lot = self.game.properties.find(p => p.id === id);
+
+                                if (lot == null) {
+                                    WS.error(ws, `Game ${message.gameId}: lot ${id}} not found`);
+                                    console.log(`Game ${message.gameId}: lot ${id}} not found`);
+                                    return;
+                                }
+        
+                                if (lot.speculators == null) {
+                                    lot.speculators = [null, null, null];
+                                }
+        
+                                if (lot.speculators[self.game.winningCondition] != null) {
+                                    WS.error(ws, `Game ${message.gameId}: lot ${id} is not for sale any more`);
+                                    console.log(`Game ${message.gameId}: lot ${id} is not for sale any more`);
+                                    return;
+                                }
+        
+                                lot.speculators[self.game.winningCondition] = player.number;
+        
+                                console.log(`Property ${lot.name} was bought by a speculator: ${player.name} under condition ${self.game.winningCondition}`);
+        
+                                self.wss.broadcastEvent (
+                                    game.id,
+                                    "lot-sold-to-speculator",
+                                    {
+                                        "id": lot.id,
+                                        "condition": self.game.winningCondition
+                                    }
+                                );
+                            });
+                        }
 
                         player.doneSpeculating = true;
                     }

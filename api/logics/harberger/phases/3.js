@@ -6,6 +6,7 @@ export default {
         const phase = {
             game: game,
             wss: wss,
+            results: {},
             onEnter: async function () {
                 console.log('PHASE 3');
 
@@ -18,6 +19,35 @@ export default {
                 self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 2);
                 self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 3);
 
+                // 1. calculate D
+
+                self.game.D = [0,0,0];
+
+                self.game.properties.forEach(p => {
+                    for (let j = 0; j < 3; j++) {
+                        self.game.D[j] += p.d[j];
+                    }
+                });
+
+                // 2. determine the winning condition
+
+                let winningCondition = null;
+                let winningSum = 0;
+
+                for(let j = 0; j < 3; j++) {
+                    if (self.game.D[j] > winningSum) {
+                        winningSum = self.game.D[j];
+                        winningCondition = j;
+                    }
+                }
+
+                this.game.winningCondition = winningCondition;
+
+                this.results.winningCondition = winningCondition;
+                
+                console.log(`The winning condition is ${winningCondition}, with a sum of ${winningSum}. Here the full list: ${self.game.D}`);
+
+                // 3. send declarations
                 const declatationData = [];
 
                 game.players.forEach(p => {
@@ -28,6 +58,8 @@ export default {
                             "id": property.id,
                             "name": property.name,
                             "owner": p.name,
+                            "role": p.role,
+                            "number": p.number,
                             "d": property.d,
                             "available": [true, true, true]
                         });
@@ -37,7 +69,10 @@ export default {
                 const err = self.wss.broadcastEvent(
                     game.id,
                     "declarations-published",
-                    declatationData
+                    {
+                        "declarations": declatationData,
+                        "winningCondition": winningCondition
+                    }
                 );
 
                 if (err != null) {
@@ -141,6 +176,46 @@ export default {
                         }
 
                         console.log(`Player ${player.name} is done speculating`);
+
+                        console.log(message.snipe);
+                        console.log(typeof message.snipe);
+                        console.log(Array.isArray(message.snipe));
+                        console.log(message.snipe.length);
+
+                        if (message.snipe != null && message.snipe.length > 0) {
+                            message.snipe.forEach(id => {
+                                const lot = self.game.properties.find(p => p.id === id);
+
+                                if (lot == null) {
+                                    WS.error(ws, `Game ${message.gameId}: lot ${id}} not found`);
+                                    console.log(`Game ${message.gameId}: lot ${id}} not found`);
+                                    return;
+                                }
+        
+                                if (lot.speculators == null) {
+                                    lot.speculators = [null, null, null];
+                                }
+        
+                                if (lot.speculators[self.game.winningCondition] != null) {
+                                    WS.error(ws, `Game ${message.gameId}: lot ${id} is not for sale any more`);
+                                    console.log(`Game ${message.gameId}: lot ${id} is not for sale any more`);
+                                    return;
+                                }
+        
+                                lot.speculators[self.game.winningCondition] = player.number;
+        
+                                console.log(`Property ${lot.name} was bought by a speculator: ${player.name} under condition ${self.game.winningCondition}`);
+        
+                                self.wss.broadcastEvent (
+                                    game.id,
+                                    "lot-sold-to-speculator",
+                                    {
+                                        "id": lot.id,
+                                        "condition": self.game.winningCondition
+                                    }
+                                );
+                            });
+                        }
 
                         player.doneSpeculating = true;
                     }

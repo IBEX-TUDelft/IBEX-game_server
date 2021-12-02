@@ -19,7 +19,8 @@ export default {
                         "value-signals",
                         {
                             "signals": player.S,
-                            "condition": self.game.winningCondition
+                            "condition": self.game.winningCondition,
+                            "taxRate": self.game.parameters.tax_rate_final
                         }
                     );
                 });

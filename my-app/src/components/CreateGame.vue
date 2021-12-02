@@ -159,6 +159,19 @@
             </div>
             <div class="row">
                 <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Status Quo Value (Fixed)</label>
+                </div>
+                <div class="form-group col-md-3">
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="no_project_owner_fixed" name="no_project_owner_fixed" id="no_project_owner_fixed" aria-describedby="emailHelp" placeholder="500000" />
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="no_project_dev_fixed" name="no_project_dev_fixed" id="no_project_dev_fixed" aria-describedby="emailHelp" placeholder="500000" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Status Quo Value (High)</label>
                 </div>
                 <div class="form-group col-md-3">
@@ -186,6 +199,19 @@
             </div>
             <div class="row">
                 <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Project A Value (Fixed)</label>
+                </div>
+                <div class="form-group col-md-3">
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="project_a_owner_fixed" name="project_a_owner_fixed" id="project_a_owner_fixed" aria-describedby="emailHelp" placeholder="500000" />
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="project_a_dev_fixed" name="project_a_dev_fixed" id="project_a_dev_fixed" aria-describedby="emailHelp" placeholder="500000" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Project A Value (High)</label>
                 </div>
                 <div class="form-group col-md-3">
@@ -209,6 +235,19 @@
                 </div>
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="project_b_dev_low" name="project_b_dev_low" id="project_b_dev_low" aria-describedby="emailHelp" placeholder="500000" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Project B Value (Fixed)</label>
+                </div>
+                <div class="form-group col-md-3">
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="project_b_owner_fixed" name="project_b_owner_fixed" id="project_b_owner_fixed" aria-describedby="emailHelp" placeholder="500000" />
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="project_b_dev_fixed" name="project_b_dev_fixed" id="project_b_dev_fixed" aria-describedby="emailHelp" placeholder="500000" />
                 </div>
             </div>
             <div class="row">
@@ -248,29 +287,35 @@ export default {
                 style: "capital"
             }),
             speculators_count: 6,
-            speculator_balance: 500000,
-            speculator_shares: 5000,
+            speculator_balance: 2000,
+            speculator_shares: 5,
             developers_count: 1,
-            developer_balance: 500000,
-            developer_shares: 5000,
+            developer_balance: 2000,
+            developer_shares: 5,
             owners_count: 5,
-            owner_balance: 500000,
-            owner_shares: 5000,
+            owner_balance: 2000,
+            owner_shares: 5,
             round_count: 5,
             game_type: 'harberger',
             minutes_for_trading: 10,
             max_lot_purchases: 3,
             no_project_dev_low: 300000,
+            no_project_dev_fixed: 350000,
             no_project_dev_high: 400000,
             no_project_owner_low: 300000,
+            no_project_owner_fixed: 350000,
             no_project_owner_high: 400000,
             project_a_dev_low: 1000000,
+            project_a_dev_fixed: 1100000,
             project_a_dev_high: 1200000,
             project_a_owner_low: 200000,
+            project_a_owner_fixed: 250000,
             project_a_owner_high: 300000,
             project_b_dev_low: 1500000,
+            project_b_dev_fixed: 1750000,
             project_b_dev_high: 2000000,
             project_b_owner_low: 100000,
+            project_b_owner_fixed: 150000,
             project_b_owner_high: 200000,
             tax_rate_initial: 1,
             tax_rate_final: 25,
@@ -313,14 +358,17 @@ export default {
                     profit: {
                         no_project: {
                             low: this.no_project_dev_low,
+                            fixed: this.no_project_dev_fixed,
                             high: this.no_project_dev_high
                         },
                         project_a: {
                             low: this.project_a_dev_low,
+                            fixed: this.project_a_dev_fixed,
                             high: this.project_a_dev_high
                         },
                         project_b: {
                             low: this.project_b_dev_low,
+                            fixed: this.project_b_dev_fixed,
                             high: this.project_b_dev_high
                         }
                     }
@@ -332,14 +380,17 @@ export default {
                     profit: {
                         no_project: {
                             low: this.no_project_owner_low,
+                            fixed: this.no_project_owner_fixed,
                             high: this.no_project_owner_high
                         },
                         project_a: {
                             low: this.project_a_owner_low,
+                            fixed: this.project_a_owner_fixed,
                             high: this.project_a_owner_high
                         },
                         project_b: {
                             low: this.project_b_owner_low,
+                            fixed: this.project_b_owner_fixed,
                             high: this.project_b_owner_high
                         }
                     }

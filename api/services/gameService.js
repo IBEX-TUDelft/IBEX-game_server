@@ -30,20 +30,26 @@ export default {
             {key: "developer_balance", type: "number", value: gameParameters.developers.balance},
             {key: "developer_shares", type: "number", value: gameParameters.developers.shares},
             {key: "developer_no_project_low", type: "number", value: gameParameters.developers.profit.no_project.low},
+            {key: "developer_no_project_fixed", type: "number", value: gameParameters.developers.profit.no_project.fixed},
             {key: "developer_no_project_high", type: "number", value: gameParameters.developers.profit.no_project.high},
             {key: "developer_project_a_low", type: "number", value: gameParameters.developers.profit.project_a.low},
+            {key: "developer_project_a_fixed", type: "number", value: gameParameters.developers.profit.project_a.fixed},
             {key: "developer_project_a_high", type: "number", value: gameParameters.developers.profit.project_a.high},
             {key: "developer_project_b_low", type: "number", value: gameParameters.developers.profit.project_b.low},
+            {key: "developer_project_b_fixed", type: "number", value: gameParameters.developers.profit.project_b.fixed},
             {key: "developer_project_b_high", type: "number", value: gameParameters.developers.profit.project_b.high},
 
             {key: "owners_count", type: "number", value: gameParameters.owners.count},
             {key: "owner_balance", type: "number", value: gameParameters.owners.balance},
             {key: "owner_shares", type: "number", value: gameParameters.owners.shares},
             {key: "owner_no_project_low", type: "number", value: gameParameters.owners.profit.no_project.low},
+            {key: "owner_no_project_fixed", type: "number", value: gameParameters.owners.profit.no_project.fixed},
             {key: "owner_no_project_high", type: "number", value: gameParameters.owners.profit.no_project.high},
             {key: "owner_project_a_low", type: "number", value: gameParameters.owners.profit.project_a.low},
+            {key: "owner_project_a_fixed", type: "number", value: gameParameters.owners.profit.project_a.fixed},
             {key: "owner_project_a_high", type: "number", value: gameParameters.owners.profit.project_a.high},
             {key: "owner_project_b_low", type: "number", value: gameParameters.owners.profit.project_b.low},
+            {key: "owner_project_b_fixed", type: "number", value: gameParameters.owners.profit.project_b.fixed},
             {key: "owner_project_b_high", type: "number", value: gameParameters.owners.profit.project_b.high}
 
 
@@ -51,6 +57,13 @@ export default {
 
         for (let i = 0; i < parameters.length; i++) {
             const parameter = parameters[i];
+
+            console.log(`${parameter.key} (${parameter.type} vs ${typeof parameter.value}): ${parameter.value}`);
+
+            if (parameter.type === 'number' && (parameter.value == null || parameter.value === "")) {
+                continue;
+            }
+
             parameter.gameId = gameId;
 
             const parameterId = await gameParameterRepository.create(parameter);

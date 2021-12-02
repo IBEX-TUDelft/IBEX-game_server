@@ -6,6 +6,9 @@ export default {
         const phase = {
             game: game,
             wss: wss,
+            results: {
+                declarations: []
+            },
             onEnter: async function () {
                 console.log('PHASE 2');
 
@@ -31,7 +34,7 @@ export default {
                         "declarations": p.d,
                     }
                 });
-            }, 
+            },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
 
@@ -77,6 +80,14 @@ export default {
                         console.log(`New Declaration from ${player.name}`);
                         
                         player.property.d = message.declaration;
+
+                        self.results.declarations.push({
+                            "player": player.number,
+                            "role": player.role,
+                            "value": player.property.v,
+                            "declaration": message.declaration,
+                            "taxes": message.declaration.map(d => d * self.game.parameters.tax_rate_initial / 100)
+                        });
 
                         self.wss.broadcastInfo(game.id, `Player ${player.name} submitted a declaration of values.`, null);
                     }

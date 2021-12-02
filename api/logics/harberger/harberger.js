@@ -50,14 +50,17 @@ export default {
                 value = {
                     noProject: {
                         low: data.parameters.developer_no_project_low,
+                        fixed: data.parameters.developer_no_project_fixed,
                         high: data.parameters.developer_no_project_high
                     },
                     projectA: {
                         low: data.parameters.developer_project_a_low,
+                        fixed: data.parameters.developer_project_a_fixed,
                         high: data.parameters.developer_project_a_high
                     },
                     projectB: {
                         low: data.parameters.developer_project_b_low,
+                        fixed: data.parameters.developer_project_b_fixed,
                         high: data.parameters.developer_project_b_high
                     }
                 }
@@ -65,14 +68,17 @@ export default {
                 value = {
                     noProject: {
                         low: data.parameters.owner_no_project_low,
+                        fixed: data.parameters.owner_no_project_fixed,
                         high: data.parameters.owner_no_project_high
                     },
                     projectA: {
                         low: data.parameters.owner_project_a_low,
+                        fixed: data.parameters.owner_project_a_fixed,
                         high: data.parameters.owner_project_a_high
                     },
                     projectB: {
                         low: data.parameters.owner_project_b_low,
+                        fixed: data.parameters.owner_project_b_fixed,
                         high: data.parameters.owner_project_b_high
                     }
                 }
@@ -83,7 +89,13 @@ export default {
             for (let j = 0; j < 3; j++) {
                 const boundaries = value[conditions[j]];
 
-                const vj = boundaries.low + Math.round((boundaries.high - boundaries.low) / 5000 * Math.random()) * 5000;
+                let vj;
+
+                if (boundaries.fixed != null) {
+                    vj = boundaries.fixed;
+                } else {
+                    vj = boundaries.low + Math.round((boundaries.high - boundaries.low) / 5000 * Math.random()) * 5000;
+                }
 
                 property.v.push(vj);
             }
@@ -124,6 +136,7 @@ export default {
             data: data,
             wss: null,
             phaseCheckingInterval: null,
+            results: [],
             pushMessage: async function(ws, message) {
                 if (message.type === 'watch') {
                     const verification = Utils.verifyJWT(message.token);
@@ -155,6 +168,8 @@ export default {
                 }
 
                 await this.data.currentPhase.onExit();
+
+                this.results.push(this.data.currentPhase.results);
 
                 await gameService.addPhaseData(
                     this.data.currentRound.id,

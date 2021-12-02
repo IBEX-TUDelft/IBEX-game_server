@@ -68,5 +68,17 @@ export default {
 
             Controller.handleSuccess(res, games, 'Data available');
         });
+
+        Controller.addGetRoute(app, '/api/v1/games/data', false, async (req, res) => {
+            const gameId = req.query.game_id;
+
+            const game = gameManager.games.find(g => g.data.id  == gameId);
+
+            const data = {
+                "firstDeclarations": game.results[2].declarations
+            }
+
+            Controller.handleSuccess(res, data, 'Data available');
+        });
     }
 };
