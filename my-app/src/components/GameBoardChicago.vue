@@ -273,127 +273,6 @@
             </div>
         </div>
 
-        <!--div class="mt-1 mx-5 mp-1" v-if="![0,6,9].includes(game.phase) && player.role > 1">
-            <div class="container justify-content-center">
-                <p style="text-align:center;">Your Property Values Under Different Conditions</p>
-            </div>
-            <table class="table table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Id</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">No Development</th>
-                        <th scope="col">Project A</th>
-                        <th scope="col">Project B</th>
-                    </tr>
-                </thead>
-                <tbody>
-                        <tr>
-                            <td>{{ player.property.id }}</td>
-                            <td>{{ player.property.name }}</td>
-                            <td>{{ formatNumber(player.property.v[0]) }}</td>
-                            <td>{{ formatNumber(player.property.v[1]) }}</td>
-                            <td>{{ formatNumber(player.property.v[2]) }}</td>
-                        </tr>
-                        <tr v-if="(game.phase == 2 || game.phase == 7) && (player.role == 2 || player.role == 3)">
-                            <td colspan="2">
-                                <button type="button" @click='submitDeclaration()' class="btn btn-danger">Submit Declaration</button>
-                            </td>
-                            <td>
-                                <input v-if="game.phase == 2 || game.winningCondition == 0" type="number" class="form-control" v-model="player.declaration[0]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" placeholder="500000" />
-                            </td>
-                            <td>
-                                <input v-if="game.phase == 2 || game.winningCondition == 1" type="number" class="form-control" v-model="player.declaration[1]" name="player_declaration_1" id="player_declaration_1" aria-describedby="emailHelp" placeholder="500000" />
-                            </td>
-                            <td>
-                                <input v-if="game.phase == 2 || game.winningCondition == 2" type="number" class="form-control" v-model="player.declaration[2]" name="player_declaration_2" id="player_declaration_2" aria-describedby="emailHelp" placeholder="500000" />
-                            </td>
-                        </tr>
-                </tbody>
-            </table>
-        </div-->
-
-        <!--div class="mt-1 mx-5 mp-1" v-if="(game.phase === 3 || game.phase === 8) && player.role === 1 && game.declarations != null">
-            <div class="container justify-content-center">
-                <p style="text-align:center;">Properties and Their Declared Values</p>
-            </div>
-            <table class="table table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Property</th>
-                        <th scope="col">Owner</th>
-                        <th scope="col">No Project</th>
-                        <th scope="col">Project A</th>
-                        <th scope="col">Project B</th>
-                    </tr>
-                </thead>
-                <tbody :key="updateSpeculationTable">
-                    <tr v-for="declaration in game.declarations" :key="declaration.id">
-                        <td>{{ declaration.name }}</td>
-                        <td>{{ declaration.owner }}</td>
-                        <td>
-                            <div class="row">
-                                <div class="col">
-                                    {{ formatNumber(declaration.d[0]) }}
-                                </div>
-                                <div class="col">
-                                    <button v-if="declaration.available[0]" type="button" @click='sendPurchaseIntention(declaration.id, 0)' class="btn btn-primary">Buy</button>
-                                    <p v-if="!declaration.available[0]">Unavailable</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="row">
-                                <div class="col">
-                                    {{ formatNumber(declaration.d[1]) }}
-                                </div>
-                                <div class="col">
-                                    <button v-if="declaration.available[1]" type="button" @click='sendPurchaseIntention(declaration.id, 1)' class="btn btn-primary">Buy</button>
-                                    <p v-if="!declaration.available[1]">Unavailable</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="row">
-                                <div class="col">
-                                    {{ formatNumber(declaration.d[2]) }}
-                                </div>
-                                <div class="col">
-                                    <button v-if="declaration.available[2]" type="button" @click='sendPurchaseIntention(declaration.id, 2)' class="btn btn-primary">Buy</button>
-                                    <p v-if="!declaration.available[2]">Unavailable</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="container justify-content-center">
-                <p style="text-align:center;"><button type="button" @click='doneSpeculating()' class="btn btn-primary">I Finished Speculating</button></p>
-            </div>
-        </div-->
-
-        <!--div class="mt-1 mx-5 mp-1" v-if="game.phase === 6 && player.signals != null">
-            <div class="container justify-content-center">
-                <p style="text-align:center;">Signals</p>
-            </div>
-            <table class="table table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">No Project</th>
-                        <th scope="col">Project A</th>
-                        <th scope="col">Project B</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ formatNumber(player.signals[0]) }}</td>
-                        <td>{{ formatNumber(player.signals[1]) }}</td>
-                        <td>{{ formatNumber(player.signals[2]) }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div-->
-
         <DoubleAuctionMarketChicago ref="doubleAuctionMarket" v-if="game.phase === 6"/>
 
     </div>
@@ -523,7 +402,7 @@
                     return 'Unavailable';
                 }
 
-                return roleMap[declaration.role] + ' ' + i;
+                return roleMap[declaration.role] + ' ' + declaration.number;
             },
             doneSpeculating() {
                 const self = this;

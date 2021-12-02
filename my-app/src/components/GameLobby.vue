@@ -22,11 +22,14 @@
                     <td>{{ item.currentRound.phase }}</td>
                     <td>
                         <div class="row">
-                            <div class="btn-toolbar col-md-6">
+                            <div class="btn-toolbar col-md-4">
                                 <button type="button" @click='joinGame(item.id)' class="btn btn-primary">Join</button>
                             </div>
-                            <div class="btn-toolbar col-md-6">
+                            <div class="btn-toolbar col-md-4">
                                 <button type="button" @click='analyseGame(item.id)' class="btn btn-primary">Analyse</button>
+                            </div>
+                            <div class="btn-toolbar col-md-4">
+                                <button type="button" @click='marketLog(item.id)' class="btn btn-primary">Market Log</button>
                             </div>
                         </div>
                     </td>
@@ -67,6 +70,15 @@ export default {
         analyseGame: async function (id) {
             try {
                 const routeData = this.$router.resolve({path: `/analyse/${id}`});
+                console.log('HRef:' + routeData.href);
+                window.open(routeData.href, '_blank');
+            } catch (e) {
+                console.log(e);
+            }
+        },
+        marketLog: async function (id) {
+            try {
+                const routeData = this.$router.resolve({path: `/market/${id}`});
                 console.log('HRef:' + routeData.href);
                 window.open(routeData.href, '_blank');
             } catch (e) {

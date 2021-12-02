@@ -104,6 +104,9 @@
                 </table>
             </div>
 
+            <div class="row-12">
+                <button type="button" class="btn btn-primary btn-block" @click='completeMarketPhase()'>End Market Phase</button>
+            </div>
         </div>
     </div>
 </template>
@@ -132,6 +135,9 @@ export default {
     },
     name: 'DoubleAuctionMarket',
     methods: {
+        completeMarketPhase() {
+            this.sendMessage("complete-market-phase", {});
+        },
         removeLastAsk() {
             const last = this.asks.reduce((p,n) => p.id >= n.id ? p : n);
 

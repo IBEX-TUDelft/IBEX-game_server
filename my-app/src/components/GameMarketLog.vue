@@ -1,0 +1,155 @@
+<template>
+    <div>
+          <div>
+            <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
+                <b-navbar-nav>
+                    <b-nav-item active>Ruleset: {{ ruleset }}</b-nav-item>
+                </b-navbar-nav>
+                <div class="container justify-content-center">
+                    <b-navbar-brand>
+                        Market Log
+                    </b-navbar-brand>
+                </div>
+                <b-navbar-nav class="ml-auto">
+                    <!--b-nav-item active v-if="game.phase === 6">Balance: {{ player.balance }}</b-nav-item>
+                    <b-nav-item active v-if="game.phase === 6">Shares: {{ player.shares }}</b-nav-item>
+                    <b-nav-item active >Round: {{ game.round }}</b-nav-item>
+                    <b-nav-item active >Phase: {{ game.phase }}</b-nav-item-->
+                </b-navbar-nav>
+            </b-navbar>
+        </div>
+
+        <div class="mt-1 mx-5 mp-1">
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <th scope="col">Time</th>
+                        <th scope="col">Round</th>
+                        <th scope="col">Actor</th>
+                        <th scope="col">Action</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Buyer</th>
+                        <th scope="col">Seller</th>
+                        <th scope="col">Best Bid</th>
+                        <th scope="col">Best Ask</th>
+                        <th scope="col">Book</th>
+                    </thead>
+                    <tbody>
+                        <tr v-for="l in marketLog" :key="l.id">
+                            <td>{{ l.time }}</td>
+                            <td>{{ l.round }}.{{ l.phase }}</td>
+                            <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
+                            <td>{{ l.action }}</td>
+                            <td>{{ l.quantity }}</td>
+                            <td>{{ l.price }}</td>
+                            <td>{{ l.buyer == null ? '' : getPlayer(l.buyer.number, l.buyer.role) }}</td>
+                            <td>{{ l.seller == null ? '' : getPlayer(l.seller.number, l.seller.role) }}</td>
+                            <td>{{ l.bestBid }}</td>
+                            <td>{{ l.bestAsk }}</td>
+                            <td>{{ l.book }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+    const roleMap = {
+        1: "Sniper",
+        2: "Developer",
+        3: "Owner"
+    };
+
+    const conditionMap = {
+        0: "No Project",
+        1: "Project A",
+        2: "Project B",
+    }
+
+    export default {
+        data() {
+            return {
+                gameId: null,
+                ruleset: null,
+                marketLog: null,
+            };
+        },
+        components: {
+        },
+        name: 'GameAnalysis',
+        created() {
+        },
+        methods: {
+            getValue(declaration, property, index) {
+                let value
+                
+                if (index != null) {
+                    value = declaration[property][index];
+                } else {
+                    value = declaration[property];
+                }
+
+                if (value < 0) {
+                    return '';
+                }
+
+                return value;
+            },
+            getYesOrNo(bool) {
+                if (bool == null) {
+                    return '';
+                }
+
+                return bool ? 'Y' : 'N';
+            },
+            getWinningCondition(i) {
+                if (this.winningCondition == null) {
+                    return '';
+                }
+
+                return this.winningCondition === i ? 'Y' : 'N';
+            },
+            getPlayer(number, role) {
+                return roleMap[role] + ' ' + number;
+            },
+            getDeclarationPlayer(i) {
+                const declaration = this.game.declarations[i];
+
+                if (declaration == null) {
+                    console.log(`Could not find declaration ${i}`);
+                    return 'Unavailable';
+                }
+
+                return roleMap[declaration.role] + ' ' + i;
+            },
+            conditionToString(c) {
+                return conditionMap[c];
+            },
+            showPreview() {
+                //TODO
+            },
+            formatNumber(num) {
+                return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+            }
+        },
+        async mounted () {
+            const self = this;
+
+            const token = localStorage.getItem("token");
+
+            this.gameId = parseInt(this.$route.params.id);
+
+            const response = await this.$http.get("/games/market-log", {
+                params: {
+                    token,
+                    game_id: self.gameId
+                }
+            });
+
+            this.ruleset = response.data.data.ruleset;
+            this.marketLog = response.data.data.marketLog;
+        }
+    }
+</script>

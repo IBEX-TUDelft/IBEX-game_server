@@ -8,6 +8,7 @@ import GameMasterBoard from '../components/GameMasterBoard';
 import GameBoardChicago from '../components/GameBoardChicago';
 import GameLobby from '../components/GameLobby';
 import GameAnalysis from '../components/GameAnalysis';
+import GameMarketLog from '../components/GameMarketLog';
 
 Vue.use(VueRouter)
 
@@ -55,6 +56,11 @@ const routes = [
     path: '/analyse/:id',
     name: 'Game Analysis',
     component: GameAnalysis
+  },
+  {
+    path: '/market/:id',
+    name: 'Market Log',
+    component: GameMarketLog
   }
 ]
 

@@ -75,7 +75,45 @@ export default {
             const game = gameManager.games.find(g => g.data.id  == gameId);
 
             const data = {
-                "firstDeclarations": game.results[2].declarations
+                "ruleset": game.data.type
+            };
+
+            if (game.results[2] != null) {
+                data.firstDeclarations = game.results[2].declarations;
+            }
+
+            if (game.results[3] != null) {
+                data.winningCondition = game.results[3].winningCondition;
+            }
+
+            if (game.results[4] != null) {
+                data.firstSnipes = game.results[4].snipes;
+                data.firstSnipeResults = game.results[4].snipeOutcomes;
+            }
+
+            if (game.results[7] != null) {
+                data.secondDeclarations = game.results[7].declarations;
+            }
+
+            if (game.results[9] != null) {
+                data.secondSnipes = game.results[9].snipes;
+                data.secondSnipeResults = game.results[9].snipeOutcomes;
+            }
+
+            Controller.handleSuccess(res, data, 'Data available');
+        });
+
+        Controller.addGetRoute(app, '/api/v1/games/market-log', false, async (req, res) => {
+            const gameId = req.query.game_id;
+
+            const game = gameManager.games.find(g => g.data.id  == gameId);
+
+            const data = {
+                "ruleset": game.data.type
+            };
+
+            if (game.results[6] != null) {
+                data.marketLog = game.results[6].log;
             }
 
             Controller.handleSuccess(res, data, 'Data available');

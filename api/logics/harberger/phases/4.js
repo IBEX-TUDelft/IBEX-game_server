@@ -7,6 +7,10 @@ export default {
             game: game,
             wss: wss,
             complete: false,
+            results: {
+                snipes: [],
+                snipeOutcomes: []
+            },
             onEnter: async function () {
                 console.log('PHASE 4');
 
@@ -36,6 +40,13 @@ export default {
                         console.log('Current land profit');
                         console.log(landProfit);
 
+                        const owner = self.game.players.find(pl => pl.number === p.owner);
+
+                        if (owner == null) {
+                            console.log(`Player number ${p.owner} not found`);
+                            return;
+                        }
+
                         if (p.speculators != null) {
                             console.log('There are speculators');
 
@@ -59,6 +70,31 @@ export default {
                                         speculator.profit =  [];
                                     }
 
+                                    self.results.snipes.push( {
+                                        "player": {
+                                            "number": speculator.number,
+                                            "role": speculator.role
+                                        },
+                                        "target": {
+                                            "number": owner.number,
+                                            "role": owner.role
+                                        },
+                                        "snipes": [winningCondition === 0, winningCondition === 1, winningCondition === 2],
+                                        "executed": true
+                                    });
+
+                                    self.results.snipeOutcomes.push( {
+                                        "player": {
+                                            "number": speculator.number,
+                                            "role": speculator.role
+                                        },
+                                        "target": {
+                                            "number": owner.number,
+                                            "role": owner.role
+                                        },
+                                        "profit": landProfit.snipeProfit
+                                    });
+
                                     speculator.profit.push({
                                         "phase": 4,
                                         "amount": landProfit.snipeProfit,
@@ -78,13 +114,6 @@ export default {
                         }
 
                         console.log('Done with speculators');
-
-                        const owner = self.game.players.find(pl => pl.number === p.owner);
-
-                        if (owner == null) {
-                            console.log(`Player number ${p.owner} not found`);
-                            return;
-                        }
 
                         console.log('Owner found');
                         console.log(owner);

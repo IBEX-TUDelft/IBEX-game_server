@@ -7,7 +7,7 @@
                 </b-navbar-nav>
                 <div class="container justify-content-center">
                     <b-navbar-brand>
-                        results
+                        Results Overview
                     </b-navbar-brand>
                 </div>
                 <b-navbar-nav class="ml-auto">
@@ -38,15 +38,15 @@
                     <tbody>
                         <tr v-for="d in firstDeclarations" :key="d.id">
                             <td>{{ getPlayer(d.player, d.role) }}</td>
-                            <td>{{ getValue(d, 'value', 0) }}</td>
-                            <td>{{ getValue(d, 'value', 1) }}</td>
-                            <td>{{ getValue(d, 'value', 2) }}</td>
-                            <td>{{ getValue(d, 'declaration', 0) }}</td>
-                            <td>{{ getValue(d, 'declaration', 1) }}</td>
-                            <td>{{ getValue(d, 'declaration', 2) }}</td>
-                            <td>{{ getValue(d, 'taxes', 0) }}</td>
-                            <td>{{ getValue(d, 'taxes', 1) }}</td>
-                            <td>{{ getValue(d, 'taxes', 2) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'value', 0)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'value', 1)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'value', 2)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'declaration', 0)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'declaration', 1)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'declaration', 2)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'taxes', 0)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'taxes', 1)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'taxes', 2)) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -62,9 +62,9 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td>{{ getWinningCondition(0) }}</td>
+                            <td>{{ getWinningCondition(1) }}</td>
+                            <td>{{ getWinningCondition(2) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -82,13 +82,13 @@
                         <th scope="col">Snipe Executed</th>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                        <tr v-for="f in firstSnipes" :key="f.id">
+                            <td>{{ getPlayer(f.player.number, f.player.role) }}</td>
+                            <td>{{ getPlayer(f.target.number, f.target.role) }}</td>
+                            <td>{{ getYesOrNo(f.snipes[0]) }}</td>
+                            <td>{{ getYesOrNo(f.snipes[1]) }}</td>
+                            <td>{{ getYesOrNo(f.snipes[2]) }}</td>
+                            <td>{{ getYesOrNo(f.executed) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -103,10 +103,10 @@
                         <th scope="col">Profit</th>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                        <tr v-for="f in firstSnipeResults" :key="f.id">
+                            <td>{{ getPlayer(f.player.number, f.player.role) }}</td>
+                            <td>{{ getPlayer(f.target.number, f.target.role) }}</td>
+                            <td>{{ formatNumber(f.profit) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -128,17 +128,17 @@
                         <th scope="col">Project B Taxes</th>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                        <tr v-for="d in secondDeclarations" :key="d.id">
+                            <td>{{ getPlayer(d.player, d.role) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'value', 0)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'value', 1)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'value', 2)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'declaration', 0)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'declaration', 1)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'declaration', 2)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'taxes', 0)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'taxes', 1)) }}</td>
+                            <td>{{ formatNumber(getValue(d, 'taxes', 2)) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -156,13 +156,13 @@
                         <th scope="col">Snipe Executed</th>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                        <tr v-for="f in secondSnipes" :key="f.id">
+                            <td>{{ getPlayer(f.player.number, f.player.role) }}</td>
+                            <td>{{ getPlayer(f.target.number, f.target.role) }}</td>
+                            <td>{{ getYesOrNo(f.snipes[0]) }}</td>
+                            <td>{{ getYesOrNo(f.snipes[1]) }}</td>
+                            <td>{{ getYesOrNo(f.snipes[2]) }}</td>
+                            <td>{{ getYesOrNo(f.executed) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -177,10 +177,10 @@
                         <th scope="col">Profit</th>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                        <tr v-for="f in secondSnipeResults" :key="f.id">
+                            <td>{{ getPlayer(f.player.number, f.player.role) }}</td>
+                            <td>{{ getPlayer(f.target.number, f.target.role) }}</td>
+                            <td>{{ formatNumber(f.profit) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -194,15 +194,6 @@
         2: "Developer",
         3: "Owner"
     };
-
-    /*const styleMap = {
-        "success": "alert-success",
-        "info": "alert-secondary",
-        "notice": "alert-primary",
-        "warning": "alert-warning",
-        "error": "alert alert-danger",
-        "fatal": "alert-dark",
-    };*/
 
     const conditionMap = {
         0: "No Project",
@@ -245,6 +236,20 @@
 
                 return value;
             },
+            getYesOrNo(bool) {
+                if (bool == null) {
+                    return '';
+                }
+
+                return bool ? 'Y' : 'N';
+            },
+            getWinningCondition(i) {
+                if (this.winningCondition == null) {
+                    return '';
+                }
+
+                return this.winningCondition === i ? 'Y' : 'N';
+            },
             getPlayer(number, role) {
                 return roleMap[role] + ' ' + number;
             },
@@ -282,7 +287,15 @@
                 }
             });
 
+            this.ruleset = response.data.data.ruleset;
             this.firstDeclarations = response.data.data.firstDeclarations;
+            this.winningCondition = response.data.data.winningCondition;
+            this.firstSnipes = response.data.data.firstSnipes;
+            this.firstSnipeResults = response.data.data.firstSnipeResults;
+
+            this.secondDeclarations = response.data.data.secondDeclarations;
+            this.secondSnipes = response.data.data.secondSnipes;
+            this.secondSnipeResults = response.data.data.secondSnipeResults;
         }
     }
 </script>
