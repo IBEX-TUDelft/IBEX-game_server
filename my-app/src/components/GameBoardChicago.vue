@@ -269,6 +269,10 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="row">
+                        <button type="button" class="btn btn-primary btn-block" @click='completeCurrentPhase()'>End Current Phase</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -437,6 +441,14 @@
             formatNumber(num) {
                 return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
             },
+            completeCurrentPhase() {
+                const self = this;
+
+                self.sendMessage({
+                    "gameId": self.game.id,
+                    "type": "complete-current-phase"
+                });
+            },
             sendMessage(msg) {
                 this.connection.send(JSON.stringify(msg));
             },
@@ -538,7 +550,7 @@
                                         "declaration": ev.data.declaration,
                                         "sniped": ev.data.sniped,
                                         "snipeProfit": ev.data.snipeProfit,
-                                        "property": `${roleMap[ev.data.role]}-${ev.data.owner}`
+                                        "property": `${roleMap[ev.data.role]} ${ev.data.owner}`
                                     });
                                 } else { //Owner
                                     self.player.profitEvents.push({

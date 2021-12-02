@@ -139,7 +139,9 @@ export default {
             this.sendMessage("complete-market-phase", {});
         },
         removeLastAsk() {
-            const last = this.asks.reduce((p,n) => p.id >= n.id ? p : n);
+            const self = this;
+
+            const last = this.asks.filter(a => a.sender == self.$parent.player.number).reduce((p,n) => p.id >= n.id ? p : n);
 
             if (last != null) {
                 this.sendMessage("cancel-order", {
@@ -150,7 +152,9 @@ export default {
             }
         },
         removeLastBid() {
-            const last = this.bids.reduce((p,n) => p.id >= n.id ? p : n);
+            const self = this;
+
+            const last = this.bids.filter(b => b.sender == self.$parent.player.number).reduce((p,n) => p.id >= n.id ? p : n);
 
             if (last != null) {
                 this.sendMessage("cancel-order", {

@@ -27,9 +27,9 @@ export default {
 
                 self.wss.broadcastInfo(self.game.id, `Prepare for the trading phase`);
 
-                setTimeout(() => {
+                /*setTimeout(() => {
                     self.complete = true;
-                }, 5000);
+                }, 5000);*/
             },
             getData() {
                 return {};
@@ -68,6 +68,17 @@ export default {
                 return await this.testComplete();
             },
             init: function () {
+                const self = this;
+
+                this.handlers.push({
+                    "type": "complete-current-phase",
+                    "role": null,
+                    "action": function(ws, message) {
+                        console.log('Received');
+
+                        self.complete = true;
+                    }
+                });
             },
             handlers: []
         }
