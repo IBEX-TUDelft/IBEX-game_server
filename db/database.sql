@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS game_rounds (
 CREATE TABLE IF NOT EXISTS game_players (
     id SERIAL PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
-    recovery_string VARCHAR(6) NOT NULL,
+    recovery_string VARCHAR(64) NOT NULL,
     game_id BIGINT NOT NULL,
     user_id BIGINT,
     player_number SMALLINT NOT NULL,
