@@ -41,6 +41,12 @@
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="minutes_for_trading" name="minutes_for_trading" id="minutes_for_trading" aria-describedby="emailHelp" placeholder="10" />
                 </div>
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Minutes for Sniping</label>
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="minutes_for_sniping" name="minutes_for_sniping" id="minutes_for_sniping" aria-describedby="emailHelp" placeholder="2" />
+                </div>
             </div>
             <div class="row">
                 <div class="form-group col-md-3">
@@ -287,17 +293,18 @@ export default {
                 style: "capital"
             }),
             speculators_count: 6,
-            speculator_balance: 2000,
+            speculator_balance: 18000,
             speculator_shares: 5,
             developers_count: 1,
-            developer_balance: 2000,
+            developer_balance: 18000,
             developer_shares: 5,
             owners_count: 5,
-            owner_balance: 2000,
+            owner_balance: 18000,
             owner_shares: 5,
             round_count: 5,
             game_type: 'harberger',
             minutes_for_trading: 10,
+            minutes_for_sniping: 2,
             max_lot_purchases: 3,
             no_project_dev_low: 300000,
             no_project_dev_fixed: 350000,
@@ -319,8 +326,8 @@ export default {
             project_b_owner_high: 200000,
             tax_rate_initial: 1,
             tax_rate_final: 25,
-            signal_low: 0.7,
-            signal_high: 1.3
+            signal_low: 0.95,
+            signal_high: 1.05
         }
     },
     components: {
@@ -397,7 +404,8 @@ export default {
                 },
                 round_count: this.round_count,
                 game_type: this.game_type,
-                minutes_for_trading: this.minutes_for_trading
+                minutes_for_trading: this.minutes_for_trading,
+                minutes_for_sniping: this.minutes_for_sniping
             }
 
             createGame(payload).then((response) => {

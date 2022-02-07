@@ -9,7 +9,7 @@
                             <td>Condition</td><td>{{ getWinningCondition() }}</td>
                         </tr>
                         <tr>
-                            <td>Public Signal</td><td>TBD</td>
+                            <td>Public Signal</td><td>{{ formatNumber($parent.game.publicSignal) }}</td>
                         </tr>
                         <tr>
                             <td>Private Signal</td><td>{{ formatNumber($parent.player.signals[$parent.game.winningCondition]) }}</td>
@@ -33,8 +33,8 @@
                     <div class="offset-md-1 col-3 d-flex align-items-end mb-3">
                         <button type="button" class="btn btn-primary btn-block" @click='postOrder("bid", true)'>Buy @ -></button>
                     </div>
-                    <div class="col-4">
-                        <table class="table table-bordered text-center">
+                    <div class="col-4" style="height: 300px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
+                        <table class="table table-bordered text-center" style="margin-top: auto; margin-bottom: 0px;">
                             <tr v-for="ask in asks" :key="ask.id">
                                 <td>{{ formatNumber(ask.price) }}{{ask.sender == $parent.player.number ? '*' : ''}}</td>
                             </tr>
@@ -49,7 +49,7 @@
                     <div class="offset-md-1 col-3">
                         <button type="button" class="btn btn-primary btn-block" @click='postOrder("ask", true)'>Sell @ -></button>
                     </div>
-                    <div class="col-4">
+                    <div class="col-4" style="height: 300px; border: 1px solid; overflow: scroll;">
                         <table class="table table-bordered text-center">
                             <tr v-for="bid in bids" :key="bid.id">
                                 <td>{{ formatNumber(bid.price) }}{{bid.sender == $parent.player.number ? '*' : ''}}</td>

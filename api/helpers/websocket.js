@@ -32,12 +32,30 @@ export default {
         message(ws, "notice", msg, handleException);
     },
     warning (ws, msg, handleException) {
+        console.log(`warning - ${msg}`);
+        if (handleException == null) {
+            handleException = (e) => {
+                console.error(e);
+            }
+        }
         message(ws, "warning", msg, handleException);
     },
     error (ws, msg, handleException) {
+        if (handleException == null) {
+            handleException = (e) => {
+                console.error(e);
+            }
+        }
+        console.log(`error - ${msg}`);
         message(ws, "error", msg, handleException);
     },
     fatal (ws, msg, handleException) {
+        if (handleException == null) {
+            handleException = (e) => {
+                console.error(e);
+            }
+        }
+        console.log(`fatal - ${msg}`);
         message(ws, "fatal", msg, handleException);
     },
     sendMessage(ws, type, msg, handleException) {

@@ -124,7 +124,9 @@ export default {
 
                 console.log(`delta1 = ${delta}, coefficient1 = ${coefficient}`);
 
-                player.S[j] = Math.round(data.V[j] * coefficient);
+                const normalizedTaxRate = data.parameters.tax_rate_final / 100;
+
+                player.S[j] = Math.round(data.V[j] * coefficient * normalizedTaxRate / 100);
             }
 
             console.log(`${player.name} S = ${player.S}`);
@@ -170,6 +172,9 @@ export default {
                 await this.data.currentPhase.onExit();
 
                 this.results.push(this.data.currentPhase.results);
+
+                console.log(`Phase ${this.data.currentRound.phase} results:`);
+                console.log(this.data.currentPhase.results);
 
                 await gameService.addPhaseData(
                     this.data.currentRound.id,

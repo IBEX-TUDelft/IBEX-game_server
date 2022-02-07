@@ -16,7 +16,8 @@
     "unique-names-generator": "^4.6.0",
     "vue": "^2.6.11",
     "vue-jwt-decode": "^0.1.0",
-    "vue-router": "^3.5.2"
+    "vue-router": "^3.5.2",
+    "xlsx": "^0.17.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

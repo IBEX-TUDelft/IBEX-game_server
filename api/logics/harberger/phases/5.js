@@ -7,6 +7,7 @@ export default {
             game: game,
             wss: wss,
             complete: false,
+            results: {},
             onEnter: async function () {
                 console.log('PHASE 5');
 
@@ -19,6 +20,7 @@ export default {
                         "value-signals",
                         {
                             "signals": player.S,
+                            "publicSignal": self.game.publicSignal,
                             "condition": self.game.winningCondition,
                             "taxRate": self.game.parameters.tax_rate_final
                         }
@@ -27,12 +29,21 @@ export default {
 
                 self.wss.broadcastInfo(self.game.id, `Prepare for the trading phase`);
 
+                self.results.signals = {
+                    publicSignal: self.game.publicSignal,
+                    privateSignals: self.game.players.map(p => { return p.S; })
+                };
                 /*setTimeout(() => {
                     self.complete = true;
                 }, 5000);*/
             },
             getData() {
-                return {};
+                const self = this;
+
+                return {
+                    publicSignal: self.game.publicSignal,
+                    privateSignals: self.game.players.map(p => { return p.S; })
+                };
             },
             onExit: async function () {
             },

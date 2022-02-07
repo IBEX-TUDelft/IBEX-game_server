@@ -21,6 +21,12 @@
 
         <div class="mt-1 mx-5 mp-1">
             <div class="row">
+                <div class="col-11" />
+                <div class="col-1">
+                    <button :disabled="marketLog == null || marketLog.length === 0" class="btn btn-success" @click="exportXlsx">Export</button>
+                </div>
+            </div>
+            <div class="row">
                 <table class="table table-bordered">
                     <thead class="thead-dark">
                         <th scope="col">Time</th>
@@ -56,6 +62,8 @@
     </div>
 </template>
 <script>
+    import XLSX from 'xlsx';
+
     const roleMap = {
         1: "Sniper",
         2: "Developer",
@@ -132,6 +140,35 @@
             },
             formatNumber(num) {
                 return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+            },
+            exportXlsx() {
+                const self = this;
+
+                const xls = [];
+
+                this.marketLog.forEach(r => {
+                    xls.push([
+                        r.time,
+                        r.round + '.' + r.phase,
+                        self.getPlayer(r.actor.number, r.actor.role),
+                        r.action,
+                        r.quantity,
+                        r.price,
+                        r.buyer == null ? '' : self.getPlayer(r.buyer.number, r.buyer.role),
+                        r.seller == null ? '' : self.getPlayer(r.seller.number, r.seller.role),
+                        r.bestBid,
+                        r.bestAsk,
+                        r.book
+                    ]);
+                });
+
+                console.log(xls);
+                /* convert state to workbook */
+                const ws = XLSX.utils.aoa_to_sheet(xls);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "SheetJS");
+                /* generate file and send to client */
+                XLSX.writeFile(wb, `${this.gameId}.market-log.xlsx`);
             }
         },
         async mounted () {

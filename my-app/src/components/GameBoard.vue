@@ -272,7 +272,11 @@
                 this.connection = new WebSocket(process.env.VUE_APP_WSS);
 
                 this.connection.onmessage = function(event) {
+                    console.log(`New message`);
+
                     const ev = JSON.parse(event.data);
+
+                    console.log(`New ${ev.type}`);
 
                     if (ev.type === "event") {
                         //TODO: give structure to this logic
@@ -383,6 +387,7 @@
                                 console.error(`Type ${ev.type} was not understood`);
                         }
                     } else { //it is a message
+                        console.log(`${ev.type} - ${ev.message}`);
                         self.pushMessage(ev.type, ev.message);
                     }
                 }

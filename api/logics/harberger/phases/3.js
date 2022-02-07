@@ -6,11 +6,16 @@ export default {
         const phase = {
             game: game,
             wss: wss,
+            startTime: 0,
             results: {},
             onEnter: async function () {
                 console.log('PHASE 3');
 
                 const self = this;
+
+                console.log(`Setting the timeout to ${self.game.parameters.minutes_for_sniping} minutes`);
+
+                self.endTime = Date.now() + self.game.parameters.minutes_for_sniping * 60 * 1000;
 
                 self.game.players.filter(p => p.role === 1).forEach(p => {p.doneSpeculating = false});
 
@@ -46,6 +51,18 @@ export default {
                 this.results.winningCondition = winningCondition;
                 
                 console.log(`The winning condition is ${winningCondition}, with a sum of ${winningSum}. Here the full list: ${self.game.D}`);
+
+                console.log('Calculating the public signal');
+
+                const S = winningSum;
+                const r = self.game.parameters.tax_rate_final / 100;
+
+                /* S would be the total declared value if the declaration would not change later.
+                    This yields S * r, the total tax virtual revenue at this stage.
+                    We say there are 100 shares of it, not all distributed to player (e.g. 5 per player, 12 players = 60% redistributed),
+                    so each share has a theoretical value of:
+                */
+                this.game.publicSignal = S * r / 100;
 
                 // 3. send declarations
                 const declatationData = [];
@@ -91,7 +108,7 @@ export default {
             onExit: async function () {
             },
             testComplete: async function () {
-                return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0;
+                return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0 || Date.now() >= this.endTime;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);
@@ -193,27 +210,27 @@ export default {
                                 }
         
                                 if (lot.speculators == null) {
-                                    lot.speculators = [null, null, null];
+                                    lot.speculators = [[], [], []];
                                 }
         
-                                if (lot.speculators[self.game.winningCondition] != null) {
+                                /*if (lot.speculators[self.game.winningCondition] != null) {
                                     WS.error(ws, `Game ${message.gameId}: lot ${id} is not for sale any more`);
                                     console.log(`Game ${message.gameId}: lot ${id} is not for sale any more`);
                                     return;
-                                }
+                                }*/
         
-                                lot.speculators[self.game.winningCondition] = player.number;
+                                lot.speculators[self.game.winningCondition].push(player.number);
         
-                                console.log(`Property ${lot.name} was bought by a speculator: ${player.name} under condition ${self.game.winningCondition}`);
+                                console.log(`Property ${lot.name} was selected by a speculator: ${player.name} under condition ${self.game.winningCondition}`);
         
-                                self.wss.broadcastEvent (
+                                /*self.wss.broadcastEvent (
                                     game.id,
                                     "lot-sold-to-speculator",
                                     {
                                         "id": lot.id,
                                         "condition": self.game.winningCondition
                                     }
-                                );
+                                );*/
                             });
                         }
 

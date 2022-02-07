@@ -119,17 +119,17 @@
                                     <th scope="col">Maximum Value</th>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
                                         <td>Status Quo</td>
                                         <td>{{ game.boundaries.owner.noProject.low }}</td>
                                         <td>{{ game.boundaries.owner.noProject.high }}</td>
                                     </tr>
-                                    <tr>
+                                    <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
                                         <td>Project A</td>
                                         <td>{{ game.boundaries.owner.projectA.low }}</td>
                                         <td>{{ game.boundaries.owner.projectA.high }}</td>
                                     </tr>
-                                    <tr>
+                                    <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
                                         <td>Project B</td>
                                         <td>{{ game.boundaries.owner.projectB.low }}</td>
                                         <td>{{ game.boundaries.owner.projectB.high }}</td>
@@ -146,17 +146,17 @@
                                     <th scope="col">Maximum Value</th>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
                                         <td>Status Quo</td>
                                         <td>{{ game.boundaries.developer.noProject.low }}</td>
                                         <td>{{ game.boundaries.developer.noProject.high }}</td>
                                     </tr>
-                                    <tr>
+                                    <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
                                         <td>Project A</td>
                                         <td>{{ game.boundaries.developer.projectA.low }}</td>
                                         <td>{{ game.boundaries.developer.projectA.high }}</td>
                                     </tr>
-                                    <tr>
+                                    <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
                                         <td>Project B</td>
                                         <td>{{ game.boundaries.developer.projectB.low }}</td>
                                         <td>{{ game.boundaries.developer.projectB.high }}</td>
@@ -321,7 +321,8 @@
                     properties: [],
                     declarations: [],
                     boundaries: null,
-                    taxRate: null
+                    taxRate: null,
+                    publicSignal: "TBD"
                 },
                 player: {
                     title: "Starting ...",
@@ -587,6 +588,7 @@
                                 self.player.signals = ev.data.signals;
                                 self.game.winningCondition = ev.data.condition;
                                 self.game.taxRate = ev.data.taxRate;
+                                self.game.publicSignal = ev.data.publicSignal;
                                 self.pushMessage("info", `Your signals: ${ev.data.signals}`);
                                 break;
                             }
@@ -633,6 +635,7 @@
                                 console.error(`Type ${ev.type} was not understood`);
                         }
                     } else { //it is a message
+                        console.log(`${ev.type} - ${ev.message}`);
                         self.pushMessage(ev.type, ev.message);
                     }
                 }

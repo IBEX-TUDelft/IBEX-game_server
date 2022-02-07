@@ -173,27 +173,12 @@ export default {
                                 }
         
                                 if (lot.speculators == null) {
-                                    lot.speculators = [null, null, null];
+                                    lot.speculators = [[], [], []];
                                 }
         
-                                if (lot.speculators[self.game.winningCondition] != null) {
-                                    WS.error(ws, `Game ${message.gameId}: lot ${id} is not for sale any more`);
-                                    console.log(`Game ${message.gameId}: lot ${id} is not for sale any more`);
-                                    return;
-                                }
+                                lot.speculators[self.game.winningCondition].push(player.number);
         
-                                lot.speculators[self.game.winningCondition] = player.number;
-        
-                                console.log(`Property ${lot.name} was bought by a speculator: ${player.name} under condition ${self.game.winningCondition}`);
-        
-                                self.wss.broadcastEvent (
-                                    game.id,
-                                    "lot-sold-to-speculator",
-                                    {
-                                        "id": lot.id,
-                                        "condition": self.game.winningCondition
-                                    }
-                                );
+                                console.log(`Property ${lot.name} was selected by a speculator: ${player.name} under condition ${self.game.winningCondition}`);
                             });
                         }
 

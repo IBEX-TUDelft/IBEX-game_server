@@ -64,69 +64,80 @@ export default {
                         console.log('Current land profit');
                         console.log(landProfit);
 
-                        if (p.speculators != null) {
+                        if (p.speculators != null && p.speculators[winningCondition].length > 0) {
                             console.log('There are speculators');
 
-                            const speculatorNumber = p.speculators[winningCondition];
+                            const biddingSpeculators = p.speculators[winningCondition];
 
-                            console.log(`Number: ${speculatorNumber}`);
+                            let winningBidderIndex = 0;
+                            
+                            if (biddingSpeculators.length >= 1) {
+                                winningBidderIndex = Math.floor( Math.random() * biddingSpeculators.length );
+                            }
 
-                            if (speculatorNumber != null) {
+                            console.log(`Speculator who won: ${biddingSpeculators[winningBidderIndex]}`);
+
+                            for (let i = 0; i < biddingSpeculators.length; i++) {
+                                const speculatorNumber = biddingSpeculators[i];
+                                
                                 const speculator = self.game.players.find(pl => pl.number === speculatorNumber);
 
-                                if (speculator != null) {
-                                    console.log(`Speculator exists`);
+                                if (speculator == null) {
+                                    console.log(`Speculator with id ${speculatorNumber} not found`);
+                                    continue;
+                                }
 
+                                if (i === winningBidderIndex) {
                                     landProfit.sniped = true;
                                     landProfit.speculator = speculatorNumber;
                                     landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
 
-                                    console.log('Land profit updated');
-
-                                    if (speculator.profit == null) {
-                                        speculator.profit =  [];
-                                    }
-
-                                    speculator.profit.push({
-                                        "phase": 9,
-                                        "amount": landProfit.snipeProfit,
-                                        "context": {
-                                            "type": "speculation",
-                                            "property": {
-                                                "id": p.id,
-                                                "name": p.name
-                                            },
-                                            "condition": winningCondition
-                                        }
-                                    });
-
-                                    self.results.snipes.push( {
-                                        "player": {
-                                            "number": speculator.number,
-                                            "role": speculator.role
-                                        },
-                                        "target": {
-                                            "number": owner.number,
-                                            "role": owner.role
-                                        },
-                                        "snipes": [winningCondition === 0, winningCondition === 1, winningCondition === 2],
-                                        "executed": true
-                                    });
-
-                                    self.results.snipeOutcomes.push( {
-                                        "player": {
-                                            "number": speculator.number,
-                                            "role": speculator.role
-                                        },
-                                        "target": {
-                                            "number": owner.number,
-                                            "role": owner.role
-                                        },
-                                        "profit": landProfit.snipeProfit
-                                    });
-
-                                    console.log('Profit added to the speculator');
+                                    console.log('Land profit updated');                                    
                                 }
+
+                                if (speculator.profit == null) {
+                                    speculator.profit =  [];
+                                }
+
+                                self.results.snipes.push( {
+                                    "player": {
+                                        "number": speculator.number,
+                                        "role": speculator.role
+                                    },
+                                    "target": {
+                                        "number": owner.number,
+                                        "role": owner.role
+                                    },
+                                    "snipes": [winningCondition === 0, winningCondition === 1, winningCondition === 2],
+                                    "executed": i === winningBidderIndex
+                                });
+
+                                self.results.snipeOutcomes.push( {
+                                    "player": {
+                                        "number": speculator.number,
+                                        "role": speculator.role
+                                    },
+                                    "target": {
+                                        "number": owner.number,
+                                        "role": owner.role
+                                    },
+                                    "profit": i === winningBidderIndex ? landProfit.snipeProfit : 0
+                                });
+
+                                speculator.profit.push({
+                                    "phase": 4,
+                                    "amount": i === winningBidderIndex ? landProfit.snipeProfit : 0,
+                                    "context": {
+                                        "type": "speculation",
+                                        "property": {
+                                            "id": p.id,
+                                            "name": p.name
+                                        },
+                                        "condition": winningCondition
+                                    }
+                                });
+
+                                console.log('Profit added to the speculator');
                             }
                         }
 
@@ -190,7 +201,8 @@ export default {
 
                 console.log(`Total taxes: ${taxPot}`);
 
-                const totalShares = this.game.players.reduce((acc, p2) => acc + p2.shares, 0);
+                //const totalShares = this.game.players.reduce((acc, p2) => acc + p2.shares, 0);
+                const totalShares = 100;
 
                 console.log(`Total shares: ${totalShares}`);
 
@@ -228,7 +240,7 @@ export default {
                         "role": player.role,
                         "taxes": 0,
                         "snipeProfit": (player.role === 1 ? taxProfit : 0),
-                        "total": (player.role === 1 ? 0: taxProfit)
+                        "total": (player.role === 1 ? 0 : taxProfit)
                     }
 
                     self.wss.sendEvent(

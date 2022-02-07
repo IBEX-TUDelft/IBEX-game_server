@@ -21,9 +21,11 @@ export default {
 
                 self.wss.broadcastInfo(self.game.id, 'The trading phase has started');
 
+                console.log(`Allowing ${self.game.parameters.minutes_for_trading} minutes for trading`);
+
                 setTimeout(() => {
                     self.complete = true;
-                }, 60000 * 15); //TODO use the configuration
+                }, 60 * 1000 * self.game.parameters.minutes_for_trading); //TODO use the configuration
             },
             onExit: async function () {
             },

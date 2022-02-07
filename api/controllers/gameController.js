@@ -91,6 +91,12 @@ export default {
                 data.firstSnipeResults = game.results[4].snipeOutcomes;
             }
 
+            console.log(game.results[5]);
+
+            if (game.results[5] != null) {
+                data.signals = game.results[5].signals;
+            }
+
             if (game.results[7] != null) {
                 data.secondDeclarations = game.results[7].declarations;
             }

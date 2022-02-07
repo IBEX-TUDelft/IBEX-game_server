@@ -16,6 +16,7 @@ export default {
             {key: "game_type", type: "string", value: gameParameters.game_type},
             {key: "round_count", type: "number", value: gameParameters.round_count},
             {key: "minutes_for_trading", type: "number", value: gameParameters.minutes_for_trading},
+            {key: "minutes_for_sniping", type: "number", value: gameParameters.minutes_for_sniping},
             {key: "tax_rate_initial", type: "number", value: gameParameters.tax_rate.initial},
             {key: "tax_rate_final", type: "number", value: gameParameters.tax_rate.final},
             {key: "signal_low", type: "float", value: gameParameters.signal.low},
@@ -168,8 +169,10 @@ export default {
         ]);
     },
     addPhaseData: async function(roundId, phaseNumber, phaseData) {
+        let round;
+
         try {
-            const round = await gameRoundRepository.findById(roundId);
+            round = await gameRoundRepository.findById(roundId);
 
             if (round == null) {
                 return `Round ${roundId} not found`;

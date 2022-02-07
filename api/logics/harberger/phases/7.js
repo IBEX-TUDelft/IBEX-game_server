@@ -82,6 +82,16 @@ export default {
 
                         console.log(`New Declaration from ${player.name}`);
                         
+                        if (player.property == null) {
+                            WS.error(ws, `Game ${message.gameId}: player ${ws.player.number} sent a declaration but does not own a property. This is a bug`);
+                            return;
+                        }
+
+                        if (player.property.d != null) {
+                            WS.warning(ws, `Game ${message.gameId}: player ${ws.player.number} sent a declaration update. This is not allowed`);
+                            return;
+                        }
+                        
                         player.property.d = message.declaration;
 
                         self.results.declarations.push({
