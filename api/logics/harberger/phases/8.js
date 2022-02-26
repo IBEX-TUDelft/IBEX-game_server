@@ -6,12 +6,15 @@ export default {
         const phase = {
             game: game,
             wss: wss,
+            startTime: 0,
             onEnter: async function () {
                 console.log('PHASE 8');
 
                 const self = this;
 
                 self.game.players.filter(p => p.role === 1).forEach(p => {p.doneSpeculating = false});
+
+                self.endTime = Date.now() + self.game.parameters.minutes_for_sniping * 60 * 1000;
 
                 self.wss.broadcastInfo(self.game.id, 'Click on the properties you are interested in. Be fast or the other speculators will take them first!', 1);
                 self.wss.broadcastInfo(self.game.id, 'Check the table of declared values. If you think some property is undervalued, you can buy it and make profit', 1);
@@ -71,7 +74,7 @@ export default {
             onExit: async function () {
             },
             testComplete: async function () {
-                return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0;
+                return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0 || Date.now() >= this.endTime;
             },
             onMessage: async function(ws, message) {
                 const handler = this.handlers.find(m => m.type === message.type);

@@ -104,9 +104,9 @@
                 </table>
             </div>
 
-            <div class="row-12">
+            <!--div class="row-12">
                 <button type="button" class="btn btn-primary btn-block" @click='completeMarketPhase()'>End Market Phase</button>
-            </div>
+            </div-->
         </div>
     </div>
 </template>
