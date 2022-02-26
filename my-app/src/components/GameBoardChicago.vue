@@ -270,9 +270,9 @@
                         </table>
                     </div>
 
-                    <div class="row">
+                    <!--div class="row">
                         <button type="button" class="btn btn-primary btn-block" @click='completeCurrentPhase()'>End Current Phase</button>
-                    </div>
+                    </div-->
                 </div>
             </div>
         </div>
