@@ -103,3 +103,12 @@ app.get('/', (req,res) => {
 app.listen(port, () => {
     console.log(`Server listening on the port::${port}`);
 });
+
+// get the unhandled rejection and throw it to another fallback handler we already have.
+process.on('unhandledRejection', (reason, promise) => {
+  throw reason;
+});
+
+process.on('uncaughtException', (error) => {
+  console.error(error);
+});

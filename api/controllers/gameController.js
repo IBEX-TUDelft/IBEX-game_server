@@ -21,6 +21,26 @@ export default {
         Controller.addGetRoute(app, '/api/v1/games/list', true, async (req, res) => {
             const records = await games.list();
 
+            const gs = gameManager.games.map(g => g.data).map(d => { return {
+                "id": d.id,
+                "title": d.title,
+                "type": d.parameters.game_type,
+                "assignedPlayers": d.assignedPlayers,
+                "currentRound": d.currentRound
+            }});
+
+            records.forEach(r => {
+                const game = gs.find(g => g.id === r.id);
+
+                if (game == null) {
+                    return;
+                }
+                
+                if (game.currentRound != null) {
+                    r.round_number = game.currentRound;
+                }
+            });
+
             Controller.handleSuccess(res, records, 'Data found');
         });
 

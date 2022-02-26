@@ -1,4 +1,5 @@
 import gameRoundRepository from "../../repositories/gameRoundRepository.js";
+import gameRepository from "../../repositories/gameRepository.js";
 import gameService from "../../services/gameService.js";
 import Utils from '../../helpers/utils.js';
 import WS from '../../helpers/websocket.js';
@@ -16,7 +17,7 @@ import Phase9 from './phases/9.js';
 import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
 
 export default {
-    create(data) {
+    async create(data) {
         //Creating the properties 1 per owner
 
         data.properties = [];
@@ -132,6 +133,8 @@ export default {
             console.log(`${player.name} S = ${player.S}`);
         }
 
+        await gameRepository.saveData(data.id, data);
+
         return {
             phases: [Phase0, Phase1, Phase2, Phase3, Phase4,
                 Phase5, Phase6, Phase7, Phase8, Phase9],
@@ -199,6 +202,8 @@ export default {
                 
                 await this.data.currentPhase.onEnter();
 
+                await gameRepository.saveData(data.id, data);
+
                 let err = this.wss.broadcastEvent(data.id, "phase-transition", {
                     "round": this.data.currentRound.number,
                     "phase": this.data.currentRound.phase
@@ -255,6 +260,8 @@ export default {
                 this.data.currentPhase = Phase0.create(this.data, this.wss);
 
                 await this.data.currentPhase.onEnter();
+
+                await gameRepository.saveData(data.id, data);
             }
         };
     }

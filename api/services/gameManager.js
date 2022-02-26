@@ -98,7 +98,7 @@ export default {
 
                 switch(gameData.parameters.game_type) {
                     case 'harberger':
-                        game = Harberger.create(gameData);
+                        game = await Harberger.create(gameData);
                         break;
                     case 'futarchy':
                     case 'voter':

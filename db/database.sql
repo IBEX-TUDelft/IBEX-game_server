@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS games (
     title VARCHAR(64),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    ended_at TIMESTAMP
+    ended_at TIMESTAMP,
+    game_data TEXT
 );
 
 CREATE TABLE IF NOT EXISTS game_parameters (
