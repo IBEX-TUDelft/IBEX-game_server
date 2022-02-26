@@ -33,9 +33,9 @@ export default {
                     publicSignal: self.game.publicSignal,
                     privateSignals: self.game.players.map(p => { return p.S; })
                 };
-                /*setTimeout(() => {
+                setTimeout(() => {
                     self.complete = true;
-                }, 5000);*/
+                }, 5000);
             },
             getData() {
                 const self = this;
