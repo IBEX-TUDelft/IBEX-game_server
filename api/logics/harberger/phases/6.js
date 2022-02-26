@@ -25,7 +25,7 @@ export default {
 
                 setTimeout(() => {
                     self.complete = true;
-                }, 60 * 1000 * self.game.parameters.minutes_for_trading); //TODO use the configuration
+                }, 60 * 1000 * self.game.parameters.minutes_for_trading);
             },
             onExit: async function () {
             },
