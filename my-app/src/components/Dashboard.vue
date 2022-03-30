@@ -1,13 +1,6 @@
 <template>
   <div>
     <Header />
-    <!--div class="container mrgnbtm">
-          <div class="row">
-            <div class="col-md-8">
-                <CreateUser @createUser="userCreate($event)" />
-            </div>
-          </div>
-    </div-->
     <div>
         <Games v-if="games.length > 0" :games="games" />
         <div v-else><p>No games to display. Click &quot;<b>New Game</b>&quot; on the right top menu to create a new one.</p></div>

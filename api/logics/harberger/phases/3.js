@@ -46,6 +46,8 @@ export default {
                     }
                 }
 
+                this.game.publicSignal = [0, 0, 0];
+
                 this.game.winningCondition = winningCondition;
 
                 this.results.winningCondition = winningCondition;
@@ -62,7 +64,7 @@ export default {
                     We say there are 100 shares of it, not all distributed to player (e.g. 5 per player, 12 players = 60% redistributed),
                     so each share has a theoretical value of:
                 */
-                this.game.publicSignal = S * r / 100;
+                this.game.publicSignal[winningCondition] = S * r / 100;
 
                 // 3. send declarations
                 const declatationData = [];
@@ -197,10 +199,20 @@ export default {
                         console.log(message.snipe);
                         console.log(typeof message.snipe);
                         console.log(Array.isArray(message.snipe));
-                        console.log(message.snipe.length);
+                        console.log('Message snipe arrays (should be 3)' + message.snipe.length);
 
-                        if (message.snipe != null && message.snipe.length > 0) {
-                            message.snipe.forEach(id => {
+                        if (message.snipe == null) {
+                            console.error('The snipe object contains no arrays');
+                            player.doneSpeculating = true;
+                            return;
+                        }
+
+                        const winningConditionSnipes = message.snipe[self.game.winningCondition];
+
+                        console.log('Winning condition snipes: ' + winningConditionSnipes.length);
+
+                        if (winningConditionSnipes != null && winningConditionSnipes.length > 0) {
+                            winningConditionSnipes.forEach(id => {
                                 const lot = self.game.properties.find(p => p.id === id);
 
                                 if (lot == null) {
@@ -212,25 +224,11 @@ export default {
                                 if (lot.speculators == null) {
                                     lot.speculators = [[], [], []];
                                 }
-        
-                                /*if (lot.speculators[self.game.winningCondition] != null) {
-                                    WS.error(ws, `Game ${message.gameId}: lot ${id} is not for sale any more`);
-                                    console.log(`Game ${message.gameId}: lot ${id} is not for sale any more`);
-                                    return;
-                                }*/
+    
         
                                 lot.speculators[self.game.winningCondition].push(player.number);
         
                                 console.log(`Property ${lot.name} was selected by a speculator: ${player.name} under condition ${self.game.winningCondition}`);
-        
-                                /*self.wss.broadcastEvent (
-                                    game.id,
-                                    "lot-sold-to-speculator",
-                                    {
-                                        "id": lot.id,
-                                        "condition": self.game.winningCondition
-                                    }
-                                );*/
                             });
                         }
 

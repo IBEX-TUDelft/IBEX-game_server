@@ -2,24 +2,6 @@
     <div class="row mt-1 mx-5 mp-1">
         <div class="col-6">
             <div class="container">
-
-                <div class="row-12 mb-1">
-                    <table class="table table-bordered text-center">
-                        <tr>
-                            <td>Condition</td><td>{{ getWinningCondition() }}</td>
-                        </tr>
-                        <tr>
-                            <td>Public Signal</td><td>{{ formatNumber($parent.game.publicSignal) }}</td>
-                        </tr>
-                        <tr>
-                            <td>Private Signal</td><td>{{ formatNumber($parent.player.signals[$parent.game.winningCondition]) }}</td>
-                        </tr>
-                        <tr>
-                            <td>Median Price</td><td>{{ getMedianPrice() }}</td>
-                        </tr>
-                    </table>
-                </div>
-
                 <div class="row mb-1">
                     <div class="offset-md-1 col-3">
                         <button type="button" class="btn btn-primary btn-block" @click='postOrder("ask", false)'>Ask</button>
@@ -36,7 +18,7 @@
                     <div class="col-4" style="height: 300px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
                         <table class="table table-bordered text-center" style="margin-top: auto; margin-bottom: 0px;">
                             <tr v-for="ask in asks" :key="ask.id">
-                                <td>{{ formatNumber(ask.price) }}{{ask.sender == $parent.player.number ? '*' : ''}}</td>
+                                <td>{{ formatNumber(ask.price) }}{{ask.sender == player.number ? '*' : ''}}</td>
                             </tr>
                         </table>
                     </div>
@@ -52,7 +34,7 @@
                     <div class="col-4" style="height: 300px; border: 1px solid; overflow: scroll;">
                         <table class="table table-bordered text-center">
                             <tr v-for="bid in bids" :key="bid.id">
-                                <td>{{ formatNumber(bid.price) }}{{bid.sender == $parent.player.number ? '*' : ''}}</td>
+                                <td>{{ formatNumber(bid.price) }}{{bid.sender == player.number ? '*' : ''}}</td>
                             </tr>
                         </table>
                     </div>
@@ -70,56 +52,63 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <!--div class="row">
                     <table class="table table-bordered text-center">
                         <tr>
-                            <td>Cash</td><td>{{ $parent.player.balance }}</td>
+                            <td>Cash</td><td>{{ player.balance }}</td>
                         </tr>
                         <tr>
-                            <td>Shares</td><td>{{ $parent.player.shares }}</td>
+                            <td>Shares</td><td>{{ player.shares }}</td>
                         </tr>
                     </table>
-                </div>
+                </div-->
             </div>
 
         </div>
 
         <div class="col-6">
 
+            <div class="row-12 mb-1">
+                <table class="table table-bordered text-center">
+                    <tr>
+                        <td>Condition</td><td>{{ conditionName }}</td>
+                        <td>Median Price</td><td>{{ getMedianPrice() }}</td>
+                    </tr>
+                    <tr>
+                        <td>Publ. Signal</td><td>{{ formatNumber(game.publicSignal[condition]) }}</td>
+                        <td>Priv. Signal</td><td>{{ formatNumber(player.signals[condition]) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Balance</td><td>{{ player.wallet[condition].balance }}</td>
+                        <td>Shares</td><td>{{ player.wallet[condition].shares }}</td>
+                    </tr>
+                </table>
+            </div>
+
             <div class="row-12">
                 <div class="text-center"><b>Contracts</b></div>
                 <table class="table table-bordered text-center">
-                    <thead>
+                    <!--thead>
                         <th scope="col" style="width: 33%">Status Quo</th>
                         <th scope="col" style="width: 33%">Project A</th>
                         <th scope="col" style="width: 33%">Project B</th>
-                    </thead>
+                    </thead-->
                     <tbody>
                         <tr v-for="contract in contracts" :key="contract.id">
-                            <td>{{ $parent.game.winningCondition === 0 ? (formatNumber(contract.price) + ((contract.from == $parent.player.number) || (contract.to == $parent.player.number) ? '*' : '')) : ''}}</td>
-                            <td>{{ $parent.game.winningCondition === 1 ? (formatNumber(contract.price) + ((contract.from == $parent.player.number) || (contract.to == $parent.player.number) ? '*' : '')) : ''}}</td>
-                            <td>{{ $parent.game.winningCondition === 2 ? (formatNumber(contract.price) + ((contract.from == $parent.player.number) || (contract.to == $parent.player.number) ? '*' : '')) : ''}}</td>
+                            <!--td>{{ game.winningCondition === 0 ? (formatNumber(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '')) : ''}}</td>
+                            <td>{{ game.winningCondition === 1 ? (formatNumber(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '')) : ''}}</td-->
+                            <td>{{ formatNumber(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '') }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
-            <!--div class="row-12">
-                <button type="button" class="btn btn-primary btn-block" @click='completeMarketPhase()'>End Market Phase</button>
-            </div-->
         </div>
     </div>
 </template>
 
 <script>
-
-const conditionMap = {
-    0: "No Project",
-    1: "Project A",
-    2: "Project B",
-}
-
 export default {
+    props: ['condition', 'conditionName', 'player', 'game', 'pushMessage', 'connection', 'formatNumber'],
     data() {
         return {
             asks: [],
@@ -141,12 +130,13 @@ export default {
         removeLastAsk() {
             const self = this;
 
-            const last = this.asks.filter(a => a.sender == self.$parent.player.number).reduce((p,n) => p.id >= n.id ? p : n);
+            const last = this.asks.filter(a => a.sender == self.$props.player.number).reduce((p,n) => p.id >= n.id ? p : n);
 
             if (last != null) {
                 this.sendMessage("cancel-order", {
                     "order": {
-                        "id": last.id
+                        "id": last.id,
+                        "condition": self.$props.condition
                     }
                 });
             }
@@ -154,12 +144,13 @@ export default {
         removeLastBid() {
             const self = this;
 
-            const last = this.bids.filter(b => b.sender == self.$parent.player.number).reduce((p,n) => p.id >= n.id ? p : n);
+            const last = this.bids.filter(b => b.sender == self.$props.player.number).reduce((p,n) => p.id >= n.id ? p : n);
 
             if (last != null) {
                 this.sendMessage("cancel-order", {
                     "order": {
-                        "id": last.id
+                        "id": last.id,
+                        "condition": self.$props.condition
                     }
                 });
             }
@@ -173,34 +164,36 @@ export default {
         },
         postOrder(type, now) {
             const self = this;
-            const player = self.$parent.player;
+
             let order;
 
             switch(type) {
                 case "ask":
-                    if (player.shares < 1) {
-                        self.pushMessage("warning", `You need 1 shares to do this, you only have ${player.shares}`);
+                    if (self.$props.player.shares < 1) {
+                        self.pushMessage("warning", `You need 1 shares to do this, you only have ${self.$props.player.shares}`);
                         return;
                     }
 
                     order = {
                         "price": parseFloat(self.ask_price),
                         "quantity": 1,
+                        "condition": self.$props.condition,
                         "type": type,
                         "now": now
                     }
 
                     break;
                 case "bid":
-                    if (player.balance < self.bid_price) {
+                    if (self.$props.player.balance < self.bid_price) {
                         self.pushMessage("warning", `You need ${self.bid_price} coins to buy 1 share
-                        at ${self.ask_price} per share, you only have ${player.balance}`);
+                        at ${self.ask_price} per share, you only have ${self.$props.player.balance}`);
                         return;
                     }
 
                     order = {
                         "price": parseFloat(self.bid_price),
                         "quantity": 1,
+                        "condition": self.$props.condition,
                         "type": type,
                         "now": now
                     }
@@ -216,21 +209,12 @@ export default {
                 "order": order
             });
         },
-        pushMessage(type, content) {
-            this.$parent.pushMessage(type, content);
-        },
-        formatNumber(num) {
-            return this.$parent.formatNumber(num);
-        },
         sendMessage(type, msg) {
-            msg.gameId = this.$parent.game.id;
+            msg.gameId = this.$props.game.id;
             msg.type = type;
 
             console.log(msg);
-            this.$parent.connection.send(JSON.stringify(msg));
-        },
-        getWinningCondition() {
-            return conditionMap[this.$parent.game.winningCondition];
+            this.$props.connection.send(JSON.stringify(msg));
         },
         getMedianPrice() {
             if (this.contracts.length === 0) {

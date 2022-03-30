@@ -77,19 +77,19 @@ export default {
          * 2: Developer
          * 3: Owner
          */
-        const roles = [];
+        const roles = [3,2]; //It starts with an owner, then a developer
         const usedNames = [];
+
+        /*for (let i = 0; i < gameParameters.developers.count; i++) {
+            roles.push(2);
+        }*/
+
+        for (let i = 1; i < gameParameters.owners.count; i++) {
+            roles.push(3);
+        }
 
         for (let i = 0; i < gameParameters.speculators.count; i++) {
             roles.push(1);
-        }
-
-        for (let i = 0; i < gameParameters.developers.count; i++) {
-            roles.push(2);
-        }
-
-        for (let i = 0; i < gameParameters.owners.count; i++) {
-            roles.push(3);
         }
 
         const playersCount = roles.length;
@@ -97,7 +97,9 @@ export default {
         console.log('Creating players');
 
         for (let i = 0; i < playersCount; i++) {
-            const role = roles.splice(Math.floor(Math.random() * roles.length), 1)[0];
+            //const role = roles.splice(Math.floor(Math.random() * roles.length), 1)[0];
+            const role = roles.splice(0, 1)[0];
+
             let name = null;
 
             while (name == null || usedNames.includes(name)) {

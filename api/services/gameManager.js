@@ -2,7 +2,8 @@ import gameRepository from '../repositories/gameRepository.js';
 import gameParameterRepository from '../repositories/gameParameterRepository.js';
 import gamePlayerRepository from '../repositories/gamePlayerRepository.js';
 import WS from '../helpers/websocket.js';
-import Harberger from '../logics/harberger/harberger.js';
+import Harberger from '../logics/harberger/Harberger2.js';
+import Futarchy from '../logics/futarchy/Futarchy.js';
 
 export default {
     create() {
@@ -98,9 +99,14 @@ export default {
 
                 switch(gameData.parameters.game_type) {
                     case 'harberger':
-                        game = await Harberger.create(gameData);
+                        game = new Harberger(gameData);
+                        await game.init();
+                        //game = await Harberger.create(gameData);
                         break;
                     case 'futarchy':
+                        game = new Futarchy(gameData);
+                        await game.init();
+                        break;
                     case 'voter':
                         return `Game ${gameId} has type ${gameData.parameters.game_type}: this logic has yet to be implemented.`;
                     default:

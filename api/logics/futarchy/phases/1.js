@@ -61,6 +61,22 @@ export default {
                     }
                 }
 
+                const players = self.game.players.map( p => {
+                    return {
+                        "number": p.number,
+                        "role": p.role,
+                        "tag": p.tag
+                    }
+                });
+
+                self.wss.broadcastEvent(
+                    self.game.id,
+                    "players-known",
+                    {
+                        "players": players
+                    }
+                );
+
                 self.wss.broadcastInfo(self.game.id, 'Wait for the developers and the owners to become acquainted with their property', 1);
                 self.wss.broadcastInfo(self.game.id, 'Get acquainted with your property, starting any project may be quite profitable for you', 2);
                 self.wss.broadcastInfo(self.game.id, 'Get acquainted with your property, notice that if a project will start, its value will decrease', 3);

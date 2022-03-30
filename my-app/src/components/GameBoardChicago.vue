@@ -1,6 +1,7 @@
 <template>
     <div>
-          <div>
+        <vue-confirm-dialog></vue-confirm-dialog>
+        <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
                     <b-nav-item active>Ruleset: {{ game.ruleset }}</b-nav-item>
@@ -11,8 +12,8 @@
                     </b-navbar-brand>
                 </div>
                 <b-navbar-nav class="ml-auto">
-                    <b-nav-item active v-if="game.phase === 6">Balance: {{ player.balance }}</b-nav-item>
-                    <b-nav-item active v-if="game.phase === 6">Shares: {{ player.shares }}</b-nav-item>
+                    <!--b-nav-item active v-if="game.phase === 6">Balance: {{ player.balance }}</b-nav-item>
+                    <b-nav-item active v-if="game.phase === 6">Shares: {{ player.shares }}</b-nav-item-->
                     <b-nav-item active >Round: {{ game.round }}</b-nav-item>
                     <b-nav-item active >Phase: {{ game.phase }}</b-nav-item>
                 </b-navbar-nav>
@@ -23,85 +24,18 @@
             <div class="row">
                 <div class="col-6">
 
-                    <div class="row-12">
-                        <div class="text-center"><b>Declarations</b></div>
-                        <b-form-checkbox-group
-                            id="checkbox-group-1"
-                            v-model="checkedPlots"
-                            name="checkedPlots"
-                        >
-
-                        <table class="table table-bordered">
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div>{{ getDeclarationPlayer(0) }}</div>
-                                        <div class="min-vh-50 d-flex align-items-center" style="min-height: 50px;">
-                                            <div class="container text-center">
-                                                <b-form-checkbox v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                                 && game.declarations[0] != null && game.declarations[0].available[game.winningCondition]" :value="game.declarations[0].id" />
-                                                {{ game.declarations[0] == null ? '-' : game.declarations[0].d[game.winningCondition] }} ({{ getSniperProbability(0)}}%)
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>{{ getDeclarationPlayer(1) }}</div>
-                                        <div class="min-vh-50 d-flex align-items-center" style="min-height: 50px;">
-                                            <div class="container text-center">
-                                                <b-form-checkbox v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                                 && game.declarations[1] != null && game.declarations[1].available[game.winningCondition]" :value="game.declarations[1].id" />
-                                                {{ game.declarations[1] == null ? '-' : game.declarations[1].d[game.winningCondition] }} ({{ getSniperProbability(1)}}%)
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>{{ getDeclarationPlayer(2) }}</div>
-                                        <div class="min-vh-50 d-flex align-items-center" style="min-height: 50px;">
-                                            <div class="container text-center">
-                                                <b-form-checkbox v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                                 && game.declarations[2] != null && game.declarations[2].available[game.winningCondition]" :value="game.declarations[2].id" />
-                                                {{ game.declarations[2] == null ? '-' : game.declarations[2].d[game.winningCondition] }} ({{ getSniperProbability(2)}}%)
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div>{{ getDeclarationPlayer(3) }}</div>
-                                        <div class="min-vh-50 d-flex align-items-center" style="min-height: 50px;">
-                                            <div class="container text-center">
-                                                <b-form-checkbox v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                                 && game.declarations[3] != null && game.declarations[3].available[game.winningCondition]" :value="game.declarations[3].id" />
-                                                {{ game.declarations[3] == null ? '-' : game.declarations[3].d[game.winningCondition] }} ({{ getSniperProbability(3)}}%)
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>{{ getDeclarationPlayer(4) }}</div>
-                                        <div class="min-vh-50 d-flex align-items-center" style="min-height: 50px;">
-                                            <div class="container text-center">
-                                                <b-form-checkbox v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                                 && game.declarations[4] != null && game.declarations[4].available[game.winningCondition]" :value="game.declarations[4].id" />
-                                                {{ game.declarations[4] == null ? '-' : game.declarations[4].d[game.winningCondition] }} ({{ getSniperProbability(4)}}%)
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>{{ getDeclarationPlayer(5) }}</div>
-                                        <div class="min-vh-50 d-flex align-items-center" style="min-height: 50px;">
-                                            <div class="container text-center">
-                                                <b-form-checkbox v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                                 && game.declarations[5] != null && game.declarations[5].available[game.winningCondition]" :value="game.declarations[5].id" />
-                                                {{ game.declarations[5] == null ? '-' : game.declarations[5].d[game.winningCondition] }} ({{ getSniperProbability(5)}}%)
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        </b-form-checkbox-group>
-                    </div>
+                    <FutarchyMatrix :condition="game.winningCondition" :project="conditionToString(game.winningCondition)"
+                     v-if="game.ruleset === 'Futarchy' && game.phase < 7"/>
+                    <HarbergerMatrix
+                        v-else
+                        :condition="game.winningCondition"
+                        :project="conditionToString(game.winningCondition)"
+                        :game="game"
+                        :player="player"
+                        :checkedPlots="checkedPlots"
+                        :getDeclarationPlayer="getDeclarationPlayer"
+                        :getSniperProbability="getSniperProbability"
+                     />
 
                     <div class="row justify-content-center" v-if="player.role == 1 && (game.phase === 3 || game.phase === 8)">
                         <div class="col-6 text-center">
@@ -184,37 +118,37 @@
                                 <tr>
                                     <td>Status Quo</td>
                                     <td>{{ player.property.v[0] }}</td>
-                                    <td><input v-if="game.phase == 2 || game.winningCondition == 0" type="number" class="form-control" v-model="player.declaration[0]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" placeholder="500000" /></td>
+                                    <td><input v-if="game.phase == 2 || game.winningCondition == 0" type="number" class="form-control" v-model="player.declaration[0]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" /></td>
                                     <td>{{ player.declaration[0] * game.taxRate / 100 }}</td>
                                     <td>{{ player.declaration[0] * ( 100 - game.taxRate) / 100 }}</td>
-                                    <td>{{ (player.boundaries.noProject.high - player.declaration[0]) * 100 / (player.boundaries.noProject.high - player.boundaries.noProject.low) }}%</td>
+                                    <td>{{ getMySniperProbability(0) }}%</td>
                                 </tr>
                                 <tr>
                                     <td>Project A</td>
                                     <td>{{ player.property.v[1] }}</td>
-                                    <td><input v-if="game.phase == 2 || game.winningCondition == 1" type="number" class="form-control" v-model="player.declaration[1]" name="player_declaration_1" id="player_declaration_1" aria-describedby="emailHelp" placeholder="500000" /></td>
+                                    <td><input v-if="game.phase == 2 || game.winningCondition == 1" type="number" class="form-control" v-model="player.declaration[1]" name="player_declaration_1" id="player_declaration_1" aria-describedby="emailHelp" /></td>
                                     <td>{{ player.declaration[1] * game.taxRate / 100 }}</td>
                                     <td>{{ player.declaration[1] * ( 100 - game.taxRate) / 100 }}</td>
-                                    <td>{{ (player.boundaries.projectA.high - player.declaration[1]) * 100 / (player.boundaries.projectA.high - player.boundaries.projectA.low) }}%</td>
+                                    <td>{{ getMySniperProbability(1) }}%</td>
                                 </tr>
                                 <tr>
                                     <td>Project B</td>
                                     <td>{{ player.property.v[2] }}</td>
-                                    <td><input v-if="game.phase == 2 || game.winningCondition == 2" type="number" class="form-control" v-model="player.declaration[2]" name="player_declaration_2" id="player_declaration_2" aria-describedby="emailHelp" placeholder="500000" /></td>
+                                    <td><input v-if="game.phase == 2 || game.winningCondition == 2" type="number" class="form-control" v-model="player.declaration[2]" name="player_declaration_2" id="player_declaration_2" aria-describedby="emailHelp" /></td>
                                     <td>{{ player.declaration[2] * game.taxRate / 100 }}</td>
                                     <td>{{ player.declaration[2] * ( 100 - game.taxRate) / 100 }}</td>
-                                    <td>{{ (player.boundaries.projectB.high - player.declaration[2]) * 100 / (player.boundaries.projectB.high - player.boundaries.projectB.low) }}%</td>
+                                    <td>{{ getMySniperProbability(2) }}%</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="row justify-content-center" v-if="player.role > 1">
-                        <div class="col-6 text-center">
+                        <!--div class="col-6 text-center">
                             <button type="button" @click='showPreview()' class="btn btn-primary">Preview</button>
-                        </div>
-                        <div class="col-6 text-center">
-                            <button v-if="game.phase === 2 || game.phase === 7" type="button" @click='submitDeclaration()' class="btn btn-primary" >Submit</button>
+                        </div-->
+                        <div class="col-12 text-center">
+                            <button v-if="(game.phase === 2 || game.phase === 7) && player.hasToDeclare" type="button" @click='submitDeclaration()' class="btn btn-primary" >Submit</button>
                         </div>
                     </div>
 
@@ -277,12 +211,25 @@
             </div>
         </div>
 
-        <DoubleAuctionMarketChicago ref="doubleAuctionMarket" v-if="game.phase === 6"/>
+        <!--div>{{ game.ruleset }}</div-->
+        <DoubleAuctionMarketChicago ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Harberger'"
+            :condition="game.winningCondition"
+            :conditionName="conditionMap[game.winningCondition]"
+            :connection="connection"
+            :game="game"
+            :player="player"
+            :pushMessage="pushMessage"
+            :formatNumber="formatNumber"
+        />
+        <DoubleAuctionMarketFutarchy ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Futarchy'"/>
 
     </div>
 </template>
 <script>
     import DoubleAuctionMarketChicago from './DoubleAuctionMarketChicago.vue';
+    import DoubleAuctionMarketFutarchy from './DoubleAuctionMarketFutarchy.vue';
+    import HarbergerMatrix from './HarbergerMatrix.vue';
+    import FutarchyMatrix from './FutarchyMatrix.vue';
 
     const roleMap = {
         1: "Sniper",
@@ -313,7 +260,7 @@
                 connection: null,
                 lastThreeMessages: [],
                 messages: [],
-                checkedPlots: [],
+                checkedPlots: [[],[],[]],
                 game: {
                     round: 1,
                     phase: 0,
@@ -322,7 +269,8 @@
                     declarations: [],
                     boundaries: null,
                     taxRate: null,
-                    publicSignal: "TBD"
+                    publicSignal: "TBD",
+                    players: []
                 },
                 player: {
                     title: "Starting ...",
@@ -333,19 +281,29 @@
                     balance: 0,
                     shares: 0,
                     property: null,
-                    declaration: [0, 0, 0],
-                    profitEvents: []
+                    declaration: [null, null, null],
+                    profitEvents: [],
+                    hasToDeclare: false
                 },
             };
         },
         components: {
-            DoubleAuctionMarketChicago
+            DoubleAuctionMarketChicago,
+            DoubleAuctionMarketFutarchy,
+            HarbergerMatrix,
+            FutarchyMatrix
         },
         name: 'GameBoard',
         created() {
             window.addEventListener("load", this.openWebSocket);
         },
         methods: {
+            getGame() {
+                return this.game;
+            },
+            getPlayer() {
+                return this.player;
+            },
             sendPurchaseIntention(id, condition) {
                 const self = this;
 
@@ -358,11 +316,40 @@
                     }
                 });
             },
-            getSniperProbability(i){
-                const declaration = this.game.declarations[i];
+            getMySniperProbability(condition) {
+                let low = null, high = null;
+
+                if (condition === 0) {
+                    low = this.player.boundaries.noProject.low;
+                    high = this.player.boundaries.noProject.high;
+                } else if (condition === 1) {
+                    low = this.player.boundaries.projectA.low;
+                    high = this.player.boundaries.projectA.high;
+                } else if (condition === 2) {
+                    low = this.player.boundaries.projectB.low;
+                    high = this.player.boundaries.projectB.high;
+                }
+
+                const snipingProbability = (high - this.player.declaration[condition]) * 100 / (high - low);
+
+                return Math.max(Math.min(snipingProbability, 100), 0);
+            },
+            getSniperProbability(playerIndex, condition){
+                console.log(`Searching for player of declaration ${playerIndex} under condition ${condition}`);
+
+                if (condition == null) {
+                    if (this.game.winningCondition != null) {
+                        condition = this.game.winningCondition;
+                    } else {
+                        console.log('Winning condition not known yet. Cannot calculate the sniper probability right now');
+                        return;
+                    }
+                }
+
+                const declaration = this.game.declarations[playerIndex];
 
                 if (declaration == null) {
-                    console.log(`Could not find declaration ${i}`);
+                    console.log(`Declarations of player not available at this stage`);
                     return null;
                 }
 
@@ -379,45 +366,77 @@
 
                 let low = null, high = null;
 
-                if (this.game.winningCondition === 0) {
+                if (condition === 0) {
                     low = boundaries.noProject.low;
                     high = boundaries.noProject.high;
-                } else if (this.game.winningCondition === 1) {
+                } else if (condition === 1) {
                     low = boundaries.projectA.low;
                     high = boundaries.projectA.high;
-                } else if (this.game.winningCondition === 2) {
+                } else if (condition === 2) {
                     low = boundaries.projectB.low;
                     high = boundaries.projectB.high;
                 }
 
                 if (low == null || high == null) {
-                    console.log(`Something wrong with the winning condition: ${this.game.winningCondition}`);
+                    console.log(`Something wrong with the winning condition: ${condition}`);
                     return null;
                 }
 
-                const value = declaration.d[this.game.winningCondition];
+                const value = declaration.d[condition];
 
-                return (high - value) * 100 / (high - low);
+                const snipingProbability = (high - value) * 100 / (high - low);
+
+                return Math.max(Math.min(snipingProbability, 100), 0);
             },
             getDeclarationPlayer(i) {
                 const declaration = this.game.declarations[i];
 
                 if (declaration == null) {
                     console.log(`Could not find declaration ${i}`);
-                    return 'Unavailable';
+
+                    switch(i) {
+                        case 0:
+                            return "Owner 1";
+                        case 1:
+                            return "Developer";
+                        default:
+                            return `Owner ${i}`;
+                    }
                 }
 
-                return roleMap[declaration.role] + ' ' + declaration.number;
+                const player = this.game.players.find(p => p.number === declaration.number);
+
+                return player.tag;
             },
             doneSpeculating() {
                 const self = this;
 
                 console.log('Checked plots: ' + this.checkedPlots);
 
-                self.sendMessage({
-                    "gameId": self.game.id,
-                    "type": "done-speculating",
-                    "snipe": this.checkedPlots
+                this.$confirm({
+                    message: 'Do you confirm your choices?',
+                    button: {
+                        no: 'No',
+                        yes: 'Yes'
+                    },
+                    /**
+                     * Callback Function
+                     * @param {Boolean} confirm
+                     */
+                    callback: confirm => {
+                        if (confirm) {
+                            self.sendMessage({
+                                "gameId": self.game.id,
+                                "type": "done-speculating",
+                                "snipe": self.checkedPlots
+                            });
+
+                            //Reset the checkboxes
+                            for (let i = 0; i < self.checkedPlots.length; i++) {
+                                self.checkedPlots[i] = [];
+                            }
+                        }
+                    }
                 });
             },
             conditionToString(c) {
@@ -426,14 +445,71 @@
             submitDeclaration() {
                 const self = this;
 
-                self.sendMessage({
-                    "gameId": self.game.id,
-                    "type": "declare",
-                    "declaration": [
-                        parseInt(self.player.declaration[0]),
-                        parseInt(self.player.declaration[1]),
-                        parseInt(self.player.declaration[2])
-                    ]
+                const myDeclarations = [0, 0, 0];
+
+                const myWarnings = [];
+
+                console.log('My declarations:' + myDeclarations);
+
+                for (let i = 0; i < 3; i++) {
+                    const v = parseInt(self.player.declaration[i]);
+
+                    console.log(v);
+
+                    if (isNaN(v) || v == null) {
+                        myWarnings.push(`Your declaration under condition ${conditionMap[i]} is empty: it might result in a massive loss`);
+                        continue;
+                    }
+
+                    myDeclarations[i] = v;
+
+                    let low = null, high = null;
+
+                    if (i === 0) {
+                        low = this.player.boundaries.noProject.low;
+                        high = this.player.boundaries.noProject.high;
+                    } else if (i === 1) {
+                        low = this.player.boundaries.projectA.low;
+                        high = this.player.boundaries.projectA.high;
+                    } else if (i === 2) {
+                        low = this.player.boundaries.projectB.low;
+                        high = this.player.boundaries.projectB.high;
+                    }
+
+                    if (v < low) {
+                        myWarnings.push(`Your declaration under condition ${conditionMap[i]} is less than the known minimum value (${low}), speculators will certainly target you`);
+                    }
+
+                    if (v > high) {
+                        myWarnings.push(`Your declaration under condition ${conditionMap[i]} is greater than the known maximum value (${high}), this is certainly not optimal`);
+                    }
+                }
+
+                let message = 'Do you confirm your declaration?' + myWarnings.join(' - ');
+
+                this.$confirm({
+                    message: message,
+                    button: {
+                        no: 'No',
+                        yes: 'Yes'
+                    },
+                    /**
+                     * Callback Function
+                     * @param {Boolean} confirm
+                     */
+                    callback: confirm => {
+                        if (confirm) {
+                            self.sendMessage({
+                                "gameId": self.game.id,
+                                "type": "declare",
+                                "declaration": [
+                                    parseInt(self.player.declaration[0]),
+                                    parseInt(self.player.declaration[1]),
+                                    parseInt(self.player.declaration[2])
+                                ]
+                            });
+                        }
+                    }
                 });
             },
             showPreview() {
@@ -496,9 +572,10 @@
                                 self.game.taxRate = ev.data.taxRate;
                                 self.player.boundaries 
                                 self.player.role = ev.data.role;
-                                self.player.title += ` (${roleMap[ev.data.role]})`;
+                                //self.player.title += ` (${roleMap[ev.data.role]})`;
                                 self.player.balance = ev.data.balance;
                                 self.player.shares = ev.data.shares;
+                                self.player.wallet = ev.data.wallet;
 
                                 if (self.player.role == 2) {
                                     self.player.boundaries = self.game.boundaries.developer;
@@ -508,15 +585,31 @@
 
                                 if (ev.data.property != null) {
                                     self.player.property = ev.data.property;
-                                    self.player.declaration[0] = ev.data.property.v[0];
-                                    self.player.declaration[1] = ev.data.property.v[1];
-                                    self.player.declaration[2] = ev.data.property.v[2];
+                                    //self.player.declaration[0] = ev.data.property.v[0];
+                                    //self.player.declaration[1] = ev.data.property.v[1];
+                                    //self.player.declaration[2] = ev.data.property.v[2];
                                     console.log(ev.data.property);
                                 }
                                 break;
                             case "phase-transition":
                                 self.game.round = ev.data.round;
                                 self.game.phase = ev.data.phase;
+
+                                if ((self.game.phase === 2 || self.game.phase === 7) && self.player.role > 1) {
+                                    self.player.hasToDeclare = true;
+                                }
+
+                                break;
+                            case "players-known":
+                                self.game.players = ev.data.players;
+
+                                self.player.tag = ev.data.players[self.player.number - 1].tag;
+                                self.player.title = self.player.tag;
+
+                                break;
+                            case 'declaration-received':
+                                self.player.hasToDeclare = false;
+                                console.log('Confirmation received');
                                 break;
                             case "declarations-published":
                                 self.game.declarations = ev.data.declarations;
@@ -593,20 +686,36 @@
                                 break;
                             }
                             case "add-order":
-                                self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "add");
+                                if (self.game.ruleset === 'Harberger') {
+                                    self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "add");
+                                } else if (self.game.ruleset === 'Futarchy') {
+                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`].orderEvent(ev.data.order, "add");
+                                }
                                 break;
                             case "delete-order":
-                                self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "delete");
+                                if (self.game.ruleset === 'Harberger') {
+                                    self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "delete");
+                                } else if (self.game.ruleset === 'Futarchy') {
+                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`].orderEvent(ev.data.order, "delete");
+                                }
                                 break;
                             case "update-order":
-                                self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "update");
+                                if (self.game.ruleset === 'Harberger') {
+                                    self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "update");
+                                } else if (self.game.ruleset === 'Futarchy') {
+                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`].orderEvent(ev.data.order, "update");
+                                }
                                 break;
                             case "contract-fulfilled": 
-                                self.$refs.doubleAuctionMarket.orderEvent(ev.data, "contract");
+                                if (self.game.ruleset === 'Harberger') {
+                                    self.$refs.doubleAuctionMarket.orderEvent(ev.data, "contract");
+                                } else if (self.game.ruleset === 'Futarchy') {
+                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.condition}`].orderEvent(ev.data, "contract");
+                                }
                                 break;
                             case "asset-movement": {
-                                self.player.balance = ev.data.balance;
-                                self.player.shares = ev.data.shares;
+                                self.player.wallet[ev.data.condition].balance = ev.data.balance;
+                                self.player.wallet[ev.data.condition].shares = ev.data.shares;
 
                                 const movement = ev.data.movement;
 
@@ -631,8 +740,11 @@
                             case "round-end":
                                 self.game.phase = "-";
                                 break;
+                            case "winning-condition":
+                                self.game.winningCondition = ev.data.winningCondition;
+                                break;
                             default:
-                                console.error(`Type ${ev.type} was not understood`);
+                                console.error(`Type ${ev.eventType} was not understood`);
                         }
                     } else { //it is a message
                         console.log(`${ev.type} - ${ev.message}`);
@@ -669,6 +781,7 @@
         },
         mounted () {
             this.game.id = parseInt(this.$route.params.id);
+            window.vue = this;
         }
     }
 </script>

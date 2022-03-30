@@ -7,54 +7,75 @@ export default {
             game: game,
             wss: wss,
             startTime: 0,
+            results: {},
             onEnter: async function () {
-                console.log('PHASE 8');
+                console.log('PHASE 3');
 
                 const self = this;
 
-                self.game.players.filter(p => p.role === 1).forEach(p => {p.doneSpeculating = false});
+                console.log(`Setting the timeout to ${self.game.parameters.minutes_for_sniping} minutes`);
 
                 self.endTime = Date.now() + self.game.parameters.minutes_for_sniping * 60 * 1000;
+
+                self.game.players.filter(p => p.role === 1).forEach(p => {p.doneSpeculating = false});
 
                 self.wss.broadcastInfo(self.game.id, 'Click on the properties you are interested in. Be fast or the other speculators will take them first!', 1);
                 self.wss.broadcastInfo(self.game.id, 'Check the table of declared values. If you think some property is undervalued, you can buy it and make profit', 1);
                 self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 2);
                 self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 3);
 
-                const declarationData = [];
+                // 1. calculate D
+
+                self.game.D = [0,0,0];
+
+                self.game.properties.forEach(p => {
+                    for (let j = 0; j < 3; j++) {
+                        self.game.D[j] += p.d[j];
+                    }
+                });
+
+                // 2. calculate all public signals
+
+                console.log('Calculating the public signal');
+
+                this.game.publicSignal = [0, 0, 0];
+
+                const r = self.game.parameters.tax_rate_final / 100;
+
+                for(let conditionIndex = 0; conditionIndex < 3; conditionIndex++) {
+                    /* S would be the total declared value if the declaration would not change later.
+                        This yields S * r, the total tax virtual revenue at this stage.
+                        We say there are 100 shares of it, not all distributed to player (e.g. 5 per player, 12 players = 60% redistributed),
+                        so each share has a theoretical value of:
+                    */
+                    const S = self.game.D[conditionIndex];
+                    this.game.publicSignal[conditionIndex] = S * r / 100;
+                }
+
+                // 3. send declarations
+                const declatationData = [];
 
                 game.players.forEach(p => {
                     const property = p.property;
 
                     if (property != null) {
-                        const declaration = {
+                        declatationData.push({
                             "id": property.id,
                             "name": property.name,
                             "owner": p.name,
                             "role": p.role,
                             "number": p.number,
                             "d": property.d,
-                            "available": [false, false, false]
-                        };
-
-                        declaration.available[self.game.winningCondition] = true;
-
-                        console.log('Winning condition declaration made available for sniping');
-
-                        declarationData.push(declaration);
-
-                        console.log('Declaration pushed');
+                            "available": [true, true, true]
+                        });
                     }
                 });
-
-                console.log('Broadcasting declarations');
 
                 const err = self.wss.broadcastEvent(
                     game.id,
                     "declarations-published",
                     {
-                        "declarations": declarationData,
-                        "winningCondition": self.game.winningCondition
+                        "declarations": declatationData
                     }
                 );
 
@@ -108,46 +129,6 @@ export default {
                 const self = this;
 
                 this.handlers.push({
-                    "type": "purchase-lot",
-                    "role": [1],
-                    "action": function(ws, message) {
-                        const player = self.game.players.find(p => p.number === ws.player.number);
-
-                        if (player == null) {
-                            WS.error(ws, `Game ${message.gameId}: player ${ws.player.number} not found`);
-                            return;
-                        }
-
-                        const lot = self.game.properties.find(p => p.id === message.lot.id);
-
-                        if (lot == null) {
-                            WS.error(ws, `Game ${message.gameId}: lot ${message.lot.id}} not found`);
-                            return;
-                        }
-
-                        if (lot.speculators == null) {
-                            lot.speculators = [null, null, null];
-                        }
-
-                        if (lot.speculators[message.lot.condition] != null) {
-                            WS.error(ws, `Game ${message.gameId}: lot ${message.lot.id} is not for sale any more`);
-                            return;
-                        }
-
-                        lot.speculators[message.lot.condition] = player.number;
-
-                        console.log(`Property ${lot.name} was bought by a speculator: ${player.name} under condition ${message.lot.condition}`);
-
-                        self.wss.broadcastEvent (
-                            game.id,
-                            "lot-sold-to-speculator",
-                            {
-                                "id": lot.id,
-                                "condition": message.lot.condition
-                            }
-                        );
-                    }
-                }, {
                     "type": "done-speculating",
                     "role": [1],
                     "action": function(ws, message) {
@@ -171,29 +152,30 @@ export default {
                             return;
                         }
 
-                        const winningConditionSnipes = message.snipe[self.game.winningCondition];
+                        for (let conditionIndex = 0; conditionIndex < 3; conditionIndex ++) {
+                            const conditionSnipes = message.snipe[conditionIndex];
 
-                        console.log('Winning condition snipes: ' + winningConditionSnipes.length);
-
-                        if (winningConditionSnipes != null && winningConditionSnipes.length > 0) {
-                            winningConditionSnipes.forEach(id => {
-                                const lot = self.game.properties.find(p => p.id === id);
-
-                                if (lot == null) {
-                                    WS.error(ws, `Game ${message.gameId}: lot ${id}} not found`);
-                                    console.log(`Game ${message.gameId}: lot ${id}} not found`);
-                                    return;
-                                }
-        
-                                if (lot.speculators == null) {
-                                    lot.speculators = [[], [], []];
-                                }
+                            console.log(`Condition ${conditionIndex} snipes: ${conditionSnipes.length}`);
     
-        
-                                lot.speculators[self.game.winningCondition].push(player.number);
-        
-                                console.log(`Property ${lot.name} was selected by a speculator: ${player.name} under condition ${self.game.winningCondition}`);
-                            });
+                            if (conditionSnipes != null && conditionSnipes.length > 0) {
+                                conditionSnipes.forEach(id => {
+                                    const lot = self.game.properties.find(p => p.id === id);
+    
+                                    if (lot == null) {
+                                        WS.error(ws, `Game ${message.gameId}: lot ${id}} not found`);
+                                        console.log(`Game ${message.gameId}: lot ${id}} not found`);
+                                        return;
+                                    }
+            
+                                    if (lot.speculators == null) {
+                                        lot.speculators = [[], [], []];
+                                    }
+
+                                    lot.speculators[conditionIndex].push(player.number);
+            
+                                    console.log(`Property ${lot.name} was selected by a speculator: ${player.name} under condition ${conditionIndex}`);
+                                });
+                            }
                         }
 
                         player.doneSpeculating = true;

@@ -88,8 +88,6 @@ export default {
         const currentPhase = data.currentPhase;
         data.currentPhase = null;
 
-        console.log('GAME DATA');
-
         await new Promise((resolve, reject) => {
             this.pool.query(`UPDATE games 
             SET game_data = '${JSON.stringify(data)}'
@@ -103,7 +101,5 @@ export default {
         });
 
         data.currentPhase = currentPhase;
-
-        console.log(data);
     }
 }

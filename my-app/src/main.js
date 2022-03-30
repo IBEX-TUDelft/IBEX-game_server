@@ -3,10 +3,13 @@ import App from './App.vue'
 import { BootstrapVue } from 'bootstrap-vue'
 import router from './router'
 import axios from "axios";
+import VueConfirmDialog from 'vue-confirm-dialog'
 
 Vue.config.productionTip = false
 
 Vue.use(BootstrapVue);
+Vue.use(VueConfirmDialog);
+Vue.component('vue-confirm-dialog', VueConfirmDialog.default);
 
 const base = axios.create({
   baseURL: process.env.VUE_APP_API,
