@@ -11,10 +11,6 @@
                     </b-navbar-brand>
                 </div>
                 <b-navbar-nav class="ml-auto">
-                    <!--b-nav-item active v-if="game.phase === 6">Balance: {{ player.balance }}</b-nav-item>
-                    <b-nav-item active v-if="game.phase === 6">Shares: {{ player.shares }}</b-nav-item>
-                    <b-nav-item active >Round: {{ game.round }}</b-nav-item>
-                    <b-nav-item active >Phase: {{ game.phase }}</b-nav-item-->
                 </b-navbar-nav>
             </b-navbar>
         </div>
@@ -44,15 +40,15 @@
                     <tbody>
                         <tr v-for="d in firstDeclarations" :key="d.id">
                             <td>{{ getPlayer(d.player, d.role) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'value', 0)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'value', 1)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'value', 2)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'declaration', 0)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'declaration', 1)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'declaration', 2)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'taxes', 0)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'taxes', 1)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'taxes', 2)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'value', 0)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'value', 1)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'value', 2)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'declaration', 0)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'declaration', 1)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'declaration', 2)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'taxes', 0)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'taxes', 1)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'taxes', 2)) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -77,9 +73,10 @@
             </div>
 
             <div class="row">
-                <div class="text-center"><b>Signals (Winning Conditions Only)</b></div>
+                <div class="text-center"><b>Signals (Winning Condition highlighted)</b></div>
                 <table class="table table-bordered">
                     <thead class="thead-dark">
+                        <th scope="col">Condition</th>
                         <th scope="col">Public</th>
                         <th scope="col">Private #1</th>
                         <th scope="col">#2</th>
@@ -95,20 +92,21 @@
                         <th scope="col">#12</th>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>{{ signals != null ? formatNumber(signals.publicSignal) : '-' }}</td>
-                            <td>{{ getPrivateSignal(0) }}</td>
-                            <td>{{ getPrivateSignal(1) }}</td>
-                            <td>{{ getPrivateSignal(2) }}</td>
-                            <td>{{ getPrivateSignal(3) }}</td>
-                            <td>{{ getPrivateSignal(4) }}</td>
-                            <td>{{ getPrivateSignal(5) }}</td>
-                            <td>{{ getPrivateSignal(6) }}</td>
-                            <td>{{ getPrivateSignal(7) }}</td>
-                            <td>{{ getPrivateSignal(8) }}</td>
-                            <td>{{ getPrivateSignal(9) }}</td>
-                            <td>{{ getPrivateSignal(10) }}</td>
-                            <td>{{ getPrivateSignal(11) }}</td>
+                        <tr v-for="c in [{id: 0}, {id: 1}, {id: 2}]" :key="c.id" :style="c.id === winningCondition ? 'background-color: yellow;' : ''">
+                            <td>{{ getConditionString(c.id) }}</td>
+                            <td>{{ signals != null ? formatUs(signals.publicSignal[c.id]) : '-' }}</td>
+                            <td>{{ getPrivateSignal(0, c.id) }}</td>
+                            <td>{{ getPrivateSignal(1, c.id) }}</td>
+                            <td>{{ getPrivateSignal(2, c.id) }}</td>
+                            <td>{{ getPrivateSignal(3, c.id) }}</td>
+                            <td>{{ getPrivateSignal(4, c.id) }}</td>
+                            <td>{{ getPrivateSignal(5, c.id) }}</td>
+                            <td>{{ getPrivateSignal(6, c.id) }}</td>
+                            <td>{{ getPrivateSignal(7, c.id) }}</td>
+                            <td>{{ getPrivateSignal(8, c.id) }}</td>
+                            <td>{{ getPrivateSignal(9, c.id) }}</td>
+                            <td>{{ getPrivateSignal(10, c.id) }}</td>
+                            <td>{{ getPrivateSignal(11, c.id) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -150,7 +148,7 @@
                         <tr v-for="f in firstSnipeResults" :key="f.id">
                             <td>{{ getPlayer(f.player.number, f.player.role) }}</td>
                             <td>{{ getPlayer(f.target.number, f.target.role) }}</td>
-                            <td>{{ formatNumber(f.profit) }}</td>
+                            <td>{{ formatUs(f.profit) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -174,15 +172,15 @@
                     <tbody>
                         <tr v-for="d in secondDeclarations" :key="d.id">
                             <td>{{ getPlayer(d.player, d.role) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'value', 0)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'value', 1)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'value', 2)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'declaration', 0)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'declaration', 1)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'declaration', 2)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'taxes', 0)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'taxes', 1)) }}</td>
-                            <td>{{ formatNumber(getValue(d, 'taxes', 2)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'value', 0)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'value', 1)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'value', 2)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'declaration', 0)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'declaration', 1)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'declaration', 2)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'taxes', 0)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'taxes', 1)) }}</td>
+                            <td>{{ formatUs(getValue(d, 'taxes', 2)) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -224,7 +222,7 @@
                         <tr v-for="f in secondSnipeResults" :key="f.id">
                             <td>{{ getPlayer(f.player.number, f.player.role) }}</td>
                             <td>{{ getPlayer(f.target.number, f.target.role) }}</td>
-                            <td>{{ formatNumber(f.profit) }}</td>
+                            <td>{{ formatUs(f.profit) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -268,6 +266,9 @@
         created() {
         },
         methods: {
+            getConditionString(i) {
+                return conditionMap[i];
+            },
             exportXlsx() {
                 const self = this;
 
@@ -291,15 +292,15 @@
                 this.firstDeclarations.forEach(d => {
                     xls.push([
                         self.getPlayer(d.player, d.role),
-                        self.formatNumber(self.getValue(d, 'value', 0)),
-                        self.formatNumber(self.getValue(d, 'value', 1)),
-                        self.formatNumber(self.getValue(d, 'value', 2)),
-                        self.formatNumber(self.getValue(d, 'declaration', 0)),
-                        self.formatNumber(self.getValue(d, 'declaration', 1)),
-                        self.formatNumber(self.getValue(d, 'declaration', 2)),
-                        self.formatNumber(self.getValue(d, 'taxes', 0)),
-                        self.formatNumber(self.getValue(d, 'taxes', 1)),
-                        self.formatNumber(self.getValue(d, 'taxes', 2))
+                        self.formatUs(self.getValue(d, 'value', 0)),
+                        self.formatUs(self.getValue(d, 'value', 1)),
+                        self.formatUs(self.getValue(d, 'value', 2)),
+                        self.formatUs(self.getValue(d, 'declaration', 0)),
+                        self.formatUs(self.getValue(d, 'declaration', 1)),
+                        self.formatUs(self.getValue(d, 'declaration', 2)),
+                        self.formatUs(self.getValue(d, 'taxes', 0)),
+                        self.formatUs(self.getValue(d, 'taxes', 1)),
+                        self.formatUs(self.getValue(d, 'taxes', 2))
                     ]);
                 });
 
@@ -321,9 +322,10 @@
 
                 xls.push([]);
 
-                xls.push(['Signals (Winning Conditions Only)']);
+                xls.push(['Signals']);
 
                 xls.push([
+                    'condition',
                     'Public',
                     'Private #1',
                     '#2',
@@ -339,21 +341,24 @@
                     '#12'
                 ]);
 
-                xls.push([
-                    this.signals != null ? self.formatNumber(this.signals.publicSignal) : '-',
-                    self.getPrivateSignal(0),
-                    self.getPrivateSignal(1),
-                    self.getPrivateSignal(2),
-                    self.getPrivateSignal(3),
-                    self.getPrivateSignal(4),
-                    self.getPrivateSignal(5),
-                    self.getPrivateSignal(6),
-                    self.getPrivateSignal(7),
-                    self.getPrivateSignal(8),
-                    self.getPrivateSignal(9),
-                    self.getPrivateSignal(10),
-                    self.getPrivateSignal(11)
-                ]);
+                for (let i = 0; i < 3; i++) {
+                    xls.push([
+                        conditionMap[i],
+                        this.signals != null ? self.formatUs(this.signals.publicSignal[i]) : '-',
+                        self.getPrivateSignal(0, i),
+                        self.getPrivateSignal(1, i),
+                        self.getPrivateSignal(2, i),
+                        self.getPrivateSignal(3, i),
+                        self.getPrivateSignal(4, i),
+                        self.getPrivateSignal(5, i),
+                        self.getPrivateSignal(6, i),
+                        self.getPrivateSignal(7, i),
+                        self.getPrivateSignal(8, i),
+                        self.getPrivateSignal(9, i),
+                        self.getPrivateSignal(10, i),
+                        self.getPrivateSignal(11, i)
+                    ]);
+                }
 
                 xls.push([]);
 
@@ -392,7 +397,7 @@
                         xls.push([
                             self.getPlayer(f.player.number, f.player.role),
                             self.getPlayer(f.target.number, f.target.role),
-                            self.formatNumber(f.profit)
+                            self.formatUs(f.profit)
                         ]);
                     });
 
@@ -418,15 +423,15 @@
                     this.secondDeclarations.forEach(d => {
                         xls.push([
                             self.getPlayer(d.player, d.role),
-                            self.formatNumber(self.getValue(d, 'value', 0)),
-                            self.formatNumber(self.getValue(d, 'value', 1)),
-                            self.formatNumber(self.getValue(d, 'value', 2)),
-                            self.formatNumber(self.getValue(d, 'declaration', 0)),
-                            self.formatNumber(self.getValue(d, 'declaration', 1)),
-                            self.formatNumber(self.getValue(d, 'declaration', 2)),
-                            self.formatNumber(self.getValue(d, 'taxes', 0)),
-                            self.formatNumber(self.getValue(d, 'taxes', 1)),
-                            self.formatNumber(self.getValue(d, 'taxes', 2))
+                            self.formatUs(self.getValue(d, 'value', 0)),
+                            self.formatUs(self.getValue(d, 'value', 1)),
+                            self.formatUs(self.getValue(d, 'value', 2)),
+                            self.formatUs(self.getValue(d, 'declaration', 0)),
+                            self.formatUs(self.getValue(d, 'declaration', 1)),
+                            self.formatUs(self.getValue(d, 'declaration', 2)),
+                            self.formatUs(self.getValue(d, 'taxes', 0)),
+                            self.formatUs(self.getValue(d, 'taxes', 1)),
+                            self.formatUs(self.getValue(d, 'taxes', 2))
                         ]);
                     });
 
@@ -468,7 +473,7 @@
                         xls.push([
                             self.getPlayer(f.player.number, f.player.role),
                             self.getPlayer(f.target.number, f.target.role),
-                            self.formatNumber(f.profit)
+                            self.formatUs(f.profit)
                         ]);
                     });
 
@@ -498,12 +503,16 @@
 
                 return value;
             },
-            getPrivateSignal(i) {
+            getPrivateSignal(i, condition) {
                 if (this.signals == null || this.signals.privateSignals[i] == null) {
                     return '-';
                 }
 
-                return this.formatNumber(this.signals.privateSignals[i][this.winningCondition]);
+                if (condition == null) {
+                    condition = this.winningCondition;
+                }
+
+                return this.formatUs(this.signals.privateSignals[i][condition]);
             },
             getYesOrNo(bool) {
                 if (bool == null) {
@@ -537,6 +546,13 @@
             },
             showPreview() {
                 //TODO
+            },
+            formatUs(num) {
+                if (num == null || typeof num != 'number') {
+                    return num;
+                }
+
+                return num.toLocaleString('en-US');
             },
             formatNumber(num) {
                 if (num == null) {
@@ -572,6 +588,8 @@
             this.secondSnipeResults = response.data.data.secondSnipeResults;
 
             console.log(response.data.data);
+
+            window.vue = this;
         }
     }
 </script>

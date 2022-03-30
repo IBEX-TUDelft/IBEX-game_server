@@ -4,7 +4,7 @@
         <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
-                    <b-nav-item active>Ruleset: {{ game.ruleset }}</b-nav-item>
+                    <!--b-nav-item active>Ruleset: {{ game.ruleset }}</b-nav-item-->
                 </b-navbar-nav>
                 <div class="container justify-content-center">
                     <b-navbar-brand>
@@ -37,7 +37,7 @@
                         :getSniperProbability="getSniperProbability"
                      />
 
-                    <div class="row justify-content-center" v-if="player.role == 1 && (game.phase === 3 || game.phase === 8)">
+                    <div class="row justify-content-center" v-if="player.role == 1 && (game.phase === 3 || game.phase === 8) && player.hasToSpeculate">
                         <div class="col-6 text-center">
                             <button type="button" @click='doneSpeculating()' class="btn btn-primary">Submit</button>
                         </div>
@@ -55,18 +55,18 @@
                                 <tbody>
                                     <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
                                         <td>Status Quo</td>
-                                        <td>{{ game.boundaries.owner.noProject.low }}</td>
-                                        <td>{{ game.boundaries.owner.noProject.high }}</td>
+                                        <td>{{ formatUs(game.boundaries.owner.noProject.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.owner.noProject.high) }}</td>
                                     </tr>
                                     <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
                                         <td>Project A</td>
-                                        <td>{{ game.boundaries.owner.projectA.low }}</td>
-                                        <td>{{ game.boundaries.owner.projectA.high }}</td>
+                                        <td>{{ formatUs(game.boundaries.owner.projectA.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.owner.projectA.high) }}</td>
                                     </tr>
                                     <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
                                         <td>Project B</td>
-                                        <td>{{ game.boundaries.owner.projectB.low }}</td>
-                                        <td>{{ game.boundaries.owner.projectB.high }}</td>
+                                        <td>{{ formatUs(game.boundaries.owner.projectB.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.owner.projectB.high) }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -82,18 +82,18 @@
                                 <tbody>
                                     <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
                                         <td>Status Quo</td>
-                                        <td>{{ game.boundaries.developer.noProject.low }}</td>
-                                        <td>{{ game.boundaries.developer.noProject.high }}</td>
+                                        <td>{{ formatUs(game.boundaries.developer.noProject.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.developer.noProject.high) }}</td>
                                     </tr>
                                     <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
                                         <td>Project A</td>
-                                        <td>{{ game.boundaries.developer.projectA.low }}</td>
-                                        <td>{{ game.boundaries.developer.projectA.high }}</td>
+                                        <td>{{ formatUs(game.boundaries.developer.projectA.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.developer.projectA.high) }}</td>
                                     </tr>
                                     <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
                                         <td>Project B</td>
-                                        <td>{{ game.boundaries.developer.projectB.low }}</td>
-                                        <td>{{ game.boundaries.developer.projectB.high }}</td>
+                                        <td>{{ formatUs(game.boundaries.developer.projectB.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.developer.projectB.high) }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -117,26 +117,26 @@
                             <tbody>
                                 <tr>
                                     <td>Status Quo</td>
-                                    <td>{{ player.property.v[0] }}</td>
+                                    <td>{{ formatUs(player.property.v[0]) }}</td>
                                     <td><input v-if="game.phase == 2 || game.winningCondition == 0" type="number" class="form-control" v-model="player.declaration[0]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" /></td>
-                                    <td>{{ player.declaration[0] * game.taxRate / 100 }}</td>
-                                    <td>{{ player.declaration[0] * ( 100 - game.taxRate) / 100 }}</td>
+                                    <td>{{ formatUs(player.declaration[0] * game.taxRate / 100) }}</td>
+                                    <td>{{ formatUs(player.declaration[0] * ( 100 - game.taxRate) / 100) }}</td>
                                     <td>{{ getMySniperProbability(0) }}%</td>
                                 </tr>
                                 <tr>
                                     <td>Project A</td>
-                                    <td>{{ player.property.v[1] }}</td>
+                                    <td>{{ formatUs(player.property.v[1]) }}</td>
                                     <td><input v-if="game.phase == 2 || game.winningCondition == 1" type="number" class="form-control" v-model="player.declaration[1]" name="player_declaration_1" id="player_declaration_1" aria-describedby="emailHelp" /></td>
-                                    <td>{{ player.declaration[1] * game.taxRate / 100 }}</td>
-                                    <td>{{ player.declaration[1] * ( 100 - game.taxRate) / 100 }}</td>
+                                    <td>{{ formatUs(player.declaration[1] * game.taxRate / 100) }}</td>
+                                    <td>{{ formatUs(player.declaration[1] * ( 100 - game.taxRate) / 100) }}</td>
                                     <td>{{ getMySniperProbability(1) }}%</td>
                                 </tr>
                                 <tr>
                                     <td>Project B</td>
-                                    <td>{{ player.property.v[2] }}</td>
+                                    <td>{{ formatUs(player.property.v[2]) }}</td>
                                     <td><input v-if="game.phase == 2 || game.winningCondition == 2" type="number" class="form-control" v-model="player.declaration[2]" name="player_declaration_2" id="player_declaration_2" aria-describedby="emailHelp" /></td>
-                                    <td>{{ player.declaration[2] * game.taxRate / 100 }}</td>
-                                    <td>{{ player.declaration[2] * ( 100 - game.taxRate) / 100 }}</td>
+                                    <td>{{ formatUs(player.declaration[2] * game.taxRate / 100) }}</td>
+                                    <td>{{ formatUs(player.declaration[2] * ( 100 - game.taxRate) / 100) }}</td>
                                     <td>{{ getMySniperProbability(2) }}%</td>
                                 </tr>
                             </tbody>
@@ -169,12 +169,12 @@
                                 <tr v-for="pEv in player.profitEvents" :key="pEv.id">
                                     <td>{{pEv.round}}.{{pEv.phase}}</td>
                                     <td>{{pEv.condition}}</td>
-                                    <td>{{pEv.value}}</td>
-                                    <td>{{pEv.declaration}}</td>
+                                    <td>{{formatUs(pEv.value)}}</td>
+                                    <td>{{formatUs(pEv.declaration)}}</td>
                                     <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
-                                    <td>{{pEv.snipeProfit}}</td>
-                                    <td>{{pEv.taxes}}</td>
-                                    <td>{{pEv.total}}</td>
+                                    <td>{{formatUs(pEv.snipeProfit)}}</td>
+                                    <td>{{formatUs(pEv.taxes)}}</td>
+                                    <td>{{formatUs(pEv.total)}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -196,9 +196,9 @@
                                     <td>{{pEv.round}}.{{pEv.phase}}</td>
                                     <td>{{pEv.condition}}</td>
                                     <td>{{pEv.property}}</td>
-                                    <td>{{pEv.declaration}}</td>
+                                    <td>{{formatUs(pEv.declaration)}}</td>
                                     <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
-                                    <td>{{pEv.snipeProfit}}</td>
+                                    <td>{{formatUs(pEv.snipeProfit)}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -283,7 +283,8 @@
                     property: null,
                     declaration: [null, null, null],
                     profitEvents: [],
-                    hasToDeclare: false
+                    hasToDeclare: false,
+                    hasToSpeculate: false,
                 },
             };
         },
@@ -518,6 +519,13 @@
             formatNumber(num) {
                 return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
             },
+            formatUs(num) {
+                if (num == null || typeof num != 'number') {
+                    return num;
+                }
+
+                return num.toLocaleString('en-US');
+            },
             completeCurrentPhase() {
                 const self = this;
 
@@ -599,6 +607,10 @@
                                     self.player.hasToDeclare = true;
                                 }
 
+                                if ((self.game.phase === 3 || self.game.phase === 8) && self.player.role === 1) {
+                                    self.player.hasToSpeculate = true;
+                                }
+
                                 break;
                             case "players-known":
                                 self.game.players = ev.data.players;
@@ -609,6 +621,10 @@
                                 break;
                             case 'declaration-received':
                                 self.player.hasToDeclare = false;
+                                console.log('Confirmation received');
+                                break;
+                            case 'speculation-received':
+                                self.player.hasToSpeculate = false;
                                 console.log('Confirmation received');
                                 break;
                             case "declarations-published":

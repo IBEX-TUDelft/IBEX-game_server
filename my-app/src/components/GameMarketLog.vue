@@ -41,18 +41,64 @@
                         <th scope="col">Best Ask</th>
                         <th scope="col">Book</th>
                     </thead>
-                    <tbody>
+                    <tbody v-if="ruleset === 'Harberger'">
                         <tr v-for="l in marketLog" :key="l.id">
                             <td>{{ l.time }}</td>
                             <td>{{ l.round }}.{{ l.phase }}</td>
                             <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
                             <td>{{ l.action }}</td>
                             <td>{{ l.quantity }}</td>
-                            <td>{{ l.price }}</td>
+                            <td>{{ formatNumber(l.price) }}</td>
                             <td>{{ l.buyer == null ? '' : getPlayer(l.buyer.number, l.buyer.role) }}</td>
                             <td>{{ l.seller == null ? '' : getPlayer(l.seller.number, l.seller.role) }}</td>
-                            <td>{{ l.bestBid }}</td>
-                            <td>{{ l.bestAsk }}</td>
+                            <td>{{  formatNumber(l.bestBid) }}</td>
+                            <td>{{  formatNumber(l.bestAsk) }}</td>
+                            <td>{{ l.book }}</td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="ruleset === 'Futarchy'">
+                        <tr><td colspan="100%" style="text-align: center;"><b>No Project</b></td></tr>
+                        <tr v-for="l in marketLog[0]" :key="l.id">
+                            <td>{{ l.time }}</td>
+                            <td>{{ l.round }}.{{ l.phase }}</td>
+                            <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
+                            <td>{{ l.action }}</td>
+                            <td>{{ l.quantity }}</td>
+                            <td>{{ formatNumber(l.price) }}</td>
+                            <td>{{ l.buyer == null ? '' : getPlayer(l.buyer.number, l.buyer.role) }}</td>
+                            <td>{{ l.seller == null ? '' : getPlayer(l.seller.number, l.seller.role) }}</td>
+                            <td>{{  formatNumber(l.bestBid) }}</td>
+                            <td>{{  formatNumber(l.bestAsk) }}</td>
+                            <td>{{ l.book }}</td>
+                        </tr>
+                        
+                        <tr><td colspan="100%" style="text-align: center;"><b>Project A</b></td></tr>
+                        <tr v-for="l in marketLog[1]" :key="l.id">
+                            <td>{{ l.time }}</td>
+                            <td>{{ l.round }}.{{ l.phase }}</td>
+                            <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
+                            <td>{{ l.action }}</td>
+                            <td>{{ l.quantity }}</td>
+                            <td>{{ formatNumber(l.price) }}</td>
+                            <td>{{ l.buyer == null ? '' : getPlayer(l.buyer.number, l.buyer.role) }}</td>
+                            <td>{{ l.seller == null ? '' : getPlayer(l.seller.number, l.seller.role) }}</td>
+                            <td>{{ formatNumber(l.bestBid) }}</td>
+                            <td>{{ formatNumber(l.bestAsk) }}</td>
+                            <td>{{ l.book }}</td>
+                        </tr>
+
+                        <tr><td colspan="100%" style="text-align: center;"><b>Project B</b></td></tr>
+                        <tr v-for="l in marketLog[2]" :key="l.id">
+                            <td>{{ l.time }}</td>
+                            <td>{{ l.round }}.{{ l.phase }}</td>
+                            <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
+                            <td>{{ l.action }}</td>
+                            <td>{{ l.quantity }}</td>
+                            <td>{{ formatNumber(l.price) }}</td>
+                            <td>{{ l.buyer == null ? '' : getPlayer(l.buyer.number, l.buyer.role) }}</td>
+                            <td>{{ l.seller == null ? '' : getPlayer(l.seller.number, l.seller.role) }}</td>
+                            <td>{{ formatNumber(l.bestBid) }}</td>
+                            <td>{{ formatNumber(l.bestAsk) }}</td>
                             <td>{{ l.book }}</td>
                         </tr>
                     </tbody>
@@ -139,28 +185,53 @@
                 //TODO
             },
             formatNumber(num) {
-                return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+                if (num == null || typeof num != 'number') {
+                    return num;
+                }
+
+                return num.toLocaleString('en-US');
             },
             exportXlsx() {
                 const self = this;
 
                 const xls = [];
 
-                this.marketLog.forEach(r => {
-                    xls.push([
-                        r.time,
-                        r.round + '.' + r.phase,
-                        self.getPlayer(r.actor.number, r.actor.role),
-                        r.action,
-                        r.quantity,
-                        r.price,
-                        r.buyer == null ? '' : self.getPlayer(r.buyer.number, r.buyer.role),
-                        r.seller == null ? '' : self.getPlayer(r.seller.number, r.seller.role),
-                        r.bestBid,
-                        r.bestAsk,
-                        r.book
-                    ]);
-                });
+                if (this.ruleset === 'Harberger') {
+                    this.marketLog.forEach(r => {
+                        xls.push([
+                            r.time,
+                            r.round + '.' + r.phase,
+                            self.getPlayer(r.actor.number, r.actor.role),
+                            r.action,
+                            r.quantity,
+                            r.price,
+                            r.buyer == null ? '' : self.getPlayer(r.buyer.number, r.buyer.role),
+                            r.seller == null ? '' : self.getPlayer(r.seller.number, r.seller.role),
+                            r.bestBid,
+                            r.bestAsk,
+                            r.book
+                        ]);
+                    });
+                } else if (this.ruleset === 'Futarchy') {
+                    this.marketLog.forEach((m, i) => {
+                        m.forEach(r => {
+                            xls.push([
+                                r.time,
+                                r.round + '.' + r.phase,
+                                self.getPlayer(r.actor.number, r.actor.role),
+                                r.action,
+                                r.quantity,
+                                r.price,
+                                r.buyer == null ? '' : self.getPlayer(r.buyer.number, r.buyer.role),
+                                r.seller == null ? '' : self.getPlayer(r.seller.number, r.seller.role),
+                                r.bestBid,
+                                r.bestAsk,
+                                r.book,
+                                conditionMap[i]
+                            ]);
+                        });
+                    });
+                }
 
                 console.log(xls);
                 /* convert state to workbook */

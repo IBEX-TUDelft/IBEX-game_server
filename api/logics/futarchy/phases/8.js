@@ -158,6 +158,13 @@ export default {
                         }
 
                         player.doneSpeculating = true;
+
+                        self.wss.sendEvent(
+                            self.game.id,
+                            player.number,
+                            "speculation-received",
+                            {}
+                        );
                     }
                 });
             },

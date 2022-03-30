@@ -360,6 +360,22 @@ export default {
                             return;
                         }
 
+                        if (order.type === 'ask') {
+                            const activeAsksForCondition = self.orders[condition].filter(o => o.sender === player.number && o.type === 'ask').length;
+
+                            if (player.wallet[condition].shares <= activeAsksForCondition) {
+                                return; //Cannot have more asks than shares
+                            }
+                        } else if (order.type === 'bid') {
+                            const committedSumForCondition = self.orders[condition].filter(o => o.sender === player.number && o.type === 'bid')
+                                .map(o => o.price)
+                                .reduce((a, b) => a + b, 0);
+
+                            if (player.wallet[condition].balance - order.price < committedSumForCondition) {
+                                return; //The sum of the bids (including the coming one) cannot exceed the balance
+                            }
+                        }
+
                         const nextOrder = {
                             "id": self.nextOrderId[condition] + 1,
                             "sender": player.number,

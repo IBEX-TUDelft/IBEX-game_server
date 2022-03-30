@@ -18,7 +18,7 @@
                     <div class="col-4" style="height: 300px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
                         <table class="table table-bordered text-center" style="margin-top: auto; margin-bottom: 0px;">
                             <tr v-for="ask in asks" :key="ask.id">
-                                <td>{{ formatNumber(ask.price) }}{{ask.sender == player.number ? '*' : ''}}</td>
+                                <td>{{ formatUs(ask.price) }}{{ask.sender == player.number ? '*' : ''}}</td>
                             </tr>
                         </table>
                     </div>
@@ -34,7 +34,7 @@
                     <div class="col-4" style="height: 300px; border: 1px solid; overflow: scroll;">
                         <table class="table table-bordered text-center">
                             <tr v-for="bid in bids" :key="bid.id">
-                                <td>{{ formatNumber(bid.price) }}{{bid.sender == player.number ? '*' : ''}}</td>
+                                <td>{{ formatUs(bid.price) }}{{bid.sender == player.number ? '*' : ''}}</td>
                             </tr>
                         </table>
                     </div>
@@ -51,17 +51,6 @@
                         <input type="number" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" placeholder="10" />
                     </div>
                 </div>
-
-                <!--div class="row">
-                    <table class="table table-bordered text-center">
-                        <tr>
-                            <td>Cash</td><td>{{ player.balance }}</td>
-                        </tr>
-                        <tr>
-                            <td>Shares</td><td>{{ player.shares }}</td>
-                        </tr>
-                    </table>
-                </div-->
             </div>
 
         </div>
@@ -72,14 +61,14 @@
                 <table class="table table-bordered text-center">
                     <tr>
                         <td>Condition</td><td>{{ conditionName }}</td>
-                        <td>Median Price</td><td>{{ getMedianPrice() }}</td>
+                        <td>Median Price</td><td>{{ formatUs(getMedianPrice()) }}</td>
                     </tr>
                     <tr>
-                        <td>Publ. Signal</td><td>{{ formatNumber(game.publicSignal[condition]) }}</td>
-                        <td>Priv. Signal</td><td>{{ formatNumber(player.signals[condition]) }}</td>
+                        <td>Publ. Signal</td><td>{{ formatUs(game.publicSignal[condition]) }}</td>
+                        <td>Priv. Signal</td><td>{{ formatUs(player.signals[condition]) }}</td>
                     </tr>
                     <tr>
-                        <td>Balance</td><td>{{ player.wallet[condition].balance }}</td>
+                        <td>Balance</td><td>{{ formatUs(player.wallet[condition].balance) }}</td>
                         <td>Shares</td><td>{{ player.wallet[condition].shares }}</td>
                     </tr>
                 </table>
@@ -88,16 +77,9 @@
             <div class="row-12">
                 <div class="text-center"><b>Contracts</b></div>
                 <table class="table table-bordered text-center">
-                    <!--thead>
-                        <th scope="col" style="width: 33%">Status Quo</th>
-                        <th scope="col" style="width: 33%">Project A</th>
-                        <th scope="col" style="width: 33%">Project B</th>
-                    </thead-->
                     <tbody>
                         <tr v-for="contract in contracts" :key="contract.id">
-                            <!--td>{{ game.winningCondition === 0 ? (formatNumber(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '')) : ''}}</td>
-                            <td>{{ game.winningCondition === 1 ? (formatNumber(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '')) : ''}}</td-->
-                            <td>{{ formatNumber(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '') }}</td>
+                            <td>{{ formatUs(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '') }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -228,6 +210,13 @@ export default {
             }
 
             return this.formatNumber(sum / this.contracts.length);
+        },
+        formatUs(num) {
+            if (num == null || typeof num != 'number') {
+                return num;
+            }
+
+            return num.toLocaleString('en-US');
         },
         orderEvent(order, eventType) {
             let list;
