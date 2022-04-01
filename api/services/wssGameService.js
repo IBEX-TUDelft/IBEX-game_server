@@ -70,7 +70,7 @@ export default {
                 }, process.env.VUE_APP_WSS_PING_INTERVAL);
             },
             broadcastEvent: function(id, type, data, role) {
-                const game = this.games.find(g => g.id = id);
+                const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
                     return `Game ${id} not found`;
@@ -87,7 +87,7 @@ export default {
                 });
             },
             sendEvent(gameId, playerNumber, type, data) {
-                const game = this.games.find(g => g.id = gameId);
+                const game = this.games.find(g => g.id === gameId);
 
                 if (game == null) {
                     return `Game ${gameId} not found`;
@@ -118,7 +118,7 @@ export default {
                 this.broadcastMessage(id, "fatal", message, role);
             },
             broadcastMessage: function(id, type, message, role) {
-                const game = this.games.find(g => g.id = id);
+                const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
                     return `Game ${id} not found`;
@@ -135,7 +135,7 @@ export default {
                 });
             },
             joinGame: function (ws, id, role, number) {
-                const game = this.games.find(g => g.id = id);
+                const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
                     return `Game ${id} not found`;
@@ -154,7 +154,7 @@ export default {
                 });
             },
             watchGame: function (ws, id) {
-                const game = this.games.find(g => g.id = id);
+                const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
                     return `Game ${id} not found`;
@@ -169,9 +169,10 @@ export default {
                 });
             },
             startGame: function (id, players) {
-                const game = this.games.find(g => g.id = id);
+                const game = this.games.find(g => g.id === id);
 
                 if (game != null) {
+                    console.log(`Game ${id} has already started`);
                     return;
                 }
                 
@@ -179,10 +180,13 @@ export default {
                     id: id,
                     players: [],
                     watchers: []
-                })
+                });
+
+                console.log('WS manager After starting a game:');
+                console.log(this.games);
             },
             deleteGame: async function (id) {
-                const game = this.games.find(g => g.id = id);
+                const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
                     return `Game ${id} not found inside the WSS manager`;
@@ -199,7 +203,7 @@ export default {
                 this.games.splice(this.games.indexOf(game), 1);
             },
             updateGame: function (id, round, phase) {
-                const game = this.games.find(g => g.id = id);
+                const game = this.games.find(g => g.id === id);
 
                 game.round = round;
                 game.phase = phase;

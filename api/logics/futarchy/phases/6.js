@@ -28,9 +28,34 @@ export default {
                 setTimeout(() => {
                     self.complete = true;
                 }, 60 * 1000 * self.game.parameters.minutes_for_trading);
+
+                console.log('Setting the timer remotely to all');
+
+                const err = self.wss.broadcastEvent(
+                    game.id,
+                    "set-timer",
+                    {
+                        "end": Date.now() + 60 * 1000 * self.game.parameters.minutes_for_trading
+                    }
+                );
+
+                if (err != null) {
+                    console.log(err);
+                }
             },
             onExit: async function () {
                 const self = this;
+
+                let err = this.wss.broadcastEvent(
+                    game.id,
+                    "reset-timer",
+                    {},
+                    1
+                );
+
+                if (err != null) {
+                    console.log(err);
+                }
 
                 // 1 Determine the winning condition based on the final market price
                 this.game.quotations = [0, 0, 0];
@@ -61,7 +86,7 @@ export default {
 
                 console.log(`The winning condition is ${winningCondition}, with a price of ${winningQuotation}. Here the full list: ${this.game.quotations}`);
 
-                const err = self.wss.broadcastEvent(
+                err = self.wss.broadcastEvent(
                     game.id,
                     "winning-condition",
                     {

@@ -45,7 +45,7 @@ export default {
         });
 
         Controller.addGetRoute(app, '/api/v1/games/delete', true, async (req, res) => {
-            const gameId = req.query.game_id;
+            const gameId = parseInt(req.query.game_id);
 
             await gameService.deleteById(gameId);
 
@@ -61,7 +61,7 @@ export default {
         });
 
         Controller.addGetRoute(app, '/api/v1/games/start', true, async (req, res) => {
-            const gameId = req.query.game_id;
+            const gameId = parseInt(req.query.game_id);
 
             wssManager.startGame(gameId);
 
@@ -90,15 +90,13 @@ export default {
         });
 
         Controller.addGetRoute(app, '/api/v1/games/data', false, async (req, res) => {
-            const gameId = req.query.game_id;
+            const gameId = parseInt(req.query.game_id);
 
             const game = gameManager.games.find(g => g.data.id  == gameId);
 
             const data = {
                 "ruleset": game.data.type
             };
-
-            let declarationResults ;
 
             switch(game.data.type) {
                 case 'Harberger':
@@ -166,7 +164,7 @@ export default {
         });
 
         Controller.addGetRoute(app, '/api/v1/games/market-log', false, async (req, res) => {
-            const gameId = req.query.game_id;
+            const gameId = parseInt(req.query.game_id);
 
             const game = gameManager.games.find(g => g.data.id  == gameId);
 

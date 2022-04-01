@@ -49,13 +49,28 @@ export default {
 
                 console.log('Broadcasting declarations');
 
-                const err = self.wss.broadcastEvent(
+                let err = self.wss.broadcastEvent(
                     game.id,
                     "declarations-published",
                     {
                         "declarations": declarationData,
                         "winningCondition": self.game.winningCondition
                     }
+                );
+
+                if (err != null) {
+                    console.log(err);
+                }
+
+                console.log('Setting the timer remotely to speculators');
+
+                err = self.wss.broadcastEvent(
+                    game.id,
+                    "set-timer",
+                    {
+                        "end": self.endTime
+                    },
+                    1
                 );
 
                 if (err != null) {
@@ -72,6 +87,16 @@ export default {
                 });
             },
             onExit: async function () {
+                const err = this.wss.broadcastEvent(
+                    game.id,
+                    "reset-timer",
+                    {},
+                    1
+                );
+
+                if (err != null) {
+                    console.log(err);
+                }
             },
             testComplete: async function () {
                 return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0 || Date.now() >= this.endTime;

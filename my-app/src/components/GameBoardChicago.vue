@@ -12,8 +12,7 @@
                     </b-navbar-brand>
                 </div>
                 <b-navbar-nav class="ml-auto">
-                    <!--b-nav-item active v-if="game.phase === 6">Balance: {{ player.balance }}</b-nav-item>
-                    <b-nav-item active v-if="game.phase === 6">Shares: {{ player.shares }}</b-nav-item-->
+                    <b-nav-item active v-if="timer.on === true">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
                     <b-nav-item active >Round: {{ game.round }}</b-nav-item>
                     <b-nav-item active >Phase: {{ game.phase }}</b-nav-item>
                 </b-navbar-nav>
@@ -261,6 +260,11 @@
                 lastThreeMessages: [],
                 messages: [],
                 checkedPlots: [[],[],[]],
+                timer: {
+                    on: false,
+                    minutes: "00",
+                    seconds: "00"
+                },
                 game: {
                     round: 1,
                     phase: 0,
@@ -304,6 +308,28 @@
             },
             getPlayer() {
                 return this.player;
+            },
+            updateTimer() {
+                const self = this;
+
+                const secondsLeft = Math.round((self.timer.end - Date.now()) / 1000);
+
+                const minutes = Math.floor(secondsLeft / 60);
+                const seconds = secondsLeft % 60;
+
+                self.timer.minutes = minutes.toString().padStart(2, '0');
+                self.timer.seconds = seconds.toString().padStart(2, '0');
+
+                if (minutes <= 0 && seconds <= 0) {
+                    console.log('The timer has rung');
+                    return;
+                }
+
+                console.log('Update');
+
+                setTimeout(self.updateTimer, 1000);
+
+                console.log('Timeout set');
             },
             sendPurchaseIntention(id, condition) {
                 const self = this;
@@ -503,11 +529,7 @@
                             self.sendMessage({
                                 "gameId": self.game.id,
                                 "type": "declare",
-                                "declaration": [
-                                    parseInt(self.player.declaration[0]),
-                                    parseInt(self.player.declaration[1]),
-                                    parseInt(self.player.declaration[2])
-                                ]
+                                "declaration": myDeclarations
                             });
                         }
                     }
@@ -610,6 +632,22 @@
                                 if ((self.game.phase === 3 || self.game.phase === 8) && self.player.role === 1) {
                                     self.player.hasToSpeculate = true;
                                 }
+
+                                break;
+                            case "set-timer":
+                                console.log('Timer');
+
+                                self.timer.end = ev.data.end;
+
+                                self.updateTimer();
+
+                                self.timer.on = true;
+                                
+                                break;
+                            case "reset-timer":
+                                self.timer.end = null;
+
+                                self.timer.on = false;
 
                                 break;
                             case "players-known":
