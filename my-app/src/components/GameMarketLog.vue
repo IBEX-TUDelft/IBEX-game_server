@@ -19,8 +19,8 @@
             </b-navbar>
         </div>
 
-        <div class="mt-1 mx-5 mp-1">
-            <div class="row">
+        <div class="mx-5 mp-1">
+            <div class="row" style="margin-bottom: 15px">
                 <div class="col-11" />
                 <div class="col-1">
                     <button :disabled="marketLog == null || marketLog.length === 0" class="btn btn-success" @click="exportXlsx">Export</button>

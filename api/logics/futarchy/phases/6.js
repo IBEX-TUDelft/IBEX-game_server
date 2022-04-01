@@ -104,7 +104,7 @@ export default {
                             return;
                         }
 
-                        if (p.speculators != null && p.speculators[winningCondition].length > 0) {
+                        if (p.speculators != null && p.speculators.find(s => s.length > 0) != null) {
                             console.log('There are speculators');
 
                             const biddingSpeculators = p.speculators[winningCondition];
@@ -115,21 +115,24 @@ export default {
                                 winningBidderIndex = Math.floor( Math.random() * biddingSpeculators.length );
                             }
 
-                            console.log(`Speculator who won: ${biddingSpeculators[winningBidderIndex]}`);
+                            const winnerNumber = biddingSpeculators[winningBidderIndex];
 
-                            for (let i = 0; i < biddingSpeculators.length; i++) {
-                                const speculatorNumber = biddingSpeculators[i];
-                                
-                                const speculator = self.game.players.find(pl => pl.number === speculatorNumber);
+                            console.log(`Speculator who won: ${winnerNumber}`);
 
-                                if (speculator == null) {
-                                    console.log(`Speculator with id ${speculatorNumber} not found`);
+                            for (let i = 0; i < self.game.players.length; i++) {
+                                const speculator = self.game.players[i];
+
+                                if (
+                                    !p.speculators[0].includes(speculator.number) &&
+                                    !p.speculators[1].includes(speculator.number) &&
+                                    !p.speculators[2].includes(speculator.number)
+                                ) {
                                     continue;
                                 }
 
-                                if (i === winningBidderIndex) {
+                                if (speculator.number === winnerNumber) {
                                     landProfit.sniped = true;
-                                    landProfit.speculator = speculatorNumber;
+                                    landProfit.speculator = speculator.number;
                                     landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
 
                                     console.log('Land profit updated');                                    
@@ -148,8 +151,12 @@ export default {
                                         "number": owner.number,
                                         "role": owner.role
                                     },
-                                    "snipes": [winningCondition === 0, winningCondition === 1, winningCondition === 2],
-                                    "executed": i === winningBidderIndex
+                                    "snipes": [
+                                        p.speculators[0].includes(speculator.number),
+                                        p.speculators[1].includes(speculator.number),
+                                        p.speculators[2].includes(speculator.number),
+                                    ],
+                                    "executed": speculator.number === winnerNumber
                                 });
 
                                 self.results.snipeOutcomes.push( {
@@ -161,12 +168,12 @@ export default {
                                         "number": owner.number,
                                         "role": owner.role
                                     },
-                                    "profit": i === winningBidderIndex ? landProfit.snipeProfit : 0
+                                    "profit": speculator.number === winnerNumber ? landProfit.snipeProfit : 0
                                 });
 
                                 speculator.profit.push({
                                     "phase": 4,
-                                    "amount": i === winningBidderIndex ? landProfit.snipeProfit : 0,
+                                    "amount": speculator.number === winnerNumber ? landProfit.snipeProfit : 0,
                                     "context": {
                                         "type": "speculation",
                                         "property": {

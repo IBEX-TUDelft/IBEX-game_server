@@ -1,6 +1,6 @@
 <template>
     <div>
-          <div>
+        <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
                     <b-nav-item active>Ruleset: {{ ruleset }}</b-nav-item>
@@ -127,9 +127,9 @@
                         <tr v-for="f in firstSnipes" :key="f.id">
                             <td>{{ getPlayer(f.player.number, f.player.role) }}</td>
                             <td>{{ getPlayer(f.target.number, f.target.role) }}</td>
-                            <td>{{ getYesOrNo(f.snipes[0]) }}</td>
-                            <td>{{ getYesOrNo(f.snipes[1]) }}</td>
-                            <td>{{ getYesOrNo(f.snipes[2]) }}</td>
+                            <td :style="0 === winningCondition ? 'background-color: yellow;' : ''">{{ getYesOrNo(f.snipes[0]) }}</td>
+                            <td :style="1 === winningCondition ? 'background-color: yellow;' : ''">{{ getYesOrNo(f.snipes[1]) }}</td>
+                            <td :style="2 === winningCondition ? 'background-color: yellow;' : ''">{{ getYesOrNo(f.snipes[2]) }}</td>
                             <td>{{ getYesOrNo(f.executed) }}</td>
                         </tr>
                     </tbody>
@@ -201,9 +201,9 @@
                         <tr v-for="f in secondSnipes" :key="f.id">
                             <td>{{ getPlayer(f.player.number, f.player.role) }}</td>
                             <td>{{ getPlayer(f.target.number, f.target.role) }}</td>
-                            <td>{{ getYesOrNo(f.snipes[0]) }}</td>
-                            <td>{{ getYesOrNo(f.snipes[1]) }}</td>
-                            <td>{{ getYesOrNo(f.snipes[2]) }}</td>
+                            <td :style="0 === winningCondition ? 'background-color: yellow;' : ''">{{ getYesOrNo(f.snipes[0]) }}</td>
+                            <td :style="1 === winningCondition ? 'background-color: yellow;' : ''">{{ getYesOrNo(f.snipes[1]) }}</td>
+                            <td :style="2 === winningCondition ? 'background-color: yellow;' : ''">{{ getYesOrNo(f.snipes[2]) }}</td>
                             <td>{{ getYesOrNo(f.executed) }}</td>
                         </tr>
                     </tbody>
