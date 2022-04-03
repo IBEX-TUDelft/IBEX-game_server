@@ -1,14 +1,18 @@
 <template>
     <div>
-        <div>
-            <table>
-                <tr>
-                    <td>Leading Market</td><td style="border: 1px green solid">{{ leadingMarket.name }} ({{ leadingMarket.price }})</td>
-                    <td>Second Market</td><td>{{ secondMarket.name }} ({{ secondMarket.price }})</td>
-                    <td>Third Market</td><td>{{ thirdMarket.name }} ({{ thirdMarket.price }})</td>
-                </tr>
-            </table>
-        </div>
+        <b-card class="mb-1">
+            <div class="row">
+                <div class="col-4">
+                    Leading Market: {{ leadingMarket.name }} ({{ leadingMarket.price }})
+                </div>
+                <div class="col-4">
+                    Second Market: {{ secondMarket.name }} ({{ secondMarket.price }})
+                </div>
+                <div class="col-4">
+                    Third Market: {{ thirdMarket.name }} ({{ thirdMarket.price }})
+                </div>
+            </div>
+        </b-card>
         <b-card no-body>
             <b-tabs card content-class="mt-3" v-model="tabIndex">
                 <b-tab active ref="tab-condition-0" v-on:click="resetTitle(0)" >
@@ -65,6 +69,7 @@ export default {
     name: 'DoubleAuctionMarketFutarchy',
     data() {
         return {
+            fields: ['name', 'price'],
             tabIndex: 0,
             activityOn0: false,
             activityOn1: false,
@@ -109,10 +114,20 @@ export default {
         },
         resetTitle(reference) {
             this[`activityOn${reference}`] = false;
-        },
+        }
     },
     components: {
         DoubleAuctionMarketChicago
     },
+    mounted () {
+        this.leadingMarket.name = this.markets[0].name;
+        this.leadingMarket.price = this.markets[0].price;
+
+        this.secondMarket.name = this.markets[1].name;
+        this.secondMarket.price = this.markets[1].price;
+
+        this.thirdMarket.name = this.markets[2].name;
+        this.thirdMarket.price = this.markets[2].price;
+    }
 }
 </script>
