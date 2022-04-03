@@ -8,7 +8,7 @@
             :name="'checkedPlots' + condition"
         >
 
-        <table class="table table-bordered">
+        <table class="table table-bordered" style="table-layout: fixed;">
             <tbody>
                 <tr>
                     <td :style="player.tag === 'Owner 1' ? 'border: 2px yellow solid;' : ''">

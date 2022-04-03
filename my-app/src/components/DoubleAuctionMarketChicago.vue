@@ -218,6 +218,13 @@ export default {
 
             return num.toLocaleString('en-US');
         },
+        getSharePrice() {
+            if (this.contracts.length === 0) {
+                return 0;
+            }
+
+            return this.contracts[this.contracts.length - 1].price;
+        },
         orderEvent(order, eventType) {
             let list;
 

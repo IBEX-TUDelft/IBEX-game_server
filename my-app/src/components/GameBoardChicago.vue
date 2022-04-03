@@ -4,13 +4,16 @@
         <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
-                    <!--b-nav-item active>Ruleset: {{ game.ruleset }}</b-nav-item-->
-                </b-navbar-nav>
-                <div class="container justify-content-center">
                     <b-navbar-brand>
                         {{ player.title }}
                     </b-navbar-brand>
-                </div>
+                    <!--b-nav-item active>{{ player.title }}</b-nav-item-->
+                </b-navbar-nav>
+                <!--div class="container justify-content-center">
+                    <b-navbar-brand>
+                        {{ player.title }}
+                    </b-navbar-brand>
+                </div-->
                 <b-navbar-nav class="ml-auto">
                     <b-nav-item active v-if="timer.on === true">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
                     <b-nav-item active >Round: {{ game.round }}</b-nav-item>
@@ -24,7 +27,7 @@
                 <div class="col-6">
 
                     <FutarchyMatrix :condition="game.winningCondition" :project="conditionToString(game.winningCondition)"
-                     v-if="game.ruleset === 'Futarchy' && game.phase < 7"/>
+                         v-if="game.ruleset === 'Futarchy' && game.phase < 7"/>
                     <HarbergerMatrix
                         v-else
                         :condition="game.winningCondition"
@@ -325,11 +328,7 @@
                     return;
                 }
 
-                console.log('Update');
-
                 setTimeout(self.updateTimer, 1000);
-
-                console.log('Timeout set');
             },
             sendPurchaseIntention(id, condition) {
                 const self = this;
@@ -635,14 +634,12 @@
 
                                 break;
                             case "set-timer":
-                                console.log('Timer');
-
                                 self.timer.end = ev.data.end;
 
                                 self.updateTimer();
 
                                 self.timer.on = true;
-                                
+
                                 break;
                             case "reset-timer":
                                 self.timer.end = null;
@@ -716,9 +713,9 @@
                                 }
                                 break;
                             }
-                            case "speculation-with-profit": {
-                                let msgContent = "";
-                                let msgType = ""
+                            case 'speculation-with-profit': {
+                                let msgContent = '';
+                                let msgType = ''
 
                                 if (ev.data.profit > 0) {
                                     msgType = "success";
@@ -731,7 +728,7 @@
                                 self.pushMessage(msgType, msgContent);
                                 break;
                             }
-                            case "value-signals": {
+                            case 'value-signals': {
                                 self.player.signals = ev.data.signals;
                                 self.game.winningCondition = ev.data.condition;
                                 self.game.taxRate = ev.data.taxRate;
@@ -739,35 +736,39 @@
                                 self.pushMessage("info", `Your signals: ${ev.data.signals}`);
                                 break;
                             }
-                            case "add-order":
+                            case 'add-order':
                                 if (self.game.ruleset === 'Harberger') {
                                     self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "add");
                                 } else if (self.game.ruleset === 'Futarchy') {
                                     self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`].orderEvent(ev.data.order, "add");
+                                    self.$refs.doubleAuctionMarket.activityDetected(ev.data.order.condition);
                                 }
                                 break;
-                            case "delete-order":
+                            case 'delete-order':
                                 if (self.game.ruleset === 'Harberger') {
                                     self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "delete");
                                 } else if (self.game.ruleset === 'Futarchy') {
                                     self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`].orderEvent(ev.data.order, "delete");
+                                    self.$refs.doubleAuctionMarket.activityDetected(ev.data.order.condition);
                                 }
                                 break;
-                            case "update-order":
+                            case 'update-order':
                                 if (self.game.ruleset === 'Harberger') {
                                     self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "update");
                                 } else if (self.game.ruleset === 'Futarchy') {
                                     self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`].orderEvent(ev.data.order, "update");
+                                    self.$refs.doubleAuctionMarket.activityDetected(`tab-condition-${ev.data.order.condition}`);
                                 }
                                 break;
-                            case "contract-fulfilled": 
+                            case 'contract-fulfilled': 
                                 if (self.game.ruleset === 'Harberger') {
                                     self.$refs.doubleAuctionMarket.orderEvent(ev.data, "contract");
                                 } else if (self.game.ruleset === 'Futarchy') {
+                                    self.$refs.doubleAuctionMarket.contractCompleted(ev.data);
                                     self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.condition}`].orderEvent(ev.data, "contract");
                                 }
                                 break;
-                            case "asset-movement": {
+                            case 'asset-movement': {
                                 self.player.wallet[ev.data.condition].balance = ev.data.balance;
                                 self.player.wallet[ev.data.condition].shares = ev.data.shares;
 
@@ -781,21 +782,30 @@
 
                                 break;
                             }
-                            case "tax-income":
+                            case 'tax-income':
                                 self.pushMessage("info", `You have made a tax income of ${ev.data.amount}`);
                                 break;
-                            case "total-profit":
+                            case 'total-profit':
                                 if (ev.data.amount >= 0) {
                                     self.pushMessage("success", `You have made a total profit of ${ev.data.amount}`);
                                 } else {
                                     self.pushMessage("error", `You have made a total loss of ${-ev.data.amount}`);
                                 }
                                 break;
-                            case "round-end":
+                            case 'round-end':
                                 self.game.phase = "-";
                                 break;
-                            case "winning-condition":
+                            case 'winning-condition':
                                 self.game.winningCondition = ev.data.winningCondition;
+                                break;
+                            case 'order-refused':
+                                self.$confirm({
+                                    message: ev.data.message,
+                                    button: {
+                                        yes: 'Ok'
+                                    },
+                                    callback: () => {}
+                                });
                                 break;
                             default:
                                 console.error(`Type ${ev.eventType} was not understood`);

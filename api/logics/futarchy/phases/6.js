@@ -49,8 +49,7 @@ export default {
                 let err = this.wss.broadcastEvent(
                     game.id,
                     "reset-timer",
-                    {},
-                    1
+                    {}
                 );
 
                 if (err != null) {
@@ -396,6 +395,15 @@ export default {
                             const activeAsksForCondition = self.orders[condition].filter(o => o.sender === player.number && o.type === 'ask').length;
 
                             if (player.wallet[condition].shares <= activeAsksForCondition) {
+                                self.wss.sendEvent(
+                                    self.game.id,
+                                    player.number,
+                                    'order-refused',
+                                    {
+                                        "message": `You have already committed all your shares ${player.wallet[condition].shares} in other asks.
+                                         You can cancel them if you want to publish new ones`
+                                    }
+                                );
                                 return; //Cannot have more asks than shares
                             }
                         } else if (order.type === 'bid') {
@@ -404,6 +412,19 @@ export default {
                                 .reduce((a, b) => a + b, 0);
 
                             if (player.wallet[condition].balance - order.price < committedSumForCondition) {
+                                const remainder = player.wallet[condition].balance - committedSumForCondition;
+
+                                self.wss.sendEvent(
+                                    self.game.id,
+                                    player.number,
+                                    'order-refused',
+                                    {
+                                        "message": `You have already committed much of your balance (${committedSumForCondition}) in other bids,
+                                         The remainder ${remainder} is not enough to bid ${order.price}. 
+                                         You may cancel previous bids to free some of your balance.`
+                                    }
+                                );
+
                                 return; //The sum of the bids (including the coming one) cannot exceed the balance
                             }
                         }
