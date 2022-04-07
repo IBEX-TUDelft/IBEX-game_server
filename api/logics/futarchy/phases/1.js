@@ -77,6 +77,14 @@ export default {
                     }
                 );
 
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "All players joined, the game will start shortly"
+                    }
+                );
+
                 self.wss.broadcastInfo(self.game.id, 'Wait for the developers and the owners to become acquainted with their property', 1);
                 self.wss.broadcastInfo(self.game.id, 'Get acquainted with your property, starting any project may be quite profitable for you', 2);
                 self.wss.broadcastInfo(self.game.id, 'Get acquainted with your property, notice that if a project will start, its value will decrease', 3);

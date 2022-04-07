@@ -15,6 +15,14 @@ export default {
 
                 const self = this;
 
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Data submitted by all players being processed and saved ..."
+                    }
+                );
+
                 setTimeout(() => {
                     self.complete = true;
                 }, 5000);

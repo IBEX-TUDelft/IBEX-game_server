@@ -276,6 +276,14 @@ export default {
                     );
                 });
 
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "See the results for this round"
+                    }
+                );
+
                 setTimeout(() => {
                     self.complete = true;
                 }, 15000);

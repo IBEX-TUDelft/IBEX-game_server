@@ -42,6 +42,14 @@ export default {
                 if (err != null) {
                     console.log(err);
                 }
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Trade shares in each market"
+                    }
+                );
             },
             onExit: async function () {
                 const self = this;

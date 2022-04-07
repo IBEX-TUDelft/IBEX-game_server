@@ -21,6 +21,33 @@ export default {
                 this.game.properties.forEach(p => {
                     p.d = null;
                 });
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Wait for all property owners to send their declarations"
+                    },
+                    1
+                );
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Fill the declaration with a value under the winning condition. Use the real value as a reference"
+                    },
+                    2
+                );
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Fill the declaration with a value under the winning condition. Use the real value as a reference"
+                    },
+                    3
+                );
             },
             onExit: async function () {
                 

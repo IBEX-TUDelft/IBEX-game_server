@@ -23,6 +23,33 @@ export default {
                 });
 
                 console.log(this.game.players);
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Wait for all property owners to send their declarations"
+                    },
+                    1
+                );
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Fill the declaration with a value under all conditions. Use the real value as a reference"
+                    },
+                    2
+                );
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Fill the declaration with a value under all conditions. Use the real value as a reference"
+                    },
+                    3
+                );
             },
             onExit: async function () {
                 

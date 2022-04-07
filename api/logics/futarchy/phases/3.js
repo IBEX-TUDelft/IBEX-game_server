@@ -97,6 +97,33 @@ export default {
                 if (err != null) {
                     console.log(err);
                 }
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Analyse all declarations and choose which ones to target, under all conditions"
+                    },
+                    1
+                );
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Wait for the speculators to make their decisions"
+                    },
+                    2
+                );
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Wait for the speculators to make their decisions"
+                    },
+                    3
+                );
             },
             getData() {
                 return game.properties.map(p => {

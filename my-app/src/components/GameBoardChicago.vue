@@ -5,15 +5,9 @@
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
                     <b-navbar-brand>
-                        {{ player.title }}
+                        {{ player.title }}: {{ player.instructions }}
                     </b-navbar-brand>
-                    <!--b-nav-item active>{{ player.title }}</b-nav-item-->
                 </b-navbar-nav>
-                <!--div class="container justify-content-center">
-                    <b-navbar-brand>
-                        {{ player.title }}
-                    </b-navbar-brand>
-                </div-->
                 <b-navbar-nav class="ml-auto">
                     <b-nav-item active v-if="timer.on === true">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
                     <b-nav-item active >Round: {{ game.round }}</b-nav-item>
@@ -281,6 +275,7 @@
                 },
                 player: {
                     title: "Starting ...",
+                    instructions: "Wait for other players to join",
                     name: "",
                     number: 0,
                     recoveryString: null,
@@ -534,9 +529,6 @@
                     }
                 });
             },
-            showPreview() {
-                //TODO
-            },
             formatNumber(num) {
                 return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
             },
@@ -595,6 +587,9 @@
                                 self.player.recoveryString = ev.data.recoveryString;
                                 self.game.ruleset = ev.data.ruleset;
                                 console.log('Recovery string: ' + self.player.recoveryString);
+                                break;
+                            case 'phase-instructions':
+                                self.player.instructions = ev.data.instructions;
                                 break;
                             case "assign-role":
                                 self.game.boundaries = ev.data.boundaries;

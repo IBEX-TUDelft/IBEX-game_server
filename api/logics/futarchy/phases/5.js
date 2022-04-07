@@ -33,6 +33,15 @@ export default {
                     publicSignal: self.game.publicSignal,
                     privateSignals: self.game.players.map(p => { return p.S; })
                 };
+
+                this.wss.broadcastEvent (
+                    game.id,
+                    "phase-instructions",
+                    {
+                        "instructions": "Public and private signals being calculated ..."
+                    }
+                );
+
                 setTimeout(() => {
                     self.complete = true;
                 }, 5000);
