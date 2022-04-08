@@ -42,7 +42,7 @@
                         <th scope="col">Book</th>
                     </thead>
                     <tbody v-if="ruleset === 'Harberger'">
-                        <tr v-for="l in marketLog" :key="l.id">
+                        <tr v-for="l in marketLog[winningCondition]" :key="l.id">
                             <td>{{ l.time }}</td>
                             <td>{{ l.round }}.{{ l.phase }}</td>
                             <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
@@ -128,6 +128,7 @@
                 gameId: null,
                 ruleset: null,
                 marketLog: null,
+                winningCondition: null
             };
         },
         components: {
@@ -258,6 +259,7 @@
 
             this.ruleset = response.data.data.ruleset;
             this.marketLog = response.data.data.marketLog;
+            this.winningCondition = response.data.data.winningCondition;
         }
     }
 </script>

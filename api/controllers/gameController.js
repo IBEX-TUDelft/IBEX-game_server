@@ -169,7 +169,8 @@ export default {
             const game = gameManager.games.find(g => g.data.id  == gameId);
 
             const data = {
-                "ruleset": game.data.type
+                "ruleset": game.data.type,
+                "winningCondition": game.data.winningCondition
             };
 
             if (game.results[6] != null) {
