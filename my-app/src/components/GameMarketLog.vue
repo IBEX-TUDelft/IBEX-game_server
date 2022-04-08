@@ -198,7 +198,7 @@
                 const xls = [];
 
                 if (this.ruleset === 'Harberger') {
-                    this.marketLog.forEach(r => {
+                    this.marketLog[this.winningCondition].forEach(r => {
                         xls.push([
                             r.time,
                             r.round + '.' + r.phase,
