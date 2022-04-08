@@ -207,10 +207,9 @@
             </div>
         </div>
 
-        <!--div>{{ game.ruleset }}</div-->
         <DoubleAuctionMarketChicago ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Harberger'"
             :condition="game.winningCondition"
-            :conditionName="conditionMap[game.winningCondition]"
+            :conditionName="conditionToString(game.winningCondition)"
             :connection="connection"
             :game="game"
             :player="player"
@@ -263,6 +262,7 @@
                     seconds: "00"
                 },
                 game: {
+                    winningCondition: null,
                     round: 1,
                     phase: 0,
                     ruleset: "",
@@ -412,6 +412,9 @@
             getDeclarationPlayer(i) {
                 const declaration = this.game.declarations[i];
 
+                console.log('Declaration:');
+                console.log(declaration);
+
                 if (declaration == null) {
                     console.log(`Could not find declaration ${i}`);
 
@@ -424,6 +427,8 @@
                             return `Owner ${i}`;
                     }
                 }
+
+                console.log(this.game.players);
 
                 const player = this.game.players.find(p => p.number === declaration.number);
 

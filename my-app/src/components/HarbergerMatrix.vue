@@ -1,6 +1,6 @@
 <template>
     <div class="row-12">
-        <div class="text-center"><b>Declarations ({{ project }})</b></div>
+        <div class="text-center"><b>Declarations {{ project != null ? '(' + project + ')' : '' }}</b></div>
 
         <b-form-checkbox-group
             :id="'checkbox-group-' + condition"

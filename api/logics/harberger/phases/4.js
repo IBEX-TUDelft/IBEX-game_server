@@ -12,6 +12,8 @@ export default {
                 snipeOutcomes: []
             },
             onEnter: async function () {
+                //await super.onEnter();
+
                 console.log('PHASE 4');
 
                 const self = this;
@@ -122,64 +124,6 @@ export default {
 
                                 console.log('Profit added to the speculator');
                             }
-
-                            /*if (speculatorNumber != null) {
-                                const speculator = self.game.players.find(pl => pl.number === speculatorNumber);
-
-                                if (speculator != null) {
-                                    console.log(`Speculator exists`);
-
-                                    landProfit.sniped = true;
-                                    landProfit.speculator = speculatorNumber;
-                                    landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
-
-                                    console.log('Land profit updated');
-
-                                    if (speculator.profit == null) {
-                                        speculator.profit =  [];
-                                    }
-
-                                    self.results.snipes.push( {
-                                        "player": {
-                                            "number": speculator.number,
-                                            "role": speculator.role
-                                        },
-                                        "target": {
-                                            "number": owner.number,
-                                            "role": owner.role
-                                        },
-                                        "snipes": [winningCondition === 0, winningCondition === 1, winningCondition === 2],
-                                        "executed": true
-                                    });
-
-                                    self.results.snipeOutcomes.push( {
-                                        "player": {
-                                            "number": speculator.number,
-                                            "role": speculator.role
-                                        },
-                                        "target": {
-                                            "number": owner.number,
-                                            "role": owner.role
-                                        },
-                                        "profit": landProfit.snipeProfit
-                                    });
-
-                                    speculator.profit.push({
-                                        "phase": 4,
-                                        "amount": landProfit.snipeProfit,
-                                        "context": {
-                                            "type": "speculation",
-                                            "property": {
-                                                "id": p.id,
-                                                "name": p.name
-                                            },
-                                            "condition": winningCondition
-                                        }
-                                    });
-
-                                    console.log('Profit added to the speculator');
-                                }
-                            }*/
                         }
 
                         console.log('Done with speculators');
@@ -235,105 +179,6 @@ export default {
                         console.error(e);
                     }
                 });
-
-                /*self.game.properties.forEach(p => {
-                    if (p.speculators == null) {
-                        console.log(`No speculation on ${p.name} this phase under any condition`);
-                        return;
-                    }
-
-                    const speculatorNumber = p.speculators[winningCondition];
-
-                    if (speculatorNumber == null) {
-                        console.log(`No speculation on ${p.name} this phase under the winning condition ${winningCondition}`);
-                        return;
-                    }
-                    
-                    const speculator = self.game.players.find(pl => pl.number === speculatorNumber);
-
-                    if (speculator == null) {
-                        console.log(`PLayer number ${speculatorNumber} not found`);
-                        return;
-                    }
-
-                    const owner = self.game.players.find(pl => pl.number === p.owner);
-
-                    if (owner == null) {
-                        console.log(`Player number ${p.owner} not found`);
-                        return;
-                    }
-
-                    const speculatorProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
-
-                    if (speculatorProfit == 0)  {
-                        console.log(`The owner of ${p.name} declared the exact value for that property. No profit/loss from this speculation`);
-                        return;
-                    }
-
-                    if (speculator.profit == null) {
-                        speculator.profit =  [];
-                    }
-
-                    speculator.profit.push({
-                        "phase": 4,
-                        "amount": speculatorProfit,
-                        "context": {
-                            "type": "speculation",
-                            "property": {
-                                "id": p.id,
-                                "name": p.name
-                            },
-                            "condition": winningCondition
-                        }
-                    });
-
-                    self.wss.sendEvent(
-                        self.game.id,
-                        speculator.number,
-                        "speculation-with-profit",
-                        {
-                            "profit": speculatorProfit,
-                            "property": {
-                                "id": p.id,
-                                "name": p.name
-                            },
-                            "condition": winningCondition
-                        }
-                    );
-
-                    if (owner.profit == null) {
-                        owner.profit = [];
-                    }
-
-                    owner.profit.push({
-                        "phase": 4,
-                        "amount": -speculatorProfit,
-                        "context": {
-                            "type": "speculation",
-                            "property": {
-                                "id": p.id,
-                                "name": p.name
-                            },
-                            "condition": winningCondition
-                        }
-                    });
-
-                    self.wss.sendEvent(
-                        self.game.id,
-                        owner.number,
-                        "speculation-with-profit",
-                        {
-                            "profit": -speculatorProfit,
-                            "property": {
-                                "id": p.id,
-                                "name": p.name
-                            },
-                            "condition": winningCondition
-                        }
-                    );
-                });*/
-
-                // 4. transition to the next phase
 
                 setTimeout(() => {
                     self.complete = true;
