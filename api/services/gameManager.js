@@ -4,6 +4,7 @@ import gamePlayerRepository from '../repositories/gamePlayerRepository.js';
 import WS from '../helpers/websocket.js';
 import Harberger from '../logics/harberger/Harberger2.js';
 import Futarchy from '../logics/futarchy/Futarchy.js';
+import Voting from '../logics/voting/Voting.js';
 
 export default {
     create() {
@@ -107,9 +108,12 @@ export default {
                         game = new Futarchy(gameData);
                         await game.init();
                         break;
-                    case 'voter':
-                        return `Game ${gameId} has type ${gameData.parameters.game_type}: this logic has yet to be implemented.`;
+                    case 'voting':
+                        game = new Voting(gameData);
+                        await game.init();
+                        break;
                     default:
+                        console.error(`Game type unknown: ${gameData.parameters.game_type}`);
                 }
 
                 this.games.push(game);

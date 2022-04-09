@@ -614,9 +614,6 @@
 
                                 if (ev.data.property != null) {
                                     self.player.property = ev.data.property;
-                                    //self.player.declaration[0] = ev.data.property.v[0];
-                                    //self.player.declaration[1] = ev.data.property.v[1];
-                                    //self.player.declaration[2] = ev.data.property.v[2];
                                     console.log(ev.data.property);
                                 }
                                 break;

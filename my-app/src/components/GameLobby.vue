@@ -59,8 +59,22 @@ export default {
     },
     methods: {
         joinGame: async function (id) {
+            const game = this.games.find(g => g.id === id);
+
+            if (game == null) {
+                console.error(`Could not find game with id ${id}`);
+                return;
+            }
+
             try {
-                const routeData = this.$router.resolve({path: `/board/${id}`});
+                let routeData;
+
+                if (game.type === 'voting') {
+                    routeData = this.$router.resolve({path: `/voting/${id}`});
+                } else {
+                    routeData = this.$router.resolve({path: `/board/${id}`});
+                }
+                
                 console.log('HRef:' + routeData.href);
                 window.open(routeData.href, '_blank');
             } catch (e) {

@@ -4,7 +4,7 @@ import Dashboard from '../components/Dashboard.vue'
 import Login from '../components/Login.vue';
 import CreateGame from '../components/CreateGame.vue';
 import GameMasterBoard from '../components/GameMasterBoard';
-//import GameBoard from '../components/GameBoard';
+import VotingBoard from '../components/VotingBoard';
 import GameBoardChicago from '../components/GameBoardChicago';
 import GameLobby from '../components/GameLobby';
 import GameAnalysis from '../components/GameAnalysis';
@@ -46,6 +46,11 @@ const routes = [
     path: '/board/:id',
     name: 'Game Board',
     component: GameBoardChicago
+  },
+  {
+    path: '/voting/:id',
+    name: 'Voting Board',
+    component: VotingBoard
   },
   {
     path: '/lobby',

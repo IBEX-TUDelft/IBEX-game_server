@@ -19,10 +19,12 @@
                     <label htmlFor="exampleInputEmail1">Game Type</label>
                 </div>
                 <div class="form-group col-md-3">
-                    <select class="form-control" v-model="game_type" name="game_type" id="game_type" aria-describedby="emailHelp" placeholder="6" >
+                    <select 
+                        class="form-control" v-model="game_type" name="game_type" id="game_type" aria-describedby="emailHelp"
+                        @change="onChangeGameType($event)" >
                         <option value="harberger">Harberger</option>
                         <option value="futarchy">Futarchy</option>
-                        <option value="voter">Voter</option>
+                        <option value="voting">Voting</option>
                     </select>
                 </div>
             </div>
@@ -34,7 +36,7 @@
                     <input type="number" class="form-control" v-model="round_count" name="round_count" id="round_count" aria-describedby="emailHelp" placeholder="6" />
                 </div>
             </div>
-            <div class="row">
+            <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Minutes for Trading</label>
                 </div>
@@ -48,7 +50,7 @@
                     <input type="number" class="form-control" v-model="minutes_for_sniping" name="minutes_for_sniping" id="minutes_for_sniping" aria-describedby="emailHelp" placeholder="2" />
                 </div>
             </div>
-            <div class="row">
+            <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Initial Tax Rate</label>
                 </div>
@@ -62,7 +64,7 @@
                     <input type="number" class="form-control" v-model="tax_rate_final" name="tax_rate_final" id="tax_rate_final" aria-describedby="emailHelp" placeholder="10" />
                 </div>
             </div>
-            <div class="row">
+            <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Signal (Low)</label>
                 </div>
@@ -99,8 +101,11 @@
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Count</label>
                 </div>
-                <div class="form-group col-md-3">
+                <div v-if="game_type != 'voting'" class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="speculators_count" name="speculators_count" id="speculators_count" aria-describedby="emailHelp" placeholder="6" />
+                </div>
+                <div v-else class="form-group col-md-3">
+
                 </div>
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="owners_count" name="owners_count" id="owners_count" aria-describedby="emailHelp" placeholder="1" />
@@ -109,7 +114,7 @@
                     <input type="number" class="form-control" v-model="developers_count" name="developers_count" id="developers_count" aria-describedby="emailHelp" placeholder="5" />
                 </div>
             </div>
-            <div class="row">
+            <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Balance (for Buying Shares?)*</label>
                 </div>
@@ -123,7 +128,7 @@
                     <input type="number" class="form-control" v-model="developer_balance" name="developer_balance" id="developer_balance" aria-describedby="emailHelp" placeholder="500000" />
                 </div>
             </div>
-            <div class="row">
+            <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Shares</label>
                 </div>
@@ -137,7 +142,7 @@
                     <input type="number" class="form-control" v-model="developer_shares" name="developer_shares" id="developer_shares" aria-describedby="emailHelp" placeholder="500000" />
                 </div>
             </div>
-            <div class="row">
+            <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Purchase Proposals per Phase (Max)</label>
                 </div>
@@ -287,6 +292,9 @@ export default {
     name: 'CreateGame',
     data() {
         return {
+            state: {
+
+            },
             title: uniqueNamesGenerator({
                 dictionaries: [colors, adjectives, animals],
                 separator: " ",
@@ -340,6 +348,16 @@ export default {
                 separator: " ",
                 style: "capital"
             });
+        },
+        onChangeGameType(event) {
+            if (this.game_type === 'voting') {
+                this.state.previousSpeculatorCount = this.speculators_count;
+                this.speculators_count = 0;
+            } else if (this.state.previousGameType === 'voting') {
+                this.speculators_count = this.state.previousSpeculatorCount;
+            }
+
+            this.state.previousGameType = event.target.value;
         },
         createGame() {
             const payload = {

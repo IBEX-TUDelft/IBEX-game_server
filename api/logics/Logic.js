@@ -23,8 +23,8 @@ export default class {
             throw new Error('Game phase classes not present');
         }
 
-        if (!['Harberger', 'Futarchy'].includes(type)) {
-            throw new Error(`The game type must be harberger or futarchy. It was ${type}`);
+        if (!['Harberger', 'Futarchy', 'Voting'].includes(type)) {
+            throw new Error(`The game type must be Harberger, Futarchy or Voting. It was ${type}`);
         }
 
         this.data = data;
@@ -37,18 +37,20 @@ export default class {
         const self = this;
 
         self.data.players.forEach(player => {
-            player.wallet = [
-                {
-                    "balance": player.balance,
-                    "shares": player.shares
-                }, {
-                    "balance": player.balance,
-                    "shares": player.shares
-                }, {
-                    "balance": player.balance,
-                    "shares": player.shares
-                }
-            ];
+            if (self.data.type != 'Voting') {
+                player.wallet = [
+                    {
+                        "balance": player.balance,
+                        "shares": player.shares
+                    }, {
+                        "balance": player.balance,
+                        "shares": player.shares
+                    }, {
+                        "balance": player.balance,
+                        "shares": player.shares
+                    }
+                ];
+            }
 
             switch (player.role) {
                 case 1:
@@ -68,7 +70,9 @@ export default class {
                     throw new Error(`Player with unexpected role (should be 1, 2 or 3): ${player.role}`);
             }
 
-            player.S = [0, 0, 0];
+            if (self.data.type != 'Voting') {
+                player.S = [0, 0, 0];
+            }
 
             if (player.role != 2 && player.role != 3) {
                 console.log(`Not assigning a property to ${player.name}, because its role (${player.role}, ${typeof player.role}) is not 2 or 3`);
@@ -158,22 +162,24 @@ export default class {
         console.log(`V = ${self.data.V}`);
 
         //TODO: for the moment the signals are pregenerated and last for the whole game. Shall we regenerate them at each turn?
-        for (let i = 0; i < self.data.players.length; i++) {
-            const player = self.data.players[i];
+        if (self.data.type != 'Voting') {
+            for (let i = 0; i < self.data.players.length; i++) {
+                const player = self.data.players[i];
 
-            for (let j = 0; j < 3; j++) {
-                const delta = (self.data.parameters.signal_high - self.data.parameters.signal_low) * Math.random();
+                for (let j = 0; j < 3; j++) {
+                    const delta = (self.data.parameters.signal_high - self.data.parameters.signal_low) * Math.random();
 
-                const coefficient = self.data.parameters.signal_low + delta;
+                    const coefficient = self.data.parameters.signal_low + delta;
 
-                console.log(`delta1 = ${delta}, coefficient1 = ${coefficient}`);
+                    console.log(`delta1 = ${delta}, coefficient1 = ${coefficient}`);
 
-                const normalizedTaxRate = self.data.parameters.tax_rate_final / 100;
+                    const normalizedTaxRate = self.data.parameters.tax_rate_final / 100;
 
-                player.S[j] = Math.round(self.data.V[j] * coefficient * normalizedTaxRate / 100);
+                    player.S[j] = Math.round(self.data.V[j] * coefficient * normalizedTaxRate / 100);
+                }
+
+                console.log(`${player.name} S = ${player.S}`);
             }
-
-            console.log(`${player.name} S = ${player.S}`);
         }
 
         await GameRepository.saveData(self.data.id, self.data);
