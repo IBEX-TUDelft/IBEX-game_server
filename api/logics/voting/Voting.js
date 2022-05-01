@@ -6,10 +6,11 @@ import Phase2 from './phases/2.js';
 import Phase3 from './phases/3.js';
 import Phase4 from './phases/4.js';
 import Phase5 from './phases/5.js';
+import Phase6 from './phases/6.js';
 
 export default class Voting extends Logic {
     constructor(data) {
-        super(data, [Phase0, Phase1, Phase2, Phase3, Phase4, Phase5], 'Voting');
+        super(data, [Phase0, Phase1, Phase2, Phase3, Phase4, Phase5, Phase6], 'Voting');
     }
 
     getRecoveryData(number) {
@@ -22,7 +23,7 @@ export default class Voting extends Logic {
                 "boundaries": self.data.boundaries
             }
         };
-  
+
         return data;
     }
 }

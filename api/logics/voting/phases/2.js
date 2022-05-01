@@ -51,7 +51,7 @@ class Phase2 extends JoinablePhase {
 
         setTimeout(() => {
             self.complete = true;
-        }, 120000 ); //TODO: replace 60000 with totalTimeout
+        }, 30000 ); //TODO: replace 60000 with totalTimeout
 
         console.log(this.game.players);
 

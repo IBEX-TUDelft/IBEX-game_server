@@ -148,7 +148,7 @@
                             <tbody>
                                 <tr v-for="condition in game.conditions" :key="condition.id">
                                     <td>{{ condition.name }}</td>
-                                    <td><input type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" /></td>
+                                    <td><input v-if="condition.id != 0" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" /></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -156,7 +156,7 @@
                         <button v-if="!player.compensationOfferReceived" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >Submit</button>
                     </div>
 
-                    <div v-if="player.role === 3 && game.phase === 5" class="row mb-1"> <!-- Compensation request -->
+                    <div v-if="player.role === 3 && game.phase === 5" class="row mb-1">
                         <div class="text-center"><b>Compensation Offers</b></div>
                         <table class="table table-bordered">
                             <thead>
@@ -180,9 +180,27 @@
                         <button v-if="!player.compensationDecisionReceived" type="button" @click='submitCompensationDecisions()' class="btn btn-primary" >Submit</button>
                     </div>
 
-                    <div class="row mb-1 text-center"><b>Chat ({{ game.selectedPlayer == null ? 'Select player' : game.selectedPlayer.tag }})</b></div>
+                    <div v-if="game.phase === 6" class="row mb-1">
+                        <div class="text-center"><b>Final Result</b></div>
+                        <table class="table table-bordered">
+                            <thead>
+                                <th scope="col">Condition</th>
+                                <th scope="col">Value</th>
+                                <th scope="col">Compensations</th>
+                                <th scope="col">Total</th>
+                            </thead>
+                            <tbody>
+                                <td>{{ game.conditions[player.result.condition].name }}</td>
+                                <td>{{ formatUs(player.result.value) }}</td>
+                                <td>{{ formatUs(player.result.compensation) }}</td>
+                                <td>{{ formatUs(player.result.value + player.result.compensation) }}</td>
+                            </tbody>
+                        </table>
+                    </div>
 
-                    <div class="row mb-1">
+                    <div v-if="game.phase === 2" class="row mb-1 text-center"><b>Chat ({{ game.selectedPlayer == null ? 'Select player' : game.selectedPlayer.tag }})</b></div>
+
+                    <div v-if="game.phase === 2" class="row mb-1">
                         <b-form-textarea
                             id="message"
                             v-model="outgoing_chat_message"
@@ -192,7 +210,7 @@
                         ></b-form-textarea>
                     </div>
 
-                    <div class="row mb-1 justify-content-center">
+                    <div v-if="game.phase === 2" class="row mb-1 justify-content-center">
                         <b-button @click="sendChatMessage" variant="primary">Send</b-button>
                     </div>
 
@@ -250,7 +268,8 @@ export default {
                 compensationRequestReceived: false,
                 compensationOfferReceived: false,
                 compensationDecisions: [],
-                compensationDecisionReceived: false
+                compensationDecisionReceived: false,
+                result: null
             },
             outgoing_chat_message: ''
         }
@@ -369,6 +388,10 @@ export default {
                             self.player.property.lastOffer = ev.data.compensationOffers;
 
                             break;
+                        case 'final-profit':
+                            self.player.result = ev.data;
+
+                            break;
                         default:
                             console.error(`Type ${ev.eventType} was not understood`);
                     }
@@ -470,7 +493,7 @@ export default {
             this.sendMessage({
                 "gameId": self.game.id,
                 "type": "compensation-offer",
-                "compensationOffers": self.game.compensationOffers
+                "compensationOffers": self.game.compensationOffers.map(c => parseInt(c))
             });
         },
         findPlayerByNumber(number) {

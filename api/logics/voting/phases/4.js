@@ -14,6 +14,7 @@ class Phase4 extends JoinablePhase {
                 console.log(message);
 
                 caller.compensationOffers = message.compensationOffers;
+                game.compensationOffers = message.compensationOffers;
 
                 player.submittedCompensationOffers = true;
 

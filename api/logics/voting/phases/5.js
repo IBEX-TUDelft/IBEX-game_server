@@ -50,15 +50,7 @@ class Phase5 extends JoinablePhase {
     }
 
     onExit() {
-        const err = this.wss.broadcastEvent(
-            this.game.id,
-            "reset-timer",
-            {}
-        );
 
-        if (err != null) {
-            console.log(err);
-        }
     }
 }
 

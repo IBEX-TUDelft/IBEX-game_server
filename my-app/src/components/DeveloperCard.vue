@@ -28,7 +28,10 @@
                 <div class="col-6">
                     {{ player.property != null && player.property.v != null && player.property.v[condition.id] != null ?  player.property.v[condition.id] : '-' }}
                 </div>
-                <div class="col-6">
+                <div v-if="game.phase <= 3" class="col-6">
+                    -
+                </div>
+                <div v-else class="col-6">
                     {{ player.property != null && player.property.lastOffer != null && player.property.lastOffer[condition.id] != null ?  player.property.lastOffer[condition.id] : '-' }}
                 </div>
             </div>
