@@ -48,7 +48,7 @@ const routes = [
     component: GameBoardChicago
   },
   {
-    path: '/voting/:id',
+    path: '/voting/:id/:recovery',
     name: 'Voting Board',
     component: VotingBoard
   },

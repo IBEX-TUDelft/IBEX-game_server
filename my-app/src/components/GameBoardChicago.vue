@@ -599,7 +599,7 @@
                             case "assign-role":
                                 self.game.boundaries = ev.data.boundaries;
                                 self.game.taxRate = ev.data.taxRate;
-                                self.player.boundaries 
+                                self.player.boundaries //TODO:  ?????
                                 self.player.role = ev.data.role;
                                 //self.player.title += ` (${roleMap[ev.data.role]})`;
                                 self.player.balance = ev.data.balance;

@@ -62,13 +62,11 @@ export default class Phase {
     }
 
     getPlayer(ws, message) {
-        const player = this.game.players.find(p => p.number === ws.player.number);
-
-        if (player == null) {
-            throw new Error(ws, `Game ${message.gameId}: player ${ws.player.number} not found`);
+        if (ws.player != null) {
+            return this.game.players.find(p => p.number === ws.player.number);
+        } else {
+            return null;
         }
-
-        return player;
     }
 
     async onMessage(ws, message) {
@@ -97,14 +95,12 @@ export default class Phase {
             }
         }
 
-        let player;
+        let player = this.getPlayer(ws, message);
 
-        try {
-            player = this.getPlayer(ws, message);
-            console.log(player);
-        } catch (err) {
-            console.err(err);
-            WS.error(ws, err.message);
+        if (player == null && handler.requiresAuthentication != false) {
+            const errMessage = `Handler ${handler.type} requires authentication. Player ${ws.player.number} not found in game ${message.gameId}`;
+            console.error(errMessage);
+            return WS.error(ws, errMessage);
         }
 
         await handler.action(ws, message, player, this);

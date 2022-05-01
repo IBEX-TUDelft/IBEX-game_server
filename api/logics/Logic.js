@@ -230,7 +230,7 @@ export default class {
             this.data.currentPhase.getData()
         );
 
-        if (this.data.currentRound.phase == 9) {
+        if (this.data.currentRound.phase === this.phases.length - 1) {
             this.wss.broadcastEvent(this.data.id, "round-end", {
                 "round": this.data.currentRound.number
             });
@@ -308,5 +308,10 @@ export default class {
         await this.data.currentPhase.onEnter();
 
         await GameRepository.saveData(data.id, data);
-    }    
+    }
+
+    getRecoveryData(number) {
+        return {
+        };
+    }
 }

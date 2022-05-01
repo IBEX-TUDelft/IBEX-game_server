@@ -44,6 +44,53 @@ export default {
             Controller.handleSuccess(res, records, 'Data found');
         });
 
+        Controller.addGetRoute(app, '/api/v1/games/status', false, async (req, res) => {
+            const gameId = parseInt(req.query.id);
+            const recovery = req.query.recovery;
+
+            const game = gameManager.games.find(g => g.data.id === gameId);
+
+            if (game == null) {
+                console.log(gameManager.games);
+                return Controller.handleGenericError(res, `Game with id ${gameId} not found`, 400);
+            }
+
+            const player = game.data.players.find(p => p.recovery === recovery);
+
+            const data = {
+                "found": false,
+                "canJoin": true,
+                "gameData": null
+            }
+
+            let message;
+
+            if (player == null) {
+                console.log(`Player with recovery ${recovery} not found in game ${gameId}`);
+
+                console.log(`Current players: ${game.data.assignedPlayers}, Total players: ${game.data.parameters.total_players}`);
+
+                if (game.data.assignedPlayers < game.data.parameters.total_players) {
+                    // 1: player not found, can join
+                    message = `Player not found but game ${gameId} can still be joined`;
+                } else {
+                    // 2: else player not found, but the game is already full
+                    message = `Game ${gameId} is full`;
+                    data.canJoin = false;
+                }
+            } else {
+                console.log(`Player with recovery ${recovery} found in game ${gameId}: returning his data`);
+                // 3: player found, here is yor data
+
+                data.found = true;
+                data.gameData = game.getRecoveryData(player.number);
+
+                message = `Game ${gameId}: player found, recovery data will be returned`;
+            }
+
+            Controller.handleSuccess(res, data, message);
+        });
+
         Controller.addGetRoute(app, '/api/v1/games/delete', true, async (req, res) => {
             const gameId = parseInt(req.query.game_id);
 

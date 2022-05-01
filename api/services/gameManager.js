@@ -140,8 +140,14 @@ export default {
                 }
 
                 switch(message.type) {
+                    case 'status':
+                        //TODO: provide the player status within the game
+                        WS.sendEvent(ws, 'status', {
+                            "joined": game.data.players.find(p => p.recovery === message.recovery)
+                        });
+                        break;
                     case 'rejoin':
-                        const player = game.data.players.find(p => p.recoveryString === message.recoveryString);
+                        const player = game.data.players.find(p => p.recovery === message.recovery);
 
                         if (player == null) {
                             WS.send(ws, {
