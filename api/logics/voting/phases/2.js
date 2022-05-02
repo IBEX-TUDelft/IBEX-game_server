@@ -105,7 +105,7 @@ class Phase2 extends JoinablePhase {
             self.game.id,
             "set-timer",
             {
-                "end": Date.now() + visibleTimeout * 60 * 1000
+                "end": Date.now() + visibleTimeout * 1000
             }
         );
 
