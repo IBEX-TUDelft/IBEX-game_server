@@ -9,6 +9,7 @@ import GameBoardChicago from '../components/GameBoardChicago';
 import GameLobby from '../components/GameLobby';
 import GameAnalysis from '../components/GameAnalysis';
 import GameMarketLog from '../components/GameMarketLog';
+import GameChatLog from '../components/GameChatLog';
 
 Vue.use(VueRouter)
 
@@ -66,6 +67,11 @@ const routes = [
     path: '/market/:id',
     name: 'Market Log',
     component: GameMarketLog
+  },
+  {
+    path: '/chat/:id',
+    name: 'Chat Log',
+    component: GameChatLog
   }
 ]
 

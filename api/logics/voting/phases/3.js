@@ -2,6 +2,10 @@ import JoinablePhase from '../../JoinablePhase.js';
 
 class Phase3 extends JoinablePhase {
 
+    results = {
+        compensationRequests: []
+    };
+
     complete = false;
 
     constructor (game, wss) {
@@ -12,6 +16,10 @@ class Phase3 extends JoinablePhase {
                 console.log(message);
 
                 player.compensationRequests = message.compensationRequests;
+                caller.results.compensationRequests.push({
+                    "number": player.number,
+                    "compensationDecisions": message.compensationRequests
+                });
 
                 const err = wss.sendEvent(
                     game.id,

@@ -5,6 +5,10 @@ class Phase2 extends JoinablePhase {
 
     complete = false;
 
+    results = {
+        chatLog: []
+    };
+
     constructor (game, wss) {
         super (game, wss, [{
             "type": "chat-with-player",
@@ -19,20 +23,62 @@ class Phase2 extends JoinablePhase {
                     return;
                 }
 
+                const messageSent = {
+                    "sender": player.number,
+                    "to": toPlayer.number,
+                    "text": message.text
+                };
+
                 const err = wss.sendEvent(
                     game.id,
                     toPlayer.number,
                     "message-received",
-                    {
-                        "sender": player.number,
-                        "to": toPlayer.number,
-                        "text": message.text
-                    }
+                    messageSent
                 );
 
                 if (err != null) {
                     console.error(err);
                 }
+
+                // Recording the chat events for showing later
+
+                const chatLog = caller.results.chatLog;
+
+                let senderJournal = chatLog.find(j => j.number === player.number);
+
+                if (senderJournal == null) {
+                    senderJournal = {
+                        "number": player.number,
+                        "logs": []
+                    };
+
+                    chatLog.push(senderJournal);
+                }
+
+                let receiverJournal = chatLog.find(j => j.number === toPlayer.number);
+
+                if (receiverJournal == null) {
+                    receiverJournal = {
+                        "number": toPlayer.number,
+                        "logs": []
+                    };
+
+                    chatLog.push(receiverJournal);
+                }
+
+                let bidirectionalLog = senderJournal.logs.find(l => l.people.includes(toPlayer.number) && l.people.includes(player.number));
+
+                if (bidirectionalLog == null) {
+                    bidirectionalLog = {
+                        "people": [player.number, toPlayer.number],
+                        "messages": []
+                    }
+
+                    senderJournal.logs.push(bidirectionalLog);
+                    receiverJournal.logs.push(bidirectionalLog);
+                }
+
+                bidirectionalLog.messages.push(messageSent);
             }
         }], [
             'Click on a plot to chat with its owner'
@@ -69,7 +115,7 @@ class Phase2 extends JoinablePhase {
     }
 
     getData() {
-        return {}
+        return this.results.chatLog;
     }
 
     testComplete () {

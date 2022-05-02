@@ -26,10 +26,10 @@
                                 <button type="button" @click='joinGame(item.id)' class="btn btn-primary">Join</button>
                             </div>
                             <div class="btn-toolbar col-md-4">
-                                <button type="button" @click='analyseGame(item.id)' class="btn btn-primary">Analyse</button>
+                                <button type="button" @click='analyseGame(item.id, item.type)' class="btn btn-primary">Analyse</button>
                             </div>
                             <div class="btn-toolbar col-md-4">
-                                <button type="button" @click='marketLog(item.id)' class="btn btn-primary">Market Log</button>
+                                <button type="button" @click='interationLog(item.id, item.type)' class="btn btn-primary">{{ item.type === 'voting' ? 'Chat' : 'Market'}} Log</button>
                             </div>
                         </div>
                     </td>
@@ -103,9 +103,15 @@ export default {
                 console.log(e);
             }
         },
-        marketLog: async function (id) {
+        interationLog: async function (id, type) {
+            let subPath = 'market';
+
+            if (type === 'voting') {
+                subPath = 'chat';
+            }
+
             try {
-                const routeData = this.$router.resolve({path: `/market/${id}`});
+                const routeData = this.$router.resolve({path: `/${subPath}/${id}`});
                 console.log('HRef:' + routeData.href);
                 window.open(routeData.href, '_blank');
             } catch (e) {

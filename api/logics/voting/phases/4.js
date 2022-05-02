@@ -6,6 +6,10 @@ class Phase4 extends JoinablePhase {
 
     compensationOffers;
 
+    results = {
+        compensationOffers: []
+    };
+
     constructor (game, wss) {
         super (game, wss, [{
             "type": "compensation-offer",
@@ -13,7 +17,7 @@ class Phase4 extends JoinablePhase {
             "action": function(ws, message, player, caller) {
                 console.log(message);
 
-                caller.compensationOffers = message.compensationOffers;
+                caller.results.compensationOffers = message.compensationOffers;
                 game.compensationOffers = message.compensationOffers;
 
                 player.submittedCompensationOffers = true;
@@ -66,7 +70,7 @@ class Phase4 extends JoinablePhase {
         const self = this;
 
         return {
-            "compensationOffers": self.compensationOffers
+            "compensationOffers": self.results.compensationOffers
         }
     }
 
@@ -83,7 +87,7 @@ class Phase4 extends JoinablePhase {
                 p.number,
                 "compensation-offer-made",
                 {
-                    "compensationOffers": self.compensationOffers
+                    "compensationOffers": self.results.compensationOffers
                 }
             );
 

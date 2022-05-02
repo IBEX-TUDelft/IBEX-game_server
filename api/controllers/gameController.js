@@ -203,8 +203,27 @@ export default {
                     }
         
                     break;
-                default:
+                case 'Voting':
+                    if (game.results[3] != null) {
+                        data.compensationRequests = game.results[3].compensationRequests;
+                    }
 
+                    if (game.results[4] != null) {
+                        data.compensationOffers = game.results[4].compensationOffers;
+                    }
+
+                    if (game.results[5] != null) {
+                        data.compensationDecisions = game.results[5].compensationDecisions;
+                    }
+
+                    if (game.results[6] != null) {
+                        data.results = game.results[6].results;
+                        data.winningCondition = game.results[6].winningCondition;
+                    }
+
+                    break;
+                default:
+                    break;
             }
 
             Controller.handleSuccess(res, data, 'Data available');
@@ -222,6 +241,28 @@ export default {
 
             if (game.results[6] != null) {
                 data.marketLog = game.results[6].log;
+            }
+
+            Controller.handleSuccess(res, data, 'Data available');
+        });
+
+        Controller.addGetRoute(app, '/api/v1/games/chat-log', false, async (req, res) => {
+            const gameId = parseInt(req.query.game_id);
+
+            const game = gameManager.games.find(g => g.data.id  == gameId);
+
+            const data = {
+                "ruleset": game.data.type,
+            };
+
+            if (game.results[2] != null) {
+                data.chatLog = game.results[2].chatLog;
+                data.players = game.data.players.map(p => {
+                    return {
+                        "number": p.number,
+                        "tag": p.tag
+                    }
+                });
             }
 
             Controller.handleSuccess(res, data, 'Data available');

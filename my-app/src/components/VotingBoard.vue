@@ -130,7 +130,7 @@
                                 <tr v-for="condition in game.conditions" :key="condition.id">
                                     <td>{{ condition.name }}</td>
                                     <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                    <td><input type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" /></td>
+                                    <td><input v-if="condition.id != 0" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" /></td>
                                 </tr>
                             </tbody>
                         </table>

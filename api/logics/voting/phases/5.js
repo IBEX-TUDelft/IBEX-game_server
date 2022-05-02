@@ -4,6 +4,10 @@ class Phase5 extends JoinablePhase {
 
     complete = false;
 
+    results = {
+        compensationDecisions: []
+    };
+
     constructor (game, wss) {
         super (game, wss, [{
             "type": "compensation-decision",
@@ -12,6 +16,10 @@ class Phase5 extends JoinablePhase {
                 console.log(message);
 
                 player.compensationDecisions = message.compensationDecisions;
+                caller.results.compensationDecisions.push({
+                    "number": player.number,
+                    "compensationDecisions": message.compensationDecisions
+                });
 
                 const err = wss.sendEvent(
                     game.id,
@@ -47,10 +55,6 @@ class Phase5 extends JoinablePhase {
 
     testComplete () {
         return this.game.players.find(p => p.role === 3 && p.compensationDecisions == null) == null;
-    }
-
-    onExit() {
-
     }
 }
 

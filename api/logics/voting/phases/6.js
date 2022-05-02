@@ -2,7 +2,10 @@ import JoinablePhase from '../../JoinablePhase.js';
 
 class Phase6 extends JoinablePhase {
 
-    results = [];
+    results = {
+        standings: [],
+        winningCondition: null
+    };
 
     constructor (game, wss) {
         super (game, wss, []);
@@ -20,7 +23,7 @@ class Phase6 extends JoinablePhase {
         const developer = self.game.players.find(p => p.role === 2);
 
         self.game.conditions.forEach(c => {
-            self.results.push({
+            self.results.standings.push({
                 "counter": 0,
                 "id": c.id,
                 "winner": false,
@@ -30,21 +33,24 @@ class Phase6 extends JoinablePhase {
 
             self.game.players.forEach(player => {
                 if (player.role === 2 || player.compensationDecisions[c.id] === true) {
-                    self.results[c.id].counter ++;
+                    self.results.standings[c.id].counter ++;
                 }
             })
         });
 
-        const standings = self.results.filter(r => r.counter >= quorum).sort((f,s) => s.value - f.value);
+        const standings = self.results.standings.filter(r => r.counter >= quorum).sort((f,s) => s.value - f.value);
 
         if (standings.length === 0) {
-            self.results[0].winner = true;
+            self.results.standings[0].winner = true;
         } else {
             standings[0].winner = true;
         }
 
-        const winner = self.results.find(r => r.winner === true);
+        const winner = self.results.standings.find(r => r.winner === true);
 
+        self.game.winningCondition = winner.id;
+        self.results.winningCondition = winner.id;
+        
         console.log(this.results);
 
         self.game.players.forEach(player => {
@@ -71,7 +77,12 @@ class Phase6 extends JoinablePhase {
     }
 
     getData () {
-        return {};
+        const self = this;
+
+        return {
+            "standings": self.results.standings,
+            "winningCondition": self.results.winningCondition
+        };
     }
 }
 
