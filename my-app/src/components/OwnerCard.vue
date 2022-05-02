@@ -21,7 +21,7 @@
                     Value
                 </div>
                 <div class="col-6 font-weight-bold">
-                    Last Offer
+                    Compensation Offer
                 </div>
             </div>
 

@@ -8,6 +8,7 @@ import VotingBoard from '../components/VotingBoard';
 import GameBoardChicago from '../components/GameBoardChicago';
 import GameLobby from '../components/GameLobby';
 import GameAnalysis from '../components/GameAnalysis';
+import GameAnalysisVoting from '../components/GameAnalysisVoting';
 import GameMarketLog from '../components/GameMarketLog';
 import GameChatLog from '../components/GameChatLog';
 
@@ -72,6 +73,11 @@ const routes = [
     path: '/chat/:id',
     name: 'Chat Log',
     component: GameChatLog
+  },
+  {
+    path: '/analyse-voting/:id',
+    name: 'Game Analysis Voting',
+    component: GameAnalysisVoting
   }
 ]
 

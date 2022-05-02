@@ -219,7 +219,7 @@ export default class {
 
         await this.data.currentPhase.onExit();
 
-        this.results.push(this.data.currentPhase.results);
+        this.results[this.results.length - 1].results.push(this.data.currentPhase.results);
 
         console.log(`Phase ${this.data.currentRound.phase} results:`);
         console.log(this.data.currentPhase.results);
@@ -287,6 +287,11 @@ export default class {
 
             this.data.rounds.push(this.data.currentRound);
         }
+
+        this.results.push({
+            "round": number,
+            "results": []
+        });
 
         const data = this.data;
 

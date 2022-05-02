@@ -204,7 +204,18 @@ export default {
         
                     break;
                 case 'Voting':
-                    if (game.results[3] != null) {
+                    data.conditions = game.data.conditions;
+                    data.players = game.data.players.map(p => {
+                        return {
+                            "number": p.number,
+                            "tag": p.tag,
+                            "role": p.role,
+                            "values": p.property.v
+                        }
+                    });
+                    data.results = game.results;
+
+                    /*if (game.results[3] != null) {
                         data.compensationRequests = game.results[3].compensationRequests;
                     }
 
@@ -217,9 +228,9 @@ export default {
                     }
 
                     if (game.results[6] != null) {
-                        data.results = game.results[6].results;
+                        data.standings = game.results[6].standings;
                         data.winningCondition = game.results[6].winningCondition;
-                    }
+                    }*/
 
                     break;
                 default:
@@ -253,17 +264,14 @@ export default {
 
             const data = {
                 "ruleset": game.data.type,
-            };
-
-            if (game.results[2] != null) {
-                data.chatLog = game.results[2].chatLog;
-                data.players = game.data.players.map(p => {
+                "players": game.data.players.map(p => {
                     return {
                         "number": p.number,
                         "tag": p.tag
                     }
-                });
-            }
+                }),
+                "results": game.results
+            };
 
             Controller.handleSuccess(res, data, 'Data available');
         });

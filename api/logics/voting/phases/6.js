@@ -7,8 +7,10 @@ class Phase6 extends JoinablePhase {
         winningCondition: null
     };
 
+    complete = false;
+
     constructor (game, wss) {
-        super (game, wss, []);
+        super (game, wss, [], ['The results of this round are available']);
     }
 
     async onEnter () {
@@ -38,11 +40,17 @@ class Phase6 extends JoinablePhase {
             })
         });
 
-        const standings = self.results.standings.filter(r => r.counter >= quorum).sort((f,s) => s.value - f.value);
+        let standings = self.results.standings.filter(r => r.counter >= quorum).sort((f,s) => s.counter - f.counter);
 
         if (standings.length === 0) {
             self.results.standings[0].winner = true;
+        } else if (standings.length === 1 || standings[0].counter > standings[1].counter) {
+            standings[0].winner = true;
         } else {
+            const maximum = standings[0].counter;
+
+            standings = standings.filter(s => s.counter === maximum).sort((f,s) => s.value - f.value);
+
             standings[0].winner = true;
         }
 
@@ -50,7 +58,7 @@ class Phase6 extends JoinablePhase {
 
         self.game.winningCondition = winner.id;
         self.results.winningCondition = winner.id;
-        
+
         console.log(this.results);
 
         self.game.players.forEach(player => {
@@ -70,10 +78,14 @@ class Phase6 extends JoinablePhase {
                 console.error(err);
             }
         });
+
+        setTimeout(() => {
+            self.complete = true;
+        }, 5000);
     }
 
     testComplete () {
-        return this.game.assignedPlayers === this.game.parameters.total_players;
+        return this.complete;
     }
 
     getData () {

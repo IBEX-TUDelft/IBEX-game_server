@@ -92,12 +92,12 @@ class Phase2 extends JoinablePhase {
 
         const self = this;
         
-        const visibleTimeout = 6;
-        //const totalTimeout = (visibleTimeout + Math.floor(Math.random() * 3))  * 60 * 1000;
+        const visibleTimeout = 6 * 60;
+        //const totalTimeout = (visibleTimeout + Math.floor(Math.random() * 3 * 60)) * 1000;
 
         setTimeout(() => {
             self.complete = true;
-        }, 30000 ); //TODO: replace 60000 with totalTimeout
+        }, 120000 ); //TODO: replace with totalTimeout
 
         console.log(this.game.players);
 

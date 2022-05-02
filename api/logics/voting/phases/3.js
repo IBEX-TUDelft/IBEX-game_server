@@ -18,7 +18,7 @@ class Phase3 extends JoinablePhase {
                 player.compensationRequests = message.compensationRequests;
                 caller.results.compensationRequests.push({
                     "number": player.number,
-                    "compensationDecisions": message.compensationRequests
+                    "compensationRequests": message.compensationRequests
                 });
 
                 const err = wss.sendEvent(

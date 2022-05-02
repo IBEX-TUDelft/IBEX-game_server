@@ -94,9 +94,15 @@ export default {
                 console.log(e);
             }
         },
-        analyseGame: async function (id) {
+        analyseGame: async function (id, type) {
+            let subPath = 'analyse';
+
+            if (type === 'voting') {
+                subPath = 'analyse-voting';
+            }
+
             try {
-                const routeData = this.$router.resolve({path: `/analyse/${id}`});
+                const routeData = this.$router.resolve({path: `/${subPath}/${id}`});
                 console.log('HRef:' + routeData.href);
                 window.open(routeData.href, '_blank');
             } catch (e) {

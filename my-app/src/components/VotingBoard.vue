@@ -198,9 +198,9 @@
                         </table>
                     </div>
 
-                    <div v-if="game.phase === 2" class="row mb-1 text-center"><b>Chat ({{ game.selectedPlayer == null ? 'Select player' : game.selectedPlayer.tag }})</b></div>
+                    <div v-if="game.selectedPlayer != null && game.selectedPlayer.number != player.number" class="row mb-1 text-center"><b>Chat ({{ game.selectedPlayer == null ? 'Select player' : game.selectedPlayer.tag }})</b></div>
 
-                    <div v-if="game.phase === 2" class="row mb-1">
+                    <div v-if="game.phase === 2 && game.selectedPlayer.number != player.number" class="row mb-1">
                         <b-form-textarea
                             id="message"
                             v-model="outgoing_chat_message"
@@ -210,7 +210,7 @@
                         ></b-form-textarea>
                     </div>
 
-                    <div v-if="game.phase === 2" class="row mb-1 justify-content-center">
+                    <div v-if="game.phase === 2 && game.selectedPlayer.number != player.number" class="row mb-1 justify-content-center">
                         <b-button @click="sendChatMessage" variant="primary">Send</b-button>
                     </div>
 
