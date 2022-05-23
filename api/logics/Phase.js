@@ -7,6 +7,12 @@ export default class Phase {
     wss = null;
     instructions = [];
 
+    timer = {
+        "set": false,
+        "visibleTimeout": null,
+        "realTimeout": null
+    }
+
     constructor (game, wss, handlers, instructions) {
         this.game = game;
         this.wss = wss;
@@ -50,7 +56,17 @@ export default class Phase {
     }
 
     async onExit() {
-        
+        if (this.timer.set === true) {
+            const err = this.wss.broadcastEvent(
+                this.game.id,
+                "reset-timer",
+                {}
+            );
+    
+            if (err != null) {
+                console.log(err);
+            }
+        }
     }
 
     async testComplete() {
@@ -106,5 +122,30 @@ export default class Phase {
         await handler.action(ws, message, player, this);
 
         return await this.testComplete();
+    }
+
+    setTimer(visibleTimeout, realTimeout) {
+        const self = this;
+
+        this.timer.set = true;
+
+        setTimeout(() => {
+            self.complete = true;
+        }, realTimeout );
+
+        this.timer.visibleTimeout = Date.now() + visibleTimeout;
+        this.timer.realTimeout = Date.now() + realTimeout;
+
+        const err = self.wss.broadcastEvent(
+            self.game.id,
+            "set-timer",
+            {
+                "end": self.timer.visibleTimeout
+            }
+        );
+
+        if (err != null) {
+            console.log(err);
+        }
     }
 }

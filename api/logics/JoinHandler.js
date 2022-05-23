@@ -12,6 +12,9 @@ export default class JoinHandler extends MessageHandler {
 
         console.log(`Assigned players: ${game.assignedPlayers}, Total players: ${game.parameters.total_players}`);
 
+        console.log('Players in join handler');
+        console.log(game.players.map(w => w.number));
+
         let player = game.players.find(p => p.recovery === message.recovery);
 
         let responseMessage;
@@ -31,6 +34,9 @@ export default class JoinHandler extends MessageHandler {
         } else {
             responseMessage = `Player ${player.number} rejoined the game`;
         }
+
+        console.log('Players in before wss join game');
+        console.log(game.players.map(w => w.number));
 
         wss.joinGame(ws, game.id, player.role, player.number);
 

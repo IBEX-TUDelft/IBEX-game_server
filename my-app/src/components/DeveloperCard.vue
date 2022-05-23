@@ -1,37 +1,18 @@
 <template>
     <div @click="setIsActive()" :class="isActive ? 'bg-light' : ''">
 
-        <div class="row">
-            <div :class="'col-11 text-center' + (newMessages ? ' font-weight-bold font-italic' : '')">
-                {{ player.tag }}
-            </div>
-            <div class="col-1">
-                {{ !isActive && newMessages ? '*' : '' }}
-            </div>
-        </div>
 
         <!--b-card-group deck-->
-        <b-card v-for="condition in game.conditions" :key="condition.id"
-            :header="condition.name"
+        <b-card 
+            :header="player.tag + '\'s requests'"
             header-tag="header"
             class="mb-1"
         >
-            <div class="row">
+            <div class="row" v-for="condition in game.conditions" :key="condition.id">
                 <div class="col-6 font-weight-bold">
-                    Value
+                    {{ condition.name }}
                 </div>
-                <div class="col-6 font-weight-bold">
-                    Owner's Request
-                </div>
-            </div>
-            <div class="row">
                 <div class="col-6">
-                    {{ player.property != null && player.property.v != null && player.property.v[condition.id] != null ?  player.property.v[condition.id] : '-' }}
-                </div>
-                <div v-if="game.phase <= 3" class="col-6">
-                    -
-                </div>
-                <div v-else class="col-6">
                     {{ player.property != null && player.property.lastOffer != null && player.property.lastOffer[condition.id] != null ?  player.property.lastOffer[condition.id] : '-' }}
                 </div>
             </div>

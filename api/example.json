@@ -1,0 +1,187 @@
+{
+    "projects": [{
+        "id": 0,
+        "tag": "status_quo",
+        "name": "Status Quo"
+    }, {
+        "id": 1,
+        "tag": "project_a",
+        "name": "Project A"
+    }],
+    "players": [{
+        "tag": "Owner 1",
+        "number": 1,
+        "role": 3
+    }, {
+        "tag": "Developer",
+        "number": 2,
+        "role": 2
+    }, {
+        "tag": "Owner 2",
+        "number": 3,
+        "role": 3
+    }, {
+        "tag": "Owner 3",
+        "number": 4,
+        "role": 3
+    }, {
+        "tag": "Owner 4",
+        "number": 5,
+        "role": 3
+    }, {
+        "tag": "Owner 5",
+        "number": 6,
+        "role": 3
+    }, {
+        "tag": "Speculator 1",
+        "number": 1,
+        "role": 1
+    }, {
+        "tag": "Speculator 2",
+        "number": 1,
+        "role": 1
+    }, {
+        "tag": "Speculator 3",
+        "number": 1,
+        "role": 1
+    }, {
+        "tag": "Speculator 4",
+        "number": 1,
+        "role": 1
+    }, {
+        "tag": "Speculator 5",
+        "number": 1,
+        "role": 1
+    }, {
+        "tag": "Speculator 6",
+        "number": 1,
+        "role": 1
+    }],
+    "boundaries": [{
+        "role": 2,
+        "project": 0,
+        "low": 300000,
+        "high": 400000
+    }, {
+        "role": 2,
+        "project": 1,
+        "low": 1000000,
+        "high": 1200000
+    }, {
+        "role": 3,
+        "project": 0,
+        "low": 200000,
+        "high": 300000
+    }, {
+        "role": 3,
+        "project": 1,
+        "low": 1000000,
+        "high": 1200000
+    }],
+    "rounds": [{
+        "number": 1,
+        "values": [{
+            "number": 1,
+            "values": [310000, 210000]
+        }, {
+            "number": 2,
+            "values": [320000, 1100000]
+        }, {
+            "number": 3,
+            "values": [330000, 230000]
+        }, {
+            "number": 4,
+            "values": [340000, 240000]
+        }, {
+            "number": 5,
+            "values": [350000, 250000]
+        }, {
+            "number": 6,
+            "values": [360000, 260000]
+        }]
+    }, {
+        "number": 2,
+        "values": [{
+            "number": 1,
+            "values": [310000, 210000]
+        }, {
+            "number": 2,
+            "values": [320000, 1100000]
+        }, {
+            "number": 3,
+            "values": [330000, 230000]
+        }, {
+            "number": 4,
+            "values": [340000, 240000]
+        }, {
+            "number": 5,
+            "values": [350000, 250000]
+        }, {
+            "number": 6,
+            "values": [360000, 260000]
+        }]
+    }, {
+        "number": 3,
+        "values": [{
+            "number": 1,
+            "values": [310000, 210000]
+        }, {
+            "number": 2,
+            "values": [320000, 1100000]
+        }, {
+            "number": 3,
+            "values": [330000, 230000]
+        }, {
+            "number": 4,
+            "values": [340000, 240000]
+        }, {
+            "number": 5,
+            "values": [350000, 250000]
+        }, {
+            "number": 6,
+            "values": [360000, 260000]
+        }]
+    }, {
+        "number": 4,
+        "values": [{
+            "number": 1,
+            "values": [310000, 210000]
+        }, {
+            "number": 2,
+            "values": [320000, 1100000]
+        }, {
+            "number": 3,
+            "values": [330000, 230000]
+        }, {
+            "number": 4,
+            "values": [340000, 240000]
+        }, {
+            "number": 5,
+            "values": [350000, 250000]
+        }, {
+            "number": 6,
+            "values": [360000, 260000]
+        }]
+    }, {
+        "number": 5,
+        "values": [{
+            "number": 1,
+            "values": [310000, 210000]
+        }, {
+            "number": 2,
+            "values": [320000, 1100000]
+        }, {
+            "number": 3,
+            "values": [330000, 230000]
+        }, {
+            "number": 4,
+            "values": [340000, 240000]
+        }, {
+            "number": 5,
+            "values": [350000, 250000]
+        }, {
+            "number": 6,
+            "values": [360000, 260000]
+        }]
+    }]
+}

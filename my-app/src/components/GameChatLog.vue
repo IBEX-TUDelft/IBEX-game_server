@@ -24,29 +24,16 @@
                             Round {{ round.round }}
                         </template>
 
-                        <b-card no-body>
-                            <b-tabs card content-class="mt-3" v-model="tabIndex">
-                                <b-tab v-for="journal in (round.results == null || round.results[2] == null ? [] : round.results[2].chatLog)" :key="journal.number">
-                                    <template #title>
-                                        {{ players.find(p => p.number === journal.number).tag }}
-                                    </template>
-                                    <div class="row">
-                                        <div :class="'col-' + Math.floor(12 / journal.logs.length) + ' p-4'" v-for="log in journal.logs" :key="log.people[0] + '-' + log.people[1]">
-                                            <p class="text-center">{{ players.find(p => p.number === log.people[0]).tag }} and {{ players.find(p => p.number === log.people[1]).tag }}</p>
-                                            <div class="row">
-                                                <table class="table table-bordered">
-                                                    <tbody>
-                                                        <tr v-for="message in log.messages" :key="message.sender + '-' + message.to">
-                                                            <td>{{ players.find(p => p.number === message.sender).tag }}: {{ message.text }}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </b-tab>
-                            </b-tabs>
-                        </b-card>
+                        <div class="row">
+                            <div v-for="message in (round.results == null || round.results[2] == null ? [] : round.results[2].chatLog).reduce( (a,b) => [b,...a], [])" :key="message.number" class="col-12 mb-1 px-0">
+                                <b-card 
+                                    :header="message.participants"
+                                    header-tag="header"
+                                >
+                                    <b-card-text><b>{{ players.find(p => p.number === message.sender).tag }}</b>: {{ message.text }}</b-card-text>
+                                </b-card>
+                            </div>
+                        </div>
 
                     </b-tab>
                 </b-tabs>
@@ -210,6 +197,24 @@
             this.ruleset = response.data.data.ruleset;
             this.chatLog = response.data.data.chatLog;
             this.players = response.data.data.players;
+
+            this.results.forEach(round => {
+                if (round.results == null || round.results[2] == null) {
+                    return;
+                }
+                
+                round.results[2].chatLog.forEach(message => {
+                    const tags = [];
+
+                    self.players.forEach(p => {
+                        if (message.to.includes(p.number) || message.sender === p.number) {
+                            tags.push(p.tag);
+                        }
+                    });
+
+                    message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];
+                })
+            });
         }
     }
 </script>

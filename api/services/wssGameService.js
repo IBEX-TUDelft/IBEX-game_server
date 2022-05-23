@@ -135,11 +135,15 @@ export default {
                 });
             },
             joinGame: function (ws, id, role, number) {
+                console.log(`Player ${number} is [re]joining game ${id}`);
+
                 const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
                     return `Game ${id} not found`;
                 }
+
+                console.log(`Game ${id} found`);
 
                 ws.player = {
                     gameId: id,
@@ -147,10 +151,24 @@ export default {
                     role: role
                 }
 
+                console.log('Players in before');
+                console.log(game.players.map(w => w.player.number));
+
+                const index = game.players.findIndex(w => w.player.number === number);
+
+                if (index > -1) {
+                    console.log(`Player ${number} rejoined with a new websocket`);
+                    game.players.splice(index, 1);
+                }
+
                 game.players.push(ws);
 
-                ws.on('close', function () {
-                    game.players.splice(game.watchers.indexOf(ws), 1);
+                console.log('Players in after');
+                console.log(game.players.map(w => w.player.number));
+
+                ws.on('close', function (code, reason) {
+                    console.log(`Player ${ws.player.number} disconnected with code ${code}: ${reason}`)
+                    game.players.splice(game.players.indexOf(ws), 1);
                 });
             },
             watchGame: function (ws, id) {

@@ -6,7 +6,7 @@
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
                     <b-navbar-brand>
-                        {{ player.title }}: {{ player.instructions }}
+                        {{ player.tag }}: {{ player.instructions }}
                     </b-navbar-brand>
                 </b-navbar-nav>
                 <b-navbar-nav class="ml-auto">
@@ -17,211 +17,226 @@
             </b-navbar>
         </div>
 
-        <div class="mt-1 mx-5 mp-1">
+        <div class="b-container mt-1 mx-5">
+
             <div class="row">
+                <div class="col-8">
+                    <div v-if="game.phase >= 2" class="row mb-1">
+                        <div class="col-12 text-center">
+                            <b>Conditions and Plot Values</b>
+                        </div>
+                    </div>
 
-                <div v-if="game.players.length > 0 && game.conditions.length > 0" class="col-9">
-                    <table class="table table-bordered" style="table-layout: fixed;">
-                        <tbody>
-                            <tr>
-                                <td :style="player.tag === 'Owner 1' ? 'border: 2px yellow solid;' : ''">
-                                    <DeveloperCard
-                                        v-if="player.role === 2"
-                                        ref="playerCard0"
-                                        :player="game.players[0]"
-                                        :game="game"
-                                    />
-                                    <OwnerCard
-                                        v-else
-                                        ref="playerCard0"
-                                        :player="game.players[0]"
-                                        :game="game"
-                                    />
-                                </td>
-                                <td :style="player.tag === 'Developer' ? 'border: 2px red solid;' : ''">
-                                    <DeveloperCard
-                                        v-if="player.role === 2"
-                                        ref="playerCard1"
-                                        :player="game.players[1]"
-                                        :game="game"
-                                    />
-                                    <OwnerCard
-                                        v-else
-                                        ref="playerCard1"
-                                        :player="game.players[1]"
-                                        :game="game"
-                                    />
-                                </td>
-                                <td :style="player.tag === 'Owner 2' ? 'border: 2px yellow solid;' : ''">
-                                    <DeveloperCard 
-                                        v-if="player.role === 2"
-                                        ref="playerCard2"
-                                        :player="game.players[2]"
-                                        :game="game"
-                                    />
-                                    <OwnerCard
-                                        v-else
-                                        ref="playerCard2"
-                                        :player="game.players[2]"
-                                        :game="game"
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td :style="player.tag === 'Owner 3' ? 'border: 2px yellow solid;' : ''">
-                                    <DeveloperCard 
-                                        v-if="player.role === 2"
-                                        ref="playerCard3"
-                                        :player="game.players[3]"
-                                        :game="game"
-                                    />
-                                    <OwnerCard
-                                        v-else
-                                        ref="playerCard3"
-                                        :player="game.players[3]"
-                                        :game="game"
-                                    />
-                                </td>
-                                <td :style="player.tag === 'Owner 4' ? 'border: 2px yellow solid;' : ''">
-                                    <DeveloperCard 
-                                        v-if="player.role === 2"
-                                        ref="playerCard4"
-                                        :player="game.players[4]"
-                                        :game="game"
-                                    />
-                                    <OwnerCard
-                                        v-else
-                                        ref="playerCard4"
-                                        :player="game.players[4]"
-                                        :game="game"
-                                    />
-                                </td>
-                                <td :style="player.tag === 'Owner 5' ? 'border: 2px yellow solid;' : ''">
-                                    <DeveloperCard 
-                                        v-if="player.role === 2"
-                                        ref="playerCard5"
-                                        :player="game.players[5]"
-                                        :game="game"
-                                    />
-                                    <OwnerCard
-                                        v-else
-                                        ref="playerCard5"
-                                        :player="game.players[5]"
-                                        :game="game"
-                                    />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <button v-if="!player.compensationOfferReceived && player.role === 2 && game.phase === 4" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >Submit</button>
-                </div>
-
-                <div v-if="game.players.length > 0" class="col-3"> <!-- Player list -->
-                    <div v-if="player.role === 3 && game.phase === 3" class="row mb-1"> <!-- Compensation request -->
-                        <div class="text-center"><b>Compensation Requests</b></div>
-                        <table class="table table-bordered">
-                            <thead>
+                    <div v-if="game.phase >= 2" class="row mb-1"> <!-- Compensation request -->
+                        <div class="col-12">
+                        <table class="table table-bordered" style="table-layout: fixed;">
+                            <thead class="thead-dark">
                                 <th scope="col">Condition</th>
                                 <th scope="col">Value</th>
-                                <th scope="col">Request</th>
+                                <th v-if="player.role === 3 && game.phase >= 3" scope="col">Request</th>
+                                <th v-if="game.phase >= 4" scope="col">Offer</th>
+                                <th v-if="game.phase === 5 && player.role === 3" scope="col">Profit</th>
+                                <th v-if="player.role === 3 && game.phase === 5" scope="col">Accept</th>
                             </thead>
                             <tbody>
                                 <tr v-for="condition in game.conditions" :key="condition.id">
                                     <td>{{ condition.name }}</td>
                                     <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                    <td><input v-if="condition.id != 0" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" /></td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <button v-if="!player.compensationRequestReceived" type="button" @click='submitCompensationRequest()' class="btn btn-primary" >Submit</button>
-                    </div>
-
-                    <div v-if="player.role === 2 && game.phase === 4" class="row mb-1"> <!-- Compensation request -->
-                        <div class="text-center"><b>Make a Compensation Offer</b></div>
-                        <table class="table table-bordered">
-                            <thead>
-                                <th scope="col">Condition</th>
-                                <th scope="col">Offer</th>
-                            </thead>
-                            <tbody>
-                                <tr v-for="condition in game.conditions" :key="condition.id">
-                                    <td>{{ condition.name }}</td>
-                                    <td><input v-if="condition.id != 0" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" /></td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <button v-if="!player.compensationOfferReceived" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >Submit</button>
-                    </div>
-
-                    <div v-if="player.role === 3 && game.phase === 5" class="row mb-1">
-                        <div class="text-center"><b>Compensation Offers</b></div>
-                        <table class="table table-bordered">
-                            <thead>
-                                <th scope="col">Condition</th>
-                                <th scope="col">Value</th>
-                                <th scope="col">Offer</th>
-                                <th scope="col">Accept</th>
-                            </thead>
-                            <tbody>
-                                <tr v-for="condition in game.conditions" :key="condition.id">
-                                    <td>{{ condition.name }}</td>
-                                    <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                    <td>{{ formatUs(player.property.lastOffer[condition.id]) }}</td>
-                                    <td>
+                                    <td v-if="player.role === 3 && game.phase >= 3">
+                                        <input v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                        <p v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ player.compensationRequests[condition.id] }}</p>
+                                    </td>
+                                    <td v-if="game.phase >= 4">
+                                        <input v-if="condition.id != 0 && player.role === 2 && player.compensationOfferReceived != true" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                        <p v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</p>
+                                    </td>
+                                    <td v-if="player.role === 3 && game.phase === 5">
+                                        {{ formatUs(player.property.v[condition.id] + (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0)) }}
+                                    </td>
+                                    <td v-if="player.role === 3 && game.phase === 5">
                                         <b-form-checkbox v-model="player.compensationDecisions[condition.id]" />
+                                    </td>
+                                    <td v-if="game.phase === 4 && player.role === 2">
+                                        <p>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.length) }}</p>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
+                        </div>
 
-                        <button v-if="!player.compensationDecisionReceived" type="button" @click='submitCompensationDecisions()' class="btn btn-primary" >Submit</button>
+                        <div class="col-12 mb-1 text-center">
+                            <button v-if="!player.compensationRequestReceived && game.phase === 3 && player.role === 3" type="button" @click='submitCompensationRequest()' class="btn btn-primary" >Submit Request</button>
+                            <button v-if="!player.compensationOfferReceived && player.role === 2 && game.phase === 4" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >Submit Offer</button>
+                            <button v-if="!player.compensationDecisionReceived && player.role === 3 && game.phase === 5" type="button" @click='submitCompensationDecisions()' class="btn btn-primary" >Submit Decision</button>
+                        </div>
+                    </div>
+
+                    <div v-if="game.phase >= 2" class="row mb-1">
+                        <div class="col-12 text-center">
+                            <b>Plot matrix</b>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-bordered" style="table-layout: fixed;">
+                                <tbody>
+                                    <tr>
+                                        <td :style="player.tag === 'Owner 1' ? 'border: 2px red solid;' : ''">
+                                            <DeveloperCard
+                                                v-if="player.role === 2"
+                                                ref="playerCard0"
+                                                :player="game.players[0]"
+                                                :game="game"
+                                            />
+                                            <div v-else class="row">
+                                                <div class="col-12 text-center">
+                                                    {{ game.players[0].tag}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td :style="player.tag === 'Developer' ? 'border: 2px red solid;' : ''">
+                                            <DeveloperCard
+                                                v-if="player.role === 2"
+                                                ref="playerCard1"
+                                                :player="game.players[1]"
+                                                :game="game"
+                                            />
+                                            <div v-else class="row">
+                                                <div class="col-12 text-center">
+                                                    {{ game.players[1].tag}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td :style="player.tag === 'Owner 2' ? 'border: 2px red solid;' : ''">
+                                            <DeveloperCard 
+                                                v-if="player.role === 2"
+                                                ref="playerCard2"
+                                                :player="game.players[2]"
+                                                :game="game"
+                                            />
+                                            <div v-else class="row">
+                                                <div class="col-12 text-center">
+                                                    {{ game.players[2].tag}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td :style="player.tag === 'Owner 3' ? 'border: 2px red solid;' : ''">
+                                            <DeveloperCard 
+                                                v-if="player.role === 2"
+                                                ref="playerCard3"
+                                                :player="game.players[3]"
+                                                :game="game"
+                                            />
+                                            <div v-else class="row">
+                                                <div class="col-12 text-center">
+                                                    {{ game.players[3].tag}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td :style="player.tag === 'Owner 4' ? 'border: 2px red solid;' : ''">
+                                            <DeveloperCard 
+                                                v-if="player.role === 2"
+                                                ref="playerCard4"
+                                                :player="game.players[4]"
+                                                :game="game"
+                                            />
+                                            <div v-else class="row">
+                                                <div class="col-12 text-center">
+                                                    {{ game.players[4].tag}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td :style="player.tag === 'Owner 5' ? 'border: 2px red solid;' : ''">
+                                            <DeveloperCard 
+                                                v-if="player.role === 2"
+                                                ref="playerCard5"
+                                                :player="game.players[5]"
+                                                :game="game"
+                                            />
+                                            <div v-else class="row">
+                                                <div class="col-12 text-center">
+                                                    {{ game.players[5].tag}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-4"> <!-- Player list -->
+
+                    <div v-if="game.phase === 6" class="row mb-1">
+                        <div class="col-12 text-center"><b>Final Result</b></div>
                     </div>
 
                     <div v-if="game.phase === 6" class="row mb-1">
-                        <div class="text-center"><b>Final Result</b></div>
                         <table class="table table-bordered">
-                            <thead>
+                            <thead class="thead-dark">
                                 <th scope="col">Condition</th>
                                 <th scope="col">Value</th>
                                 <th scope="col">Compensations</th>
                                 <th scope="col">Total</th>
                             </thead>
                             <tbody>
-                                <td>{{ game.conditions[player.result.condition].name }}</td>
+                                <!--td>{{ game.conditions[player.result.condition].name }}</td>
                                 <td>{{ formatUs(player.result.value) }}</td>
                                 <td>{{ formatUs(player.result.compensation) }}</td>
-                                <td>{{ formatUs(player.result.value + player.result.compensation) }}</td>
+                                <td>{{ formatUs(player.result.value + player.result.compensation) }}</td-->
                             </tbody>
                         </table>
                     </div>
 
-                    <div v-if="game.selectedPlayer != null && game.selectedPlayer.number != player.number" class="row mb-1 text-center"><b>Chat ({{ game.selectedPlayer == null ? 'Select player' : game.selectedPlayer.tag }})</b></div>
+                    <div class="row mb-1"><div class="col-12 text-center"><b>Chat</b></div></div>
 
-                    <div v-if="game.phase === 2 && game.selectedPlayer.number != player.number" class="row mb-1">
+                    <div v-if="game.phase === 2" class="row mb-1">
+                        <div class="col-6">
+                            <b-form-checkbox-group
+                                id="message-recipients"
+                                v-model="forms.messageRecipients"
+                                name="message-recipients"
+                                stacked
+                            >
+                                <b-form-checkbox v-for="p in game.players.filter(i => i.number != player.number)" :key="p.number" :value="p.number">
+                                    {{ p.tag }}</b-form-checkbox>
+                            </b-form-checkbox-group>
+                        </div>
+                        <div class="col-6 text-center">
+                            <b-button size="sm" block @click="forms.messageRecipients = game.players.filter(p => p.number != player.number).map(p => p.number)" variant="primary" class="mb-1">Select All</b-button>
+                            <b-button size="sm" block @click="forms.messageRecipients = game.players.filter(p => p.role != 2 && p.number != player.number).map(p => p.number)" variant="primary" class="mb-1">Select Owners</b-button>
+                            <b-button size="sm" block @click="forms.messageRecipients = []" variant="primary">Deselect All</b-button>
+                        </div>
+                    </div>
+
+                    <div v-if="game.phase === 2" class="row mb-1">
                         <b-form-textarea
                             id="message"
-                            v-model="outgoing_chat_message"
+                            v-model="forms.outgoingChatMessage"
                             placeholder="Your message ..."
                             rows="3"
                             max-rows="6"
                         ></b-form-textarea>
                     </div>
 
-                    <div v-if="game.phase === 2 && game.selectedPlayer.number != player.number" class="row mb-1 justify-content-center">
+                    <div v-if="game.phase === 2" class="row mb-1 justify-content-center">
                         <b-button @click="sendChatMessage" variant="primary">Send</b-button>
                     </div>
 
                     <div class="row">
-                        <table class="table table-bordered">
-                            <tbody>
-                                <tr v-for="message in (game.selectedPlayer == null ? [] : game.selectedPlayer.messages)" :key="message.number">
-                                    <td>{{ message.sender === player.number ? 'You' : game.selectedPlayer.tag }}: {{ message.text }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div v-for="message in game.messages.reduce( (a,b) => [b,...a], [])" :key="message.number" class="col-12 mb-1 px-0">
+                            <b-card 
+                                :header="message.participants"
+                                header-tag="header"
+                                @click="forms.messageRecipients = [...message.to, message.sender].filter(i => i != player.number)"
+                            >
+                                <b-card-text><b>{{ (message.sender === player.number ? 'You' : game.players.find(p => p.number === message.sender).tag) }}</b>: {{ message.text }}</b-card-text>
+                            </b-card>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,7 +247,7 @@
 
 <script>
 import DeveloperCard from './DeveloperCard.vue';
-import OwnerCard from './OwnerCard.vue';
+//import OwnerCard from './OwnerCard.vue';
 import { getGameStatus } from '../services/GameService'
 
 export default {
@@ -244,6 +259,10 @@ export default {
                 minutes: "00",
                 seconds: "00"
             },
+            forms: {
+                messageRecipients: [],
+                outgoingChatMessage: ""
+            },
             game: {
                 winningCondition: null,
                 round: 1,
@@ -251,12 +270,10 @@ export default {
                 ruleset: "Voting",
                 conditions: [],
                 players: [],
-                selectedPlayerIndex: -1,
-                selectedPlayer: null,
-                compensationOffers: []
+                compensationOffers: [],
+                messages: []
             },
             player: {
-                title: "Starting",
                 instructions: "Wait for other players to join",
                 name: "",
                 tag: "",
@@ -270,13 +287,12 @@ export default {
                 compensationDecisions: [],
                 compensationDecisionReceived: false,
                 result: null
-            },
-            outgoing_chat_message: ''
+            }
         }
     },
     components: {
         DeveloperCard,
-        OwnerCard
+        //OwnerCard
     },
     methods: {
         openWebSocket() {
@@ -292,12 +308,7 @@ export default {
                     console.log(`New event: ${ev.eventType}`);
                     console.log(ev.data);
 
-                    switch(ev.eventType) {    
-                        case "game-data":
-                            self.player = ev.data.player;
-                            self.game.players = ev.data.players;
-                            self.game.conditions = ev.data.conditions;
-                            break;
+                    switch(ev.eventType) {
                         case "phase-transition":
                             self.game.round = ev.data.round;
                             self.game.phase = ev.data.phase;
@@ -325,7 +336,6 @@ export default {
                             self.player.number = ev.data.number;
                             self.player.tag = ev.data.tag;
                             self.player.id = ev.data.id;
-                            self.player.title = self.player.tag;
 
                             self.game.boundaries = ev.data.boundaries;
                             self.game.conditions = ev.data.conditions;
@@ -350,9 +360,22 @@ export default {
                                 return console.error(`Player ${ev.data.sender} not found`);
                             }
 
-                            sender.messages.push(ev.data);
+                            var tags = [];
 
-                            self.$refs[`playerCard${sender.id}`].signalNewMessage();
+                            self.game.players.forEach(p => {
+                                if (self.player.number === p.number) {
+                                    tags.push('You');
+                                    return;
+                                }
+
+                                if (ev.data.to.includes(p.number) || ev.data.sender === p.number) {
+                                    tags.push(p.tag);
+                                }
+                            });
+
+                            ev.data.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];
+                            
+                            self.game.messages.push(ev.data);
 
                             break;
                         case 'compensation-request-received':
@@ -375,6 +398,10 @@ export default {
                                 player.property.lastOffer = cr.compensationRequests;
                             });
 
+                            for (let prop in self.$refs) {//.forEach(r => r.$forceUpdate());
+                                self.$refs[prop].$forceUpdate();
+                            }
+
                             break;
                         case 'compensation-offer-received':
                             self.player.compensationOfferReceived = true;
@@ -386,6 +413,7 @@ export default {
                             break;
                         case 'compensation-offer-made':
                             self.player.property.lastOffer = ev.data.compensationOffers;
+                            self.game.compensationOffers = ev.data.compensationOffers;
 
                             break;
                         case 'final-profit':
@@ -424,18 +452,29 @@ export default {
         sendChatMessage() {
             const self = this;
 
-            self.game.selectedPlayer.messages.push({
+            const tags = ['You'];
+
+            self.game.players.forEach(p => {
+                if (self.forms.messageRecipients.includes(p.number)) {
+                    tags.push(p.tag);
+                }
+            });
+
+            self.game.messages.push({
                 "sender": self.player.number,
-                "to": self.game.selectedPlayer.number,
-                "text": self.outgoing_chat_message
+                "to": self.forms.messageRecipients,
+                "text": self.forms.outgoingChatMessage,
+                "participants": tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1]
             });
 
             this.sendMessage({
                 "gameId": self.game.id,
-                "type": "chat-with-player",
-                "to": self.game.selectedPlayer.number,
-                "text": self.outgoing_chat_message
+                "type": "chat-with-players",
+                "to": self.forms.messageRecipients,
+                "text": self.forms.outgoingChatMessage
             });
+
+            self.forms.outgoingChatMessage = '';
         },
         updateTimer() {
             const self = this;
@@ -455,9 +494,73 @@ export default {
 
             setTimeout(self.updateTimer, 1000);
         },
-        recover(data) {
-            console.log(data);
+        recover(gameData) {
+            const self = this;
+
+            console.log(gameData);
             //TODO
+
+            for (const prop in self.player) {
+                if (typeof self.player[prop] === "function") {
+                    continue;
+                }
+
+                self.player[prop] = null;
+            }
+
+            self.player.compensationRequestReceived = false;
+            self.player.compensationOfferReceived = false;
+            self.player.compensationDecisionReceived = false;
+            self.player.compensationRequests = [];
+            self.player.compensationDecisions = [];
+            
+            for (const prop in gameData.player) {
+                self.player[prop] = gameData.player[prop];
+            }
+
+            self.game = gameData.game;
+
+            self.game.messages.forEach(message => {
+                const tags = [];
+
+                self.game.players.forEach(p => {
+                    if (self.player.number === p.number) {
+                        tags.push('You');
+                        return;
+                    }
+
+                    if (message.to.includes(p.number) || message.sender === p.number) {
+                        tags.push(p.tag);
+                    }
+                });
+
+                message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];
+            });
+
+            if (gameData.game.compensationRequests != null) {
+                gameData.game.compensationRequests.forEach(cr => {
+                    const player = self.findPlayerByNumber(cr.number);
+
+                    if (player == null) {
+                        console.error(`Could not find player ${cr.number}`)
+                        return;
+                    }
+
+                    if (player.property == null) {
+                        player.property = {}
+                    }
+
+                    player.property.lastOffer = cr.compensationRequests;
+                })
+            }
+            
+            if (gameData.timer != null) {
+                self.timer.end = gameData.timer > Date.now() ? gameData.timer : Date.now();
+
+                self.updateTimer();
+
+                self.timer.on = true;
+            }
         },
         setSelectedPlayer(playerIndex) {
             if (this.game.selectedPlayerIndex > -1) {
@@ -527,8 +630,8 @@ export default {
             return;
         }
 
-        if (response.data != null) {
-            this.recover(response.data);
+        if (response.gameData != null) {
+            this.recover(response.gameData);
         }
 
         this.openWebSocket();

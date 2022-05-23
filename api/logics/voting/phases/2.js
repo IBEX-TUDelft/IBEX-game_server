@@ -5,80 +5,61 @@ class Phase2 extends JoinablePhase {
 
     complete = false;
 
+    messageCounter = 0;
+
     results = {
         chatLog: []
     };
 
     constructor (game, wss) {
         super (game, wss, [{
-            "type": "chat-with-player",
+            "type": "chat-with-players",
             "role": null,
             "action": function(ws, message, player, caller) {
                 console.log(message);
 
-                const toPlayer = game.players.find(p => p.number === message.to);
-
-                if (toPlayer == null) {
-                    WS.error(ws, `Game ${message.gameId}: Could not find player ${message.to}`);
+                if (message.to == null || message.to.length === 0) {
+                    WS.error(ws, `Game ${message.gameId}: no recipient specified to this message: ${message.text} from ${player.tag}`);
                     return;
                 }
 
-                const messageSent = {
-                    "sender": player.number,
-                    "to": toPlayer.number,
-                    "text": message.text
-                };
+                message.to.forEach(toPlayerNumber => {
+                    const toPlayer = game.players.find(p => p.number === toPlayerNumber);
 
-                const err = wss.sendEvent(
-                    game.id,
-                    toPlayer.number,
-                    "message-received",
-                    messageSent
-                );
-
-                if (err != null) {
-                    console.error(err);
-                }
-
-                // Recording the chat events for showing later
-
-                const chatLog = caller.results.chatLog;
-
-                let senderJournal = chatLog.find(j => j.number === player.number);
-
-                if (senderJournal == null) {
-                    senderJournal = {
-                        "number": player.number,
-                        "logs": []
-                    };
-
-                    chatLog.push(senderJournal);
-                }
-
-                let receiverJournal = chatLog.find(j => j.number === toPlayer.number);
-
-                if (receiverJournal == null) {
-                    receiverJournal = {
-                        "number": toPlayer.number,
-                        "logs": []
-                    };
-
-                    chatLog.push(receiverJournal);
-                }
-
-                let bidirectionalLog = senderJournal.logs.find(l => l.people.includes(toPlayer.number) && l.people.includes(player.number));
-
-                if (bidirectionalLog == null) {
-                    bidirectionalLog = {
-                        "people": [player.number, toPlayer.number],
-                        "messages": []
+                    if (toPlayer == null) {
+                        WS.error(ws, `Game ${message.gameId}: Could not find player ${toPlayerNumber}`);
+                        return;
                     }
 
-                    senderJournal.logs.push(bidirectionalLog);
-                    receiverJournal.logs.push(bidirectionalLog);
-                }
+                    const messageSent = {
+                        "sender": player.number,
+                        "to": message.to,
+                        "number": caller.messageCounter,
+                        "text": message.text
+                    };
+    
+                    caller.messageCounter++;
+                    
+                    const err = wss.sendEvent(
+                        game.id,
+                        toPlayer.number,
+                        "message-received",
+                        messageSent
+                    );
+    
+                    if (err != null) {
+                        console.error(err);
+                    }                    
+                });
 
-                bidirectionalLog.messages.push(messageSent);
+                // Recording the chat events for showing at a later time
+
+                const chatLog = caller.results.chatLog.push({
+                    "time": Date.now(),
+                    "sender": player.number,
+                    "to": message.to,
+                    "text": message.text
+                });
             }
         }], [
             'Click on a plot to chat with its owner'
@@ -94,24 +75,9 @@ class Phase2 extends JoinablePhase {
         
         const visibleTimeout = 6 * 60;
         //const totalTimeout = (visibleTimeout + Math.floor(Math.random() * 3 * 60)) * 1000;
+        const totalTimeout = 30000;
 
-        setTimeout(() => {
-            self.complete = true;
-        }, 120000 ); //TODO: replace with totalTimeout
-
-        console.log(this.game.players);
-
-        const err = self.wss.broadcastEvent(
-            self.game.id,
-            "set-timer",
-            {
-                "end": Date.now() + visibleTimeout * 1000
-            }
-        );
-
-        if (err != null) {
-            console.log(err);
-        }
+        this.setTimer(visibleTimeout * 1000, totalTimeout);
     }
 
     getData() {
@@ -122,17 +88,6 @@ class Phase2 extends JoinablePhase {
         return this.complete;
     }
 
-    onExit() {
-        const err = this.wss.broadcastEvent(
-            this.game.id,
-            "reset-timer",
-            {}
-        );
-
-        if (err != null) {
-            console.log(err);
-        }
-    }
 }
 
 export default {
