@@ -34,7 +34,7 @@ class Phase6 extends JoinablePhase {
             });
 
             self.game.players.forEach(player => {
-                if (player.role === 2 || player.compensationDecisions[c.id] === true) {
+                if (player.role === 3 && player.compensationDecisions[c.id] === true) {
                     self.results.standings[c.id].counter ++;
                 }
             })

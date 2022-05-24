@@ -35,6 +35,7 @@
                                 <th scope="col">Value</th>
                                 <th v-if="player.role === 3 && game.phase >= 3" scope="col">Request</th>
                                 <th v-if="game.phase >= 4" scope="col">Offer</th>
+                                <th v-if="game.phase === 4 && player.role === 2" scope="col">Profit</th>
                                 <th v-if="game.phase === 5 && player.role === 3" scope="col">Profit</th>
                                 <th v-if="player.role === 3 && game.phase === 5" scope="col">Accept</th>
                             </thead>
@@ -167,6 +168,64 @@
                             </table>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center"><b>Owners' Value Ranges</b></div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <th scope="col">Condition</th>
+                                    <th scope="col">Minimum Value</th>
+                                    <th scope="col">Maximum Value</th>
+                                </thead>
+                                <tbody>
+                                    <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
+                                        <td>Status Quo</td>
+                                        <td>{{ formatUs(game.boundaries.owner.noProject.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.owner.noProject.high) }}</td>
+                                    </tr>
+                                    <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
+                                        <td>Project A</td>
+                                        <td>{{ formatUs(game.boundaries.owner.projectA.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.owner.projectA.high) }}</td>
+                                    </tr>
+                                    <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
+                                        <td>Project B</td>
+                                        <td>{{ formatUs(game.boundaries.owner.projectB.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.owner.projectB.high) }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center"><b>Developers' Value Ranges</b></div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <th scope="col">Condition</th>
+                                    <th scope="col">Minimum Value</th>
+                                    <th scope="col">Maximum Value</th>
+                                </thead>
+                                <tbody>
+                                    <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
+                                        <td>Status Quo</td>
+                                        <td>{{ formatUs(game.boundaries.developer.noProject.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.developer.noProject.high) }}</td>
+                                    </tr>
+                                    <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
+                                        <td>Project A</td>
+                                        <td>{{ formatUs(game.boundaries.developer.projectA.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.developer.projectA.high) }}</td>
+                                    </tr>
+                                    <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
+                                        <td>Project B</td>
+                                        <td>{{ formatUs(game.boundaries.developer.projectB.low) }}</td>
+                                        <td>{{ formatUs(game.boundaries.developer.projectB.high) }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="col-4"> <!-- Player list -->
@@ -184,10 +243,10 @@
                                 <th scope="col">Total</th>
                             </thead>
                             <tbody>
-                                <!--td>{{ game.conditions[player.result.condition].name }}</td>
+                                <td>{{ game.conditions[player.result.condition].name }}</td>
                                 <td>{{ formatUs(player.result.value) }}</td>
                                 <td>{{ formatUs(player.result.compensation) }}</td>
-                                <td>{{ formatUs(player.result.value + player.result.compensation) }}</td-->
+                                <td>{{ formatUs(player.result.value + player.result.compensation) }}</td>
                             </tbody>
                         </table>
                     </div>
