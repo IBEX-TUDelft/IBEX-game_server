@@ -74,8 +74,8 @@ class Phase2 extends JoinablePhase {
         const self = this;
         
         const visibleTimeout = 6 * 60;
-        //const totalTimeout = (visibleTimeout + Math.floor(Math.random() * 3 * 60)) * 1000;
-        const totalTimeout = 30000;
+        const totalTimeout = (visibleTimeout + Math.floor(Math.random() * 3 * 60)) * 1000;
+        //const totalTimeout = 30000;
 
         this.setTimer(visibleTimeout * 1000, totalTimeout);
     }
