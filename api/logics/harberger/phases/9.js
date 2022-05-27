@@ -1,8 +1,6 @@
-import WS from '../../../helpers/websocket.js';
-import Utils from '../../../helpers/utils.js';
-import Phase from '../../Phase.js';
+import JoinablePhase from '../../JoinablePhase.js';
 
-class Phase9 extends Phase {
+class Phase9 extends JoinablePhase {
 
     complete = false;
     results = {

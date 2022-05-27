@@ -70,12 +70,11 @@ class Phase2 extends JoinablePhase {
         await super.onEnter();
 
         console.log('PHASE 2');
-
-        const self = this;
         
-        const visibleTimeout = 6 * 60;
-        const totalTimeout = (visibleTimeout + Math.floor(Math.random() * 3 * 60)) * 1000;
-        //const totalTimeout = 30000;
+        const visibleTimeout = parseInt(process.env.VOTING_CHAT_FIXED_DURATION);
+        const totalTimeout = (visibleTimeout + Math.floor(Math.random() * parseInt(process.env.VOTING_CHAT_MAX_EXTRA_TIME))) * 1000;
+
+        console.log(`Timer: ${process.env.VOTING_CHAT_FIXED_DURATION}s visible, ${process.env.VOTING_CHAT_MAX_EXTRA_TIME}s extra. Total: ${totalTimeout}ms`);
 
         this.setTimer(visibleTimeout * 1000, totalTimeout);
     }

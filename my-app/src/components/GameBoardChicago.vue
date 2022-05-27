@@ -24,7 +24,7 @@
                          v-if="game.ruleset === 'Futarchy' && game.phase < 7"/>
                     <HarbergerMatrix
                         v-else
-                        :condition="game.winningCondition"
+                        :condition="game.conditions[game.winningCondition]"
                         :project="conditionToString(game.winningCondition)"
                         :game="game"
                         :player="player"
@@ -39,70 +39,37 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="text-center"><b>Owners' Value Ranges</b></div>
-                            <table class="table table-bordered">
-                                <thead>
+                    <div v-if="game.boundaries != null"  class="row">
+
+                        <div v-for="role in ['owner', 'developer']" :key="role" class="col-6">
+                            <div class="text-center mb-1"><b>Value Ranges ({{ role }})</b></div>
+                            <table class="table table-bordered" style="table-layout: fixed;">
+                                <thead class="thead-dark">
                                     <th scope="col">Condition</th>
-                                    <th scope="col">Minimum Value</th>
-                                    <th scope="col">Maximum Value</th>
+                                    <th scope="col">Minimum</th>
+                                    <th scope="col">Maximum</th>
                                 </thead>
                                 <tbody>
-                                    <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
-                                        <td>Status Quo</td>
-                                        <td>{{ formatUs(game.boundaries.owner.noProject.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.owner.noProject.high) }}</td>
-                                    </tr>
-                                    <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
-                                        <td>Project A</td>
-                                        <td>{{ formatUs(game.boundaries.owner.projectA.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.owner.projectA.high) }}</td>
-                                    </tr>
-                                    <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
-                                        <td>Project B</td>
-                                        <td>{{ formatUs(game.boundaries.owner.projectB.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.owner.projectB.high) }}</td>
+                                    <tr v-for="condition in game.conditions" :key="condition.id"
+                                        :style="{'background-color': game.winningCondition === condition.id ? 'yellow' : 'white'}">
+                                        <td>{{ condition.name }}</td>
+                                        <td>{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
+                                        <td>{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <div class="col-6">
-                            <div class="text-center"><b>Developers' Value Ranges</b></div>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <th scope="col">Condition</th>
-                                    <th scope="col">Minimum Value</th>
-                                    <th scope="col">Maximum Value</th>
-                                </thead>
-                                <tbody>
-                                    <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
-                                        <td>Status Quo</td>
-                                        <td>{{ formatUs(game.boundaries.developer.noProject.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.developer.noProject.high) }}</td>
-                                    </tr>
-                                    <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
-                                        <td>Project A</td>
-                                        <td>{{ formatUs(game.boundaries.developer.projectA.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.developer.projectA.high) }}</td>
-                                    </tr>
-                                    <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
-                                        <td>Project B</td>
-                                        <td>{{ formatUs(game.boundaries.developer.projectB.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.developer.projectB.high) }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="col-6">
                     <!-- Actions -->
                     <div class="row" v-if="player.role > 1">
-                        <div class="text-center"><b>My Value Information</b></div>
+                        <div class="text-center mb-1"><b>My Value Information</b></div>
                         <table class="table table-bordered">
-                            <thead>
+                            <thead class="thead-dark">
                                 <th scope="col">Condition</th>
                                 <th scope="col">Value</th>
                                 <th scope="col">Declaration</th>
@@ -111,47 +78,28 @@
                                 <th scope="col">Sniper Prob.</th>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Status Quo</td>
-                                    <td>{{ formatUs(player.property.v[0]) }}</td>
-                                    <td><input v-if="game.phase == 2 || game.winningCondition == 0" type="number" class="form-control" v-model="player.declaration[0]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" /></td>
-                                    <td>{{ formatUs(player.declaration[0] * game.taxRate / 100) }}</td>
-                                    <td>{{ formatUs(player.declaration[0] * ( 100 - game.taxRate) / 100) }}</td>
-                                    <td>{{ getMySniperProbability(0) }}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Project A</td>
-                                    <td>{{ formatUs(player.property.v[1]) }}</td>
-                                    <td><input v-if="game.phase == 2 || game.winningCondition == 1" type="number" class="form-control" v-model="player.declaration[1]" name="player_declaration_1" id="player_declaration_1" aria-describedby="emailHelp" /></td>
-                                    <td>{{ formatUs(player.declaration[1] * game.taxRate / 100) }}</td>
-                                    <td>{{ formatUs(player.declaration[1] * ( 100 - game.taxRate) / 100) }}</td>
-                                    <td>{{ getMySniperProbability(1) }}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Project B</td>
-                                    <td>{{ formatUs(player.property.v[2]) }}</td>
-                                    <td><input v-if="game.phase == 2 || game.winningCondition == 2" type="number" class="form-control" v-model="player.declaration[2]" name="player_declaration_2" id="player_declaration_2" aria-describedby="emailHelp" /></td>
-                                    <td>{{ formatUs(player.declaration[2] * game.taxRate / 100) }}</td>
-                                    <td>{{ formatUs(player.declaration[2] * ( 100 - game.taxRate) / 100) }}</td>
-                                    <td>{{ getMySniperProbability(2) }}%</td>
+                                <tr v-for="condition in game.conditions" :key="condition.id">
+                                    <td>{{ condition.name }}</td>
+                                    <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                    <td><input v-if="game.phase == 2 || game.winningCondition == condition.id" type="number" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" /></td>
+                                    <td>{{ formatUs(player.declaration[condition.id] * game.taxRate / 100) }}</td>
+                                    <td>{{ formatUs(player.declaration[condition.id] * ( 100 - game.taxRate) / 100) }}</td>
+                                    <td>{{ getMySniperProbability(condition.id) }}%</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="row justify-content-center" v-if="player.role > 1">
-                        <!--div class="col-6 text-center">
-                            <button type="button" @click='showPreview()' class="btn btn-primary">Preview</button>
-                        </div-->
                         <div class="col-12 text-center">
                             <button v-if="(game.phase === 2 || game.phase === 7) && player.hasToDeclare" type="button" @click='submitDeclaration()' class="btn btn-primary" >Submit</button>
                         </div>
                     </div>
 
                     <div class="row" v-if="player.role > 1">
-                        <div class="text-center"><b>Results</b></div>
+                        <div class="text-center mb-1"><b>Results</b></div>
                         <table class="table table-bordered">
-                            <thead>
+                            <thead class="thead-dark">
                                 <th scope="col">Round</th>
                                 <th scope="col">Condition</th>
                                 <th scope="col">Value</th>
@@ -177,9 +125,9 @@
                     </div>
 
                     <div class="row" v-if="player.role == 1">
-                        <div class="text-center"><b>Results</b></div>
+                        <div class="text-center mb-1"><b>Results</b></div>
                         <table class="table table-bordered">
-                            <thead>
+                            <thead class="thead-dark">
                                 <th scope="col">Round</th>
                                 <th scope="col">Condition</th>
                                 <th scope="col">Property</th>
@@ -200,9 +148,6 @@
                         </table>
                     </div>
 
-                    <!--div class="row">
-                        <button type="button" class="btn btn-primary btn-block" @click='completeCurrentPhase()'>End Current Phase</button>
-                    </div-->
                 </div>
             </div>
         </div>
@@ -271,7 +216,8 @@
                     boundaries: null,
                     taxRate: null,
                     publicSignal: "TBD",
-                    players: []
+                    players: [],
+                    conditions: []
                 },
                 player: {
                     title: "Starting ...",
@@ -598,8 +544,9 @@
                                 break;
                             case "assign-role":
                                 self.game.boundaries = ev.data.boundaries;
+                                self.game.conditions = ev.data.conditions;
                                 self.game.taxRate = ev.data.taxRate;
-                                self.player.boundaries //TODO:  ?????
+                                //self.player.boundaries //TODO:  ?????
                                 self.player.role = ev.data.role;
                                 //self.player.title += ` (${roleMap[ev.data.role]})`;
                                 self.player.balance = ev.data.balance;
@@ -816,19 +763,11 @@
                 this.connection.onopen = function() {
                     console.log("Successfully connected to the websocket server...");
 
-                    if (self.firstConnection) {
-                        self.sendMessage({
-                            "gameId": self.game.id,
-                            "type": "join"
-                        });
-                        self.firstConnection = false;
-                    } else {
-                        self.sendMessage({
-                            "gameId": self.game.id,
-                            "type": "rejoin",
-                            "recoveryString": self.player.recoveryString
-                        });
-                    }
+                    self.sendMessage({
+                        "gameId": self.game.id,
+                        "type": "join",
+                        "recovery": self.player.recovery
+                    });
                 }
 
                 this.connection.onclose = function() {
@@ -842,6 +781,8 @@
         },
         mounted () {
             this.game.id = parseInt(this.$route.params.id);
+            this.player.recovery = this.$route.params.recovery;
+
             window.vue = this;
         }
     }

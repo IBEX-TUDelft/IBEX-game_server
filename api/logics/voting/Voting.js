@@ -94,6 +94,16 @@ export default class Voting extends Logic {
             player.compensationDecisions = playerData.compensationDecisions;
         }
 
+        if (self.data.winningCondition != null) {
+            const compensation = self.data.compensationOffers[self.data.winningCondition];
+
+            player.result = {
+                "condition": self.data.winningCondition,
+                "value": player.property.v[self.data.winningCondition],
+                "compensation": (player.role === 2) ? - compensation * (self.data.players.length - 1) : compensation
+            }
+        }
+
         let timer = null;
 
         if (self.data.currentPhase.timer.set === true) {

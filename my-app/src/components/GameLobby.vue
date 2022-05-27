@@ -85,7 +85,7 @@ export default {
                 if (game.type === 'voting') {
                     routeData = this.$router.resolve({path: `/voting/${id}/${this.generateString(63)}${game.assignedPlayers}`});
                 } else {
-                    routeData = this.$router.resolve({path: `/board/${id}`});
+                    routeData = this.$router.resolve({path: `/board/${id}/${this.generateString(63)}${game.assignedPlayers}`});
                 }
                 
                 console.log('HRef:' + routeData.href);

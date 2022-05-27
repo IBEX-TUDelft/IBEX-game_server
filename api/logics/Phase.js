@@ -114,7 +114,7 @@ export default class Phase {
         let player = this.getPlayer(ws, message);
 
         if (player == null && handler.requiresAuthentication != false) {
-            const errMessage = `Handler ${handler.type} requires authentication. Player ${ws.player.number} not found in game ${message.gameId}`;
+            const errMessage = `Handler ${handler.type} requires authentication. Player ${ws.player == null ? 'unknown' : ws.player.number} not found in game ${message.gameId}`;
             console.error(errMessage);
             return WS.error(ws, errMessage);
         }

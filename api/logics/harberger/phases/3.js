@@ -1,7 +1,7 @@
 import WS from '../../../helpers/websocket.js';
-import Phase from '../../Phase.js';
+import JoinablePhase from '../../JoinablePhase.js';
 
-class Phase3 extends Phase {
+class Phase3 extends JoinablePhase {
     startTime = 0;
     results = {};
 

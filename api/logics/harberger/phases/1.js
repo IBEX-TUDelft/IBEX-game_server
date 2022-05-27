@@ -1,6 +1,6 @@
-import Phase from '../../Phase.js';
+import JoinablePhase from '../../JoinablePhase.js';
 
-class Phase1 extends Phase {
+class Phase1 extends JoinablePhase {
 
     complete = false;
 
@@ -17,36 +17,49 @@ class Phase1 extends Phase {
 
         const self = this;
 
-        const boundaries = {
-            developer: {
-                noProject: {
-                    low: self.game.parameters.developer_no_project_low,
-                    high: self.game.parameters.developer_no_project_high
-                },
-                projectA: {
-                    low: self.game.parameters.developer_project_a_low,
-                    high: self.game.parameters.developer_project_a_high
-                },
-                projectB: {
-                    low: self.game.parameters.developer_project_b_low,
-                    high: self.game.parameters.developer_project_b_high
-                }
-            },
-            owner: {
-                noProject: {
-                    low: self.game.parameters.owner_no_project_low,
-                    high: self.game.parameters.owner_no_project_high
-                },
-                projectA: {
-                    low: self.game.parameters.owner_project_a_low,
-                    high: self.game.parameters.owner_project_a_high
-                },
-                projectB: {
-                    low: self.game.parameters.owner_project_b_low,
-                    high: self.game.parameters.owner_project_b_high
-                }
+        this.game.conditions = [{
+                "name": "No Project",
+                "id": 0,
+                "parameter": "no_project",
+                "key": "noProject"
+            }, {
+                "name": "Project A",
+                "id": 1,
+                "parameter": "project_a",
+                "key": "projectA"
             }
+        ];
+
+        if (parseInt(process.env.PROJECT_COUNT) > 2) {
+            this.game.conditions.push({
+                "name": "Project B",
+                "id": 2,
+                "parameter": "project_b",
+                "key": "projectB"
+            });
         }
+
+        if (parseInt(process.env.PROJECT_COUNT) > 3) {
+            this.game.conditions.push({
+                "name": "Project C",
+                "id": 3,
+                "parameter": "project_c",
+                "key": "projectC"
+            });
+        }
+
+        self.game.boundaries = {};
+
+        ['developer', 'owner'].forEach(role => {
+            self.game.boundaries[role] = {};
+
+            self.game.conditions.forEach(condition => {
+                self.game.boundaries[role][condition.key] = {
+                    "low": self.game.parameters[`${role}_${condition.parameter}_low`],
+                    "high": self.game.parameters[`${role}_${condition.parameter}_high`]
+                }
+            });
+        });
 
         for (let i = 0; i < this.game.players.length; i++) {
             const player = this.game.players[i];
@@ -57,8 +70,9 @@ class Phase1 extends Phase {
                 "shares": player.shares,
                 "wallet": player.wallet,
                 "property": player.property,
-                "boundaries": boundaries,
-                "taxRate": self.game.parameters.tax_rate_initial
+                "boundaries": self.game.boundaries,
+                "taxRate": self.game.parameters.tax_rate_initial,
+                "conditions": self.game.conditions
             });
 
             if (err != null) {

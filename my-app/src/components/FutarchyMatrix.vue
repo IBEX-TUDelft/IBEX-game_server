@@ -2,10 +2,10 @@
     <div>
         <b-card no-body>
             <b-tabs card content-class="mt-3">
-                <b-tab title="No Project" active>
+                <b-tab v-for="condition in $parent.conditions" :key="condition.id" :title="condition.name" active>
                     <HarbergerMatrix
-                        :condition="0"
-                        project="No Project"
+                        :condition="condition"
+                        :project="condition.name"
                         :game="$parent.game"
                         :player="$parent.player"
                         :checkedPlots="$parent.checkedPlots"
@@ -13,7 +13,7 @@
                         :getSniperProbability="$parent.getSniperProbability"
                         />
                 </b-tab>
-                <b-tab title="Project A">
+                <!--b-tab title="Project A">
                     <HarbergerMatrix
                         :condition="1"
                         project="Project A"
@@ -34,7 +34,7 @@
                         :getDeclarationPlayer="$parent.getDeclarationPlayer"
                         :getSniperProbability="$parent.getSniperProbability"
                     />
-                </b-tab>
+                </b-tab-->
             </b-tabs>
         </b-card>
     </div>

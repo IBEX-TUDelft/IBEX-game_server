@@ -1,7 +1,7 @@
 import WS from '../../../helpers/websocket.js';
-import Phase from '../../Phase.js';
+import JoinablePhase from '../../JoinablePhase.js';
 
-class Phase6 extends Phase {
+class Phase6 extends JoinablePhase {
 
     orderList = [[],[],[]];
     movementList = [[],[],[]];

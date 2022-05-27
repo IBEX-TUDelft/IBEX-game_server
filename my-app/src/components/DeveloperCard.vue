@@ -1,12 +1,12 @@
 <template>
-    <div @click="setIsActive()" :class="isActive ? 'bg-light' : ''">
-
-
-        <!--b-card-group deck-->
+    <div v-if="player != null">
         <b-card 
-            :header="player.tag + '\'s requests'"
+            v-if="role === 2"
+            :header="player.tag + '\'s Compensation Request'"
             header-tag="header"
             class="mb-1"
+            :bg-variant="owned ? 'danger' : 'light'"
+            :text-variant="owned ? 'white' : 'black'"
         >
             <div class="row" v-for="condition in game.conditions" :key="condition.id">
                 <div class="col-6 font-weight-bold">
@@ -17,40 +17,25 @@
                 </div>
             </div>
         </b-card>
+        <b-card 
+            v-else
+            class="mb-1"
+            :bg-variant="owned ? 'danger' : 'light'"
+            :text-variant="owned ? 'white' : 'black'"
+        >
+            <div class="row">
+                <div class="col-12 text-center">
+                    {{ player.tag }}
+                </div>
+            </div>
+        </b-card>
     </div>
 </template>
 <script>
 export default {
-    props: ['player', 'game'],
+    props: ['player', 'game', 'role', 'owned'],
     data() {
-        return {
-            isActive: false,
-            newMessages: false
-        }
-    },
-    methods: {
-        signalActivePlayer(active) {
-            console.log('Called');
-
-            if (active) {
-                this.isActive = true;
-                this.newMessages = false;
-            } else {
-                this.isActive = false;
-            }
-        },
-        signalNewMessage() {
-            if (!this.isActive) {
-                this.newMessages = true;
-            } else {
-                this.newMessages = false;
-            }
-        },
-        setIsActive() {
-            console.log(this.$props.player.id);
-            console.log(this.$props.player);
-            this.$parent.setSelectedPlayer(this.$props.player.id);
-        }
+        return {}
     }
 }
 </script>

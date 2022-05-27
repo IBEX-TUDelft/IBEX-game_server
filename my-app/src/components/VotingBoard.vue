@@ -29,40 +29,40 @@
 
                     <div v-if="game.phase >= 2" class="row mb-1"> <!-- Compensation request -->
                         <div class="col-12">
-                        <table class="table table-bordered" style="table-layout: fixed;">
-                            <thead class="thead-dark">
-                                <th scope="col">Condition</th>
-                                <th scope="col">Value</th>
-                                <th v-if="player.role === 3 && game.phase >= 3" scope="col">Request</th>
-                                <th v-if="game.phase >= 4" scope="col">Offer</th>
-                                <th v-if="game.phase === 4 && player.role === 2" scope="col">Profit</th>
-                                <th v-if="game.phase === 5 && player.role === 3" scope="col">Profit</th>
-                                <th v-if="player.role === 3 && game.phase === 5" scope="col">Accept</th>
-                            </thead>
-                            <tbody>
-                                <tr v-for="condition in game.conditions" :key="condition.id">
-                                    <td>{{ condition.name }}</td>
-                                    <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                    <td v-if="player.role === 3 && game.phase >= 3">
-                                        <input v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
-                                        <p v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ player.compensationRequests[condition.id] }}</p>
-                                    </td>
-                                    <td v-if="game.phase >= 4">
-                                        <input v-if="condition.id != 0 && player.role === 2 && player.compensationOfferReceived != true" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
-                                        <p v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</p>
-                                    </td>
-                                    <td v-if="player.role === 3 && game.phase === 5">
-                                        {{ formatUs(player.property.v[condition.id] + (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0)) }}
-                                    </td>
-                                    <td v-if="player.role === 3 && game.phase === 5">
-                                        <b-form-checkbox v-model="player.compensationDecisions[condition.id]" />
-                                    </td>
-                                    <td v-if="game.phase === 4 && player.role === 2">
-                                        <p>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.length) }}</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            <table class="table table-bordered" style="table-layout: fixed;">
+                                <thead class="thead-dark">
+                                    <th scope="col">Condition</th>
+                                    <th scope="col">Value</th>
+                                    <th v-if="player.role === 3 && game.phase >= 3" scope="col">Request</th>
+                                    <th v-if="game.phase >= 4" scope="col">Offer</th>
+                                    <th v-if="game.phase === 4 && player.role === 2" scope="col">Profit</th>
+                                    <th v-if="game.phase === 5 && player.role === 3" scope="col">Profit</th>
+                                    <th v-if="player.role === 3 && game.phase === 5" scope="col">Accept</th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="condition in game.conditions" :key="condition.id">
+                                        <td>{{ condition.name }}</td>
+                                        <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                        <td v-if="player.role === 3 && game.phase >= 3">
+                                            <input v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <p v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</p>
+                                        </td>
+                                        <td v-if="game.phase >= 4">
+                                            <input v-if="condition.id != 0 && player.role === 2 && player.compensationOfferReceived != true" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <p v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</p>
+                                        </td>
+                                        <td v-if="player.role === 3 && game.phase === 5">
+                                            {{ formatUs(player.property.v[condition.id] + (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0)) }}
+                                        </td>
+                                        <td v-if="player.role === 3 && game.phase === 5">
+                                            <b-form-checkbox v-model="player.compensationDecisions[condition.id]" />
+                                        </td>
+                                        <td v-if="game.phase === 4 && player.role === 2">
+                                            <p>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.length) }}</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
 
                         <div class="col-12 mb-1 text-center">
@@ -78,152 +78,40 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-12">
-                            <table class="table table-bordered" style="table-layout: fixed;">
-                                <tbody>
-                                    <tr>
-                                        <td :style="player.tag === 'Owner 1' ? 'border: 2px red solid;' : ''">
-                                            <DeveloperCard
-                                                v-if="player.role === 2"
-                                                ref="playerCard0"
-                                                :player="game.players[0]"
-                                                :game="game"
-                                            />
-                                            <div v-else class="row">
-                                                <div class="col-12 text-center">
-                                                    {{ game.players[0].tag}}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td :style="player.tag === 'Developer' ? 'border: 2px red solid;' : ''">
-                                            <DeveloperCard
-                                                v-if="player.role === 2"
-                                                ref="playerCard1"
-                                                :player="game.players[1]"
-                                                :game="game"
-                                            />
-                                            <div v-else class="row">
-                                                <div class="col-12 text-center">
-                                                    {{ game.players[1].tag}}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td :style="player.tag === 'Owner 2' ? 'border: 2px red solid;' : ''">
-                                            <DeveloperCard 
-                                                v-if="player.role === 2"
-                                                ref="playerCard2"
-                                                :player="game.players[2]"
-                                                :game="game"
-                                            />
-                                            <div v-else class="row">
-                                                <div class="col-12 text-center">
-                                                    {{ game.players[2].tag}}
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td :style="player.tag === 'Owner 3' ? 'border: 2px red solid;' : ''">
-                                            <DeveloperCard 
-                                                v-if="player.role === 2"
-                                                ref="playerCard3"
-                                                :player="game.players[3]"
-                                                :game="game"
-                                            />
-                                            <div v-else class="row">
-                                                <div class="col-12 text-center">
-                                                    {{ game.players[3].tag}}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td :style="player.tag === 'Owner 4' ? 'border: 2px red solid;' : ''">
-                                            <DeveloperCard 
-                                                v-if="player.role === 2"
-                                                ref="playerCard4"
-                                                :player="game.players[4]"
-                                                :game="game"
-                                            />
-                                            <div v-else class="row">
-                                                <div class="col-12 text-center">
-                                                    {{ game.players[4].tag}}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td :style="player.tag === 'Owner 5' ? 'border: 2px red solid;' : ''">
-                                            <DeveloperCard 
-                                                v-if="player.role === 2"
-                                                ref="playerCard5"
-                                                :player="game.players[5]"
-                                                :game="game"
-                                            />
-                                            <div v-else class="row">
-                                                <div class="col-12 text-center">
-                                                    {{ game.players[5].tag}}
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="row mb-1" v-for="offset in [0,3]" :key="offset">
+                        <div class="col-4" v-for="index in [0 + offset, 1 + offset, 2 + offset]" :key="index">
+                            <DeveloperCard
+                                v-if="game != null && game.players != null && game.players[index] != null"
+                                :ref="'playerCard' + index"
+                                :role="player.role"
+                                :player="game.players[index]"
+                                :game="game"
+                                :owned="player.number === game.players[index].number"
+                            />
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="text-center"><b>Owners' Value Ranges</b></div>
-                            <table class="table table-bordered">
-                                <thead>
+                    <div v-if="game.boundaries != null"  class="row">
+
+                        <div v-for="role in ['owner', 'developer']" :key="role" class="col-6">
+                            <div class="text-center mb-1"><b>Value Ranges ({{ role }})</b></div>
+                            <table class="table table-bordered" style="table-layout: fixed;">
+                                <thead class="thead-dark">
                                     <th scope="col">Condition</th>
                                     <th scope="col">Minimum Value</th>
                                     <th scope="col">Maximum Value</th>
                                 </thead>
                                 <tbody>
-                                    <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
-                                        <td>Status Quo</td>
-                                        <td>{{ formatUs(game.boundaries.owner.noProject.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.owner.noProject.high) }}</td>
-                                    </tr>
-                                    <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
-                                        <td>Project A</td>
-                                        <td>{{ formatUs(game.boundaries.owner.projectA.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.owner.projectA.high) }}</td>
-                                    </tr>
-                                    <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
-                                        <td>Project B</td>
-                                        <td>{{ formatUs(game.boundaries.owner.projectB.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.owner.projectB.high) }}</td>
+                                    <tr v-for="condition in game.conditions" :key="condition.id"
+                                        :style="{'background-color': game.winningCondition === condition.id ? 'yellow' : 'white'}">
+                                        <td>{{ condition.name }}</td>
+                                        <td>{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
+                                        <td>{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <div class="col-6">
-                            <div class="text-center"><b>Developers' Value Ranges</b></div>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <th scope="col">Condition</th>
-                                    <th scope="col">Minimum Value</th>
-                                    <th scope="col">Maximum Value</th>
-                                </thead>
-                                <tbody>
-                                    <tr :style="{'background-color': game.winningCondition === 0 ? 'yellow' : 'white'}">
-                                        <td>Status Quo</td>
-                                        <td>{{ formatUs(game.boundaries.developer.noProject.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.developer.noProject.high) }}</td>
-                                    </tr>
-                                    <tr :style="{'background-color': game.winningCondition === 1 ? 'yellow' : 'white'}">
-                                        <td>Project A</td>
-                                        <td>{{ formatUs(game.boundaries.developer.projectA.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.developer.projectA.high) }}</td>
-                                    </tr>
-                                    <tr :style="{'background-color': game.winningCondition === 2 ? 'yellow' : 'white'}">
-                                        <td>Project B</td>
-                                        <td>{{ formatUs(game.boundaries.developer.projectB.low) }}</td>
-                                        <td>{{ formatUs(game.boundaries.developer.projectB.high) }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+
                     </div>
 
                 </div>
@@ -306,7 +194,6 @@
 
 <script>
 import DeveloperCard from './DeveloperCard.vue';
-//import OwnerCard from './OwnerCard.vue';
 import { getGameStatus } from '../services/GameService'
 
 export default {
@@ -350,8 +237,7 @@ export default {
         }
     },
     components: {
-        DeveloperCard,
-        //OwnerCard
+        DeveloperCard
     },
     methods: {
         openWebSocket() {
@@ -457,8 +343,8 @@ export default {
                                 player.property.lastOffer = cr.compensationRequests;
                             });
 
-                            for (let prop in self.$refs) {//.forEach(r => r.$forceUpdate());
-                                self.$refs[prop].$forceUpdate();
+                            for (let prop in self.$refs) {
+                                self.$refs[prop][0].$forceUpdate();
                             }
 
                             break;
@@ -619,18 +505,6 @@ export default {
                 self.updateTimer();
 
                 self.timer.on = true;
-            }
-        },
-        setSelectedPlayer(playerIndex) {
-            if (this.game.selectedPlayerIndex > -1) {
-                this.$refs[`playerCard${this.game.selectedPlayerIndex}`].signalActivePlayer(false);
-            }
-
-            this.game.selectedPlayerIndex = playerIndex;
-            this.game.selectedPlayer = this.game.players[playerIndex];
-
-            if (this.game.selectedPlayerIndex > -1) {
-                this.$refs[`playerCard${this.game.selectedPlayerIndex}`].signalActivePlayer(true);
             }
         },
         formatUs(num) {
