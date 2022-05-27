@@ -688,7 +688,10 @@
                                 if (self.game.ruleset === 'Harberger') {
                                     self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "add");
                                 } else if (self.game.ruleset === 'Futarchy') {
-                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`].orderEvent(ev.data.order, "add");
+                                    const ref = `doubleAuctionMarket${ev.data.order.condition}`;
+
+                                    console.log(`Ref: ${ref}`);
+                                    self.$refs.doubleAuctionMarket.$refs[ref][0].orderEvent(ev.data.order, "add");
                                     self.$refs.doubleAuctionMarket.activityDetected(ev.data.order.condition);
                                 }
                                 break;
@@ -696,7 +699,7 @@
                                 if (self.game.ruleset === 'Harberger') {
                                     self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "delete");
                                 } else if (self.game.ruleset === 'Futarchy') {
-                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`].orderEvent(ev.data.order, "delete");
+                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`][0].orderEvent(ev.data.order, "delete");
                                     self.$refs.doubleAuctionMarket.activityDetected(ev.data.order.condition);
                                 }
                                 break;
@@ -704,7 +707,7 @@
                                 if (self.game.ruleset === 'Harberger') {
                                     self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "update");
                                 } else if (self.game.ruleset === 'Futarchy') {
-                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`].orderEvent(ev.data.order, "update");
+                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`][0].orderEvent(ev.data.order, "update");
                                     self.$refs.doubleAuctionMarket.activityDetected(`tab-condition-${ev.data.order.condition}`);
                                 }
                                 break;
@@ -713,7 +716,7 @@
                                     self.$refs.doubleAuctionMarket.orderEvent(ev.data, "contract");
                                 } else if (self.game.ruleset === 'Futarchy') {
                                     self.$refs.doubleAuctionMarket.contractCompleted(ev.data);
-                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.condition}`].orderEvent(ev.data, "contract");
+                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.condition}`][0].orderEvent(ev.data, "contract");
                                 }
                                 break;
                             case 'asset-movement': {

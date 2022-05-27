@@ -70,7 +70,7 @@ export default {
                 let winningCondition = -1;
                 let winningQuotation = 0;
 
-                for (let condition = 0; condition < 3; condition++) {
+                for (let condition = 0; condition < self.game.conditions.length; condition++) {
                     const list = this.movementList[condition];
 
                     if (list.length === 0) { //Not traded? Then it is not considered palatable

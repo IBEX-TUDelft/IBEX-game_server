@@ -29,7 +29,7 @@ export default {
                 self.game.D = [0,0,0];
 
                 self.game.properties.forEach(p => {
-                    for (let j = 0; j < 3; j++) {
+                    for (let j = 0; j < self.game.conditions.length; j++) {
                         self.game.D[j] += p.d[j];
                     }
                 });
@@ -42,7 +42,7 @@ export default {
 
                 const r = self.game.parameters.tax_rate_final / 100;
 
-                for(let conditionIndex = 0; conditionIndex < 3; conditionIndex++) {
+                for(let conditionIndex = 0; conditionIndex < self.game.conditions.length; conditionIndex++) {
                     /* S would be the total declared value if the declaration would not change later.
                         This yields S * r, the total tax virtual revenue at this stage.
                         We say there are 100 shares of it, not all distributed to player (e.g. 5 per player, 12 players = 60% redistributed),

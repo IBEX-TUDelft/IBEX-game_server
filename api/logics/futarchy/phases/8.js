@@ -183,7 +183,7 @@ export default {
                             return;
                         }
 
-                        for (let conditionIndex = 0; conditionIndex < 3; conditionIndex ++) {
+                        for (let conditionIndex = 0; conditionIndex < self.game.conditions.length; conditionIndex ++) {
                             const conditionSnipes = message.snipe[conditionIndex];
 
                             console.log(`Condition ${conditionIndex} snipes: ${conditionSnipes.length}`);
