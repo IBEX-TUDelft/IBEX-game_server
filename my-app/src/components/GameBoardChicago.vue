@@ -423,7 +423,11 @@
 
                 console.log('My declarations:' + myDeclarations);
 
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < self.game.conditions.length; i++) {
+                    if (self.game.winningCondition != null && self.game.winningCondition != i) {
+                        continue;
+                    }
+
                     const v = parseInt(self.player.declaration[i]);
 
                     console.log(v);

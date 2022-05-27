@@ -27,10 +27,14 @@ class Phase9 extends JoinablePhase {
 
         // a. calculate D
 
-        self.game.D = [0,0,0];
+        self.game.D = [];
 
         self.game.properties.forEach(p => {
-            for (let j = 0; j < 3; j++) {
+            for (let j = 0; j < self.game.conditions.length; j++) {
+                if (self.game.D[j] == null) {
+                    self.game.D[j] = 0;
+                }
+                
                 self.game.D[j] += p.d[j];
             }
         });

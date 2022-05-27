@@ -86,7 +86,7 @@ class Phase3 extends JoinablePhase {
         self.game.D = [0,0,0];
 
         self.game.properties.forEach(p => {
-            for (let j = 0; j < 3; j++) {
+            for (let j = 0; j < self.game.conditions.length; j++) {
                 self.game.D[j] += p.d[j];
             }
         });
@@ -96,7 +96,7 @@ class Phase3 extends JoinablePhase {
         let winningCondition = null;
         let winningSum = 0;
 
-        for(let j = 0; j < 3; j++) {
+        for(let j = 0; j < self.game.conditions.length; j++) {
             if (self.game.D[j] > winningSum) {
                 winningSum = self.game.D[j];
                 winningCondition = j;

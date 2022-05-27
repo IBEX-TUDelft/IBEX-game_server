@@ -23,8 +23,9 @@
                             <div v-if="condition != null" class="min-vh-50 d-flex align-items-center" style="min-height: 50px;">
                                 <div class="container text-center">
                                     <b-form-checkbox v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                        && game.declarations[index] != null && game.declarations[index].available[condition.id]" :value="game.declarations[index].id" />
+                                        && game.declarations[index] != null && game.declarations[index].available[condition.id]" :value="game.declarations[index].id" >
                                     {{ game.declarations[index] == null || condition == null ? '-' : formatUs(game.declarations[index].d[condition.id]) }} ({{ getSniperProbability(index, condition.id)}}%)
+                                    </b-form-checkbox>
                                 </div>
                             </div>
                         </div>
