@@ -96,6 +96,17 @@ class Phase6 extends JoinablePhase {
             "winningCondition": self.results.winningCondition
         };
     }
+
+    async onExit() {
+        await super.onExit();
+
+        this.game.players.forEach(p => {
+            p.compensationRequests = null;
+            p.submittedCompensationOffers = false;
+            p.compensationDecisions = null;
+            p.submittedCompensationOffers = false;
+        })
+    }
 }
 
 export default {

@@ -234,6 +234,10 @@ export default class {
             this.wss.broadcastEvent(this.data.id, "round-end", {
                 "round": this.data.currentRound.number
             });
+            console.log('Beginning a new round');
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            await this.beginRound();
+            console.log('Should have begun');
             return;
         }
 
@@ -247,6 +251,8 @@ export default class {
         
         await this.data.currentPhase.onEnter();
 
+        console.log(`Phase ${this.data.currentRound.phase} of round ${this.data.currentRound.number} complete? ${this.data.currentPhase.testComplete()}`)
+        
         await GameRepository.saveData(this.data.id, this.data);
 
         let err = this.wss.broadcastEvent(this.data.id, "phase-transition", {
@@ -288,6 +294,11 @@ export default class {
             this.data.rounds.push(this.data.currentRound);
         }
 
+        if (number > this.data.parameters.round_count ) {
+            console.log('The game is over');
+            return;
+        }
+
         this.results.push({
             "round": number,
             "results": []
@@ -308,9 +319,19 @@ export default class {
             "gameId": data.id
         }
 
+        console.log('Data saved');
+
         this.data.currentPhase = this.phases[0].create(this.data, this.wss);
 
+        console.log('Phase created');
+
         await this.data.currentPhase.onEnter();
+
+        if (this.data.currentRound.number > 1) {
+            await this.nextPhase();
+        }
+
+        console.log('Should have entered the new phase');
 
         await GameRepository.saveData(data.id, data);
     }

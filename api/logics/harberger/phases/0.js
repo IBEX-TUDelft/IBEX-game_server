@@ -1,4 +1,3 @@
-import WS from '../../../helpers/websocket.js';
 import JoinablePhase from '../../JoinablePhase.js';
 
 class Phase0 extends JoinablePhase {

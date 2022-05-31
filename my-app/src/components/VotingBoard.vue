@@ -58,7 +58,7 @@
                                             <b-form-checkbox v-model="player.compensationDecisions[condition.id]" />
                                         </td>
                                         <td v-if="game.phase === 4 && player.role === 2">
-                                            <p>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.length) }}</p>
+                                            <p>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.filter(p => p.role === 3).length) }}</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -363,6 +363,17 @@ export default {
                             break;
                         case 'final-profit':
                             self.player.result = ev.data;
+
+                            break;
+                        case 'round-end':
+                            self.game.compensationOffers = [];
+                            self.game.messages = [];
+
+                            self.player.compensationRequests = [];
+                            self.player.compensationRequestReceived = false;
+                            self.player.compensationOfferReceived = false;
+                            self.player.compensationDecisions = [];
+                            self.player.compensationDecisionReceived = false;
 
                             break;
                         default:
