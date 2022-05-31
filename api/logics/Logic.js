@@ -26,6 +26,42 @@ export default class {
                 "developer": 1277,
                 "owner": [291, 299, 300, 335, 329]
             }
+        ],
+        [
+            {
+                "developer": 389,
+                "owner": [500, 457, 440, 493, 382]
+            }, {
+                "developer": 1219,
+                "owner": [338, 245, 348, 328, 230]
+            }
+        ],
+        [
+            {
+                "developer": 340,
+                "owner": [392, 405, 486, 449, 368]
+            }, {
+                "developer": 1041,
+                "owner": [265, 277, 311, 206, 342]
+            }
+        ],
+        [
+            {
+                "developer": 385,
+                "owner": [466, 443, 448, 363, 447]
+            }, {
+                "developer": 1050,
+                "owner": [251, 337, 221, 325, 275]
+            }
+        ],
+        [
+            {
+                "developer": 374,
+                "owner": [402, 356, 411, 444, 389]
+            }, {
+                "developer": 1096,
+                "owner": [236, 268, 232, 300, 348]
+            }
         ]
     ];
 
@@ -319,13 +355,13 @@ export default class {
 
         this.data.players.forEach(p => {
             if (p.role === 2) {
-                p.property.v[0] = this.series[number - 1][0].developer;
-                p.property.v[1] = this.series[number - 1][1].developer;
+                p.property.v[0] = this.series[number - 1][0].developer * 1000;
+                p.property.v[1] = this.series[number - 1][1].developer * 1000;
             } else if (p.role === 3) {
                 console.log(p.property.v);
 
-                p.property.v[0] = this.series[number - 1][0].owner[ownerCounter];
-                p.property.v[1] = this.series[number - 1][1].owner[ownerCounter];
+                p.property.v[0] = this.series[number - 1][0].owner[ownerCounter] * 1000;
+                p.property.v[1] = this.series[number - 1][1].owner[ownerCounter] * 1000;
 
                 ownerCounter ++;
             }

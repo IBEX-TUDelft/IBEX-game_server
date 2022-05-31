@@ -216,7 +216,7 @@
                     return '';
                 }
 
-                const playerCompensationRequests = allCompensationRequests.find(acr => acr.number = number);
+                const playerCompensationRequests = allCompensationRequests.find(acr => acr.number === number);
 
                 if (playerCompensationRequests == null || playerCompensationRequests.compensationRequests == null) {
                     return '';

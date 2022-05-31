@@ -13,7 +13,12 @@
                     {{ condition.name }}
                 </div>
                 <div class="col-6">
-                    {{ player.property != null && player.property.lastOffer != null && player.property.lastOffer[condition.id] != null ?  player.property.lastOffer[condition.id] : '-' }}
+                    <div v-if="player.property != null && player.property.lastOffer != null && player.property.lastOffer[condition.id] != null">
+                    {{  $parent.formatUs(player.property.lastOffer[condition.id]) }}
+                    </div>
+                    <div v-else>
+                        -
+                    </div>
                 </div>
             </div>
         </b-card>
