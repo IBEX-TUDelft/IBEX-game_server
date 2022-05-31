@@ -8,6 +8,27 @@ import WS from '../helpers/websocket.js';
 
 export default class {
 
+    series = [    
+        [
+            {
+                "developer": 366,
+                "owner": [471, 399, 480, 409, 353]
+            }, {
+                "developer": 1052,
+                "owner": [327, 254, 224, 264, 284]
+            }
+        ],
+        [
+            {
+                "developer": 369,
+                "owner": [465, 382, 429, 374, 357]
+            }, {
+                "developer": 1277,
+                "owner": [291, 299, 300, 335, 329]
+            }
+        ]
+    ];
+
     data;
     phases;
     wss = null;
@@ -252,7 +273,7 @@ export default class {
         await this.data.currentPhase.onEnter();
 
         console.log(`Phase ${this.data.currentRound.phase} of round ${this.data.currentRound.number} complete? ${this.data.currentPhase.testComplete()}`)
-        
+
         await GameRepository.saveData(this.data.id, this.data);
 
         let err = this.wss.broadcastEvent(this.data.id, "phase-transition", {
@@ -293,6 +314,22 @@ export default class {
 
             this.data.rounds.push(this.data.currentRound);
         }
+
+        let ownerCounter = 0;
+
+        this.data.players.forEach(p => {
+            if (p.role === 2) {
+                p.property.v[0] = this.series[number - 1][0].developer;
+                p.property.v[1] = this.series[number - 1][1].developer;
+            } else if (p.role === 3) {
+                console.log(p.property.v);
+
+                p.property.v[0] = this.series[number - 1][0].owner[ownerCounter];
+                p.property.v[1] = this.series[number - 1][1].owner[ownerCounter];
+
+                ownerCounter ++;
+            }
+        });
 
         if (number > this.data.parameters.round_count ) {
             console.log('The game is over');

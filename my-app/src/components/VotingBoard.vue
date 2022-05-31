@@ -410,6 +410,21 @@ export default {
 
             const tags = ['You'];
 
+            if (self.forms.messageRecipients.length === 0) {
+                this.$confirm({
+                    message: 'Select at least one recipient or click on a message to reply to it',
+                    button: {
+                        yes: 'Continue'
+                    },
+                    /**
+                     * Callback Function
+                     * @param {Boolean} confirm
+                     */
+                    callback: () => {}
+                });
+                return;
+            }
+
             self.game.players.forEach(p => {
                 if (self.forms.messageRecipients.includes(p.number)) {
                     tags.push(p.tag);
