@@ -4,6 +4,10 @@ class Phase1 extends JoinablePhase {
 
     complete = false;
 
+    results = {
+        players: []
+    };
+
     constructor (game, wss) {
         super (game, wss, [], [
             'All players joined, the game will start shortly'
@@ -16,6 +20,13 @@ class Phase1 extends JoinablePhase {
         console.log('PHASE 1');
 
         const self = this;
+
+        this.game.players.forEach(p => {
+            self.results.players.push({
+                "number": p.number,
+                "values": [...p.property.v]
+            });
+        });
 
         this.game.conditions = [{
                 "name": "No Project",
@@ -101,7 +112,11 @@ class Phase1 extends JoinablePhase {
     }
 
     getData() {
-        return {}
+        const self = this;
+
+        return {
+            "players": self.results.players
+        }
     }
 
     testComplete () {

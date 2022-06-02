@@ -5,12 +5,12 @@
                 <b-navbar-nav>
                     <b-nav-item active>Ruleset: {{ ruleset }}</b-nav-item>
                 </b-navbar-nav>
-                <div class="container justify-content-center">
+                <b-navbar-nav class="container justify-content-center">
                     <b-navbar-brand>
                         Results Overview
                     </b-navbar-brand>
-                </div>
-                <b-navbar-nav class="ml-auto">
+                </b-navbar-nav>
+                <b-navbar-nav>
                     <button :disabled="false" class="btn btn-success" @click="exportXlsx()">Export</button>
                 </b-navbar-nav>
             </b-navbar>
@@ -38,7 +38,7 @@
                                 <tbody>
                                     <tr v-for="condition in conditions" :key="condition.id" :style="condition.id === winningCondition ? 'background-color: yellow;' : ''">
                                         <td>{{ condition.name }}</td>
-                                        <td>{{ formatUs( owner.values[condition.id] ) }}</td>
+                                        <td>{{ formatUs( getPlayerValues(owner.number, round.round)[condition.id] ) }}</td>
                                         <td>{{ getCompensationRequest(round.round, owner.number, condition.id) }}</td>
                                         <td>{{ getCompensationOffered(round.round, condition.id) }}</td>
                                         <td>{{ getCompensationAccepted(round.round, owner.number, condition.id) }}</td>
@@ -77,7 +77,7 @@
                                 <tbody>
                                     <tr v-for="player in players" :key="player.number">
                                         <td>{{ player.tag }}</td>
-                                        <td>{{ formatUs( player.values[getWinningCondition(round.round)] ) }}</td>
+                                        <td>{{ formatUs( getPlayerValues(player.number, round.round)[getWinningCondition(round.round)] ) }}</td>
                                         <td>{{ getCompensationReceived(round.round, player.role) }}</td>
                                         <td>{{ getTotalProfit(round.round, player) }}</td>
                                     </tr>
@@ -141,7 +141,7 @@
                             xls.push([
                                 owner.tag,
                                 condition.name,
-                                self.formatUs( owner.values[condition.id] ),
+                                self.formatUs( self.getPlayerValues(owner.number, round.round)[condition.id] ),
                                 self.getCompensationRequest(round.round, owner.number, condition.id),
                                 this.getCompensationOffered(round.round, condition.id),
                                 this.getCompensationAccepted(round.round, owner.number, condition.id)
@@ -181,7 +181,7 @@
                     this.players.forEach(player => {
                         xls.push([
                             player.tag,
-                            self.formatUs( player.values[self.getWinningCondition(1)] ),
+                            self.formatUs( self.getPlayerValues(player.number, round.round)[self.getWinningCondition(1)] ),
                             self.getCompensationReceived(round.round, player.role),
                             self.getTotalProfit(1, player)
                         ]);
@@ -268,13 +268,13 @@
                     return '';
                 }
 
-                const playerCompensationDecisions = allCompensationDecisions.find(acd => acd.number = number);
+                const playerCompensationDecisions = allCompensationDecisions.find(acd => acd.number === number);
 
                 if (playerCompensationDecisions == null || playerCompensationDecisions.compensationDecisions == null) {
                     return '';
                 }
 
-                return playerCompensationDecisions.compensationDecisions[condition] === true ? 'Yes' : 'No';
+                return playerCompensationDecisions.compensationDecisions.includes(condition) ? 'Yes' : 'No';
             },
             getCompensationReceived(roundNumber, role) {
                 if (this.rounds == null) {
@@ -330,11 +330,17 @@
                 
                 const jackpot = compensationOffers[winningCondition];
 
+                const playerValue = this.getPlayerValues(player.number, roundNumber)[winningCondition];
+
                 if (player.role === 3) {
-                    return this.formatUs(player.values[winningCondition] + jackpot);
+                    return this.formatUs(playerValue + jackpot);
                 } else {
-                    return this.formatUs(player.values[winningCondition] - (this.players.length - 1 ) * jackpot);
+                    return this.formatUs(playerValue - (this.players.length - 1 ) * jackpot);
                 }
+            },
+            getPlayerValues(playerNumber, roundNumber) {
+                return this.rounds.find(r => r.round === roundNumber)
+                    .results[1].players.find(p => p.number === playerNumber).values;
             },
             getStandingCounter(roundNumber, condition) {
                 if (this.rounds == null) {

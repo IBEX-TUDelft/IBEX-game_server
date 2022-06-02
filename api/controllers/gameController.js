@@ -215,23 +215,6 @@ export default {
                     });
                     data.results = game.results;
 
-                    /*if (game.results[3] != null) {
-                        data.compensationRequests = game.results[3].compensationRequests;
-                    }
-
-                    if (game.results[4] != null) {
-                        data.compensationOffers = game.results[4].compensationOffers;
-                    }
-
-                    if (game.results[5] != null) {
-                        data.compensationDecisions = game.results[5].compensationDecisions;
-                    }
-
-                    if (game.results[6] != null) {
-                        data.standings = game.results[6].standings;
-                        data.winningCondition = game.results[6].winningCondition;
-                    }*/
-
                     break;
                 default:
                     break;

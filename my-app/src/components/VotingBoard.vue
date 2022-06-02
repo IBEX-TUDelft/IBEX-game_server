@@ -28,42 +28,51 @@
                     </div>
 
                     <div v-if="game.phase >= 2" class="row mb-1"> <!-- Compensation request -->
-                        <div class="col-12">
-                            <table class="table table-bordered" style="table-layout: fixed;">
-                                <thead class="thead-dark">
-                                    <th scope="col">Condition</th>
-                                    <th scope="col">Value</th>
-                                    <th v-if="player.role === 3 && game.phase >= 3" scope="col">Request</th>
-                                    <th v-if="game.phase >= 4" scope="col">Offer</th>
-                                    <th v-if="game.phase === 4 && player.role === 2" scope="col">Profit</th>
-                                    <th v-if="game.phase === 5 && player.role === 3" scope="col">Profit</th>
-                                    <th v-if="player.role === 3 && game.phase === 5" scope="col">Accept</th>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="condition in game.conditions" :key="condition.id">
-                                        <td>{{ condition.name }}</td>
-                                        <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                        <td v-if="player.role === 3 && game.phase >= 3">
-                                            <input v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
-                                            <p v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</p>
-                                        </td>
-                                        <td v-if="game.phase >= 4">
-                                            <input v-if="condition.id != 0 && player.role === 2 && player.compensationOfferReceived != true" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
-                                            <p v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</p>
-                                        </td>
-                                        <td v-if="player.role === 3 && game.phase === 5">
-                                            {{ formatUs(player.property.v[condition.id] + (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0)) }}
-                                        </td>
-                                        <td v-if="player.role === 3 && game.phase === 5">
-                                            <b-form-checkbox v-model="player.compensationDecisions[condition.id]" />
-                                        </td>
-                                        <td v-if="game.phase === 4 && player.role === 2">
-                                            <p>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.filter(p => p.role === 3).length) }}</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <b-form-group>
+
+                            <div class="col-12">
+                                <table class="table table-bordered" style="table-layout: fixed;">
+                                    <thead class="thead-dark">
+                                        <th scope="col">Condition</th>
+                                        <th scope="col">Value</th>
+                                        <th v-if="player.role === 3 && game.phase >= 3" scope="col">Request</th>
+                                        <th v-if="game.phase >= 4" scope="col">Offer</th>
+                                        <th v-if="game.phase === 4 && player.role === 2" scope="col">Profit</th>
+                                        <th v-if="game.phase === 5 && player.role === 3" scope="col">Profit</th>
+                                        <th v-if="player.role === 3 && game.phase === 5" scope="col">Accept</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="condition in game.conditions" :key="condition.id">
+                                            <td>{{ condition.name }}</td>
+                                            <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                            <td v-if="player.role === 3 && game.phase >= 3">
+                                                <input v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                                <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
+                                            </td>
+                                            <td v-if="game.phase >= 4">
+                                                <input v-if="condition.id != 0 && player.role === 2 && player.compensationOfferReceived != true" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                                <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
+                                            </td>
+                                            <td v-if="player.role === 3 && game.phase === 5">
+                                                {{ formatUs(player.property.v[condition.id] + (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0)) }}
+                                            </td>
+                                            <td v-if="player.role === 3 && game.phase === 5">
+                                                <!--b-form-checkbox v-model="player.compensationDecisions[condition.id]" /-->
+                                                <b-form-radio
+                                                    v-model="forms.selectedCondition"
+                                                    :name="'select-condition-' + condition.id"
+                                                    :value="condition.id"
+                                                />
+                                            </td>
+                                            <td v-if="game.phase === 4 && player.role === 2">
+                                                <div>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.filter(p => p.role === 3).length) }}</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </b-form-group>
 
                         <div class="col-12 mb-1 text-center">
                             <button v-if="!player.compensationRequestReceived && game.phase === 3 && player.role === 3" type="button" @click='submitCompensationRequest()' class="btn btn-primary" >Submit Request</button>
@@ -72,7 +81,7 @@
                         </div>
                     </div>
 
-                    <div v-if="game.phase >= 2" class="row mb-1">
+                    <div v-if="game.phase >= 1" class="row mb-1">
                         <div class="col-12 text-center">
                             <b>Plot matrix</b>
                         </div>
@@ -207,7 +216,8 @@ export default {
             },
             forms: {
                 messageRecipients: [],
-                outgoingChatMessage: ""
+                outgoingChatMessage: "",
+                selectedCondition: 0
             },
             game: {
                 winningCondition: null,
@@ -375,6 +385,10 @@ export default {
                             self.player.compensationDecisions = [];
                             self.player.compensationDecisionReceived = false;
 
+                            self.forms.messageRecipients = [];
+                            self.forms.outgoingChatMessage = "";
+                            self.forms.selectedCondition = 0;
+
                             break;
                         default:
                             console.error(`Type ${ev.eventType} was not understood`);
@@ -413,6 +427,21 @@ export default {
             if (self.forms.messageRecipients.length === 0) {
                 this.$confirm({
                     message: 'Select at least one recipient or click on a message to reply to it',
+                    button: {
+                        yes: 'Continue'
+                    },
+                    /**
+                     * Callback Function
+                     * @param {Boolean} confirm
+                     */
+                    callback: () => {}
+                });
+                return;
+            }
+
+            if (self.forms.outgoingChatMessage == null || self.forms.outgoingChatMessage.trim().length === 0) {
+                this.$confirm({
+                    message: 'You can\t send an empty message',
                     button: {
                         yes: 'Continue'
                     },
@@ -540,8 +569,27 @@ export default {
 
             return num.toLocaleString('en-US');
         },
-        submitCompensationRequest() {
+        async submitCompensationRequest() {
             const self = this;
+
+            const confirm = await new Promise(resolve => {
+                this.$confirm({
+                    "message": "Are you sure? You can't change the request later.",
+                    "button": {
+                        "yes": "Continue",
+                        "no": "Cancel"
+                    },
+                    /**
+                     * Callback Function
+                     * @param {Boolean} confirm
+                     */
+                    callback: resolve
+                });
+            });
+
+            if (!confirm) {
+                return
+            }
 
             this.sendMessage({
                 "gameId": self.game.id,
@@ -549,8 +597,27 @@ export default {
                 "compensationRequests": self.player.compensationRequests.map(c => parseInt(c))
             });
         },
-        submitCompensationOffers() {
+        async submitCompensationOffers() {
             const self = this;
+
+            const confirm = await new Promise(resolve => {
+                this.$confirm({
+                    "message": "Are you sure? You can't change the offer later.",
+                    "button": {
+                        "yes": "Continue",
+                        "no": "Cancel"
+                    },
+                    /**
+                     * Callback Function
+                     * @param {Boolean} confirm
+                     */
+                    callback: resolve
+                });
+            });
+
+            if (!confirm) {
+                return
+            }
 
             this.sendMessage({
                 "gameId": self.game.id,
@@ -561,13 +628,32 @@ export default {
         findPlayerByNumber(number) {
             return this.game.players.find(p => p.number === number);
         },
-        submitCompensationDecisions() {
+        async submitCompensationDecisions() {
             const self = this;
+
+            const confirm = await new Promise(resolve => {
+                this.$confirm({
+                    "message": "Are you sure? You can't change your decision later.",
+                    "button": {
+                        "yes": "Continue",
+                        "no": "Cancel"
+                    },
+                    /**
+                     * Callback Function
+                     * @param {Boolean} confirm
+                     */
+                    callback: resolve
+                });
+            });
+
+            if (!confirm) {
+                return
+            }
 
             this.sendMessage({
                 "gameId": self.game.id,
                 "type": "compensation-decision",
-                "compensationDecisions": self.player.compensationDecisions
+                "compensationDecisions": [self.forms.selectedCondition]
             });
         }
     },

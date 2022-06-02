@@ -168,7 +168,7 @@
                     <input type="number" class="form-control" v-model="no_project_dev_low" name="no_project_dev_low" id="no_project_dev_low" aria-describedby="emailHelp" placeholder="500000" />
                 </div>
             </div>
-            <div class="row">
+            <!--div class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Status Quo Value (Fixed)</label>
                 </div>
@@ -180,7 +180,7 @@
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="no_project_dev_fixed" name="no_project_dev_fixed" id="no_project_dev_fixed" aria-describedby="emailHelp" placeholder="500000" />
                 </div>
-            </div>
+            </div-->
             <div class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Status Quo Value (High)</label>
@@ -208,7 +208,7 @@
                     <input type="number" class="form-control" v-model="project_a_dev_low" name="project_a_dev_low" id="project_a_dev_low" aria-describedby="emailHelp" placeholder="500000" />
                 </div>
             </div>
-            <div class="row">
+            <!--div class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Project A Value (Fixed)</label>
                 </div>
@@ -220,7 +220,7 @@
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="project_a_dev_fixed" name="project_a_dev_fixed" id="project_a_dev_fixed" aria-describedby="emailHelp" placeholder="500000" />
                 </div>
-            </div>
+            </div-->
             <div class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Project A Value (High)</label>
@@ -235,7 +235,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <!--div class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Project B Value (Low)</label>
                 </div>
@@ -273,7 +273,7 @@
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="project_b_dev_high" name="project_b_dev_high" id="project_b_dev_high" aria-describedby="emailHelp" placeholder="500000" />
                 </div>
-            </div>
+            </div-->
 
             <button type="button" @click='createGame()' class="btn btn-danger">Create</button>
         </form>
@@ -317,15 +317,15 @@ export default {
             no_project_dev_low: 300000,
             no_project_dev_fixed: 350000,
             no_project_dev_high: 400000,
-            no_project_owner_low: 300000,
-            no_project_owner_fixed: 350000,
-            no_project_owner_high: 400000,
+            no_project_owner_low: 350000,
+            no_project_owner_fixed: 425000,
+            no_project_owner_high: 500000,
             project_a_dev_low: 1000000,
-            project_a_dev_fixed: 1100000,
-            project_a_dev_high: 1200000,
+            project_a_dev_fixed: 1150000,
+            project_a_dev_high: 1300000,
             project_a_owner_low: 200000,
-            project_a_owner_fixed: 250000,
-            project_a_owner_high: 300000,
+            project_a_owner_fixed: 275000,
+            project_a_owner_high: 350000,
             project_b_dev_low: 1500000,
             project_b_dev_fixed: 1750000,
             project_b_dev_high: 2000000,

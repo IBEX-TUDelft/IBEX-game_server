@@ -5,12 +5,13 @@
                 <b-navbar-nav>
                     <b-nav-item active>Ruleset: {{ ruleset }}</b-nav-item>
                 </b-navbar-nav>
-                <div class="container justify-content-center">
+                <b-navbar-nav class="container justify-content-center">
                     <b-navbar-brand>
                         Chat Log
                     </b-navbar-brand>
-                </div>
-                <b-navbar-nav class="ml-auto">
+                </b-navbar-nav>
+                <b-navbar-nav>
+                    <button :disabled="false" class="btn btn-success" @click="exportXlsx()">Export</button>
                 </b-navbar-nav>
             </b-navbar>
         </div>
@@ -18,7 +19,7 @@
         <div>
             <b-card no-body>
                 <b-tabs card content-class="mt-3" v-model="roundIndex">
-                    <b-tab v-for="round in results" :key="round.round">
+                    <b-tab v-for="round in rounds" :key="round.round">
 
                         <template #title>
                             Round {{ round.round }}
@@ -62,7 +63,7 @@
                 gameId: null,
                 ruleset: null,
                 chatLog: null,
-                results: null,
+                rounds: null,
                 tabIndex: 0,
                 roundIndex: 0
             };
@@ -131,52 +132,33 @@
             exportXlsx() {
                 const self = this;
 
-                const xls = [];
+                const wb = XLSX.utils.book_new();
 
-                if (this.ruleset === 'Harberger') {
-                    this.marketLog[this.winningCondition].forEach(r => {
+                self.rounds.forEach(round => {
+                    const xls = [];
+
+                    xls.push([
+                        'People',
+                        'Message'
+                    ]);
+
+                    round.results[2].chatLog.forEach(message => {
                         xls.push([
-                            r.time,
-                            r.round + '.' + r.phase,
-                            self.getPlayer(r.actor.number, r.actor.role),
-                            r.action,
-                            r.quantity,
-                            r.price,
-                            r.buyer == null ? '' : self.getPlayer(r.buyer.number, r.buyer.role),
-                            r.seller == null ? '' : self.getPlayer(r.seller.number, r.seller.role),
-                            r.bestBid,
-                            r.bestAsk,
-                            r.book
+                            [message.sender, ...message.to]
+                                .sort((a,b,) => a - b)
+                                .map(number => self.players.find(p => p.number === number).tag)
+                                .join(','),
+                            message.text
                         ]);
                     });
-                } else if (this.ruleset === 'Futarchy') {
-                    this.marketLog.forEach((m, i) => {
-                        m.forEach(r => {
-                            xls.push([
-                                r.time,
-                                r.round + '.' + r.phase,
-                                self.getPlayer(r.actor.number, r.actor.role),
-                                r.action,
-                                r.quantity,
-                                r.price,
-                                r.buyer == null ? '' : self.getPlayer(r.buyer.number, r.buyer.role),
-                                r.seller == null ? '' : self.getPlayer(r.seller.number, r.seller.role),
-                                r.bestBid,
-                                r.bestAsk,
-                                r.book,
-                                conditionMap[i]
-                            ]);
-                        });
-                    });
-                }
 
-                console.log(xls);
-                /* convert state to workbook */
-                const ws = XLSX.utils.aoa_to_sheet(xls);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "SheetJS");
+                    /* convert state to workbook */
+                    const ws = XLSX.utils.aoa_to_sheet(xls);
+                    XLSX.utils.book_append_sheet(wb, ws, `Round ${round.round}`);
+                });
+
                 /* generate file and send to client */
-                XLSX.writeFile(wb, `${this.gameId}.market-log.xlsx`);
+                XLSX.writeFile(wb, `${this.gameId}.game-chat.xlsx`);
             }
         },
         async mounted () {
@@ -193,12 +175,12 @@
                 }
             });
 
-            this.results = response.data.data.results;
+            this.rounds = response.data.data.results;
             this.ruleset = response.data.data.ruleset;
             this.chatLog = response.data.data.chatLog;
             this.players = response.data.data.players;
 
-            this.results.forEach(round => {
+            this.rounds.forEach(round => {
                 if (round.results == null || round.results[2] == null) {
                     return;
                 }
