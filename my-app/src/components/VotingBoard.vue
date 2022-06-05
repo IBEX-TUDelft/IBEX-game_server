@@ -31,41 +31,60 @@
                         <b-form-group>
 
                             <div class="col-12">
-                                <table class="table table-bordered" style="table-layout: fixed;">
+                                <table v-if="player.role === 2" class="table table-bordered" style="table-layout: fixed;">
                                     <thead class="thead-dark">
                                         <th scope="col">Condition</th>
                                         <th scope="col">Value</th>
-                                        <th v-if="player.role === 3 && game.phase >= 3" scope="col">Request</th>
                                         <th v-if="game.phase >= 4" scope="col">Offer</th>
-                                        <th v-if="game.phase === 4 && player.role === 2" scope="col">Profit</th>
-                                        <th v-if="game.phase === 5 && player.role === 3" scope="col">Profit</th>
-                                        <th v-if="player.role === 3 && game.phase === 5" scope="col">Accept</th>
+                                        <th v-if="game.phase === 4" scope="col">Profit</th>
                                     </thead>
                                     <tbody>
                                         <tr v-for="condition in game.conditions" :key="condition.id">
                                             <td>{{ condition.name }}</td>
                                             <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                            <td v-if="player.role === 3 && game.phase >= 3">
+                                            <td v-if="game.phase >= 4">
+                                                <input v-if="condition.id != 0 && player.compensationOfferReceived != true" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                                <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
+                                            </td>
+                                            <td v-if="game.phase === 4">
+                                                <div>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.filter(p => p.role === 3).length) }}</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table v-if="player.role === 3" class="table table-bordered" style="table-layout: fixed;">
+                                    <thead class="thead-dark">
+                                        <th scope="col">Condition</th>
+                                        <th scope="col">Value</th>
+                                        <th v-if="game.phase >= 3" scope="col">Request</th>
+                                        <th v-if="game.phase >= 5" scope="col">Offer</th>
+                                        <th v-if="game.phase === 3 || game.phase === 5" scope="col">Profit</th>
+                                        <th v-if="game.phase === 5" scope="col">Accept</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="condition in game.conditions" :key="condition.id">
+                                            <td>{{ condition.name }}</td>
+                                            <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                            <td v-if="game.phase >= 3">
                                                 <input v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
                                                 <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
                                             </td>
-                                            <td v-if="game.phase >= 4">
-                                                <input v-if="condition.id != 0 && player.role === 2 && player.compensationOfferReceived != true" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <td v-if="game.phase >= 5">
                                                 <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                             </td>
-                                            <td v-if="player.role === 3 && game.phase === 5">
+                                            <td v-if="game.phase === 3">
+                                                {{ formatUs(player.property.v[condition.id] + (player.compensationRequests[condition.id] != null ? parseInt(player.compensationRequests[condition.id]) : 0)) }}
+                                            </td>
+                                            <td v-if="game.phase === 5">
                                                 {{ formatUs(player.property.v[condition.id] + (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0)) }}
                                             </td>
-                                            <td v-if="player.role === 3 && game.phase === 5">
-                                                <!--b-form-checkbox v-model="player.compensationDecisions[condition.id]" /-->
+                                            <td v-if="game.phase === 5">
                                                 <b-form-radio
                                                     v-model="forms.selectedCondition"
                                                     :name="'select-condition-' + condition.id"
                                                     :value="condition.id"
                                                 />
-                                            </td>
-                                            <td v-if="game.phase === 4 && player.role === 2">
-                                                <div>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.filter(p => p.role === 3).length) }}</div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -184,13 +203,17 @@
                     </div>
 
                     <div class="row">
-                        <div v-for="message in game.messages.reduce( (a,b) => [b,...a], [])" :key="message.number" class="col-12 mb-1 px-0">
+                        <div v-for="box in game.messageBoxes" :key="box.participants" class="col-12 mb-1 px-0">
                             <b-card 
-                                :header="message.participants"
+                                :header="box.participants"
                                 header-tag="header"
-                                @click="forms.messageRecipients = [...message.to, message.sender].filter(i => i != player.number)"
+                                @click="forms.messageRecipients = box.people.filter(i => i != player.number)"
                             >
-                                <b-card-text><b>{{ (message.sender === player.number ? 'You' : game.players.find(p => p.number === message.sender).tag) }}</b>: {{ message.text }}</b-card-text>
+                                <b-card-text class="px-0">
+                                    <div v-for="message in box.messages" :key="message.time">
+                                        <b>{{ (message.sender === player.number ? 'You' : game.players.find(p => p.number === message.sender).tag) }}</b>: {{ message.text }}
+                                    </div>
+                                </b-card-text>
                             </b-card>
                         </div>
                     </div>
@@ -227,7 +250,8 @@ export default {
                 conditions: [],
                 players: [],
                 compensationOffers: [],
-                messages: []
+                messages: [],
+                messageBoxes: []
             },
             player: {
                 instructions: "Wait for other players to join",
@@ -267,6 +291,24 @@ export default {
                         case "phase-transition":
                             self.game.round = ev.data.round;
                             self.game.phase = ev.data.phase;
+
+                            if (ev.data.phase === 0) {
+                                console.log('A NEW ROUND HAS BEGUN');
+                                
+                                self.game.compensationOffers = [];
+                                self.game.messages = [];
+                                self.game.messageBoxes = [];
+
+                                self.player.compensationRequests = [];
+                                self.player.compensationRequestReceived = false;
+                                self.player.compensationOfferReceived = false;
+                                self.player.compensationDecisions = [];
+                                self.player.compensationDecisionReceived = false;
+
+                                self.forms.messageRecipients = [];
+                                self.forms.outgoingChatMessage = '';
+                                self.forms.selectedCondition = 0;
+                            }
                             break;
                         case "set-timer":
                             self.timer.end = ev.data.end;
@@ -332,6 +374,8 @@ export default {
                             
                             self.game.messages.push(ev.data);
 
+                            self.addMessage(ev.data);
+
                             break;
                         case 'compensation-request-received':
                             self.player.compensationRequestReceived = true;
@@ -376,7 +420,7 @@ export default {
 
                             break;
                         case 'round-end':
-                            self.game.compensationOffers = [];
+                            /*self.game.compensationOffers = [];
                             self.game.messages = [];
 
                             self.player.compensationRequests = [];
@@ -387,7 +431,7 @@ export default {
 
                             self.forms.messageRecipients = [];
                             self.forms.outgoingChatMessage = "";
-                            self.forms.selectedCondition = 0;
+                            self.forms.selectedCondition = 0;*/
 
                             break;
                         default:
@@ -460,12 +504,17 @@ export default {
                 }
             });
 
-            self.game.messages.push({
+            const message = {
                 "sender": self.player.number,
                 "to": self.forms.messageRecipients,
                 "text": self.forms.outgoingChatMessage,
-                "participants": tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1]
-            });
+                "participants": tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1],
+                "time": Date.now()
+            };
+
+            self.addMessage(message);
+
+            self.game.messages.push(message);
 
             this.sendMessage({
                 "gameId": self.game.id,
@@ -519,9 +568,11 @@ export default {
             }
 
             self.game = gameData.game;
+            self.game.messageBoxes = [];
 
             self.game.messages.forEach(message => {
-                const tags = [];
+                self.addMessage(message);
+                /*const tags = [];
 
                 self.game.players.forEach(p => {
                     if (self.player.number === p.number) {
@@ -534,7 +585,7 @@ export default {
                     }
                 });
 
-                message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];
+                message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];*/
             });
 
             if (gameData.game.compensationRequests != null) {
@@ -655,6 +706,58 @@ export default {
                 "type": "compensation-decision",
                 "compensationDecisions": [self.forms.selectedCondition]
             });
+        },
+        addMessage(message) {
+            const self = this;
+
+            const people = [message.sender, ...message.to];
+
+            let box = this.game.messageBoxes.find(mb => {
+                let counter = 0;
+
+                people.forEach(number => {
+                    if (mb.people.includes(number)) {
+                        counter++;
+                    }
+                });
+
+                return counter === mb.people.length && counter === people.length;
+            })
+
+            if (box == null) {
+                box = {
+                    "people": people,
+                    "messages": []
+                }
+
+                const tags = [];
+
+                self.game.players.forEach(p => {
+                    if (self.player.number === p.number) {
+                        tags.push('You');
+                        return;
+                    }
+
+                    if (message.to.includes(p.number) || message.sender === p.number) {
+                        tags.push(p.tag);
+                    }
+                });
+
+                box.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];
+
+                this.game.messageBoxes.push(box);
+            }
+
+            box.messages = [{
+                "time": message.time,
+                "sender": message.sender,
+                "text": message.text},
+                ...box.messages
+            ];
+
+            box.last = message.time;
+
+            this.game.messageBoxes.sort((a,b) => b.last - a.last);
         }
     },
     async mounted () {

@@ -398,6 +398,15 @@ export default class {
 
         console.log('Phase created');
 
+        let err = this.wss.broadcastEvent(this.data.id, "phase-transition", {
+            "round": this.data.currentRound.number,
+            "phase": this.data.currentRound.phase
+        });
+
+        if (err) {
+            console.error(err);
+        }
+
         await this.data.currentPhase.onEnter();
 
         if (this.data.currentRound.number > 1) {

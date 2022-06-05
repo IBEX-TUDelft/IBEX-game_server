@@ -23,6 +23,8 @@ class Phase2 extends JoinablePhase {
                     return;
                 }
 
+                const time = Date.now();
+
                 message.to.forEach(toPlayerNumber => {
                     const toPlayer = game.players.find(p => p.number === toPlayerNumber);
 
@@ -35,7 +37,8 @@ class Phase2 extends JoinablePhase {
                         "sender": player.number,
                         "to": message.to,
                         "number": caller.messageCounter,
-                        "text": message.text
+                        "text": message.text,
+                        "time": time
                     };
     
                     caller.messageCounter++;
@@ -55,7 +58,7 @@ class Phase2 extends JoinablePhase {
                 // Recording the chat events for showing at a later time
 
                 const chatLog = caller.results.chatLog.push({
-                    "time": Date.now(),
+                    "time": time,
                     "sender": player.number,
                     "to": message.to,
                     "text": message.text

@@ -65,7 +65,7 @@
                             </table>
                         </div>
 
-                        <div class="row">
+                        <div v-if="[0,1].includes(getWinningCondition(round.round))" class="row">
                             <div><b>Profit ({{ conditions[getWinningCondition(round.round)].name }})</b></div>
                             <table class="table table-bordered">
                                 <thead class="thead-dark">
@@ -339,8 +339,13 @@
                 }
             },
             getPlayerValues(playerNumber, roundNumber) {
-                return this.rounds.find(r => r.round === roundNumber)
-                    .results[1].players.find(p => p.number === playerNumber).values;
+                const round = this.rounds.find(r => r.round === roundNumber);
+
+                if (round.results.length < 2) {
+                    return [];
+                }
+
+                return round.results[1].players.find(p => p.number === playerNumber).values;
             },
             getStandingCounter(roundNumber, condition) {
                 if (this.rounds == null) {
@@ -390,17 +395,17 @@
             },
             getWinningCondition(roundNumber) {
                 if (this.rounds == null) {
-                    return '';
+                    return null;
                 }
 
                 const round = this.rounds.find(r => r.round === roundNumber);
 
                 if (round == null) {
-                    return '';
+                    return null;
                 }
 
                 if (round.results == null || round.results[6] == null) {
-                    return '';
+                    return null;
                 }
 
                 return round.results[6].winningCondition;

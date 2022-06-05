@@ -5,7 +5,7 @@
             :header="player.tag + '\'s Compensation Request'"
             header-tag="header"
             class="mb-1"
-            :bg-variant="owned ? 'danger' : 'light'"
+            :bg-variant="owned ? 'primary' : 'light'"
             :text-variant="owned ? 'white' : 'black'"
         >
             <div class="row" v-for="condition in game.conditions" :key="condition.id">
@@ -25,7 +25,7 @@
         <b-card 
             v-else
             class="mb-1"
-            :bg-variant="owned ? 'danger' : 'light'"
+            :bg-variant="owned ? 'primary' : 'light'"
             :text-variant="owned ? 'white' : 'black'"
         >
             <div class="row">

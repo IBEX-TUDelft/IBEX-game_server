@@ -20,7 +20,7 @@ class Phase6 extends JoinablePhase {
 
         const self = this;
 
-        const quorum = Math.ceil(self.game.players.length / 2);
+        const quorum = Math.ceil(self.game.players.filter(p => p.role === 3).length / 2);
 
         const developer = self.game.players.find(p => p.role === 2);
 

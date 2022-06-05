@@ -66,11 +66,6 @@ export default class Voting extends Logic {
             "instructions": self.data.currentPhase.instructions[playerData.role - 1]
         };
 
-        if (self.data.compensationOffers != null) {
-            game.compensationOffers = self.data.compensationOffers;
-            player.compensationOfferReceived = true;
-        }
-
         if (self.data.currentRound.phase >= 6) {
             game.winningCondition = self.data.winningCondition;
         }
@@ -82,6 +77,11 @@ export default class Voting extends Logic {
             player.role = playerData.role;
             player.property = playerData.property;
             player.recovery = playerData.recovery;
+        }
+
+        if (playerData.submittedCompensationOffers === true) {
+            game.compensationOffers = self.data.compensationOffers;
+            player.compensationOfferReceived = true;
         }
 
         if (playerData.compensationRequests != null) {
