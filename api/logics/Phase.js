@@ -2,6 +2,7 @@ import WS from '../helpers/websocket.js';
 import Utils from '../helpers/utils.js';
 
 export default class Phase {
+    number;
     handlers = [];
     game = null;
     wss = null;
@@ -16,12 +17,23 @@ export default class Phase {
     constructor (game, wss, handlers, instructions) {
         this.game = game;
         this.wss = wss;
+        this.number = game.currentRound.phase;
 
         if (handlers != null && handlers.length != 0) {
             this.handlers.push(...handlers);
         }
 
-        if (instructions != null && instructions.length > 0) {
+        if (game.dictionary != null) {
+            const phaseNumber = game.currentRound.phase;
+
+            const phaseInstructions = game.dictionary.instructions.phases[phaseNumber];
+
+            this.instructions.push(
+                '-',
+                phaseInstructions.developer,
+                phaseInstructions.owner
+            );
+        } else if (instructions != null && instructions.length > 0) {
             if (instructions.length === 1) {
                 this.instructions.push(instructions[0], instructions[0], instructions[0]); //Same for all roles
             } else if (instructions.length === 3) {
@@ -36,6 +48,9 @@ export default class Phase {
 
     async onEnter() {
         const self = this;
+
+        console.log(`SENDING INSTRUCTIONS FOR PHASE ${this.game.currentRound.phase}`);
+        console.log(this.instructions);
 
         if (this.instructions.length > 0) {
             for (let i = 0; i < 3; i++) {

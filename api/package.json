@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/bbachi/vuejs-nginx-docker.git"
   },
-  "author": "Bhargav Bachina",
+  "author": "Yary Ribero",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/bbachi/vuejs-nginx-docker/issues"

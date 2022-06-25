@@ -1,0 +1,43 @@
+[
+    {
+        "type": "Voting",
+        "instructions": {
+            "phases": [{
+                "owner": "Wait for other players to join",
+                "developer": "Wait for other players to join"
+            }, {
+                "owner": "All players joined, the game will start shortly",
+                "developer": "All players joined, the game will start shortly"
+            }, {
+                "owner": "Deliberation phase",
+                "developer": "Deliberation phase"
+            }, {
+                "owner": "",
+                "developer": ""
+            }, {
+                "owner": "",
+                "developer": ""
+            }, {
+                "owner": "",
+                "developer": ""
+            }, {
+                "owner": "",
+                "developer": ""
+            }]
+        }
+    }, {
+        "type": "Harberger",
+        "instructions": {
+            "phases": [
+
+            ]
+        }
+    }, {
+        "type": "Futarchy",
+        "instructions": {
+            "phases": [
+
+            ]
+        }
+    }
+]

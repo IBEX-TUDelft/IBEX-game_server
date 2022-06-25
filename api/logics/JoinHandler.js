@@ -12,9 +12,6 @@ export default class JoinHandler extends MessageHandler {
 
         console.log(`Assigned players: ${game.assignedPlayers}, Total players: ${game.parameters.total_players}`);
 
-        console.log('Players in join handler');
-        console.log(game.players.map(w => w.number));
-
         let player = game.players.find(p => p.recovery === message.recovery);
 
         let responseMessage;
@@ -27,6 +24,7 @@ export default class JoinHandler extends MessageHandler {
 
             player = game.players[game.assignedPlayers];
             player.recovery = message.recovery;
+            player.ready = false;
 
             game.assignedPlayers++;
 
@@ -35,18 +33,30 @@ export default class JoinHandler extends MessageHandler {
             responseMessage = `Player ${player.number} rejoined the game`;
         }
 
-        console.log('Players in before wss join game');
-        console.log(game.players.map(w => w.number));
-
         wss.joinGame(ws, game.id, player.role, player.number);
-
-        console.log(player);
 
         WS.sendEvent(ws, "assign-name", {
             "name" : player.name,
             "number": player.number,
             "ruleset": game.type
         });
+
+        console.log(`ROUND NUMBER ${phase.number}`);
+
+        if (phase.number === 0) {
+            const err = wss.sendEvent (
+                game.id,
+                player.number,
+                "phase-instructions",
+                {
+                    "instructions": phase.instructions[1]
+                },
+            );
+
+            if (err) {
+                console.error(err);
+            }
+        }
 
         wss.broadcastInfo(game.id, responseMessage, null);
     }

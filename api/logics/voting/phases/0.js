@@ -3,15 +3,40 @@ import JoinablePhase from '../../JoinablePhase.js';
 class Phase0 extends JoinablePhase {
 
     constructor (game, wss) {
-        super (game, wss, []);
+        super (game, wss, [{
+            "type": "player-is-ready",
+            "role": null,
+            "action": function(ws, message, player, caller) {
+                player.ready = true;
+
+                let err = wss.sendEvent(
+                    game.id,
+                    player.number,
+                    "ready-received",
+                    {}
+                );
+
+                if (err) {
+                    console.error(err);
+                }
+            }
+        }]);
     }
 
     testComplete () {
-        return this.game.assignedPlayers === this.game.parameters.total_players;
+        return this.game.assignedPlayers === this.game.parameters.total_players && (this.game.players.find(p => p.ready != true) == null);
     }
 
     getData () {
         return this.game.players;
+    }
+
+    async onExit () {
+        await super.onExit();
+
+        this.game.players.forEach(player => {
+            player.ready = false;
+        });
     }
 }
 

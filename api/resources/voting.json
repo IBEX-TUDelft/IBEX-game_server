@@ -1,0 +1,26 @@
+{
+    "instructions": {
+        "phases": [{
+            "owner": "Wait for other players to join",
+            "developer": "Wait for other players to join"
+        }, {
+            "owner": "All players joined, the game will start shortly",
+            "developer": "All players joined, the game will start shortly"
+        }, {
+            "owner": "Deliberation phase",
+            "developer": "Deliberation phase"
+        }, {
+            "owner": "Submit a compensation request, remember to click on the submit button. Wait for all to submit.",
+            "developer": "Wait for all owners to submit their requests"
+        }, {
+            "owner": "Wait for the developer to submit a compensation offer",
+            "developer": "Submit your compensation offers (click the submit button)"
+        }, {
+            "owner": "Submit your final decision, remember to click on the submit button. Wait for all to submit.",
+            "developer": "Wait for all owners to submit their decisions on your offer"
+        }, {
+            "owner": "The results of this round are available",
+            "developer": "The results of this round are available"
+        }]
+    }
+}

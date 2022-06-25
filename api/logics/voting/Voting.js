@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 import Logic from "../Logic.js";
 
 import Phase0 from './phases/0.js';
@@ -11,6 +13,11 @@ import Phase6 from './phases/6.js';
 export default class Voting extends Logic {
     constructor(data) {
         super(data, [Phase0, Phase1, Phase2, Phase3, Phase4, Phase5, Phase6], 'Voting');
+
+
+        const rawDictionary = fs.readFileSync('./resources/voting.json');
+
+        data.dictionary = JSON.parse(rawDictionary);
     }
 
     getRecoveryData(number) {
@@ -47,7 +54,9 @@ export default class Voting extends Logic {
             messages = self.results.find(r => r.round === self.data.currentRound.number).results[2].chatLog;
         }
 
-        game.messages = messages.filter(m => m.sender === number || m.to.includes(number));
+        if (messages != null) {
+            game.messages = messages.filter(m => m.sender === number || m.to.includes(number));
+        }
 
         let compensationRequests = null;
 
@@ -77,6 +86,7 @@ export default class Voting extends Logic {
             player.role = playerData.role;
             player.property = playerData.property;
             player.recovery = playerData.recovery;
+            player.ready = playerData.ready;
         }
 
         if (playerData.submittedCompensationOffers === true) {

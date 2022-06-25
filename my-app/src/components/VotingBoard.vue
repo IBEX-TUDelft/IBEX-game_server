@@ -6,7 +6,7 @@
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
                     <b-navbar-brand>
-                        {{ player.tag }}: {{ player.instructions }}
+                        {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
                     </b-navbar-brand>
                 </b-navbar-nav>
                 <b-navbar-nav class="ml-auto">
@@ -19,7 +19,12 @@
 
         <div class="b-container mt-1 mx-5">
 
-            <div class="row">
+            <div class="row d-flex align-items-center justify-content-center" style="height: 500px;" v-if="game.phase === 0">
+                <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
+                <div v-else>Waiting all players to join ...</div>
+            </div>
+
+            <div class="row" v-if="game.phase >= 1">
                 <div class="col-8">
                     <div v-if="game.phase >= 2" class="row mb-1">
                         <div class="col-12 text-center">
@@ -167,7 +172,7 @@
                         </table>
                     </div>
 
-                    <div class="row mb-1"><div class="col-12 text-center"><b>Chat</b></div></div>
+                    <div v-if="game.phase > 1" class="row mb-1"><div class="col-12 text-center"><b>Chat</b></div></div>
 
                     <div v-if="game.phase === 2" class="row mb-1">
                         <div class="col-6">
@@ -204,7 +209,7 @@
 
                     <div class="row">
                         <div v-for="box in game.messageBoxes" :key="box.participants" class="col-12 mb-1 px-0">
-                            <b-card 
+                            <b-card
                                 :header="box.participants"
                                 header-tag="header"
                                 @click="forms.messageRecipients = box.people.filter(i => i != player.number)"
@@ -254,13 +259,14 @@ export default {
                 messageBoxes: []
             },
             player: {
-                instructions: "Wait for other players to join",
+                instructions: "",
                 name: "",
-                tag: "",
+                tag: "New Player",
                 number: 0,
                 recoveryString: null,
                 role: null,
                 property: null,
+                ready: false,
                 compensationRequests: [],
                 compensationRequestReceived: false,
                 compensationOfferReceived: false,
@@ -288,6 +294,9 @@ export default {
                     console.log(ev.data);
 
                     switch(ev.eventType) {
+                        case 'ready-received':
+                            self.player.ready = true;
+                            break;
                         case "phase-transition":
                             self.game.round = ev.data.round;
                             self.game.phase = ev.data.phase;
@@ -570,23 +579,25 @@ export default {
             self.game = gameData.game;
             self.game.messageBoxes = [];
 
-            self.game.messages.forEach(message => {
-                self.addMessage(message);
-                /*const tags = [];
+            if (self.game.messages != null) {
+                self.game.messages.forEach(message => {
+                    self.addMessage(message);
+                    /*const tags = [];
 
-                self.game.players.forEach(p => {
-                    if (self.player.number === p.number) {
-                        tags.push('You');
-                        return;
-                    }
+                    self.game.players.forEach(p => {
+                        if (self.player.number === p.number) {
+                            tags.push('You');
+                            return;
+                        }
 
-                    if (message.to.includes(p.number) || message.sender === p.number) {
-                        tags.push(p.tag);
-                    }
+                        if (message.to.includes(p.number) || message.sender === p.number) {
+                            tags.push(p.tag);
+                        }
+                    });
+
+                    message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];*/
                 });
-
-                message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];*/
-            });
+            }
 
             if (gameData.game.compensationRequests != null) {
                 gameData.game.compensationRequests.forEach(cr => {
@@ -619,6 +630,14 @@ export default {
             }
 
             return num.toLocaleString('en-US');
+        },
+        signalReady() {
+            const self = this;
+
+            this.sendMessage({
+                "gameId": self.game.id,
+                "type": "player-is-ready",
+            });
         },
         async submitCompensationRequest() {
             const self = this;

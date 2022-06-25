@@ -57,7 +57,9 @@ class Phase3 extends JoinablePhase {
         return this.game.players.find(p => p.role === 3 && p.compensationRequests == null) == null;
     }
 
-    onExit() {
+    async onExit() {
+        await super.onExit();
+
         const err = this.wss.broadcastEvent(
             this.game.id,
             "reset-timer",

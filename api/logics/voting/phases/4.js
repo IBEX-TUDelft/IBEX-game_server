@@ -78,7 +78,9 @@ class Phase4 extends JoinablePhase {
         return this.game.players.find(p => p.role === 2 && p.submittedCompensationOffers === true) != null;
     }
 
-    onExit() {
+    async onExit() {
+        await super.onExit();
+        
         const self = this;
 
         this.game.players.filter(p => p.role === 3).forEach(p => {
