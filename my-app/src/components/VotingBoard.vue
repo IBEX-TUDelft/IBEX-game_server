@@ -313,6 +313,7 @@ export default {
                                 self.player.compensationOfferReceived = false;
                                 self.player.compensationDecisions = [];
                                 self.player.compensationDecisionReceived = false;
+                                self.player.ready = false;
 
                                 self.forms.messageRecipients = [];
                                 self.forms.outgoingChatMessage = '';
@@ -582,20 +583,6 @@ export default {
             if (self.game.messages != null) {
                 self.game.messages.forEach(message => {
                     self.addMessage(message);
-                    /*const tags = [];
-
-                    self.game.players.forEach(p => {
-                        if (self.player.number === p.number) {
-                            tags.push('You');
-                            return;
-                        }
-
-                        if (message.to.includes(p.number) || message.sender === p.number) {
-                            tags.push(p.tag);
-                        }
-                    });
-
-                    message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];*/
                 });
             }
 
@@ -781,7 +768,6 @@ export default {
     },
     async mounted () {
         this.game.id = parseInt(this.$route.params.id);
-
         this.player.recovery = this.$route.params.recovery;
         window.vue = this;
 

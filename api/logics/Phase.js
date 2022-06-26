@@ -23,17 +23,7 @@ export default class Phase {
             this.handlers.push(...handlers);
         }
 
-        if (game.dictionary != null) {
-            const phaseNumber = game.currentRound.phase;
-
-            const phaseInstructions = game.dictionary.instructions.phases[phaseNumber];
-
-            this.instructions.push(
-                '-',
-                phaseInstructions.developer,
-                phaseInstructions.owner
-            );
-        } else if (instructions != null && instructions.length > 0) {
+        if (instructions != null && instructions.length > 0) {
             if (instructions.length === 1) {
                 this.instructions.push(instructions[0], instructions[0], instructions[0]); //Same for all roles
             } else if (instructions.length === 3) {
@@ -49,8 +39,17 @@ export default class Phase {
     async onEnter() {
         const self = this;
 
-        console.log(`SENDING INSTRUCTIONS FOR PHASE ${this.game.currentRound.phase}`);
-        console.log(this.instructions);
+        if (this.game.dictionary != null) {
+            const phaseNumber = this.game.currentRound.phase;
+
+            const phaseInstructions = this.game.dictionary.instructions.phases[phaseNumber];
+
+            this.instructions.push(
+                phaseInstructions.speculator == null ? '-' : phaseInstructions.speculator,
+                phaseInstructions.developer,
+                phaseInstructions.owner
+            );
+        }
 
         if (this.instructions.length > 0) {
             for (let i = 0; i < 3; i++) {

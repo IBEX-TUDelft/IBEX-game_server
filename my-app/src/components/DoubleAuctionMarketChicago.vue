@@ -65,11 +65,11 @@
                     </tr>
                     <tr>
                         <td>Publ. Signal</td><td>{{ formatUs(game.publicSignal[condition]) }}</td>
-                        <td>Priv. Signal</td><td>{{ formatUs(player.signals[condition]) }}</td>
+                        <td>Priv. Signal</td><td>{{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</td>
                     </tr>
                     <tr>
-                        <td>Balance</td><td>{{ formatUs(player.wallet[condition].balance) }}</td>
-                        <td>Shares</td><td>{{ player.wallet[condition].shares }}</td>
+                        <td>Balance</td><td>{{ player.wallet == null ? 'n/a' : formatUs(player.wallet[condition].balance) }}</td>
+                        <td>Shares</td><td>{{ player.wallet == null ? 'n/a' : player.wallet[condition].shares }}</td>
                     </tr>
                 </table>
             </div>
@@ -209,7 +209,7 @@ export default {
                 sum += this.contracts[i].price;
             }
 
-            return this.formatNumber(sum / this.contracts.length);
+            return this.formatUs(sum / this.contracts.length);
         },
         formatUs(num) {
             if (num == null || typeof num != 'number') {

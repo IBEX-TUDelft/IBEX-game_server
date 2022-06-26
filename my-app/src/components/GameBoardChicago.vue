@@ -1,22 +1,31 @@
 <template>
     <div>
         <vue-confirm-dialog></vue-confirm-dialog>
+
+        <error-list :warningList="[]"></error-list>
+
         <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
                     <b-navbar-brand>
-                        {{ player.title }}: {{ player.instructions }}
+                        {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
                     </b-navbar-brand>
                 </b-navbar-nav>
                 <b-navbar-nav class="ml-auto">
                     <b-nav-item active v-if="timer.on === true">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
-                    <b-nav-item active >Round: {{ game.round }}</b-nav-item>
-                    <b-nav-item active >Phase: {{ game.phase }}</b-nav-item>
+                    <b-nav-item active v-if="!game.over">Round: {{ game.round }}</b-nav-item>
+                    <b-nav-item active v-if="!game.over">Phase: {{ game.phase }}</b-nav-item>
+                    <b-nav-item active v-if="game.over">Game Over</b-nav-item>
                 </b-navbar-nav>
             </b-navbar>
         </div>
 
-        <div class="mt-1 mx-5 mp-1" v-if="![0,6].includes(game.phase)">
+        <div class="row d-flex align-items-center justify-content-center" style="height: 500px;" v-if="game.phase === 0">
+            <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
+            <div v-else>Waiting all players to join ...</div>
+        </div>
+
+        <div class="mt-1 mx-5 mp-1" v-if="![0,6,9].includes(game.phase)">
             <div class="row">
                 <div class="col-6">
 
@@ -81,10 +90,32 @@
                                 <tr v-for="condition in game.conditions" :key="condition.id">
                                     <td>{{ condition.name }}</td>
                                     <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                    <td><input v-if="game.phase == 2 || game.winningCondition == condition.id" type="number" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" /></td>
-                                    <td>{{ formatUs(player.declaration[condition.id] * game.taxRate / 100) }}</td>
-                                    <td>{{ formatUs(player.declaration[condition.id] * ( 100 - game.taxRate) / 100) }}</td>
-                                    <td>{{ getMySniperProbability(condition.id) }}%</td>
+                                    <td>
+                                        <input v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" type="number" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
+                                        <div v-else>
+                                            <!-- {{ game.winningCondition }} {{ condition.id }} {{ player.declaration}} -->
+                                            <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
+                                                <div v-if="player.declaration != null && player.declaration[condition.id] != null">
+                                                    {{ player.declaration[condition.id]}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
+                                            {{ player.declaration != null ? formatUs(player.declaration[condition.id] * game.taxRate / 100) : '' }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
+                                            {{ player.declaration != null ? formatUs(player.declaration[condition.id] * ( 100 - game.taxRate) / 100): '' }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div v-if="game.winningCondition == null || game.winningCondition === condition.id">
+                                            {{ getMySniperProbability(condition.id) }}%
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -163,6 +194,7 @@
         />
         <DoubleAuctionMarketFutarchy ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Futarchy'"/>
 
+        <Summaries :summaries="player.summaries"/>
     </div>
 </template>
 <script>
@@ -170,6 +202,10 @@
     import DoubleAuctionMarketFutarchy from './DoubleAuctionMarketFutarchy.vue';
     import HarbergerMatrix from './HarbergerMatrix.vue';
     import FutarchyMatrix from './FutarchyMatrix.vue';
+    import ErrorList from './modals/ErrorList.vue';
+    import Summaries from './Summaries.vue';
+
+    import { getGameStatus } from '../services/GameService'
 
     const roleMap = {
         1: "Sniper",
@@ -201,12 +237,21 @@
                 lastThreeMessages: [],
                 messages: [],
                 checkedPlots: [[],[],[]],
+                modals: {
+                    errorList: {
+                        show: false,
+                        description: 'There is a problem',
+                        warnings: [],
+                        callback: null
+                    }
+                },
                 timer: {
                     on: false,
                     minutes: "00",
                     seconds: "00"
                 },
                 game: {
+                    over: false,
                     winningCondition: null,
                     round: 1,
                     phase: 0,
@@ -220,19 +265,20 @@
                     conditions: []
                 },
                 player: {
-                    title: "Starting ...",
-                    instructions: "Wait for other players to join",
-                    name: "",
-                    number: 0,
-                    recoveryString: null,
+                    instructions: "",
+                    tag: "",
+                    number: null,
+                    recovery: null,
                     role: null,
-                    balance: 0,
-                    shares: 0,
+                    boundaries: null,
+                    wallet: null,
                     property: null,
                     declaration: [null, null, null],
                     profitEvents: [],
                     hasToDeclare: false,
                     hasToSpeculate: false,
+                    ready: false,
+                    summaries: []
                 },
             };
         },
@@ -240,12 +286,11 @@
             DoubleAuctionMarketChicago,
             DoubleAuctionMarketFutarchy,
             HarbergerMatrix,
-            FutarchyMatrix
+            FutarchyMatrix,
+            ErrorList,
+            Summaries
         },
         name: 'GameBoard',
-        created() {
-            window.addEventListener("load", this.openWebSocket);
-        },
         methods: {
             getGame() {
                 return this.game;
@@ -253,6 +298,14 @@
             getPlayer() {
                 return this.player;
             },
+            signalReady() {
+                const self = this;
+
+                this.sendMessage({
+                    "gameId": self.game.id,
+                    "type": "player-is-ready",
+                });
+            },            
             updateTimer() {
                 const self = this;
 
@@ -299,7 +352,7 @@
 
                 const snipingProbability = (high - this.player.declaration[condition]) * 100 / (high - low);
 
-                return Math.max(Math.min(snipingProbability, 100), 0);
+                return Math.max(Math.min(snipingProbability, 100), 0).toFixed(2);
             },
             getSniperProbability(playerIndex, condition){
                 console.log(`Searching for player of declaration ${playerIndex} under condition ${condition}`);
@@ -353,7 +406,7 @@
 
                 const snipingProbability = (high - value) * 100 / (high - low);
 
-                return Math.max(Math.min(snipingProbability, 100), 0);
+                return Math.max(Math.min(snipingProbability, 100), 0).toFixed(2);
             },
             getDeclarationPlayer(i) {
                 const declaration = this.game.declarations[i];
@@ -461,28 +514,25 @@
                     }
                 }
 
-                let message = 'Do you confirm your declaration?' + myWarnings.join(' - ');
+                if (myWarnings.length > 0) {
+                    this.modals.errorList.description = 'There are some caveats with your declaration. Do you want to submit it anyway?'
+                    + 'It will not be possible to change it at a later time.';
+                    this.modals.errorList.warnings = myWarnings;
+                } else {
+                    this.modals.errorList.description = 'Do you want to proceed and submit your declaration?'
+                    + 'It will not be possible to change it at a later time.';
+                    this.modals.errorList.warnings = [];
+                }
 
-                this.$confirm({
-                    message: message,
-                    button: {
-                        no: 'No',
-                        yes: 'Yes'
-                    },
-                    /**
-                     * Callback Function
-                     * @param {Boolean} confirm
-                     */
-                    callback: confirm => {
-                        if (confirm) {
-                            self.sendMessage({
-                                "gameId": self.game.id,
-                                "type": "declare",
-                                "declaration": myDeclarations
-                            });
-                        }
-                    }
-                });
+                this.modals.errorList.callback = () => {
+                    self.sendMessage({
+                        "gameId": self.game.id,
+                        "type": "declare",
+                        "declaration": myDeclarations
+                    });
+                }
+
+                this.modals.errorList.show = true;
             },
             formatNumber(num) {
                 return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
@@ -521,6 +571,113 @@
                     self.lastThreeMessages = [self.messages[self.messages.length - 1], self.lastThreeMessages[0], self.lastThreeMessages[1]];
                 }
             },
+            resetToPhaseZero() {
+                this.player.declaration = [null, null, null];
+                this.player.profitEvents = [];
+                this.player.hasToDeclare = false;
+                this.player.hasToSpeculate = false;
+                this.player.ready = false;
+                this.player.signals = [];
+
+                this.game.winningCondition = null,
+                this.phase = 0;
+                this.game.declaration = [null, null, null],
+                this.publicSignal = "TBD";
+            },
+            recover(gameData) {
+                const self = this;
+
+                console.log(gameData);
+                //TODO
+
+                this.resetToPhaseZero();
+                
+                for (const prop in gameData.player) {
+                    self.player[prop] = gameData.player[prop];
+                }
+
+                if (self.player.doneSpeculating != null) {
+                    self.player.hasToSpeculate = !self.player.doneSpeculating;
+                }
+
+                if (self.player.property != null && self.player.property.d != null) {
+                    self.player.declaration = self.player.property.d;
+                }
+
+                if (self.player.S != null) {
+                    self.player.signals = self.player.S;
+                }
+
+                if (gameData.game.over != null) {
+                    self.game.over = gameData.game.over;
+                }
+
+                for (const prop in gameData.game) {
+                    self.game[prop] = gameData.game[prop];
+                }
+
+                if (self.game.boundaries != null) {
+                    if (self.player.role == 2) {
+                        self.player.boundaries = self.game.boundaries.developer;
+                    } else if (self.player.role == 3) {
+                        self.player.boundaries = self.game.boundaries.owner;
+                    }
+                }
+
+                if (self.game.orders != null && self.game.orders.length > 0) {
+                    if (self.game.ruleset === 'Harberger') {
+                        if (self.game.orders[self.game.winningCondition] != null) {
+                            self.game.orders[self.game.winningCondition].forEach(order => {
+                                console.log(order);
+                                self.$refs.doubleAuctionMarket.orderEvent(order, "add");
+                            });
+                        }
+                    } else if (self.game.ruleset === 'Futarchy') {
+                        self.game.orders.forEach((orderList) => {
+                            if (orderList == null || orderList.length === 0) {
+                                return;
+                            }
+
+                            orderList.forEach((order) => {
+                                const ref = `doubleAuctionMarket${order.condition}`;
+
+                                console.log(`Ref: ${ref}`);
+                                self.$refs.doubleAuctionMarket.$refs[ref][0].orderEvent(order, "add");
+                                self.$refs.doubleAuctionMarket.activityDetected(order.condition);
+                            })
+                        });
+                    }
+                }
+
+                if (self.game.movementList != null && self.game.movementList.length > 0) {
+                    if (self.game.ruleset === 'Harberger') {
+                        if (self.game.movementList[self.game.winningCondition] != null) {
+                            self.game.movementList[self.game.winningCondition].forEach((movement) => {
+                                self.$refs.doubleAuctionMarket.orderEvent(movement, "contract");
+                            });
+                        }
+                    } else if (self.game.ruleset === 'Futarchy') {
+                        self.game.movementList.forEach(conditionMovements => {
+                            if (conditionMovements == null || conditionMovements.length === 0) {
+                                return;
+                            }
+
+                            conditionMovements.forEach((movement) => {
+                                self.$refs.doubleAuctionMarket.contractCompleted(movement);
+                                self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${movement.condition}`][0].orderEvent(movement, "contract");
+                            });
+                        });
+                    }
+                }
+
+                if (gameData.timer != null) {
+                    self.timer.end = gameData.timer > Date.now() ? gameData.timer : Date.now();
+
+                    self.updateTimer();
+
+                    self.timer.on = true;
+                }
+            },
             openWebSocket() {
                 const self = this;
 
@@ -534,14 +691,14 @@
                         console.log(`New event: ${ev.eventType}`);
                         console.log(ev.data);
 
-                        switch(ev.eventType) {    
+                        switch(ev.eventType) {
+                            case 'ready-received':
+                                self.player.ready = true;
+                                break;
                             case "assign-name":
-                                self.player.name = ev.data.name;
                                 self.player.title = `Player ${ev.data.number}`;
                                 self.player.number = ev.data.number;
-                                self.player.recoveryString = ev.data.recoveryString;
                                 self.game.ruleset = ev.data.ruleset;
-                                console.log('Recovery string: ' + self.player.recoveryString);
                                 break;
                             case 'phase-instructions':
                                 self.player.instructions = ev.data.instructions;
@@ -550,9 +707,7 @@
                                 self.game.boundaries = ev.data.boundaries;
                                 self.game.conditions = ev.data.conditions;
                                 self.game.taxRate = ev.data.taxRate;
-                                //self.player.boundaries //TODO:  ?????
                                 self.player.role = ev.data.role;
-                                //self.player.title += ` (${roleMap[ev.data.role]})`;
                                 self.player.balance = ev.data.balance;
                                 self.player.shares = ev.data.shares;
                                 self.player.wallet = ev.data.wallet;
@@ -572,14 +727,22 @@
                                 self.game.round = ev.data.round;
                                 self.game.phase = ev.data.phase;
 
-                                if ((self.game.phase === 2 || self.game.phase === 7) && self.player.role > 1) {
-                                    self.player.hasToDeclare = true;
+                                if (self.game.phase === 2 || self.game.phase === 7) {
+                                    self.game.declarations = [null, null, null];
+
+                                    if (self.player.role > 1) {
+                                        self.player.hasToDeclare = true;
+                                        self.player.declaration = [null, null, null];
+                                    }
                                 }
 
                                 if ((self.game.phase === 3 || self.game.phase === 8) && self.player.role === 1) {
                                     self.player.hasToSpeculate = true;
                                 }
 
+                                if (ev.data.phase === 0) { //New round
+                                    self.resetToPhaseZero();
+                                }
                                 break;
                             case "set-timer":
                                 self.timer.end = ev.data.end;
@@ -599,7 +762,6 @@
                                 self.game.players = ev.data.players;
 
                                 self.player.tag = ev.data.players[self.player.number - 1].tag;
-                                self.player.title = self.player.tag;
 
                                 break;
                             case 'declaration-received':
@@ -617,22 +779,6 @@
                                 console.log(self.game.declarations);
 
                                 break;
-                            case "lot-sold-to-speculator": {
-                                const declaration = self.game.declarations.find(d => d.id === ev.data.id);
-
-                                if (declaration != null) {
-                                
-                                    declaration.available[ev.data.condition] = false;
-                                    console.log(`Property ${declaration.name} is not available any more under condition ${conditionMap[ev.data.condition]}`);
-                                    self.$forceUpdate();
-                                } else {
-                                    console.error(`Declaration ${ev.data.id} not found.`);
-                                }
-
-                                self.updateSpeculationTable ++;
-
-                                break;
-                            }
                             case "profit": {
                                 if (self.player.role === 1) { //Speculator
                                     self.player.profitEvents.push({
@@ -744,7 +890,7 @@
                                 }
                                 break;
                             case 'round-end':
-                                self.game.phase = "-";
+                                self.resetToPhaseZero();
                                 break;
                             case 'winning-condition':
                                 self.game.winningCondition = ev.data.winningCondition;
@@ -757,6 +903,12 @@
                                     },
                                     callback: () => {}
                                 });
+                                break;
+                            case 'round-summary':
+                                self.player.summaries.push(ev.data);
+                                break;
+                            case 'game-over':
+                                self.game.over = true;
                                 break;
                             default:
                                 console.error(`Type ${ev.eventType} was not understood`);
@@ -787,10 +939,38 @@
             }
         },
         mounted () {
+            const self = this;
+
             this.game.id = parseInt(this.$route.params.id);
             this.player.recovery = this.$route.params.recovery;
-
             window.vue = this;
+
+            console.log(`${process.env.VUE_APP_API}`);
+
+            getGameStatus(this.$route.params.id, this.$route.params.recovery).then(async (response) => {
+                console.log('Status: ');
+                console.log(response);
+
+                if (response.canJoin != true) {
+                    console.log('The game is full');
+                    return;
+                }
+
+                if (response.gameData != null) {
+                    self.game.phase = response.gameData.game.phase;
+                    self.game.ruleset = response.gameData.game.ruleset;
+
+                    await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load
+
+                    self.recover(response.gameData);
+                }
+
+                try {
+                    self.openWebSocket();
+                } catch (err) {
+                    console.log(err);
+                }
+            });
         }
     }
 </script>

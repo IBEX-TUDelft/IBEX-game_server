@@ -1,6 +1,6 @@
-import JoinablePhase from '../../JoinablePhase.js';
+import JoinablePhase from "../JoinablePhase.js";
 
-class Phase0 extends JoinablePhase {
+class WaitToStartPhase extends JoinablePhase {
 
     constructor (game, wss) {
         super (game, wss, [{
@@ -42,6 +42,6 @@ class Phase0 extends JoinablePhase {
 
 export default {
     create(game, wss) {
-        return new Phase0(game, wss);
+        return new WaitToStartPhase(game, wss);
     }
 }

@@ -66,8 +66,6 @@ class Phase1 extends JoinablePhase {
 
             const err = self.wss.sendEvent(self.game.id, player.number, "assign-role", {
                 "role": player.role,
-                "balance": player.balance,
-                "shares": player.shares,
                 "wallet": player.wallet,
                 "property": player.property,
                 "boundaries": self.game.boundaries,

@@ -2,7 +2,7 @@ import gameRepository from '../repositories/gameRepository.js';
 import gameParameterRepository from '../repositories/gameParameterRepository.js';
 import gamePlayerRepository from '../repositories/gamePlayerRepository.js';
 import WS from '../helpers/websocket.js';
-import Harberger from '../logics/harberger/Harberger2.js';
+import Harberger from '../logics/harberger/Harberger.js';
 import Futarchy from '../logics/futarchy/Futarchy.js';
 import Voting from '../logics/voting/Voting.js';
 

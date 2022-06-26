@@ -168,7 +168,7 @@ export default {
 
                 ws.on('close', function (code, reason) {
                     console.log(`Player ${ws.player.number} disconnected with code ${code}: ${reason}`)
-                    game.players.splice(game.players.indexOf(ws), 1);
+                    //game.players.splice(game.players.indexOf(ws), 1);
                 });
             },
             watchGame: function (ws, id) {

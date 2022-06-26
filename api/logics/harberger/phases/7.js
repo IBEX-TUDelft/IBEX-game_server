@@ -59,6 +59,26 @@ class Phase7 extends JoinablePhase {
         });
     }
 
+    async onExit() {
+        await super.onExit();
+
+        const self = this;
+
+        self.game.players.forEach(player => {
+            const summary = player.summaries[self.game.currentRound.number - 1];
+
+            if (player.property == null) {
+                summary.secondDeclaration = 0;
+                summary.secondTaxes = 0;
+            } else {
+                const declaration = self.results.declarations.find(d => d.player === player.number);
+
+                summary.secondDeclaration = declaration.declaration[self.game.winningCondition];
+                summary.secondTaxes = declaration.taxes[self.game.winningCondition];
+            }
+        });
+    }
+
     testComplete () {
         return this.game.properties.find(p => p.d == null) == null; //true when all properties have a declaration
     }

@@ -200,35 +200,7 @@ class Phase6 extends JoinablePhase {
 
         console.log(`Allowing ${self.game.parameters.minutes_for_trading} minutes for trading`);
 
-        setTimeout(() => {
-            self.complete = true;
-        }, 60 * 1000 * self.game.parameters.minutes_for_trading);
-
-        const err = self.wss.broadcastEvent(
-            self.game.id,
-            "set-timer",
-            {
-                "end": Date.now() + 60 * 1000 * self.game.parameters.minutes_for_trading
-            }
-        );
-
-        if (err != null) {
-            console.log(err);
-        }
-    }
-
-    onExit () {
-        const self = this;
-
-        let err = this.wss.broadcastEvent(
-            self.game.id,
-            "reset-timer",
-            {}
-        );
-
-        if (err != null) {
-            console.log(err);
-        }
+        this.setTimer(60 * 1000 * self.game.parameters.minutes_for_trading, 60 * 1000 * self.game.parameters.minutes_for_trading);
     }
 
     testComplete () {

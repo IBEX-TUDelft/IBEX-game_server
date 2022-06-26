@@ -140,6 +140,15 @@ class Phase3 extends JoinablePhase {
                     "available": [true, true, true]
                 });
             }
+
+            const summary = {
+                "round": self.game.currentRound.number,
+                "value": property == null ? 0 : property.v[winningCondition],
+                "firstDeclaration": property == null ? 0 : property.d[winningCondition],
+                "firstTaxes": property == null ? 0 : property.d[winningCondition] * self.game.parameters.tax_rate_initial / 100,
+            }
+
+            p.summaries.push(summary);
         });
 
         let err = self.wss.broadcastEvent(
@@ -155,31 +164,8 @@ class Phase3 extends JoinablePhase {
             console.log(err);
         }
 
-        err = self.wss.broadcastEvent(
-            self.game.id,
-            "set-timer",
-            {
-                "end": self.endTime
-            },
-            1
-        );
 
-        if (err != null) {
-            console.log(err);
-        }
-    }
-
-    onExit () {
-        const err = this.wss.broadcastEvent(
-            this.game.id,
-            "reset-timer",
-            {},
-            1
-        );
-
-        if (err != null) {
-            console.log(err);
-        }
+        this.setTimer(self.game.parameters.minutes_for_sniping * 60 * 1000, self.game.parameters.minutes_for_sniping * 60 * 1000);
     }
 
     getData() {

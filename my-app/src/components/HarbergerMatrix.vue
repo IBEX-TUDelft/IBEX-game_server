@@ -9,25 +9,23 @@
             v-model="checkedPlots[(condition != null ? condition.id : 'tbd')]"
             :name="'checkedPlots' + (condition != null ? condition.id : 'tbd')"
         >
-
             <div class="row mb-1" v-for="offset in [0,3]" :key="offset">
                 <div class="col-4" v-for="index in [0 + offset, 1 + offset, 2 + offset]" :key="index">
                     <b-card 
                         :header="getDeclarationPlayer(index)"
                         header-tag="header"
                         class="mb-1"
-                        :bg-variant="(player.role != 1 && index + 1 === player.number) ? 'danger' : 'light'"
+                        :bg-variant="(player.role != 1 && index + 1 === player.number) ? 'primary' : 'light'"
                         :text-variant="(player.role != 1 && index + 1 === player.number) ? 'white' : 'black'"
                     >
                         <div class="row">
-                            <div v-if="condition != null" class="min-vh-50 d-flex align-items-center" style="min-height: 50px;">
-                                <div class="container text-center">
-                                    <b-form-checkbox v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                        && game.declarations[index] != null && game.declarations[index].available[condition.id]" :value="game.declarations[index].id" >
-                                    {{ game.declarations[index] == null || condition == null ? '-' : formatUs(game.declarations[index].d[condition.id]) }} ({{ getSniperProbability(index, condition.id)}}%)
-                                    </b-form-checkbox>
-                                </div>
+                            <div class="col-12 text-center" v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
+                                    && game.declarations[index] != null">
+                                <b-form-checkbox :value="game.declarations[index].id">
+                                {{ getGameDeclaration(index, condition) }} ({{ getSniperProbability(index, condition.id)}}%)
+                                </b-form-checkbox>
                             </div>
+                            <div v-else class="col-12 text-center">{{ getGameDeclaration(index, condition) }}</div>
                         </div>
                     </b-card>
                 </div>
@@ -47,6 +45,30 @@ export default {
             }
 
             return num.toLocaleString('en-US');
+        },
+        getGameDeclaration(index, condition) {
+            const declarations = this.$props.game.declarations;
+
+            if (index == null) {
+                console.warn('getGameDeclaration: parameter index is null');
+                return '-';
+            }
+
+            if (condition == null) {
+                console.warn('getGameDeclaration: parameter condition is null');
+                return '-';
+            }
+
+            if (
+                declarations == null ||
+                declarations[index] == null ||
+                declarations[index].d == null ||
+                declarations[index].d[condition.id] == null
+            ) {
+                return '-';
+            }
+
+            return this.formatUs(declarations[index].d[condition.id])
         }
     }
 }

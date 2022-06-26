@@ -65,6 +65,7 @@ export default class {
         ]
     ];
 
+    over = false;
     data;
     phases;
     wss = null;
@@ -94,20 +95,7 @@ export default class {
         const self = this;
 
         self.data.players.forEach(player => {
-            if (self.data.type != 'Voting') {
-                player.wallet = [
-                    {
-                        "balance": player.balance,
-                        "shares": player.shares
-                    }, {
-                        "balance": player.balance,
-                        "shares": player.shares
-                    }, {
-                        "balance": player.balance,
-                        "shares": player.shares
-                    }
-                ];
-            }
+            player.summaries = [];
 
             switch (player.role) {
                 case 1:
@@ -343,6 +331,8 @@ export default class {
     }
 
     async beginRound () {
+        this.refreshWallet();
+
         let number = 1;
 
         if (this.data.currentRound != null) {
@@ -369,6 +359,8 @@ export default class {
 
         if (number > this.data.parameters.round_count ) {
             console.log('The game is over');
+            this.wss.broadcastEvent(this.data.id, "game-over", {});
+            this.over = true;
             return;
         }
 
@@ -409,13 +401,34 @@ export default class {
 
         await this.data.currentPhase.onEnter();
 
-        if (this.data.currentRound.number > 1) {
+        /*if (this.data.currentRound.number > 1) {
             await this.nextPhase();
-        }
+        }*/
 
         console.log('Should have entered the new phase');
 
         await GameRepository.saveData(data.id, data);
+    }
+
+    refreshWallet() {
+        const self = this;
+
+        self.data.players.forEach(player => {
+            if (self.data.type != 'Voting') {
+                player.wallet = [
+                    {
+                        "balance": player.balance,
+                        "shares": player.shares
+                    }, {
+                        "balance": player.balance,
+                        "shares": player.shares
+                    }, {
+                        "balance": player.balance,
+                        "shares": player.shares
+                    }
+                ];
+            }
+        });
     }
 
     getRecoveryData(number) {

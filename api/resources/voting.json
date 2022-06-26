@@ -1,26 +1,38 @@
 {
     "instructions": {
         "phases": [{
-            "owner": "Wait for other players to join",
-            "developer": "Wait for other players to join"
+            "number": 0,
+            "owner": "Wait for all players to be ready",
+            "developer": "Wait for all players to be ready"
         }, {
-            "owner": "All players joined, the game will start shortly",
-            "developer": "All players joined, the game will start shortly"
+            "number": 1,
+            "owner": "All the players are ready, the game will start shortly",
+            "developer": "All the players are ready, the game will start shortly"
         }, {
+            "number": 2,
             "owner": "Deliberation phase",
             "developer": "Deliberation phase"
         }, {
+            "number": 3,
             "owner": "Submit a compensation request, remember to click on the submit button. Wait for all to submit.",
             "developer": "Wait for all owners to submit their requests"
         }, {
+            "number": 4,
             "owner": "Wait for the developer to submit a compensation offer",
             "developer": "Submit your compensation offers (click the submit button)"
         }, {
+            "number": 5,
             "owner": "Submit your final decision, remember to click on the submit button. Wait for all to submit.",
             "developer": "Wait for all owners to submit their decisions on your offer"
         }, {
+            "number": 6,
             "owner": "The results of this round are available",
             "developer": "The results of this round are available"
         }]
+    }, "placeHolders": {
+        "make-request-button": "",
+        "make-offer-button": "",
+        "choose-offer-title": "Submit your final vote",
+        "choose-offer-button": "Vote"
     }
 }

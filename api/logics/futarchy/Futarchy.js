@@ -1,4 +1,4 @@
-import Phase0 from './phases/0.js';
+import WaitToStartPhase from '../common/WaitToStartPhase.js';
 import Phase1 from './phases/1.js';
 import Phase2 from './phases/2.js';
 import Phase3 from './phases/3.js';
@@ -12,7 +12,7 @@ import Logic from "../Logic.js";
 
 export default class Futarchy extends Logic {
     constructor(data) {
-        super(data, [Phase0, Phase1, Phase2, Phase3, Phase4,
+        super(data, [WaitToStartPhase, Phase1, Phase2, Phase3, Phase4,
             Phase5, Phase6, Phase7, Phase8, Phase9], 'Futarchy');
     }
 }
