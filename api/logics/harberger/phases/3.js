@@ -3,7 +3,9 @@ import JoinablePhase from '../../JoinablePhase.js';
 
 class Phase3 extends JoinablePhase {
     startTime = 0;
-    results = {};
+    results = {
+        winningCondition: null
+    };
 
     constructor(game, wss) {
         super (game, wss, [{

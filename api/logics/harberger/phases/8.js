@@ -235,11 +235,11 @@ class Phase8 extends JoinablePhase {
                         const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
                         const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
 
-                        ownerSummary.secondRepurchase = (ownerSummary.firstRepurchase == null) ?
-                            -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;
+                        ownerSummary.secondRepurchase = (ownerSummary.secondRepurchase == null) ?
+                            -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.secondRepurchase;
 
-                        speculatorSummary.secondRepurchase = (speculatorSummary.firstRepurchase == null) ?
-                            landProfit.snipeProfit : landProfit.snipeProfit + speculatorSummary.firstRepurchase;
+                        speculatorSummary.secondRepurchase = (speculatorSummary.secondRepurchase == null) ?
+                            landProfit.snipeProfit : landProfit.snipeProfit + speculatorSummary.secondRepurchase;
 
                         self.results.snipeOutcomes.push( {
                             "player": {
@@ -383,10 +383,6 @@ class Phase8 extends JoinablePhase {
                 "profit",
                 taxProfitBill
             );
-
-            if (player.summaries == null) {
-                player.summaries = [];
-            }
 
             self.wss.sendEvent(
                 self.game.id,

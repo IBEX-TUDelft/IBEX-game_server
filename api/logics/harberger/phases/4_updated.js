@@ -214,7 +214,7 @@ class Phase4 extends JoinablePhase {
         this.game.properties.forEach(p => { p.speculators = null; });
     }
 
-    async testComplete () {
+    testComplete () {
         return this.complete;
     }
 }

@@ -57,7 +57,7 @@ class Phase5 extends JoinablePhase {
         };
     }
 
-    async testComplete () {
+    testComplete () {
         return this.complete;
     }
 }

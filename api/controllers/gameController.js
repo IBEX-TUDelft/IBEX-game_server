@@ -145,7 +145,7 @@ export default {
                 "ruleset": game.data.type
             };
 
-            switch(game.data.type) {
+            /*switch(game.data.type) {
                 case 'Harberger':
                     if (game.results[2] != null) {
                         data.firstDeclarations = game.results[2].declarations;
@@ -203,22 +203,22 @@ export default {
                     }
         
                     break;
-                case 'Voting':
+                case 'Voting':*/
                     data.conditions = game.data.conditions;
                     data.players = game.data.players.map(p => {
                         return {
                             "number": p.number,
                             "tag": p.tag,
                             "role": p.role,
-                            "values": p.property.v
+                            "values": p.property != null ? p.property.v : null
                         }
                     });
                     data.results = game.results;
 
-                    break;
+                    /*break;
                 default:
                     break;
-            }
+            }*/
 
             Controller.handleSuccess(res, data, 'Data available');
         });
@@ -230,12 +230,16 @@ export default {
 
             const data = {
                 "ruleset": game.data.type,
-                "winningCondition": game.data.winningCondition
+                "players": game.data.players.map(p => {
+                    return {
+                        "number": p.number,
+                        "tag": p.tag
+                    }
+                }),
+                "conditions": game.conditions,
+                "marketLogs": game.results.filter(r => r.results[6] != null).map(r => r.results[6].log),
+                "winningConditions": game.results.filter(r => r.results[3] != null).map(r => r.results[3].winningCondition),
             };
-
-            if (game.results[6] != null) {
-                data.marketLog = game.results[6].log;
-            }
 
             Controller.handleSuccess(res, data, 'Data available');
         });

@@ -13,7 +13,7 @@ class Phase9 extends JoinablePhase {
 
         console.log('PHASE 9');
 
-        this.setTimer(60 * 1000 * 10, 60 * 1000 * 10);
+        this.setTimer(30 * 1000, 30 * 1000);
     }
 
     getData() {

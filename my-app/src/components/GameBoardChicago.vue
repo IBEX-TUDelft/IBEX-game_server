@@ -194,7 +194,7 @@
         />
         <DoubleAuctionMarketFutarchy ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Futarchy'"/>
 
-        <Summaries :summaries="player.summaries"/>
+        <Summaries v-if="game.phase === 9" :summaries="player.summaries"/>
     </div>
 </template>
 <script>
