@@ -13,8 +13,6 @@ class Phase1 extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
 
-        console.log('PHASE 1');
-
         const self = this;
 
         this.game.conditions = [{
@@ -94,11 +92,7 @@ class Phase1 extends JoinablePhase {
             }
         );
         
-        setTimeout(() => {
-            self.complete = true;
-        }, 5000);
-
-        console.log(this.game.players);
+        this.setTimer(15 * 1000, 15 * 1000); //Timer of 15 seconds requested by Sander
     }
 
     getData() {

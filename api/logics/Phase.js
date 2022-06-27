@@ -67,6 +67,8 @@ export default class Phase {
                 }
             }
         }
+
+        console.log(`Entering phase ${this.game.currentRound.phase}`);
     }
 
     async onExit() {

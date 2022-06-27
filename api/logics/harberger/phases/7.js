@@ -52,8 +52,6 @@ class Phase7 extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
 
-        console.log('PHASE 7');
-
         this.game.properties.forEach(p => {
             p.d = null;
         });

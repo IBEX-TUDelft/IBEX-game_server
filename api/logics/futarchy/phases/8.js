@@ -16,11 +16,6 @@ export default {
 
                 self.endTime = Date.now() + self.game.parameters.minutes_for_sniping * 60 * 1000;
 
-                self.wss.broadcastInfo(self.game.id, 'Click on the properties you are interested in. Be fast or the other speculators will take them first!', 1);
-                self.wss.broadcastInfo(self.game.id, 'Check the table of declared values. If you think some property is undervalued, you can buy it and make profit', 1);
-                self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 2);
-                self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 3);
-
                 const declarationData = [];
 
                 game.players.forEach(p => {

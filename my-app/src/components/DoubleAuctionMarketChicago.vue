@@ -12,7 +12,7 @@
                 </div>
 
                 <div class="row mb-1">
-                    <div class="offset-md-1 col-3 d-flex align-items-end mb-3">
+                    <div class="offset-md-1 col-3 d-flex align-items-end">
                         <button type="button" class="btn btn-primary btn-block" @click='postOrder("bid", true)'>Buy @ -></button>
                     </div>
                     <div class="col-4" style="height: 300px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
@@ -22,7 +22,7 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="col-3 d-flex align-items-end mb-3">
+                    <div class="col-3 d-flex align-items-end">
                         <button type="button" class="btn btn-primary btn-block" @click='removeLastAsk()'>Remove Ask</button>
                     </div>
                 </div>

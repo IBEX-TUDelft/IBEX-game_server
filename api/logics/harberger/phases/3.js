@@ -68,20 +68,13 @@ class Phase3 extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
 
-        console.log('PHASE 3');
-
         const self = this;
-
-        console.log(`Setting the timeout to ${self.game.parameters.minutes_for_sniping} minutes`);
 
         self.endTime = Date.now() + self.game.parameters.minutes_for_sniping * 60 * 1000;
 
-        self.game.players.filter(p => p.role === 1).forEach(p => {p.doneSpeculating = false});
-
-        self.wss.broadcastInfo(self.game.id, 'Click on the properties you are interested in. Be fast or the other speculators will take them first!', 1);
-        self.wss.broadcastInfo(self.game.id, 'Check the table of declared values. If you think some property is undervalued, you can buy it and make profit', 1);
-        self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 2);
-        self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 3);
+        self.game.players.filter(p => p.role === 1).forEach(p => {
+            p.doneSpeculating = false
+        });
 
         // 1. calculate D
 

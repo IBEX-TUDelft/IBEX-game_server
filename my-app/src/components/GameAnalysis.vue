@@ -416,7 +416,7 @@
                     }
 
                     if (self.secondSnipeResults[i] != null) {
-                        xls.push(['First Snipes Results']); 
+                        xls.push(['Second Snipes Results']); 
 
                         xls.push(['Player', 'Target', 'Profit']);
 
@@ -455,7 +455,7 @@
                 return value;
             },
             getPrivateSignal(index, i, condition) {
-                if (this.signals == null || this.signals[index].privateSignals[i] == null) {
+                if (this.signals == null || this.signals[index] == null || this.signals[index].privateSignals[i] == null) {
                     return '-';
                 }
 
@@ -555,7 +555,7 @@
             } else {
                 this.winningCondition = extractProperty(this.rounds, 6, 'winningCondition');
                 this.firstSnipes = extractProperty(this.rounds, 6, 'snipes');
-                this.firstSnipeResults = extractProperty(this.rounds, 6, 'snipes');
+                this.firstSnipeResults = extractProperty(this.rounds, 6, 'snipeOutcomes');
             }
 
             this.indexes = this.rounds.map((e, i) => i);

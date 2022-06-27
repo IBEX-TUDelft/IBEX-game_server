@@ -1,4 +1,4 @@
-import JoinablePhase from '../../JoinablePhase.js';
+import JoinablePhase from "../JoinablePhase.js";
 
 class Phase9 extends JoinablePhase {
 

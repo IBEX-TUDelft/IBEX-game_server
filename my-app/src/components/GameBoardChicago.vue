@@ -1,8 +1,8 @@
 <template>
     <div>
-        <vue-confirm-dialog></vue-confirm-dialog>
-
         <error-list :warningList="[]"></error-list>
+        <confirm></confirm>
+        <acknowledge></acknowledge>
 
         <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
@@ -203,7 +203,10 @@
     import HarbergerMatrix from './HarbergerMatrix.vue';
     import FutarchyMatrix from './FutarchyMatrix.vue';
     import ErrorList from './modals/ErrorList.vue';
+    import Confirm from './modals/Confirm.vue';
+    import Acknowledge from './modals/Acknowledge.vue';
     import Summaries from './Summaries.vue';
+    import dictionary from '../assets/harberger.json';
 
     import { getGameStatus } from '../services/GameService'
 
@@ -234,6 +237,7 @@
                 updateSpeculationTable: 0,
                 firstConnection: true,
                 connection: null,
+                dictionary: {},
                 lastThreeMessages: [],
                 messages: [],
                 checkedPlots: [[],[],[]],
@@ -242,6 +246,16 @@
                         show: false,
                         description: 'There is a problem',
                         warnings: [],
+                        callback: null
+                    }, confirm: {
+                        show: false,
+                        title: 'Confirmation Request',
+                        description: 'There is a problem',
+                        callback: null
+                    }, acknowledge: {
+                        show: false,
+                        title: 'Notice',
+                        description: 'Look at This',
                         callback: null
                     }
                 },
@@ -288,6 +302,8 @@
             HarbergerMatrix,
             FutarchyMatrix,
             ErrorList,
+            Confirm,
+            Acknowledge,
             Summaries
         },
         name: 'GameBoard',
@@ -433,36 +449,27 @@
 
                 return player.tag;
             },
-            doneSpeculating() {
+            async doneSpeculating() {
                 const self = this;
 
                 console.log('Checked plots: ' + this.checkedPlots);
 
-                this.$confirm({
-                    message: 'Do you confirm your choices?',
-                    button: {
-                        no: 'No',
-                        yes: 'Yes'
-                    },
-                    /**
-                     * Callback Function
-                     * @param {Boolean} confirm
-                     */
-                    callback: confirm => {
-                        if (confirm) {
-                            self.sendMessage({
-                                "gameId": self.game.id,
-                                "type": "done-speculating",
-                                "snipe": self.checkedPlots
-                            });
+                const confirm = await this.confirm('speculator-submit-title', 'speculator-submit-description');
 
-                            //Reset the checkboxes
-                            for (let i = 0; i < self.checkedPlots.length; i++) {
-                                self.checkedPlots[i] = [];
-                            }
-                        }
-                    }
+                if (! confirm) {
+                    return;
+                }
+
+                self.sendMessage({
+                    "gameId": self.game.id,
+                    "type": "done-speculating",
+                    "snipe": self.checkedPlots
                 });
+
+                //Reset the checkboxes
+                for (let i = 0; i < self.checkedPlots.length; i++) {
+                    self.checkedPlots[i] = [];
+                }
             },
             conditionToString(c) {
                 return conditionMap[c];
@@ -896,13 +903,7 @@
                                 self.game.winningCondition = ev.data.winningCondition;
                                 break;
                             case 'order-refused':
-                                self.$confirm({
-                                    message: ev.data.message,
-                                    button: {
-                                        yes: 'Ok'
-                                    },
-                                    callback: () => {}
-                                });
+                                self.acknowledge('order-refused', ev.data.message);
                                 break;
                             case 'round-summary':
                                 self.player.summaries.push(ev.data);
@@ -936,6 +937,48 @@
                 this.connection.onerror = function() {
                     self.openWebSocket();
                 }
+            },
+            resolvePlaceHolder(placeholder) {
+                if (this.dictionary == null) {
+                    console.warn('No dictionary available');
+                    return placeholder;
+                }
+
+                if (this.dictionary.placeHolders == null) {
+                    console.warn('No placeholders in the dictionary');
+                    return placeholder;
+                }
+
+                if (this.dictionary.placeHolders[placeholder] == null) {
+                    console.warn(`Placeholder not found in the dictionary: ${placeholder}`);
+                    return placeholder;
+                }
+
+                return this.dictionary.placeHolders[placeholder];
+            },
+            acknowledge(titlePlaceholder, descriptionPlaceholder) {
+                this.modals.acknowledge.title = this.resolvePlaceHolder(titlePlaceholder);
+                this.modals.acknowledge.description = this.resolvePlaceHolder(descriptionPlaceholder);
+                this.modals.acknowledge.show = true;
+            },
+            async confirm(titlePlaceholder, descriptionPlaceholder) {
+                this.modals.confirm.title = this.resolvePlaceHolder(titlePlaceholder);
+                this.modals.confirm.description = this.resolvePlaceHolder(descriptionPlaceholder);
+                this.modals.confirm.show = true;
+
+                const result = await new Promise((resolve) => {
+                    this.modals.confirm.confirm = () => {
+                        resolve(true);
+                    };
+
+                    this.modals.confirm.cancel = () => {
+                        resolve(false);
+                    };
+                });
+
+                this.modals.confirm.show = false;
+
+                return result;
             }
         },
         mounted () {
@@ -944,6 +987,8 @@
             this.game.id = parseInt(this.$route.params.id);
             this.player.recovery = this.$route.params.recovery;
             window.vue = this;
+
+            this.dictionary = dictionary;
 
             console.log(`${process.env.VUE_APP_API}`);
 

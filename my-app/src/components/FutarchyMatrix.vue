@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="row-12 mb-3">
         <b-card no-body>
             <b-tabs card content-class="mt-3">
                 <b-tab

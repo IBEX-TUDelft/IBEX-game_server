@@ -13,10 +13,6 @@ export default {
                 console.log('PHASE 7');
 
                 const self = this;
-                
-                self.wss.broadcastInfo(self.game.id, 'Wait for the developers and the owners to declare their property public values', 1);
-                self.wss.broadcastInfo(self.game.id, 'Declare the values you assign to your property under each condition', 2);
-                self.wss.broadcastInfo(self.game.id, 'Declare the values you assign to your property under each condition', 3);
 
                 this.game.properties.forEach(p => {
                     p.d = null;

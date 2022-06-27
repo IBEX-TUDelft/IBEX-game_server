@@ -1,6 +1,7 @@
 <template>
     <div>
-        <vue-confirm-dialog></vue-confirm-dialog>
+        <confirm></confirm>
+        <acknowledge></acknowledge>
 
         <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
@@ -11,13 +12,14 @@
                 </b-navbar-nav>
                 <b-navbar-nav class="ml-auto">
                     <b-nav-item active v-if="timer.on === true">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
-                    <b-nav-item active >Round: {{ game.round }}</b-nav-item>
-                    <b-nav-item active >Phase: {{ game.phase }}</b-nav-item>
+                    <b-nav-item active v-if="!game.over">Round: {{ game.round }}</b-nav-item>
+                    <b-nav-item active v-if="!game.over">Phase: {{ game.phase }}</b-nav-item>
+                    <b-nav-item active v-if="game.over">Game Over</b-nav-item>
                 </b-navbar-nav>
             </b-navbar>
         </div>
 
-        <div class="b-container mt-1 mx-5">
+        <div v-if="game.phase < 6" class="b-container mt-1 mx-5">
 
             <div class="row d-flex align-items-center justify-content-center" style="height: 500px;" v-if="game.phase === 0">
                 <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
@@ -26,13 +28,13 @@
 
             <div class="row" v-if="game.phase >= 1">
                 <div class="col-8">
-                    <div v-if="game.phase >= 2" class="row mb-1">
+                    <div v-if="game.phase >= 2" class="row mb-3">
                         <div class="col-12 text-center">
-                            <b>Conditions and Plot Values</b>
+                            <b>{{ resolvePlaceHolder('conditions-plot-values-title') }}</b>
                         </div>
                     </div>
 
-                    <div v-if="game.phase >= 2" class="row mb-1"> <!-- Compensation request -->
+                    <div v-if="game.phase >= 2" class="row mb-3"> <!-- Compensation request -->
                         <b-form-group>
 
                             <div class="col-12">
@@ -99,19 +101,19 @@
                         </b-form-group>
 
                         <div class="col-12 mb-1 text-center">
-                            <button v-if="!player.compensationRequestReceived && game.phase === 3 && player.role === 3" type="button" @click='submitCompensationRequest()' class="btn btn-primary" >Submit Request</button>
-                            <button v-if="!player.compensationOfferReceived && player.role === 2 && game.phase === 4" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >Submit Offer</button>
-                            <button v-if="!player.compensationDecisionReceived && player.role === 3 && game.phase === 5" type="button" @click='submitCompensationDecisions()' class="btn btn-primary" >Submit Decision</button>
+                            <button v-if="!player.compensationRequestReceived && game.phase === 3 && player.role === 3" type="button" @click='submitCompensationRequest()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-request-button') }}</button>
+                            <button v-if="!player.compensationOfferReceived && player.role === 2 && game.phase === 4" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-offer-button') }}</button>
+                            <button v-if="!player.compensationDecisionReceived && player.role === 3 && game.phase === 5" type="button" @click='submitCompensationDecisions()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-decision-button') }}</button>
                         </div>
                     </div>
 
-                    <div v-if="game.phase >= 1" class="row mb-1">
+                    <div v-if="game.phase >= 1" class="row mb-3">
                         <div class="col-12 text-center">
-                            <b>Plot matrix</b>
+                            <b>{{ resolvePlaceHolder('plot-matrix') }}</b>
                         </div>
                     </div>
 
-                    <div class="row mb-1" v-for="offset in [0,3]" :key="offset">
+                    <div class="row mb-3" v-for="offset in [0,3]" :key="offset">
                         <div class="col-4" v-for="index in [0 + offset, 1 + offset, 2 + offset]" :key="index">
                             <DeveloperCard
                                 v-if="game != null && game.players != null && game.players[index] != null"
@@ -151,30 +153,9 @@
 
                 <div class="col-4"> <!-- Player list -->
 
-                    <div v-if="game.phase === 6" class="row mb-1">
-                        <div class="col-12 text-center"><b>Final Result</b></div>
-                    </div>
+                    <div v-if="game.phase > 1" class="row mb-3"><div class="col-12 text-center"><b>Chat</b></div></div>
 
-                    <div v-if="game.phase === 6" class="row mb-1">
-                        <table class="table table-bordered">
-                            <thead class="thead-dark">
-                                <th scope="col">Condition</th>
-                                <th scope="col">Value</th>
-                                <th scope="col">Compensations</th>
-                                <th scope="col">Total</th>
-                            </thead>
-                            <tbody>
-                                <td>{{ game.conditions[player.result.condition].name }}</td>
-                                <td>{{ formatUs(player.result.value) }}</td>
-                                <td>{{ formatUs(player.result.compensation) }}</td>
-                                <td>{{ formatUs(player.result.value + player.result.compensation) }}</td>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div v-if="game.phase > 1" class="row mb-1"><div class="col-12 text-center"><b>Chat</b></div></div>
-
-                    <div v-if="game.phase === 2" class="row mb-1">
+                    <div v-if="game.phase === 2" class="row mb-3">
                         <div class="col-6">
                             <b-form-checkbox-group
                                 id="message-recipients"
@@ -226,17 +207,43 @@
             </div>
         </div>
 
+        <div v-else class="b-container mt-1 mx-5">
+            <div v-if="game.phase === 6" class="row mb-3">
+                <div class="col-12 text-center"><b>Final Result</b></div>
+            </div>
+
+            <div v-if="game.phase === 6" class="row mb-3">
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <th scope="col">Condition</th>
+                        <th scope="col">Value</th>
+                        <th scope="col">Compensations</th>
+                        <th scope="col">Total</th>
+                    </thead>
+                    <tbody>
+                        <td>{{ game.conditions[player.result.condition].name }}</td>
+                        <td>{{ formatUs(player.result.value) }}</td>
+                        <td>{{ formatUs(player.result.compensation) }}</td>
+                        <td>{{ formatUs(player.result.value + player.result.compensation) }}</td>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import DeveloperCard from './DeveloperCard.vue';
+import Confirm from './modals/Confirm.vue';
+import Acknowledge from './modals/Acknowledge.vue';
 import { getGameStatus } from '../services/GameService'
+import dictionary from '../assets/voting.json';
 
 export default {
     data() {
         return {
             connection: null,
+            dictionary: {},
             timer: {
                 on: false,
                 minutes: "00",
@@ -256,7 +263,8 @@ export default {
                 players: [],
                 compensationOffers: [],
                 messages: [],
-                messageBoxes: []
+                messageBoxes: [],
+                over: false
             },
             player: {
                 instructions: "",
@@ -273,11 +281,26 @@ export default {
                 compensationDecisions: [],
                 compensationDecisionReceived: false,
                 result: null
-            }
+            },
+            modals: {
+                confirm: {
+                    show: false,
+                    title: 'Confirmation Request',
+                    description: 'There is a problem',
+                    callback: null
+                }, acknowledge: {
+                    show: false,
+                    title: 'Confirmation Request',
+                    description: 'There is a problem',
+                    callback: null
+                }
+            },
         }
     },
     components: {
-        DeveloperCard
+        DeveloperCard,
+        Confirm,
+        Acknowledge
     },
     methods: {
         openWebSocket() {
@@ -444,6 +467,9 @@ export default {
                             self.forms.selectedCondition = 0;*/
 
                             break;
+                        case 'game-over':
+                            self.game.over = true;
+                            break;
                         default:
                             console.error(`Type ${ev.eventType} was not understood`);
                     }
@@ -479,32 +505,12 @@ export default {
             const tags = ['You'];
 
             if (self.forms.messageRecipients.length === 0) {
-                this.$confirm({
-                    message: 'Select at least one recipient or click on a message to reply to it',
-                    button: {
-                        yes: 'Continue'
-                    },
-                    /**
-                     * Callback Function
-                     * @param {Boolean} confirm
-                     */
-                    callback: () => {}
-                });
+                this.acknowledge('message-problem-title', 'message-no-recipients-description');
                 return;
             }
 
             if (self.forms.outgoingChatMessage == null || self.forms.outgoingChatMessage.trim().length === 0) {
-                this.$confirm({
-                    message: 'You can\t send an empty message',
-                    button: {
-                        yes: 'Continue'
-                    },
-                    /**
-                     * Callback Function
-                     * @param {Boolean} confirm
-                     */
-                    callback: () => {}
-                });
+                this.acknowledge('message-problem-title', 'message-empty-description"');
                 return;
             }
 
@@ -629,20 +635,9 @@ export default {
         async submitCompensationRequest() {
             const self = this;
 
-            const confirm = await new Promise(resolve => {
-                this.$confirm({
-                    "message": "Are you sure? You can't change the request later.",
-                    "button": {
-                        "yes": "Continue",
-                        "no": "Cancel"
-                    },
-                    /**
-                     * Callback Function
-                     * @param {Boolean} confirm
-                     */
-                    callback: resolve
-                });
-            });
+            const confirm = await this.confirm('submit-request-title', 'submit-request-description');
+
+            console.log(confirm);
 
             if (!confirm) {
                 return
@@ -657,20 +652,7 @@ export default {
         async submitCompensationOffers() {
             const self = this;
 
-            const confirm = await new Promise(resolve => {
-                this.$confirm({
-                    "message": "Are you sure? You can't change the offer later.",
-                    "button": {
-                        "yes": "Continue",
-                        "no": "Cancel"
-                    },
-                    /**
-                     * Callback Function
-                     * @param {Boolean} confirm
-                     */
-                    callback: resolve
-                });
-            });
+            const confirm = await this.confirm('submit-offer-title', 'submit-offer-description');
 
             if (!confirm) {
                 return
@@ -688,20 +670,7 @@ export default {
         async submitCompensationDecisions() {
             const self = this;
 
-            const confirm = await new Promise(resolve => {
-                this.$confirm({
-                    "message": "Are you sure? You can't change your decision later.",
-                    "button": {
-                        "yes": "Continue",
-                        "no": "Cancel"
-                    },
-                    /**
-                     * Callback Function
-                     * @param {Boolean} confirm
-                     */
-                    callback: resolve
-                });
-            });
+            const confirm = await this.confirm('submit-decision-title', 'submit-decision-description');
 
             if (!confirm) {
                 return
@@ -764,6 +733,48 @@ export default {
             box.last = message.time;
 
             this.game.messageBoxes.sort((a,b) => b.last - a.last);
+        },
+        resolvePlaceHolder(placeholder) {
+            if (this.dictionary == null) {
+                console.warn('No dictionary available');
+                return placeholder;
+            }
+
+            if (this.dictionary.placeHolders == null) {
+                console.warn('No placeholders in the dictionary');
+                return placeholder;
+            }
+
+            if (this.dictionary.placeHolders[placeholder] == null) {
+                console.warn(`Placeholder not found in the dictionary: ${placeholder}`);
+                return placeholder;
+            }
+
+            return this.dictionary.placeHolders[placeholder];
+        },
+        acknowledge(titlePlaceholder, descriptionPlaceholder) {
+            this.modals.acknowledge.title = this.resolvePlaceHolder(titlePlaceholder);
+            this.modals.acknowledge.description = this.resolvePlaceHolder(descriptionPlaceholder);
+            this.modals.acknowledge.show = true;
+        },
+        async confirm(titlePlaceholder, descriptionPlaceholder) {
+            this.modals.confirm.title = this.resolvePlaceHolder(titlePlaceholder);
+            this.modals.confirm.description = this.resolvePlaceHolder(descriptionPlaceholder);
+            this.modals.confirm.show = true;
+
+            const result = await new Promise((resolve) => {
+                this.modals.confirm.confirm = () => {
+                    resolve(true);
+                };
+
+                this.modals.confirm.cancel = () => {
+                    resolve(false);
+                };
+            });
+
+            this.modals.confirm.show = false;
+
+            return result;
         }
     },
     async mounted () {
@@ -788,6 +799,8 @@ export default {
         }
 
         this.openWebSocket();
+
+        this.dictionary = dictionary;
     }
 }
 </script>

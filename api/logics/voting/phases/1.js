@@ -106,9 +106,7 @@ class Phase1 extends JoinablePhase {
             }
         );
 
-        setTimeout(() => {
-            self.complete = true;
-        }, 15000); //Timer of 15 seconds requested by Sander
+        this.setTimer(15 * 1000, 15 * 1000); //Timer of 15 seconds requested by Sander
     }
 
     getData() {

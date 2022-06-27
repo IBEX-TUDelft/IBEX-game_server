@@ -143,7 +143,7 @@ class Phase6 extends JoinablePhase {
                     return;
                 }
 
-                const order = self.orders[condition].find(o => o.id === message.order.id);
+                const order = phase.orders[condition].find(o => o.id === message.order.id);
 
                 if (order == null) {
                     WS.error(ws, `Order not found. ${message.order.id}`);

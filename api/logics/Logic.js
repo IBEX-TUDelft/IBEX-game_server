@@ -279,10 +279,11 @@ export default class {
             this.wss.broadcastEvent(this.data.id, "round-end", {
                 "round": this.data.currentRound.number
             });
+            
             console.log('Beginning a new round');
-            await new Promise(resolve => setTimeout(resolve, 5000));
+
             await this.beginRound();
-            console.log('Should have begun');
+            
             return;
         }
 
