@@ -3,7 +3,7 @@ import Phase1 from '../harberger/phases/1.js'
 import Phase2 from '../harberger/phases/2.js'
 import Phase3 from './phases/3.js';
 import Phase4 from './phases/4.js';
-import Phase5 from '../harberger/phases/5.js';
+import Phase5 from './phases/5.js';
 import Phase6 from './phases/6.js';
 import Phase7 from '../harberger/phases/7.js';
 import Phase8 from '../harberger/phases/8.js';

@@ -26,7 +26,7 @@
                         </template>
 
                         <div class="row">
-                            <div v-for="message in (round.results == null || round.results[2] == null ? [] : round.results[2].chatLog).reduce( (a,b) => [b,...a], [])" :key="message.number" class="col-12 mb-1 px-0">
+                            <div v-for="message in (chatLog[round.round - 1] == null ? [] : chatLog[round.round - 1])" :key="message.number" class="col-12 mb-1 px-0">
                                 <b-card 
                                     :header="message.participants"
                                     header-tag="header"
@@ -142,7 +142,7 @@
                         'Message'
                     ]);
 
-                    round.results[2].chatLog.forEach(message => {
+                    self.chatLog[round.round - 1].forEach(message => {
                         xls.push([
                             [message.sender, ...message.to]
                                 .sort((a,b,) => a - b)
@@ -177,8 +177,30 @@
 
             this.rounds = response.data.data.results;
             this.ruleset = response.data.data.ruleset;
-            this.chatLog = response.data.data.chatLog;
             this.players = response.data.data.players;
+
+            function extractChatLog (rounds) {
+                const result = [];
+                
+                rounds.forEach(r => {
+                    const partial = [];
+
+                    [2,4].forEach((phase) => {
+                        if (r.results[phase] == null) {
+                            return
+                        }
+
+                        partial.push(...r.results[phase].chatLog);
+                    });
+
+                    result.push(partial);
+                })
+                
+
+                return result;
+            }
+
+            this.chatLog = extractChatLog(this.rounds);
 
             this.rounds.forEach(round => {
                 if (round.results == null || round.results[2] == null) {
@@ -195,8 +217,28 @@
                     });
 
                     message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];
-                })
+                });
+
+                if (round.results[4] == null) {
+                    return;
+                }
+
+                round.results[4].chatLog.forEach(message => {
+                    const tags = [];
+
+                    self.players.forEach(p => {
+                        if (message.to.includes(p.number) || message.sender === p.number) {
+                            tags.push(p.tag);
+                        }
+                    });
+
+                    message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];
+                });
             });
+
+            console.log(response.data.data);
+
+            window.vue = this;
         }
     }
 </script>

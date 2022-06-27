@@ -19,7 +19,7 @@
             </b-navbar>
         </div>
 
-        <div v-if="game.phase < 6" class="b-container mt-1 mx-5">
+        <div v-if="game.phase < 7" class="b-container mt-1 mx-5">
 
             <div class="row d-flex align-items-center justify-content-center" style="height: 500px;" v-if="game.phase === 0">
                 <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
@@ -34,7 +34,7 @@
                         </div>
                     </div>
 
-                    <div v-if="game.phase >= 2" class="row mb-3"> <!-- Compensation request -->
+                    <div v-if="game.phase >= 2" class="row mb-3">
                         <b-form-group>
 
                             <div class="col-12">
@@ -42,18 +42,18 @@
                                     <thead class="thead-dark">
                                         <th scope="col">Condition</th>
                                         <th scope="col">Value</th>
-                                        <th v-if="game.phase >= 4" scope="col">Offer</th>
-                                        <th v-if="game.phase === 4" scope="col">Profit</th>
+                                        <th v-if="game.phase >= 5" scope="col">Offer</th>
+                                        <th v-if="game.phase === 5" scope="col">Profit</th>
                                     </thead>
                                     <tbody>
                                         <tr v-for="condition in game.conditions" :key="condition.id">
                                             <td>{{ condition.name }}</td>
                                             <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                            <td v-if="game.phase >= 4">
+                                            <td v-if="game.phase >= 5">
                                                 <input v-if="condition.id != 0 && player.compensationOfferReceived != true" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
-                                                <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
+                                                <div v-if="game.phase >= 6">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                             </td>
-                                            <td v-if="game.phase === 4">
+                                            <td v-if="game.phase === 5">
                                                 <div>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.filter(p => p.role === 3).length) }}</div>
                                             </td>
                                         </tr>
@@ -65,9 +65,9 @@
                                         <th scope="col">Condition</th>
                                         <th scope="col">Value</th>
                                         <th v-if="game.phase >= 3" scope="col">Request</th>
-                                        <th v-if="game.phase >= 5" scope="col">Offer</th>
-                                        <th v-if="game.phase === 3 || game.phase === 5" scope="col">Profit</th>
-                                        <th v-if="game.phase === 5" scope="col">Accept</th>
+                                        <th v-if="game.phase >= 6" scope="col">Offer</th>
+                                        <th v-if="game.phase === 3 || game.phase === 6" scope="col">Profit</th>
+                                        <th v-if="game.phase === 6" scope="col">Vote</th>
                                     </thead>
                                     <tbody>
                                         <tr v-for="condition in game.conditions" :key="condition.id">
@@ -77,16 +77,16 @@
                                                 <input v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
                                                 <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
                                             </td>
-                                            <td v-if="game.phase >= 5">
+                                            <td v-if="game.phase >= 6">
                                                 <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                             </td>
                                             <td v-if="game.phase === 3">
                                                 {{ formatUs(player.property.v[condition.id] + (player.compensationRequests[condition.id] != null ? parseInt(player.compensationRequests[condition.id]) : 0)) }}
                                             </td>
-                                            <td v-if="game.phase === 5">
+                                            <td v-if="game.phase === 6">
                                                 {{ formatUs(player.property.v[condition.id] + (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0)) }}
                                             </td>
-                                            <td v-if="game.phase === 5">
+                                            <td v-if="game.phase === 6">
                                                 <b-form-radio
                                                     v-model="forms.selectedCondition"
                                                     :name="'select-condition-' + condition.id"
@@ -102,8 +102,8 @@
 
                         <div class="col-12 mb-1 text-center">
                             <button v-if="!player.compensationRequestReceived && game.phase === 3 && player.role === 3" type="button" @click='submitCompensationRequest()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-request-button') }}</button>
-                            <button v-if="!player.compensationOfferReceived && player.role === 2 && game.phase === 4" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-offer-button') }}</button>
-                            <button v-if="!player.compensationDecisionReceived && player.role === 3 && game.phase === 5" type="button" @click='submitCompensationDecisions()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-decision-button') }}</button>
+                            <button v-if="!player.compensationOfferReceived && player.role === 2 && game.phase === 5" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-offer-button') }}</button>
+                            <button v-if="!player.compensationDecisionReceived && player.role === 3 && game.phase === 6" type="button" @click='submitCompensationDecisions()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-decision-button') }}</button>
                         </div>
                     </div>
 
@@ -155,7 +155,7 @@
 
                     <div v-if="game.phase > 1" class="row mb-3"><div class="col-12 text-center"><b>Chat</b></div></div>
 
-                    <div v-if="game.phase === 2" class="row mb-3">
+                    <div v-if="game.phase === 2 || game.phase === 4" class="row mb-3">
                         <div class="col-6">
                             <b-form-checkbox-group
                                 id="message-recipients"
@@ -174,7 +174,7 @@
                         </div>
                     </div>
 
-                    <div v-if="game.phase === 2" class="row mb-1">
+                    <div v-if="game.phase === 2 || game.phase === 4" class="row mb-1">
                         <b-form-textarea
                             id="message"
                             v-model="forms.outgoingChatMessage"
@@ -184,7 +184,7 @@
                         ></b-form-textarea>
                     </div>
 
-                    <div v-if="game.phase === 2" class="row mb-1 justify-content-center">
+                    <div v-if="game.phase === 2 || game.phase === 4" class="row mb-1 justify-content-center">
                         <b-button @click="sendChatMessage" variant="primary">Send</b-button>
                     </div>
 
@@ -208,11 +208,11 @@
         </div>
 
         <div v-else class="b-container mt-1 mx-5">
-            <div v-if="game.phase === 6" class="row mb-3">
+            <div v-if="game.phase === 7" class="row mb-3">
                 <div class="col-12 text-center"><b>Final Result</b></div>
             </div>
 
-            <div v-if="game.phase === 6" class="row mb-3">
+            <div v-if="game.phase === 7" class="row mb-3">
                 <table class="table table-bordered">
                     <thead class="thead-dark">
                         <th scope="col">Condition</th>

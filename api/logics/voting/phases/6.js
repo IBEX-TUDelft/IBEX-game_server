@@ -1,6 +1,6 @@
 import JoinablePhase from '../../JoinablePhase.js';
 
-class Phase6 extends JoinablePhase {
+class End extends JoinablePhase {
 
     results = {
         standings: [],
@@ -79,9 +79,7 @@ class Phase6 extends JoinablePhase {
             }
         });
 
-        setTimeout(() => {
-            self.complete = true;
-        }, 5000);
+        this.setTimer(30 * 1000, 30 * 1000);
     }
 
     testComplete () {
@@ -111,6 +109,6 @@ class Phase6 extends JoinablePhase {
 
 export default {
     create(game, wss) {
-        return new Phase6(game, wss);
+        return new End(game, wss);
     }
 }

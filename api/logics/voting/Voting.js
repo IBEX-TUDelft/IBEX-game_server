@@ -3,16 +3,16 @@ import fs from 'fs';
 import Logic from "../Logic.js";
 
 import WaitToStartPhase from '../common/WaitToStartPhase.js';
-import Phase1 from './phases/1.js';
-import Phase2 from './phases/2.js';
-import Phase3 from './phases/3.js';
-import Phase4 from './phases/4.js';
-import Phase5 from './phases/5.js';
-import Phase6 from './phases/6.js';
+import Introduction from './phases/Introduction.js';
+import Chat from './phases/Chat.js';
+import Request from './phases/Request.js';
+import Offer from './phases/Offer.js';
+import Vote from './phases/Vote.js';
+import End from './phases/6.js';
 
 export default class Voting extends Logic {
     constructor(data) {
-        super(data, [WaitToStartPhase, Phase1, Phase2, Phase3, Phase4, Phase5, Phase6], 'Voting');
+        super(data, [WaitToStartPhase, Introduction, Chat, Request, Chat, Offer, Vote, End], 'Voting');
 
         const rawDictionary = fs.readFileSync('./resources/voting.json');
 
@@ -68,13 +68,19 @@ export default class Voting extends Logic {
             })
         }
 
+        if (self.data.currentRound.phase === 4) {
+            messages = self.data.currentPhase.results.chatLog;
+        } else if (self.data.currentRound.phase > 4) {
+            messages = self.results.find(r => r.round === self.data.currentRound.number).results[4].chatLog;
+        }
+
         game.compensationRequests = compensationRequests;
 
         const player = {
             "instructions": self.data.currentPhase.instructions[playerData.role - 1]
         };
 
-        if (self.data.currentRound.phase >= 6) {
+        if (self.data.currentRound.phase >= 7) {
             game.winningCondition = self.data.winningCondition;
         }
 

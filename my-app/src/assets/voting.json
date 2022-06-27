@@ -18,14 +18,18 @@
             "developer": "Wait for all owners to submit their requests"
         }, {
             "number": 4,
+            "owner": "Deliberation phase",
+            "developer": "Deliberation phase"
+        }, {
+            "number": 5,
             "owner": "Wait for the developer to submit a compensation offer",
             "developer": "Submit your compensation offers (click the submit button)"
         }, {
-            "number": 5,
+            "number": 6,
             "owner": "Submit your final decision, remember to click on the submit button. Wait for all to submit.",
             "developer": "Wait for all owners to submit their decisions on your offer"
         }, {
-            "number": 6,
+            "number": 7,
             "owner": "The results of this round are available",
             "developer": "The results of this round are available"
         }]

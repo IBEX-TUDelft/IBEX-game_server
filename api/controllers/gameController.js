@@ -145,80 +145,18 @@ export default {
                 "ruleset": game.data.type
             };
 
-            /*switch(game.data.type) {
-                case 'Harberger':
-                    if (game.results[2] != null) {
-                        data.firstDeclarations = game.results[2].declarations;
-                    }
-        
-                    if (game.results[3] != null) {
-                        data.winningCondition = game.results[3].winningCondition;
-                    }
-        
-                    if (game.results[4] != null) {
-                        data.firstSnipes = game.results[4].snipes;
-                        data.firstSnipeResults = game.results[4].snipeOutcomes;
-                    }
-        
-                    console.log(game.results[5]);
-        
-                    if (game.results[5] != null) {
-                        data.signals = game.results[5].signals;
-                    }
-        
-                    if (game.results[7] != null) {
-                        data.secondDeclarations = game.results[7].declarations;
-                    }
-        
-                    if (game.results[9] != null) {
-                        data.secondSnipes = game.results[9].snipes;
-                        data.secondSnipeResults = game.results[9].snipeOutcomes;
-                    }
-        
-                    break;
-                case 'Futarchy':
-                    if (game.results[2] != null) {
-                        data.firstDeclarations = game.results[2].declarations;
-                    }
-        
-                    if (game.results[6] != null) {
-                        data.winningCondition = game.results[6].winningCondition;
-                        data.firstSnipes = game.results[6].snipes;
-                        data.firstSnipeResults = game.results[6].snipeOutcomes;
-                    }
-        
-                    console.log(game.results[5]);
-        
-                    if (game.results[5] != null) {
-                        data.signals = game.results[5].signals;
-                    }
-        
-                    if (game.results[7] != null) {
-                        data.secondDeclarations = game.results[7].declarations;
-                    }
-        
-                    if (game.results[9] != null) {
-                        data.secondSnipes = game.results[9].snipes;
-                        data.secondSnipeResults = game.results[9].snipeOutcomes;
-                    }
-        
-                    break;
-                case 'Voting':*/
-                    data.conditions = game.data.conditions;
-                    data.players = game.data.players.map(p => {
-                        return {
-                            "number": p.number,
-                            "tag": p.tag,
-                            "role": p.role,
-                            "values": p.property != null ? p.property.v : null
-                        }
-                    });
-                    data.results = game.results;
+            data.conditions = game.data.conditions;
 
-                    /*break;
-                default:
-                    break;
-            }*/
+            data.players = game.data.players.map(p => {
+                return {
+                    "number": p.number,
+                    "tag": p.tag,
+                    "role": p.role,
+                    "values": p.property != null ? p.property.v : null
+                }
+            });
+
+            data.results = game.results;
 
             Controller.handleSuccess(res, data, 'Data available');
         });

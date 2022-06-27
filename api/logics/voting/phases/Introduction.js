@@ -1,6 +1,6 @@
 import JoinablePhase from '../../JoinablePhase.js';
 
-class Phase1 extends JoinablePhase {
+class Introduction extends JoinablePhase {
 
     complete = false;
 
@@ -124,6 +124,6 @@ class Phase1 extends JoinablePhase {
 
 export default {
     create(game, wss) {
-        return new Phase1(game, wss);
+        return new Introduction(game, wss);
     }
 }

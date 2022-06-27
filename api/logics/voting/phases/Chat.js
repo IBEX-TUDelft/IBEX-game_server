@@ -1,7 +1,7 @@
 import JoinablePhase from '../../JoinablePhase.js';
 import WS from '../../../helpers/websocket.js';
 
-class Phase2 extends JoinablePhase {
+class Chat extends JoinablePhase {
 
     complete = false;
 
@@ -71,8 +71,6 @@ class Phase2 extends JoinablePhase {
 
     async onEnter () {
         await super.onEnter();
-
-        console.log('PHASE 2');
         
         const visibleTimeout = parseInt(process.env.VOTING_CHAT_FIXED_DURATION);
         const totalTimeout = (visibleTimeout + Math.floor(Math.random() * parseInt(process.env.VOTING_CHAT_MAX_EXTRA_TIME))) * 1000;
@@ -94,6 +92,6 @@ class Phase2 extends JoinablePhase {
 
 export default {
     create(game, wss) {
-        return new Phase2(game, wss);
+        return new Chat(game, wss);
     }
 }
