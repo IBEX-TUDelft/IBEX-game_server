@@ -1,106 +1,126 @@
-<template>
-    <div class="row mt-1 mx-5 mp-1">
-        <div class="col-6">
-            <div class="container">
-                <div class="row mb-1">
-                    <div class="offset-md-1 col-3">
+<template><div class="container-fluid">
+    <div class="row justify-content-center">
+        <h3 class="text-center">{{ conditionName }}</h3>
+    </div>
+
+    <div class="d-flex flex-row mt-1 p-0">
+        <div class="col-4">Median Price: {{ getMedianPrice() }}</div>
+        <div class="col-4">Public Signal: {{ formatUs(game.publicSignal[condition]) }}</div>
+        <div class="col-4">Private Signal: {{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</div>
+    </div>
+
+    <div class="d-flex flex-row mt-1 p-0">
+
+        <div class="d-flex flex-column col-10 p-0">
+            <div class="d-flex flex-row p-0">
+
+                <div class="col-4">
+                    <div class="row-12">
                         <button type="button" class="btn btn-primary btn-block" @click='postOrder("ask", false)'>Ask</button>
-                    </div>
-                    <div class="col-4">
-                        <input type="number" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" placeholder="10" />
                     </div>
                 </div>
 
-                <div class="row mb-1">
-                    <div class="offset-md-1 col-3 d-flex align-items-end">
+                <div class="col-4">
+                    <div class="row-12">
+                        <input type="number" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="d-flex flex-row mt-1 p-0">
+                <div class="d-flex flex-column col-4">
+                    <div v-if="player.wallet != null && player.wallet[condition] != null" class="d-flex flex-row mb-auto mt-2">
+                        Shares: {{ player.wallet[condition].shares }}
+                    </div>
+
+                    <div class="d-flex flex-row">
                         <button type="button" class="btn btn-primary btn-block" @click='postOrder("bid", true)'>Buy @ -></button>
                     </div>
-                    <div class="col-4" style="height: 300px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
-                        <table class="table table-bordered text-center" style="margin-top: auto; margin-bottom: 0px;">
-                            <tr v-for="ask in asks" :key="ask.id">
-                                <td>{{ formatUs(ask.price) }}{{ask.sender == player.number ? '*' : ''}}</td>
-                            </tr>
-                        </table>
+                </div>
+
+                <div class="d-flex flex-col col-4" style="height: 200px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
+                    <table class="table table-bordered text-center" style="margin-top: auto; margin-bottom: 0px;">
+                        <tr v-for="ask in asks" :key="ask.id">
+                            <td class="p-1">{{ formatUs(ask.price) }}{{ask.sender == player.number ? '*' : ''}}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-column col-4">
+                    <div class="d-flex flex-row mb-auto">
                     </div>
-                    <div class="col-3 d-flex align-items-end">
+                    <div class="d-flex flex-row">
                         <button type="button" class="btn btn-primary btn-block" @click='removeLastAsk()'>Remove Ask</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="row mb-1">
-                    <div class="offset-md-1 col-3">
+            <div class="d-flex flex-row mt-1 p-0">
+
+                <div class="d-flex flex-column col-4">
+                    <div class="d-flex flex-row">
                         <button type="button" class="btn btn-primary btn-block" @click='postOrder("ask", true)'>Sell @ -></button>
                     </div>
-                    <div class="col-4" style="height: 300px; border: 1px solid; overflow: scroll;">
-                        <table class="table table-bordered text-center">
-                            <tr v-for="bid in bids" :key="bid.id">
-                                <td>{{ formatUs(bid.price) }}{{bid.sender == player.number ? '*' : ''}}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-3">
-                        <button type="button" class="btn btn-primary btn-block" @click='removeLastBid()'>Remove Bid</button>
+
+                    <div v-if="player.wallet != null && player.wallet[condition] != null" class="d-flex flex-row mt-2">
+                        Cash: {{ player.wallet[condition].balance }}
                     </div>
                 </div>
 
-                <div class="row mb-1">
-                    <div class="offset-md-1 col-3">
-                        <button type="button" class="btn btn-primary btn-block" @click='postOrder("bid", false)'>Bid</button>
-                    </div>
-                    <div class="col-4">
-                        <input type="number" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" placeholder="10" />
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="col-6">
-
-            <div class="row-12 mb-1">
-                <table class="table table-bordered text-center">
-                    <tr>
-                        <td>Condition</td><td>{{ conditionName }}</td>
-                        <td>Median Price</td><td>{{ formatUs(getMedianPrice()) }}</td>
-                    </tr>
-                    <tr>
-                        <td>Publ. Signal</td><td>{{ formatUs(game.publicSignal[condition]) }}</td>
-                        <td>Priv. Signal</td><td>{{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</td>
-                    </tr>
-                    <tr>
-                        <td>Balance</td><td>{{ player.wallet == null ? 'n/a' : formatUs(player.wallet[condition].balance) }}</td>
-                        <td>Shares</td><td>{{ player.wallet == null ? 'n/a' : player.wallet[condition].shares }}</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="row-12">
-                <div class="text-center"><b>Contracts</b></div>
-                <table class="table table-bordered text-center">
-                    <tbody>
-                        <tr v-for="contract in contracts" :key="contract.id">
-                            <td>{{ formatUs(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '') }}</td>
+                <div class="d-flex flex-col col-4" style="height: 200px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
+                    <table class="table table-bordered text-center">
+                        <tr v-for="bid in bids" :key="bid.id">
+                            <td>{{ formatUs(bid.price) }}{{bid.sender == player.number ? '*' : ''}}</td>
                         </tr>
-                    </tbody>
-                </table>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-column col-4">
+                    <button type="button" class="btn btn-primary btn-block" @click='removeLastBid()'>Remove Bid</button>
+                </div>
+
             </div>
+
+            <div class="d-flex flex-row mt-1 p-0">
+
+                <div class="d-flex flex-column col-4">
+                    <button type="button" class="btn btn-primary btn-block" @click='postOrder("bid", false)'>Bid</button>
+                </div>
+
+                <div class="d-flex flex-column col-4">
+                    <input type="number" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
+                </div>
+            </div>
+
         </div>
+
+        <div class="d-flex flex-column col-2 p-0">
+            <div class="text-center"><b>Contracts</b></div>
+            <table class="table table-bordered text-center">
+                <tbody>
+                    <tr v-for="contract in contracts" :key="contract.id">
+                        <td>{{ formatUs(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '') }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
     </div>
-</template>
+
+</div></template>
 
 <script>
+import EventService from '../services/EventService';
+
 export default {
-    props: ['condition', 'conditionName', 'player', 'game', 'pushMessage', 'connection', 'formatNumber'],
+    props: ['condition', 'conditionName', 'player', 'game', 'pushMessage', 'connection'],
     data() {
         return {
             asks: [],
             bids: [],
-            ask_quantity: 0,
-            ask_price: 0,
-            ask_now: 0,
-            bid_quantity: 0,
-            bid_price: 0,
-            bid_now: "no",
+            ask_price: null,
+            bid_price: null,
             contracts: []
         }
     },
@@ -198,6 +218,19 @@ export default {
             console.log(msg);
             this.$props.connection.send(JSON.stringify(msg));
         },
+        getMedianPriceAsInt() {
+            if (this.contracts.length === 0) {
+                return 0;
+            }
+            
+            let sum = 0;
+
+            for (let i = 0; i < this.contracts.length; i++) {
+                sum += this.contracts[i].price;
+            }
+
+            return Math.round(sum * 100 / this.contracts.length) / 100;
+        },
         getMedianPrice() {
             if (this.contracts.length === 0) {
                 return '-';
@@ -209,14 +242,10 @@ export default {
                 sum += this.contracts[i].price;
             }
 
-            return this.formatUs(sum / this.contracts.length);
+            return this.formatUs(Math.round(sum * 100 / this.contracts.length) / 100);
         },
         formatUs(num) {
-            if (num == null || typeof num != 'number') {
-                return num;
-            }
-
-            return num.toLocaleString('en-US');
+            return this.$parent.formatUs(num);
         },
         getSharePrice() {
             if (this.contracts.length === 0) {
@@ -239,7 +268,9 @@ export default {
                 case "ask":
                     list = this.asks;
                     break;
-                case "bid":
+                case "bid":/*if (self.$props.condition === event.update.condition) {
+                this.orderEvent(event.order, "contract");
+            }*/
                     list = this.bids;
                     break;
                 case "contract":
@@ -312,6 +343,77 @@ export default {
                     throw new Error(`Type was ${order.type}. Can be only ask|bid`);
             }
         }
+    },
+    async mounted() {
+        const self = this;
+
+        console.log('COMPONENT READY ' + this.condition);
+
+        EventService.on('add-order', (event) => {
+            console.log('Captured add-order');
+            console.log(event);
+
+            if (self.$props.condition === event.order.condition) {
+                self.orderEvent(event.order, "add");
+            }
+        });
+
+        EventService.on('delete-order', (event) => {
+            console.log('Captured delete-order');
+            console.log(event);
+
+            if (self.$props.condition === event.order.condition) {
+                self.orderEvent(event.order, "delete");
+            }
+        });
+
+        EventService.on('update-order', (event) => {
+            console.log('Captured update-order');
+            console.log(event);
+
+            if (self.$props.condition === event.update.condition) {
+                self.orderEvent(event.order, "update");
+            }
+        });
+
+        EventService.on('contract-fulfilled', (event) => {
+            console.log('Captured contract-fulfilled');
+            console.log(event);
+
+            if (self.$props.condition === event.condition) {
+                self.orderEvent(event, "contract");
+            }
+
+            EventService.emit('median-updated', self.$props.conditionName, self.getMedianPriceAsInt());
+        });
+
+        let dataRecovered = false;
+
+        EventService.on('data-recovered', async (data) => {
+            if (self.$props.condition == null || dataRecovered === true) {
+                return;
+            }
+
+            if (data.game.movementList == null) {
+                return;
+            }
+            
+            dataRecovered = true;
+
+            console.log(`Captured data-recovered on market ${self.$props.condition}`);
+
+            data.game.movementList[self.$props.condition].forEach(contract => {
+                self.contracts.push(contract);
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            EventService.emit('median-updated', self.$props.conditionName, self.getMedianPriceAsInt());
+        });
+
+        console.log('COMPONENT ' + this.condition + ' READY TO CAPTURE ' + 'data-recovered');
+
+        EventService.emit('component-ready');
     }
 }
 </script>

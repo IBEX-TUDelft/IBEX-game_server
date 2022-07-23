@@ -1,207 +1,212 @@
 <template>
-    <div>
+    <b-col><div class="d-flex flex-column h-100">
+
         <error-list :warningList="[]"></error-list>
         <confirm></confirm>
         <acknowledge></acknowledge>
 
-        <div>
-            <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
-                <b-navbar-nav>
-                    <b-navbar-brand>
-                        {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
-                    </b-navbar-brand>
-                </b-navbar-nav>
-                <b-navbar-nav class="ml-auto">
-                    <b-nav-item active v-if="timer.on === true">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
-                    <b-nav-item active v-if="!game.over">Round: {{ game.round }}</b-nav-item>
-                    <b-nav-item active v-if="!game.over">Phase: {{ game.phase }}</b-nav-item>
-                    <b-nav-item active v-if="game.over">Game Over</b-nav-item>
-                </b-navbar-nav>
-            </b-navbar>
-        </div>
+        <b-row class="no-gutters justify-content-center">
+            <b-col>
+                <b-navbar class="mb-0" id="navbar" toggleable="md" type="dark" variant="info" >
+                    <b-navbar-nav>
+                        <b-navbar-brand>
+                            {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
+                        </b-navbar-brand>
+                    </b-navbar-nav>
+                    <b-navbar-nav class="ml-auto">
+                        <b-nav-item active v-if="timer.on === true">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
+                        <b-nav-item active v-if="!game.over">Round: {{ game.round }}</b-nav-item>
+                        <b-nav-item active v-if="!game.over">Phase: {{ game.phase }}</b-nav-item>
+                        <b-nav-item active v-if="game.over">Game Over</b-nav-item>
+                    </b-navbar-nav>
+                </b-navbar>
+            </b-col>
+        </b-row>
 
-        <div class="row d-flex align-items-center justify-content-center" style="height: 500px;" v-if="game.phase === 0">
-            <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
-            <div v-else>Waiting all players to join ...</div>
-        </div>
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase === 0">
+            <b-col class="d-flex align-items-center justify-content-center flex-column">
+                <b-row class="">
+                    <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
+                    <div v-else>Waiting all players to join ...</div>
+                </b-row>
+            </b-col>
+        </b-row>
 
-        <div class="mt-1 mx-5 mp-1" v-if="![0,6,9].includes(game.phase)">
-            <div class="row">
-                <div class="col-6">
+        <b-row class="d-flex flex-row no-gutters" v-if="![0,6,9].includes(game.phase)">
+            <div class="d-flex flex-column col-6">
 
-                    <FutarchyMatrix :condition="game.winningCondition" :project="conditionToString(game.winningCondition)"
-                         v-if="game.ruleset === 'Futarchy' && game.phase < 7"/>
-                    <HarbergerMatrix
-                        v-else
-                        :condition="game.conditions[game.winningCondition]"
-                        :project="conditionToString(game.winningCondition)"
-                        :game="game"
-                        :player="player"
-                        :checkedPlots="checkedPlots"
-                        :getDeclarationPlayer="getDeclarationPlayer"
-                        :getSniperProbability="getSniperProbability"
-                     />
+                <!--FutarchyMatrix :condition="game.winningCondition" :project="conditionToString(game.winningCondition)"
+                        v-if="game.ruleset === 'Futarchy' && game.phase < 7"/-->
+                <HarbergerMatrix
 
-                    <div class="row justify-content-center" v-if="player.role == 1 && (game.phase === 3 || game.phase === 8) && player.hasToSpeculate">
-                        <div class="col-6 text-center">
-                            <button type="button" @click='doneSpeculating()' class="btn btn-primary">Submit</button>
-                        </div>
+                    :condition="game.conditions[game.winningCondition]"
+                    :project="conditionToString(game.winningCondition)"
+                    :game="game"
+                    :player="player"
+                    :checkedPlots="checkedPlots"
+                    :getDeclarationPlayer="getDeclarationPlayer"
+                    :getSniperProbability="getSniperProbability"
+                    />
+
+                <div class="row justify-content-center" v-if="player.role == 1 && (game.phase === 3 || game.phase === 8) && player.hasToSpeculate">
+                    <div class="col-6 text-center">
+                        <button type="button" @click='doneSpeculating()' class="btn btn-primary">Submit</button>
                     </div>
-
-                    <div v-if="game.boundaries != null"  class="row">
-
-                        <div v-for="role in ['owner', 'developer']" :key="role" class="col-6">
-                            <div class="text-center mb-1"><b>Value Ranges ({{ role }})</b></div>
-                            <table class="table table-bordered" style="table-layout: fixed;">
-                                <thead class="thead-dark">
-                                    <th scope="col">Condition</th>
-                                    <th scope="col">Minimum</th>
-                                    <th scope="col">Maximum</th>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="condition in game.conditions" :key="condition.id"
-                                        :style="{'background-color': game.winningCondition === condition.id ? 'yellow' : 'white'}">
-                                        <td>{{ condition.name }}</td>
-                                        <td>{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
-                                        <td>{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                    </div>
-
                 </div>
 
-                <div class="col-6">
-                    <!-- Actions -->
-                    <div class="row" v-if="player.role > 1">
-                        <div class="text-center mb-1"><b>My Value Information</b></div>
-                        <table class="table table-bordered">
+                <b-row class="no-gutters" v-if="game.boundaries != null">
+
+                    <div v-for="role in ['owner', 'developer']" :key="role" class="col-6 p-1">
+                        <div class="text-center mb-1"><b>Value Ranges ({{ role }})</b></div>
+                        <table class="table table-bordered" style="table-layout: fixed;">
                             <thead class="thead-dark">
                                 <th scope="col">Condition</th>
-                                <th scope="col">Value</th>
-                                <th scope="col">Declaration</th>
-                                <th scope="col">Tax Bill</th>
-                                <th scope="col">Profit</th>
-                                <th scope="col">Sniper Prob.</th>
+                                <th scope="col">Minimum</th>
+                                <th scope="col">Maximum</th>
                             </thead>
                             <tbody>
-                                <tr v-for="condition in game.conditions" :key="condition.id">
+                                <tr v-for="condition in game.conditions" :key="condition.id"
+                                    :style="{'background-color': game.winningCondition === condition.id ? 'yellow' : 'white'}">
                                     <td>{{ condition.name }}</td>
-                                    <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                    <td>
-                                        <input v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" type="number" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
-                                        <div v-else>
-                                            <!-- {{ game.winningCondition }} {{ condition.id }} {{ player.declaration}} -->
-                                            <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
-                                                <div v-if="player.declaration != null && player.declaration[condition.id] != null">
-                                                    {{ player.declaration[condition.id]}}
-                                                </div>
+                                    <td>{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
+                                    <td>{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </b-row>
+
+            </div>
+
+            <div class="col-6">
+                <!-- Actions -->
+                <b-row class="d-flex flex-row no-gutters p-1" v-if="player.role > 1">
+                    <div class="text-center mb-1"><b>My Value Information</b></div>
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <th scope="col">Condition</th>
+                            <th scope="col">Value</th>
+                            <th scope="col">Declaration</th>
+                            <th scope="col">Tax Bill</th>
+                            <th scope="col">Profit</th>
+                            <th scope="col">Sniper Prob.</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="condition in game.conditions" :key="condition.id">
+                                <td>{{ condition.name }}</td>
+                                <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                <td>
+                                    <input v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" type="number" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
+                                    <div v-else>
+                                        <!-- {{ game.winningCondition }} {{ condition.id }} {{ player.declaration}} -->
+                                        <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
+                                            <div v-if="player.declaration != null && player.declaration[condition.id] != null">
+                                                {{ player.declaration[condition.id]}}
                                             </div>
                                         </div>
-                                    </td>
-                                    <td>
-                                        <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
-                                            {{ player.declaration != null ? formatUs(player.declaration[condition.id] * game.taxRate / 100) : '' }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
-                                            {{ player.declaration != null ? formatUs(player.declaration[condition.id] * ( 100 - game.taxRate) / 100): '' }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div v-if="game.winningCondition == null || game.winningCondition === condition.id">
-                                            {{ getMySniperProbability(condition.id) }}%
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
+                                        {{ player.declaration != null ? formatUs(player.declaration[condition.id] * game.taxRate / 100) : '' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
+                                        {{ player.declaration != null ? formatUs(player.property.v[condition.id] - player.declaration[condition.id]* ( game.taxRate) / 100): '' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div v-if="game.winningCondition == null || game.winningCondition === condition.id">
+                                        {{ getMySniperProbability(condition.id) }}%
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </b-row>
 
-                    <div class="row justify-content-center" v-if="player.role > 1">
-                        <div class="col-12 text-center">
-                            <button v-if="(game.phase === 2 || game.phase === 7) && player.hasToDeclare" type="button" @click='submitDeclaration()' class="btn btn-primary" >Submit</button>
-                        </div>
+                <b-row class="d-flex flex-row no-gutters p-1 justify-content-center" v-if="player.role > 1">
+                    <div class="col-12 text-center">
+                        <button v-if="(game.phase === 2 || game.phase === 7) && player.hasToDeclare" type="button" @click='submitDeclaration()' class="btn btn-primary" >Submit</button>
                     </div>
+                </b-row>
 
-                    <div class="row" v-if="player.role > 1">
-                        <div class="text-center mb-1"><b>Results</b></div>
-                        <table class="table table-bordered">
-                            <thead class="thead-dark">
-                                <th scope="col">Round</th>
-                                <th scope="col">Condition</th>
-                                <th scope="col">Value</th>
-                                <th scope="col">Declaration</th>
-                                <th scope="col">Sniped</th>
-                                <th scope="col">Snipe Profit/Loss</th>
-                                <th scope="col">Taxes</th>
-                                <th scope="col">Round Profit</th>
-                            </thead>
-                            <tbody>
-                                <tr v-for="pEv in player.profitEvents" :key="pEv.id">
-                                    <td>{{pEv.round}}.{{pEv.phase}}</td>
-                                    <td>{{pEv.condition}}</td>
-                                    <td>{{formatUs(pEv.value)}}</td>
-                                    <td>{{formatUs(pEv.declaration)}}</td>
-                                    <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
-                                    <td>{{formatUs(pEv.snipeProfit)}}</td>
-                                    <td>{{formatUs(pEv.taxes)}}</td>
-                                    <td>{{formatUs(pEv.total)}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <b-row class="d-flex flex-row no-gutters p-1" v-if="player.role > 1">
+                    <div class="text-center mb-1"><b>Results</b></div>
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <th scope="col">Round</th>
+                            <th scope="col">Condition</th>
+                            <th scope="col">Value</th>
+                            <th scope="col">Declaration</th>
+                            <th scope="col">Sniped</th>
+                            <th scope="col">Snipe Profit/Loss</th>
+                            <th scope="col">Taxes</th>
+                            <th scope="col">Round Profit</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="pEv in player.profitEvents" :key="pEv.id">
+                                <td>{{pEv.round}}.{{pEv.phase}}</td>
+                                <td>{{pEv.condition}}</td>
+                                <td>{{formatUs(pEv.value)}}</td>
+                                <td>{{formatUs(pEv.declaration)}}</td>
+                                <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
+                                <td>{{formatUs(pEv.snipeProfit)}}</td>
+                                <td>{{formatUs(pEv.taxes)}}</td>
+                                <td>{{formatUs(pEv.total)}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </b-row>
 
-                    <div class="row" v-if="player.role == 1">
-                        <div class="text-center mb-1"><b>Results</b></div>
-                        <table class="table table-bordered">
-                            <thead class="thead-dark">
-                                <th scope="col">Round</th>
-                                <th scope="col">Condition</th>
-                                <th scope="col">Property</th>
-                                <th scope="col">Declaration</th>
-                                <th scope="col">Sniped</th>
-                                <th scope="col">Profit</th>
-                            </thead>
-                            <tbody>
-                                <tr v-for="pEv in player.profitEvents" :key="pEv.id">
-                                    <td>{{pEv.round}}.{{pEv.phase}}</td>
-                                    <td>{{pEv.condition}}</td>
-                                    <td>{{pEv.property}}</td>
-                                    <td>{{formatUs(pEv.declaration)}}</td>
-                                    <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
-                                    <td>{{formatUs(pEv.snipeProfit)}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <b-row class="d-flex flex-row no-gutters p-1" v-if="player.role == 1">
+                    <div class="text-center mb-1"><b>Results</b></div>
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <th scope="col">Round</th>
+                            <th scope="col">Condition</th>
+                            <th scope="col">Property</th>
+                            <th scope="col">Declaration</th>
+                            <th scope="col">Sniped</th>
+                            <th scope="col">Profit</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="pEv in player.profitEvents" :key="pEv.id">
+                                <td>{{pEv.round}}.{{pEv.phase}}</td>
+                                <td>{{pEv.condition}}</td>
+                                <td>{{pEv.property}}</td>
+                                <td>{{formatUs(pEv.declaration)}}</td>
+                                <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
+                                <td>{{formatUs(pEv.snipeProfit)}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </b-row>
 
-                </div>
             </div>
-        </div>
+        </b-row>
 
-        <DoubleAuctionMarketChicago ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Harberger'"
+        <DoubleAuctionMarketSingle ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Harberger'"
             :condition="game.winningCondition"
             :conditionName="conditionToString(game.winningCondition)"
             :connection="connection"
             :game="game"
             :player="player"
             :pushMessage="pushMessage"
-            :formatNumber="formatNumber"
         />
         <DoubleAuctionMarketFutarchy ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Futarchy'"/>
 
         <Summaries v-if="game.phase === 9" :summaries="player.summaries"/>
-    </div>
+        
+    </div></b-col>
 </template>
 <script>
-    import DoubleAuctionMarketChicago from './DoubleAuctionMarketChicago.vue';
+    import DoubleAuctionMarketSingle from './DoubleAuctionMarketSingle.vue';
     import DoubleAuctionMarketFutarchy from './DoubleAuctionMarketFutarchy.vue';
     import HarbergerMatrix from './HarbergerMatrix.vue';
-    import FutarchyMatrix from './FutarchyMatrix.vue';
+    //import FutarchyMatrix from './FutarchyMatrix.vue';
     import ErrorList from './modals/ErrorList.vue';
     import Confirm from './modals/Confirm.vue';
     import Acknowledge from './modals/Acknowledge.vue';
@@ -209,6 +214,7 @@
     import dictionary from '../assets/harberger.json';
 
     import { getGameStatus } from '../services/GameService'
+    import EventService from '../services/EventService';
 
     const roleMap = {
         1: "Sniper",
@@ -240,7 +246,7 @@
                 dictionary: {},
                 lastThreeMessages: [],
                 messages: [],
-                checkedPlots: [[],[],[]],
+                checkedPlots: [],
                 modals: {
                     errorList: {
                         show: false,
@@ -297,10 +303,10 @@
             };
         },
         components: {
-            DoubleAuctionMarketChicago,
+            DoubleAuctionMarketSingle,
             DoubleAuctionMarketFutarchy,
             HarbergerMatrix,
-            FutarchyMatrix,
+            //FutarchyMatrix,
             ErrorList,
             Confirm,
             Acknowledge,
@@ -451,7 +457,7 @@
             },
             async doneSpeculating() {
                 const self = this;
-
+                
                 console.log('Checked plots: ' + this.checkedPlots);
 
                 const confirm = await this.confirm('speculator-submit-title', 'speculator-submit-description');
@@ -460,16 +466,27 @@
                     return;
                 }
 
-                self.sendMessage({
-                    "gameId": self.game.id,
-                    "type": "done-speculating",
-                    "snipe": self.checkedPlots
+                const snipes = [];
+
+                this.game.conditions.forEach(() => {
+                    snipes.push([]);
+                })
+
+                this.checkedPlots.forEach((snipe) => {
+                    const [player, condition] = snipe.split('.');
+
+                    snipes[parseInt(condition)].push(parseInt(player));
                 });
 
-                //Reset the checkboxes
-                for (let i = 0; i < self.checkedPlots.length; i++) {
-                    self.checkedPlots[i] = [];
-                }
+                console.log(snipes);
+
+                this.sendMessage({
+                    "gameId": self.game.id,
+                    "type": "done-speculating",
+                    "snipe": snipes
+                });
+ 
+                this.checkedPlots = [];
             },
             conditionToString(c) {
                 return conditionMap[c];
@@ -541,15 +558,18 @@
 
                 this.modals.errorList.show = true;
             },
-            formatNumber(num) {
-                return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
-            },
             formatUs(num) {
                 if (num == null || typeof num != 'number') {
                     return num;
                 }
 
-                return num.toLocaleString('en-US');
+                let format = 'en-US';
+
+                if (this.dictionary.parameters.format != null) {
+                    format = this.dictionary.parameters.format;
+                }
+
+                return (Math.round(num * 100) / 100).toLocaleString(format);
             },
             completeCurrentPhase() {
                 const self = this;
@@ -698,6 +718,8 @@
                         console.log(`New event: ${ev.eventType}`);
                         console.log(ev.data);
 
+                        EventService.emit(ev.eventType, ev.data);
+
                         switch(ev.eventType) {
                             case 'ready-received':
                                 self.player.ready = true;
@@ -734,7 +756,7 @@
                                 self.game.round = ev.data.round;
                                 self.game.phase = ev.data.phase;
 
-                                if (self.game.phase === 2 || self.game.phase === 7) {
+                                if (self.game.phase === 1 || self.game.phase === 7) {
                                     self.game.declarations = [null, null, null];
 
                                     if (self.player.role > 1) {
@@ -744,6 +766,7 @@
                                 }
 
                                 if ((self.game.phase === 3 || self.game.phase === 8) && self.player.role === 1) {
+                                    self.checkedPlots = [];
                                     self.player.hasToSpeculate = true;
                                 }
 
@@ -837,41 +860,6 @@
                                 self.pushMessage("info", `Your signals: ${ev.data.signals}`);
                                 break;
                             }
-                            case 'add-order':
-                                if (self.game.ruleset === 'Harberger') {
-                                    self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "add");
-                                } else if (self.game.ruleset === 'Futarchy') {
-                                    const ref = `doubleAuctionMarket${ev.data.order.condition}`;
-
-                                    console.log(`Ref: ${ref}`);
-                                    self.$refs.doubleAuctionMarket.$refs[ref][0].orderEvent(ev.data.order, "add");
-                                    self.$refs.doubleAuctionMarket.activityDetected(ev.data.order.condition);
-                                }
-                                break;
-                            case 'delete-order':
-                                if (self.game.ruleset === 'Harberger') {
-                                    self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "delete");
-                                } else if (self.game.ruleset === 'Futarchy') {
-                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`][0].orderEvent(ev.data.order, "delete");
-                                    self.$refs.doubleAuctionMarket.activityDetected(ev.data.order.condition);
-                                }
-                                break;
-                            case 'update-order':
-                                if (self.game.ruleset === 'Harberger') {
-                                    self.$refs.doubleAuctionMarket.orderEvent(ev.data.order, "update");
-                                } else if (self.game.ruleset === 'Futarchy') {
-                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.order.condition}`][0].orderEvent(ev.data.order, "update");
-                                    self.$refs.doubleAuctionMarket.activityDetected(`tab-condition-${ev.data.order.condition}`);
-                                }
-                                break;
-                            case 'contract-fulfilled': 
-                                if (self.game.ruleset === 'Harberger') {
-                                    self.$refs.doubleAuctionMarket.orderEvent(ev.data, "contract");
-                                } else if (self.game.ruleset === 'Futarchy') {
-                                    self.$refs.doubleAuctionMarket.contractCompleted(ev.data);
-                                    self.$refs.doubleAuctionMarket.$refs[`doubleAuctionMarket${ev.data.condition}`][0].orderEvent(ev.data, "contract");
-                                }
-                                break;
                             case 'asset-movement': {
                                 self.player.wallet[ev.data.condition].balance = ev.data.balance;
                                 self.player.wallet[ev.data.condition].shares = ev.data.shares;
@@ -1005,9 +993,19 @@
                     self.game.phase = response.gameData.game.phase;
                     self.game.ruleset = response.gameData.game.ruleset;
 
+                    console.log('AWAITING TO RECOVER THE DATA');
+
                     await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load
 
                     self.recover(response.gameData);
+
+                    console.log('DATA RECOVERED');
+
+                    await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load
+
+                    EventService.on('component-ready', () => {
+                        EventService.emit('data-recovered', response.gameData);
+                    });
                 }
 
                 try {

@@ -1,24 +1,42 @@
 <template>
 
-    <div class="row-12">
+    <div class="flex-row">
         
-        <div class="text-center mb-1"><b>Declarations {{ condition != null ? '(' + condition.name + ')' : '' }}</b></div>
+        <!--div class="text-center mb-1"><b>Declarations {{ condition != null ? '(' + condition.name + ')' : '' }}</b></div-->
+        <div class="text-center mb-1"><b>Declarations</b></div>
 
-        <b-form-checkbox-group
+        <!--b-form-checkbox-group
             :id="'checkbox-group-' + (condition != null ? condition.id : 'tbd')"
             v-model="checkedPlots[(condition != null ? condition.id : 'tbd')]"
             :name="'checkedPlots' + (condition != null ? condition.id : 'tbd')"
+        -->
+        <b-form-checkbox-group
+            :id="'checked-plots'"
+            v-model="$parent.checkedPlots"
+            name="checked-plots"
+            class="d-flex flex-column col"
         >
-            <div class="row mb-1" v-for="offset in [0,3]" :key="offset">
-                <div class="col-4" v-for="index in [0 + offset, 1 + offset, 2 + offset]" :key="index">
+            <div class="row p-0" v-for="offset in [0,3]" :key="offset">
+                <div class="col-4 p-1" v-for="index in [0 + offset, 1 + offset, 2 + offset]" :key="index">
                     <b-card 
                         :header="getDeclarationPlayer(index)"
                         header-tag="header"
-                        class="mb-1"
+
                         :bg-variant="(player.role != 1 && index + 1 === player.number) ? 'primary' : 'light'"
                         :text-variant="(player.role != 1 && index + 1 === player.number) ? 'white' : 'black'"
                     >
-                        <div class="row">
+                        <div class="row p-0" v-for="condition in game.conditions" :key="condition.id">
+                            <div v-if="game.winningCondition == null || game.winningCondition === condition.id">
+                                <div class="col-12 p-0" v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
+                                        && game.declarations[index] != null">
+                                    <b-form-checkbox :value="(index + 1) + '.' + condition.id" >
+                                    {{ condition.name }} {{ getGameDeclaration(index, condition) }} ({{ getSniperProbability(index, condition.id)}}%)
+                                    </b-form-checkbox>
+                                </div>
+                                <div v-else class="col-12">{{ condition.name }}: {{ getGameDeclaration(index, condition) }}</div>
+                            </div>
+                        </div>
+                        <!--div class="row">
                             <div class="col-12 text-center" v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
                                     && game.declarations[index] != null">
                                 <b-form-checkbox :value="game.declarations[index].id">
@@ -26,7 +44,7 @@
                                 </b-form-checkbox>
                             </div>
                             <div v-else class="col-12 text-center">{{ getGameDeclaration(index, condition) }}</div>
-                        </div>
+                        </div-->
                     </b-card>
                 </div>
             </div>
@@ -40,11 +58,7 @@ export default {
     props: ['condition', 'project', 'checkedPlots', 'game', 'player', 'getDeclarationPlayer', 'getSniperProbability'],
     methods: {
         formatUs(num) {
-            if (num == null || typeof num != 'number') {
-                return num;
-            }
-
-            return num.toLocaleString('en-US');
+            return this.$parent.formatUs(num);
         },
         getGameDeclaration(index, condition) {
             const declarations = this.$props.game.declarations;

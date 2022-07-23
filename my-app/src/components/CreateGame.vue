@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <b-col><div class="d-flex flex-column h-100">
         <Header />
         <div class="px-5">
         <form>
@@ -279,7 +279,7 @@
         </form>
         </div>
         <div class="p-5">* To Be Clarified</div>
-    </div>
+    </div></b-col>
 </template>
 
 <script>

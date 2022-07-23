@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <b-col><div class="d-flex flex-column h-100">
           <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
@@ -40,7 +40,7 @@
                 </b-tabs>
             </b-card>
         </div>
-    </div>
+    </div></b-col>
 </template>
 <script>
     import XLSX from 'xlsx';
@@ -186,11 +186,11 @@
                     const partial = [];
 
                     [2,4].forEach((phase) => {
-                        if (r.results[phase] == null) {
+                        if (r.phase[phase] == null) {
                             return
                         }
 
-                        partial.push(...r.results[phase].chatLog);
+                        partial.push(...r.phase[phase].chatLog);
                     });
 
                     result.push(partial);
@@ -203,11 +203,11 @@
             this.chatLog = extractChatLog(this.rounds);
 
             this.rounds.forEach(round => {
-                if (round.results == null || round.results[2] == null) {
+                if (round.phase == null || round.phase[2] == null) {
                     return;
                 }
                 
-                round.results[2].chatLog.forEach(message => {
+                round.phase[2].chatLog.forEach(message => {
                     const tags = [];
 
                     self.players.forEach(p => {
@@ -219,11 +219,11 @@
                     message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];
                 });
 
-                if (round.results[4] == null) {
+                if (round.phase[4] == null) {
                     return;
                 }
 
-                round.results[4].chatLog.forEach(message => {
+                round.phase[4].chatLog.forEach(message => {
                     const tags = [];
 
                     self.players.forEach(p => {

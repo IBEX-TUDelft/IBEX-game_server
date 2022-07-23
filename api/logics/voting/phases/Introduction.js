@@ -28,37 +28,6 @@ class Introduction extends JoinablePhase {
             });
         });
 
-        this.game.conditions = [{
-                "name": "No Project",
-                "id": 0,
-                "parameter": "no_project",
-                "key": "noProject"
-            }, {
-                "name": "Project A",
-                "id": 1,
-                "parameter": "project_a",
-                "key": "projectA"
-            }
-        ];
-
-        if (parseInt(process.env.PROJECT_COUNT) > 2) {
-            this.game.conditions.push({
-                "name": "Project B",
-                "id": 2,
-                "parameter": "project_b",
-                "key": "projectB"
-            });
-        }
-
-        if (parseInt(process.env.PROJECT_COUNT) > 3) {
-            this.game.conditions.push({
-                "name": "Project C",
-                "id": 3,
-                "parameter": "project_c",
-                "key": "projectC"
-            });
-        }
-
         self.game.boundaries = {};
 
         ['developer', 'owner'].forEach(role => {

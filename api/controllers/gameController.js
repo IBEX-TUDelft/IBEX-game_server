@@ -133,6 +133,8 @@ export default {
                 }
             });
 
+            games.reverse();
+            
             Controller.handleSuccess(res, games, 'Data available');
         });
 
@@ -156,7 +158,7 @@ export default {
                 }
             });
 
-            data.results = game.results;
+            data.results = game.data.results;
 
             Controller.handleSuccess(res, data, 'Data available');
         });
@@ -174,10 +176,15 @@ export default {
                         "tag": p.tag
                     }
                 }),
-                "conditions": game.conditions,
-                "marketLogs": game.results.filter(r => r.results[6] != null).map(r => r.results[6].log),
-                "winningConditions": game.results.filter(r => r.results[3] != null).map(r => r.results[3].winningCondition),
+                "conditions": game.data.conditions,
+                "marketLogs": game.data.results.filter(r => r.phase[6] != null).map(r => r.phase[6].log)
             };
+
+            if (game.data.type === 'Futarchy') {
+                data.winningConditions = game.data.results.filter(r => r.phase[6] != null).map(r => r.phase[6].winningCondition)
+            } else if (game.data.type === 'Harberger') {
+                data.winningConditions = game.data.results.filter(r => r.phase[3] != null).map(r => r.phase[3].winningCondition)
+            }
 
             Controller.handleSuccess(res, data, 'Data available');
         });
@@ -195,7 +202,7 @@ export default {
                         "tag": p.tag
                     }
                 }),
-                "results": game.results
+                "results": game.data.results
             };
 
             Controller.handleSuccess(res, data, 'Data available');

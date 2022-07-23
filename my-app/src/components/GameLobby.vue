@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <b-col><div class="d-flex flex-column h-100">
         <Header />
         <div class="table-responsive px-5">
             <table class="table table-bordered">
@@ -37,7 +37,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </div></b-col>
 </template>
 <script>
 import Header from './Header.vue'

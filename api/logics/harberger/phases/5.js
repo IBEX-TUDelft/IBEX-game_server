@@ -40,7 +40,7 @@ class Phase5 extends JoinablePhase {
 
         self.results.signals = {
             publicSignal: self.game.publicSignal,
-            privateSignals: self.game.players.map(p => { return p.S; })
+            privateSignals: self.game.players.map(p => { return [...p.S]; })
         };
         
         this.setTimer(5 * 1000, 5 * 1000);

@@ -11,7 +11,8 @@ class Phase6 extends JoinablePhase {
     results = {
         snipes: [],
         snipeOutcomes: [],
-        log: [[],[],[]]
+        log: [[],[],[]],
+        winningCondition: null
     }
 
     constructor(game, wss) {
@@ -227,15 +228,21 @@ class Phase6 extends JoinablePhase {
                 continue;
             }
 
-            const last = list[list.length - 1];
+            list.map(i => i.movement.price).reduce((a,b) => a + b);
 
-            this.game.quotations[condition] = last.movement.price;
+            //const last = list[list.length - 1];
+
+            //this.game.quotations[condition] = last.movement.price;
+
+            this.game.quotations[condition] = list.map(i => i.movement.price).reduce((a,b) => a + b) / list.length;
 
             if (this.game.quotations[condition] > winningQuotation) {
                 winningQuotation = this.game.quotations[condition];
                 winningCondition = condition;
             }
         }
+
+        console.log(this.game.quotations);
 
         this.game.winningCondition = winningCondition;
 

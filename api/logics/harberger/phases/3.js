@@ -174,7 +174,7 @@ class Phase3 extends JoinablePhase {
     }
 
     testComplete () {
-        return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0 || Date.now() >= this.endTime;
+        return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0 || this.complete === true;
     }
 }
 

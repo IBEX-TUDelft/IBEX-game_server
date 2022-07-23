@@ -5,6 +5,7 @@ import GameRepository from '../repositories/gameRepository.js';
 import GameService from "../services/gameService.js";
 import Utils from '../helpers/utils.js';
 import WS from '../helpers/websocket.js';
+import fs from 'fs';
 
 export default class {
 
@@ -70,7 +71,6 @@ export default class {
     phases;
     wss = null;
     phaseCheckingInterval = null;
-    results = [];
 
     constructor (data, phases, type) {
         if (data == null) {
@@ -93,6 +93,9 @@ export default class {
 
     async init () {
         const self = this;
+
+        const rawProjects = fs.readFileSync('./resources/projects.json');
+        this.data.conditions = JSON.parse(rawProjects);
 
         self.data.players.forEach(player => {
             player.summaries = [];
@@ -196,7 +199,9 @@ export default class {
             self.data.properties.push(property);
         });
 
-        self.data.V = [0, 0, 0];
+        this.data.results = [];
+
+        /*self.data.V = [0, 0, 0];
 
         self.data.properties.forEach(p => {
             for (let j = 0; j < 3; j++) {
@@ -225,7 +230,7 @@ export default class {
 
                 console.log(`${player.name} S = ${player.S}`);
             }
-        }
+        }*/
 
         await GameRepository.saveData(self.data.id, self.data);
     }
@@ -264,7 +269,7 @@ export default class {
 
         await this.data.currentPhase.onExit();
 
-        this.results[this.results.length - 1].results.push(this.data.currentPhase.results);
+        this.data.results[this.data.results.length - 1].phase.push(this.data.currentPhase.results);
 
         console.log(`Phase ${this.data.currentRound.phase} results:`);
         console.log(this.data.currentPhase.results);
@@ -358,6 +363,36 @@ export default class {
             }
         });
 
+        if (this.data.type != 'Voting') {
+            let V = [];
+
+            for (let j = 0; j < 2; j++) {
+                V[j] = 0;
+
+                this.data.properties.forEach(p => {
+                    V[j] += p.v[j];
+                });
+            }
+
+            for (let i = 0; i < this.data.players.length; i++) {
+                const player = this.data.players[i];
+
+                for (let j = 0; j < 2; j++) {
+                    const delta = (this.data.parameters.signal_high - this.data.parameters.signal_low) * Math.random();
+
+                    const coefficient = this.data.parameters.signal_low + delta;
+
+                    console.log(`delta1 = ${delta}, coefficient1 = ${coefficient}`);
+
+                    const normalizedTaxRate = this.data.parameters.tax_rate_final / 100;
+
+                    player.S[j] = Math.round(V[j] * coefficient * normalizedTaxRate / 100);
+                }
+
+                console.log(`${player.name} S = ${player.S}`);
+            }
+        }
+
         if (number > this.data.parameters.round_count ) {
             console.log('The game is over');
             this.wss.broadcastEvent(this.data.id, "game-over", {});
@@ -365,9 +400,9 @@ export default class {
             return;
         }
 
-        this.results.push({
+        this.data.results.push({
             "round": number,
-            "results": []
+            "phase": []
         });
 
         const data = this.data;
@@ -401,10 +436,6 @@ export default class {
         }
 
         await this.data.currentPhase.onEnter();
-
-        /*if (this.data.currentRound.number > 1) {
-            await this.nextPhase();
-        }*/
 
         console.log('Should have entered the new phase');
 

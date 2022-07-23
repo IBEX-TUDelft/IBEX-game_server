@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <b-col><div class="d-flex flex-column h-100">
         <confirm></confirm>
         <acknowledge></acknowledge>
 
@@ -229,7 +229,7 @@
                 </table>
             </div>
         </div>
-    </div>
+    </div></b-col>
 </template>
 
 <script>
@@ -622,7 +622,13 @@ export default {
                 return num;
             }
 
-            return num.toLocaleString('en-US');
+            let format = 'en-US';
+
+            if (this.dictionary.parameters.format != null) {
+                format = this.dictionary.parameters.format;
+            }
+
+            return (Math.round(num * 100) / 100).toLocaleString(format);
         },
         signalReady() {
             const self = this;

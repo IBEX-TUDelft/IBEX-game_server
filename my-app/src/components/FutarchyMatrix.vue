@@ -31,5 +31,10 @@ export default {
     components: {
         HarbergerMatrix
     },
+    methods: {
+        formatUs(num) {
+            return this.$parent.formatUs(num);
+        }
+    }
 }
 </script>

@@ -29,7 +29,7 @@ class Phase2 extends JoinablePhase {
                 caller.results.declarations.push({
                     "player": player.number,
                     "role": player.role,
-                    "value": player.property.v,
+                    "value": [...player.property.v],
                     "declaration": message.declaration,
                     "taxes": message.declaration.map(d => d * game.parameters.tax_rate_initial / 100)
                 });

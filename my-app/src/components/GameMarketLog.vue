@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <b-col><div class="d-flex flex-column h-100">
           <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
@@ -42,8 +42,9 @@
                                         <th scope="col">Best Ask</th>
                                         <th scope="col">Book</th>
                                     </thead>
-                                    <tbody v-if="ruleset === 'Harberger'">
-                                        <tr v-for="l in marketLogs[i][winningConditions[i]]" :key="l.id">
+                                    <tbody v-for="c in getActiveConditions(i)" :key="c.name">
+                                        <tr><td colspan="100%" style="text-align: center;"><b>{{ c.name }}</b></td></tr>
+                                        <tr v-for="l in c.marketLog" :key="l.id">
                                             <td>{{ l.time }}</td>
                                             <td>{{ l.round }}.{{ l.phase }}</td>
                                             <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
@@ -57,52 +58,7 @@
                                             <td>{{ l.book }}</td>
                                         </tr>
                                     </tbody>
-                                    <tbody v-if="ruleset === 'Futarchy'">
-                                        <tr><td colspan="100%" style="text-align: center;"><b>No Project</b></td></tr>
-                                        <tr v-for="l in marketLogs[i][0]" :key="l.id">
-                                            <td>{{ l.time }}</td>
-                                            <td>{{ l.round }}.{{ l.phase }}</td>
-                                            <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
-                                            <td>{{ l.action }}</td>
-                                            <td>{{ l.quantity }}</td>
-                                            <td>{{ formatNumber(l.price) }}</td>
-                                            <td>{{ l.buyer == null ? '' : getPlayer(l.buyer.number, l.buyer.role) }}</td>
-                                            <td>{{ l.seller == null ? '' : getPlayer(l.seller.number, l.seller.role) }}</td>
-                                            <td>{{  formatNumber(l.bestBid) }}</td>
-                                            <td>{{  formatNumber(l.bestAsk) }}</td>
-                                            <td>{{ l.book }}</td>
-                                        </tr>
-                                        
-                                        <tr><td colspan="100%" style="text-align: center;"><b>Project A</b></td></tr>
-                                        <tr v-for="l in marketLogs[i][1]" :key="l.id">
-                                            <td>{{ l.time }}</td>
-                                            <td>{{ l.round }}.{{ l.phase }}</td>
-                                            <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
-                                            <td>{{ l.action }}</td>
-                                            <td>{{ l.quantity }}</td>
-                                            <td>{{ formatNumber(l.price) }}</td>
-                                            <td>{{ l.buyer == null ? '' : getPlayer(l.buyer.number, l.buyer.role) }}</td>
-                                            <td>{{ l.seller == null ? '' : getPlayer(l.seller.number, l.seller.role) }}</td>
-                                            <td>{{ formatNumber(l.bestBid) }}</td>
-                                            <td>{{ formatNumber(l.bestAsk) }}</td>
-                                            <td>{{ l.book }}</td>
-                                        </tr>
 
-                                        <tr><td colspan="100%" style="text-align: center;"><b>Project B</b></td></tr>
-                                        <tr v-for="l in marketLogs[i][2]" :key="l.id">
-                                            <td>{{ l.time }}</td>
-                                            <td>{{ l.round }}.{{ l.phase }}</td>
-                                            <td>{{ getPlayer(l.actor.number, l.actor.role) }}</td>
-                                            <td>{{ l.action }}</td>
-                                            <td>{{ l.quantity }}</td>
-                                            <td>{{ formatNumber(l.price) }}</td>
-                                            <td>{{ l.buyer == null ? '' : getPlayer(l.buyer.number, l.buyer.role) }}</td>
-                                            <td>{{ l.seller == null ? '' : getPlayer(l.seller.number, l.seller.role) }}</td>
-                                            <td>{{ formatNumber(l.bestBid) }}</td>
-                                            <td>{{ formatNumber(l.bestAsk) }}</td>
-                                            <td>{{ l.book }}</td>
-                                        </tr>
-                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -111,22 +67,10 @@
                 </b-tabs>
             </b-card>
         </div>
-    </div>
+    </div></b-col>
 </template>
 <script>
     import XLSX from 'xlsx';
-
-    const roleMap = {
-        1: "Sniper",
-        2: "Developer",
-        3: "Owner"
-    };
-
-    const conditionMap = {
-        0: "No Project",
-        1: "Project A",
-        2: "Project B",
-    }
 
     export default {
         data() {
@@ -162,6 +106,27 @@
 
                 return value;
             },
+            getActiveConditions(round) {
+                const self = this;
+
+                const cds = [];
+
+                if (this.ruleset === 'Harberger') {
+                    cds.push({
+                        "name": self.conditions[self.winningConditions[round]].name,
+                        "marketLog": this.marketLogs[round][self.winningConditions[round]]
+                    });
+                } else if (this.ruleset === 'Futarchy') {
+                    for (let i = 0; i < self.conditions.length; i++) {
+                        cds.push({
+                            "name": self.conditions[i].name,
+                            "marketLog": self.marketLogs[round][i]
+                        })
+                    }
+                }
+
+                return cds;
+            },
             getYesOrNo(bool) {
                 if (bool == null) {
                     return '';
@@ -176,24 +141,8 @@
 
                 return this.winningCondition === i ? 'Y' : 'N';
             },
-            getPlayer(number, role) {
-                return roleMap[role] + ' ' + number;
-            },
-            getDeclarationPlayer(i) {
-                const declaration = this.game.declarations[i];
-
-                if (declaration == null) {
-                    console.log(`Could not find declaration ${i}`);
-                    return 'Unavailable';
-                }
-
-                return roleMap[declaration.role] + ' ' + i;
-            },
-            conditionToString(c) {
-                return conditionMap[c];
-            },
-            showPreview() {
-                //TODO
+            getPlayer(number) {
+                return this.players.find(p => p.number === number).tag;
             },
             formatNumber(num) {
                 if (num == null || typeof num != 'number') {
@@ -255,7 +204,7 @@
                                     r.bestBid,
                                     r.bestAsk,
                                     r.book,
-                                    conditionMap[i]
+                                    self.conditions[i].name
                                 ]);
                             });
                         });
@@ -296,6 +245,7 @@
             });
             this.indexes = this.marketLogs.map((e, i) => i);
             this.winningConditions = response.data.data.winningConditions;
+            this.conditions = response.data.data.conditions;
         }
     }
 </script>

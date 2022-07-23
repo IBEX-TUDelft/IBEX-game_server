@@ -8,6 +8,8 @@ export default class Phase {
     wss = null;
     instructions = [];
 
+    phasePlayers = [];
+
     timer = {
         "set": false,
         "visibleTimeout": null,
@@ -33,7 +35,11 @@ export default class Phase {
             }
         }
 
-        console.log(this.handlers);
+        this.phasePlayers.push(...this.game.players.map(p => {
+            return {
+                "number": p.number
+            };
+        }));
     }
 
     async onEnter() {

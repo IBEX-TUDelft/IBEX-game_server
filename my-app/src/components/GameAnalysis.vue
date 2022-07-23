@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <b-col><div class="d-flex flex-column h-100">
         <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
@@ -80,7 +80,7 @@
                                         <th scope="col">#12</th>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="c in conditions" :key="c.id" :style="c.id === winningCondition ? 'background-color: yellow;' : ''">
+                                        <tr v-for="c in conditions" :key="c.id" :style="c.id === winningCondition[index] ? 'background-color: yellow;' : ''">
                                             <td>{{ c.name }}</td>
                                             <td>{{ signals != null ? formatUs(signals[index].publicSignal[c.id]) : '-' }}</td>
                                             <td>{{ getPrivateSignal(index, 0, c.id) }}</td>
@@ -210,7 +210,7 @@
             </b-card>
 
         </div>
-    </div>
+    </div></b-col>
 </template>
 <script>
     import XLSX from 'xlsx';
@@ -532,11 +532,11 @@
                 const result = [];
 
                 rounds.forEach(r => {
-                    if (r.results[phase] == null) {
+                    if (r.phase[phase] == null) {
                         return
                     }
 
-                    result.push(r.results[phase][property]);
+                    result.push(r.phase[phase][property]);
                 })
 
                 return result;

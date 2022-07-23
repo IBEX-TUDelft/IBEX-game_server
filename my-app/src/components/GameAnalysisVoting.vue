@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <b-col><div class="d-flex flex-column h-100">
         <div>
             <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                 <b-navbar-nav>
@@ -90,7 +90,7 @@
             </b-card>
 
         </div>
-    </div>
+    </div></b-col>
 </template>
 <script>
     import XLSX from 'xlsx';
@@ -315,11 +315,11 @@
                 const result = [];
 
                 rounds.forEach(r => {
-                    if (r.results[phase] == null) {
+                    if (r.phase[phase] == null) {
                         return
                     }
 
-                    result.push(r.results[phase][property]);
+                    result.push(r.phase[phase][property]);
                 })
 
                 return result;

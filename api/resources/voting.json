@@ -1,4 +1,15 @@
 {
+    "projects": [{
+        "name": "No Project",
+        "id": 0,
+        "parameter": "no_project",
+        "key": "noProject"
+    }, {
+        "name": "Project",
+        "id": 1,
+        "parameter": "project_a",
+        "key": "projectA"
+    }],
     "instructions": {
         "phases": [{
             "number": 0,
