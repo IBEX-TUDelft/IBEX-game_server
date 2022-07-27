@@ -37,6 +37,18 @@ class Phase6 extends JoinablePhase {
                 }
 
                 if (order.type === 'ask') {
+                    if (order.price <= 0) {
+                        wss.sendEvent(
+                            game.id,
+                            player.number,
+                            'order-refused',
+                            {
+                                "message": `Order prices must be non negative. Your price: ${order.price}`
+                            }
+                        );
+                        return; //Cannot ask or bid negative numbers
+                    }
+                    
                     const activeAsksForCondition = phase.orders[condition].filter(o => o.sender === player.number && o.type === 'ask').length;
 
                     if (player.wallet[condition].shares <= activeAsksForCondition) {

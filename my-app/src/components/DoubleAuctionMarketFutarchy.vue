@@ -37,6 +37,9 @@ export default {
         },
         formatUs(num) {
             return this.$parent.formatUs(num);
+        },
+        numberOnly(e) {
+            return this.$parent.numberOnly(e);
         }
     },
     components: {

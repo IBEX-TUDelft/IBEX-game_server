@@ -2,23 +2,26 @@
     <div v-if="player != null">
         <b-card 
             v-if="role === 2"
-            :header="player.tag + '\'s Compensation Request'"
+            :header="player.role === 2 ? player.tag : player.tag + '\'s Compensation Request'"
             header-tag="header"
             class="mb-1"
             :bg-variant="owned ? 'primary' : 'light'"
             :text-variant="owned ? 'white' : 'black'"
         >
-            <div class="row" v-for="condition in game.conditions" :key="condition.id">
-                <div class="col-6 font-weight-bold">
+            <div class="row" v-for="condition in game.conditions.slice(1, game.conditions.length)" :key="condition.id">
+                <div v-if="player.role != 2" class="col-6 font-weight-bold">
                     {{ condition.name }}
                 </div>
-                <div class="col-6">
+                <div v-if="player.role != 2" class="col-6">
                     <div v-if="player.property != null && player.property.lastOffer != null && player.property.lastOffer[condition.id] != null">
                     {{  $parent.formatUs(player.property.lastOffer[condition.id]) }}
                     </div>
                     <div v-else>
                         -
                     </div>
+                </div>
+                <div v-if="player.role === 2" class="col-12 text-center">
+                    -
                 </div>
             </div>
         </b-card>

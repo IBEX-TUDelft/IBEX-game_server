@@ -306,10 +306,12 @@ export default class {
 
         await GameRepository.saveData(this.data.id, this.data);
 
-        let err = this.wss.broadcastEvent(this.data.id, "phase-transition", {
+        const evData = {
             "round": this.data.currentRound.number,
             "phase": this.data.currentRound.phase
-        });
+        };
+
+        let err = this.wss.broadcastEvent(this.data.id, "phase-transition", evData);
 
         if (err != null) {
             console.error(err);

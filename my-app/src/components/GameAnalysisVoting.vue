@@ -224,6 +224,12 @@
             getCompensationReceived(roundNumber, role) {
                 const jackpot = this.compensationOffers[roundNumber - 1][this.winningCondition[roundNumber - 1]];
 
+                console.log('jackpot: ' + jackpot);
+
+                if (jackpot == null || jackpot === 0) {
+                    return 0;
+                }
+
                 if (role === 3) {
                     return this.formatUs(jackpot);
                 } else {
@@ -332,7 +338,7 @@
             
             this.playerValues = extractProperty(this.rounds, 1, 'players');
             this.compensationRequests = extractProperty(this.rounds, 3, 'compensationRequests');
-            this.compensationOffers = extractProperty(this.rounds, 5, 'compensationOffers');
+            this.compensationOffers = extractProperty(this.rounds, 4, 'compensationOffers');
             this.compensationDecisions = extractProperty(this.rounds, 6, 'compensationDecisions');
             this.standings = extractProperty(this.rounds, 7, 'standings');
             this.winningCondition = extractProperty(this.rounds, 7, 'winningCondition');

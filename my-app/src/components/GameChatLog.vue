@@ -185,7 +185,7 @@
                 rounds.forEach(r => {
                     const partial = [];
 
-                    [2,4].forEach((phase) => {
+                    [2,5].forEach((phase) => {
                         if (r.phase[phase] == null) {
                             return
                         }
@@ -219,11 +219,11 @@
                     message.participants = tags.slice(0, tags.length - 1).join(', ') + ' and ' + tags[tags.length - 1];
                 });
 
-                if (round.phase[4] == null) {
+                if (round.phase[5] == null) {
                     return;
                 }
 
-                round.phase[4].chatLog.forEach(message => {
+                round.phase[5].chatLog.forEach(message => {
                     const tags = [];
 
                     self.players.forEach(p => {

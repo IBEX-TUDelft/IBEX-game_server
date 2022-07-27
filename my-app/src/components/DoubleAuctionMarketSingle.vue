@@ -22,7 +22,7 @@
 
                 <div class="col-4">
                     <div class="row-12">
-                        <input type="number" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
+                        <b-form-input @keydown="$parent.numberOnly" type="number" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
                     </div>
                 </div>
 
@@ -89,7 +89,7 @@
                 </div>
 
                 <div class="d-flex flex-column col-4">
-                    <input type="number" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
+                    <b-form-input @keydown="$parent.numberOnly" type="number" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
                 </div>
             </div>
 
@@ -184,6 +184,8 @@ export default {
                         "now": now
                     }
 
+                    self.ask_price = null;
+
                     break;
                 case "bid":
                     if (self.$props.player.balance < self.bid_price) {
@@ -199,6 +201,8 @@ export default {
                         "type": type,
                         "now": now
                     }
+
+                    self.bid_price = null;
 
                     break;
                 default:

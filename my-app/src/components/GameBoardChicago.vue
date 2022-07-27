@@ -35,10 +35,7 @@
         <b-row class="d-flex flex-row no-gutters" v-if="![0,6,9].includes(game.phase)">
             <div class="d-flex flex-column col-6">
 
-                <!--FutarchyMatrix :condition="game.winningCondition" :project="conditionToString(game.winningCondition)"
-                        v-if="game.ruleset === 'Futarchy' && game.phase < 7"/-->
                 <HarbergerMatrix
-
                     :condition="game.conditions[game.winningCondition]"
                     :project="conditionToString(game.winningCondition)"
                     :game="game"
@@ -46,7 +43,7 @@
                     :checkedPlots="checkedPlots"
                     :getDeclarationPlayer="getDeclarationPlayer"
                     :getSniperProbability="getSniperProbability"
-                    />
+                />
 
                 <div class="row justify-content-center" v-if="player.role == 1 && (game.phase === 3 || game.phase === 8) && player.hasToSpeculate">
                     <div class="col-6 text-center">
@@ -97,9 +94,8 @@
                                 <td>{{ condition.name }}</td>
                                 <td>{{ formatUs(player.property.v[condition.id]) }}</td>
                                 <td>
-                                    <input v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" type="number" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
+                                    <b-form-input @keydown="numberOnly" v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" type="number" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
                                     <div v-else>
-                                        <!-- {{ game.winningCondition }} {{ condition.id }} {{ player.declaration}} -->
                                         <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
                                             <div v-if="player.declaration != null && player.declaration[condition.id] != null">
                                                 {{ player.declaration[condition.id]}}
@@ -206,7 +202,6 @@
     import DoubleAuctionMarketSingle from './DoubleAuctionMarketSingle.vue';
     import DoubleAuctionMarketFutarchy from './DoubleAuctionMarketFutarchy.vue';
     import HarbergerMatrix from './HarbergerMatrix.vue';
-    //import FutarchyMatrix from './FutarchyMatrix.vue';
     import ErrorList from './modals/ErrorList.vue';
     import Confirm from './modals/Confirm.vue';
     import Acknowledge from './modals/Acknowledge.vue';
@@ -306,7 +301,6 @@
             DoubleAuctionMarketSingle,
             DoubleAuctionMarketFutarchy,
             HarbergerMatrix,
-            //FutarchyMatrix,
             ErrorList,
             Confirm,
             Acknowledge,
@@ -967,6 +961,18 @@
                 this.modals.confirm.show = false;
 
                 return result;
+            },
+            numberOnly(e) {
+                console.log(e.which);
+
+                const allowed = [8,9,48,49,50,51,52,53,54,55,56,57,190];
+
+                if (!allowed.includes(e.which)) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                return true;
             }
         },
         mounted () {

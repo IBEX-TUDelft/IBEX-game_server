@@ -1,6 +1,6 @@
 import JoinablePhase from '../../JoinablePhase.js';
 
-class Phase5 extends JoinablePhase {
+class Vote extends JoinablePhase {
 
     complete = false;
 
@@ -42,7 +42,7 @@ class Phase5 extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
 
-        console.log('PHASE 5');
+        console.log('VOTING PHASE');
     }
 
     getData() {
@@ -60,6 +60,6 @@ class Phase5 extends JoinablePhase {
 
 export default {
     create(game, wss) {
-        return new Phase5(game, wss);
+        return new Vote(game, wss);
     }
 }

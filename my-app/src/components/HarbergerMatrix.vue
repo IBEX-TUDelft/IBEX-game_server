@@ -2,14 +2,8 @@
 
     <div class="flex-row">
         
-        <!--div class="text-center mb-1"><b>Declarations {{ condition != null ? '(' + condition.name + ')' : '' }}</b></div-->
         <div class="text-center mb-1"><b>Declarations</b></div>
 
-        <!--b-form-checkbox-group
-            :id="'checkbox-group-' + (condition != null ? condition.id : 'tbd')"
-            v-model="checkedPlots[(condition != null ? condition.id : 'tbd')]"
-            :name="'checkedPlots' + (condition != null ? condition.id : 'tbd')"
-        -->
         <b-form-checkbox-group
             :id="'checked-plots'"
             v-model="$parent.checkedPlots"
@@ -28,7 +22,7 @@
                         <div class="row p-0" v-for="condition in game.conditions" :key="condition.id">
                             <div v-if="game.winningCondition == null || game.winningCondition === condition.id">
                                 <div class="col-12 p-0" v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                        && game.declarations[index] != null">
+                                        && game.declarations[index] != null && player.hasToSpeculate">
                                     <b-form-checkbox :value="(index + 1) + '.' + condition.id" >
                                     {{ condition.name }} {{ getGameDeclaration(index, condition) }} ({{ getSniperProbability(index, condition.id)}}%)
                                     </b-form-checkbox>
@@ -36,15 +30,7 @@
                                 <div v-else class="col-12">{{ condition.name }}: {{ getGameDeclaration(index, condition) }}</div>
                             </div>
                         </div>
-                        <!--div class="row">
-                            <div class="col-12 text-center" v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
-                                    && game.declarations[index] != null">
-                                <b-form-checkbox :value="game.declarations[index].id">
-                                {{ getGameDeclaration(index, condition) }} ({{ getSniperProbability(index, condition.id)}}%)
-                                </b-form-checkbox>
-                            </div>
-                            <div v-else class="col-12 text-center">{{ getGameDeclaration(index, condition) }}</div>
-                        </div-->
+
                     </b-card>
                 </div>
             </div>

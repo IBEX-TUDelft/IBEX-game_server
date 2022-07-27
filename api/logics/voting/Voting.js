@@ -12,7 +12,7 @@ import End from './phases/6.js';
 
 export default class Voting extends Logic {
     constructor(data) {
-        super(data, [WaitToStartPhase, Introduction, Chat, Request, Chat, Offer, Vote, End], 'Voting');
+        super(data, [WaitToStartPhase, Introduction, Chat, Request, Offer, Chat, Vote, End], 'Voting');
 
         const rawDictionary = fs.readFileSync('./resources/voting.json');
 
@@ -45,12 +45,16 @@ export default class Voting extends Logic {
         let messages = null;
 
         console.log('RESULTS');
-        console.log(self.results);
+        console.log(self.data.results);
 
         if (self.data.currentRound.phase === 2) {
             messages = self.data.currentPhase.results.chatLog;
         } else if (self.data.currentRound.phase > 2) {
-            messages = self.results.find(r => r.round === self.data.currentRound.number).results[2].chatLog;
+            const results = self.data.results.find(r => r.round === self.data.currentRound.number);
+
+            console.log(results);
+
+            messages = results.phase[2].chatLog;
         }
 
         if (messages != null) {
@@ -68,10 +72,10 @@ export default class Voting extends Logic {
             })
         }
 
-        if (self.data.currentRound.phase === 4) {
+        if (self.data.currentRound.phase === 5) {
             messages = self.data.currentPhase.results.chatLog;
-        } else if (self.data.currentRound.phase > 4) {
-            messages = self.results.find(r => r.round === self.data.currentRound.number).results[4].chatLog;
+        } else if (self.data.currentRound.phase > 5) {
+            messages = self.data.results.find(r => r.round === self.data.currentRound.number).phase[5].chatLog;
         }
 
         game.compensationRequests = compensationRequests;
