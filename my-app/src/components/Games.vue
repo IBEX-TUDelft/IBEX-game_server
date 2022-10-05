@@ -72,6 +72,7 @@
                         }
                     });
 
+                    // eslint-disable-next-line
                     this.games = records.data.data;
 
                     console.log('Game ' + id + ' deleted.');
