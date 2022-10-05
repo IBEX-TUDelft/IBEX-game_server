@@ -50,11 +50,11 @@
                                             <td>{{ condition.name }}</td>
                                             <td>{{ formatUs(player.property.v[condition.id]) }}</td>
                                             <td v-if="game.phase >= 4">
-                                                <input v-if="condition.id != 0 && player.compensationOfferReceived != true" type="number" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
-                                                <div v-if="game.phase >= 6">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
+                                                <b-form-input @keydown="formatInput"  v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                                <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                             </td>
                                             <td v-if="game.phase === 4">
-                                                <div>{{ formatUs(player.property.v[condition.id] - (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0) * game.players.filter(p => p.role === 3).length) }}</div>
+                                                <div>{{ formatUs(player.property.v[condition.id] - parseFormatted(extractDataFromObject('0', game.compensationOffers, condition.id)) * game.players.filter(p => p.role === 3).length) }}</div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -74,17 +74,17 @@
                                             <td>{{ condition.name }}</td>
                                             <td>{{ formatUs(player.property.v[condition.id]) }}</td>
                                             <td v-if="game.phase >= 3">
-                                                <input v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" type="number" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                                <b-form-input @keydown="formatInput" v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
                                                 <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
                                             </td>
                                             <td v-if="game.phase >= 6">
                                                 <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                             </td>
                                             <td v-if="game.phase === 3">
-                                                {{ formatUs(player.property.v[condition.id] + (player.compensationRequests[condition.id] != null ? parseInt(player.compensationRequests[condition.id]) : 0)) }}
+                                                {{ formatUs(player.property.v[condition.id] + parseFormatted(player.compensationRequests[condition.id], 0)) }}
                                             </td>
                                             <td v-if="game.phase === 6">
-                                                {{ formatUs(player.property.v[condition.id] + (game.compensationOffers[condition.id] != null ? game.compensationOffers[condition.id] : 0)) }}
+                                                {{ formatUs(player.property.v[condition.id] + extractDataFromObject(0, game.compensationOffers, condition.id)) }}
                                             </td>
                                             <td v-if="game.phase === 6" style="background-color: yellow;">
                                                 <b-form-radio
@@ -152,6 +152,24 @@
                 </div>
 
                 <div class="col-4"> <!-- Player list -->
+
+                    <div v-if="game.phase === 4 && player.role === 2" class="row mb-3"><div class="col-12 text-center"><b>Requests</b></div></div>
+
+                    <div v-if="game.phase === 4 && player.role === 2" class="row mb-3">
+                        <table class="table table-bordered" style="table-layout: fixed;">
+                            <thead class="thead-dark">
+                                <th scope="col">Player</th>
+                                <th scope="col">Request</th>
+                            </thead>
+                            <tbody>
+                                <tr v-for="p in game.players.filter(p => p.role === 3).map(p => { return { n: p.number, t: p.tag, r: p.property.lastOffer[1] }; }).sort((a, b) => b.r - a.r)"
+                                    :key="p.n">
+                                    <td>{{ p.t }}</td>
+                                    <td>{{ formatUs(p.r) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div v-if="game.phase > 1" class="row mb-3"><div class="col-12 text-center"><b>Chat</b></div></div>
 
@@ -238,12 +256,14 @@ import Confirm from './modals/Confirm.vue';
 import Acknowledge from './modals/Acknowledge.vue';
 import { getGameStatus } from '../services/GameService'
 import dictionary from '../assets/voting.json';
+import { LocalizedNumberParser } from 'localized-number-parser';
 
 export default {
     data() {
         return {
             connection: null,
             dictionary: {},
+            format: 'en-US',
             timer: {
                 on: false,
                 minutes: "00",
@@ -359,6 +379,9 @@ export default {
                             break;
                         case 'phase-instructions':
                             self.player.instructions = ev.data.instructions;
+
+                            self.acknowledge(`Phase Instructions`, ev.data.instructions);
+
                             break;
                         case 'assign-role':
                             self.player.role = ev.data.role;
@@ -622,13 +645,7 @@ export default {
                 return num;
             }
 
-            let format = 'en-US';
-
-            if (this.dictionary.parameters.format != null) {
-                format = this.dictionary.parameters.format;
-            }
-
-            return (Math.round(num * 100) / 100).toLocaleString(format);
+            return (Math.round(num * 100) / 100).toLocaleString(this.format);
         },
         signalReady() {
             const self = this;
@@ -652,7 +669,7 @@ export default {
             this.sendMessage({
                 "gameId": self.game.id,
                 "type": "compensation-request",
-                "compensationRequests": self.player.compensationRequests.map(c => parseInt(c))
+                "compensationRequests": self.player.compensationRequests.map(c => new LocalizedNumberParser(self.format).parse(c))
             });
         },
         async submitCompensationOffers() {
@@ -667,7 +684,7 @@ export default {
             this.sendMessage({
                 "gameId": self.game.id,
                 "type": "compensation-offer",
-                "compensationOffers": self.game.compensationOffers.map(c => parseInt(c))
+                "compensationOffers": self.game.compensationOffers.map(c => new LocalizedNumberParser(self.format).parse(c))
             });
         },
         findPlayerByNumber(number) {
@@ -781,7 +798,121 @@ export default {
             this.modals.confirm.show = false;
 
             return result;
-        }
+        }, formatInput(e) {
+            if (e == null) {
+                return;
+            }
+            if (![8,9,48,49,50,51,52,53,54,55,56,57,188,190].includes(e.which)) {
+                console.log(`Sorry ${e.which}`)
+                e.preventDefault();
+                return false;
+            }
+
+            let format = this.format;
+
+            if (Number.isNaN(new LocalizedNumberParser(format).parse(e.target.value))) {
+                return true;
+            }
+
+            const currentValueString = e.target.value;
+            let currentValue = null;
+
+            try {
+                currentValue = new LocalizedNumberParser(format).parse(currentValueString);
+
+                if (currentValue != null) {
+                    console.log(`Current value string: ${currentValueString}, parsed into ${currentValue} (${typeof currentValue}). Format: ${format}`);
+                } else {
+                    console.log(`Current value string: ${currentValueString} can't be parsed into a ${format} value because the parser return a null value`);
+                }
+            } catch (err) {
+                console.err(`Current value string: ${currentValueString} can't be parsed into a ${format} value because of an exception`, err);
+            }
+
+            let newValue;
+
+            switch(e.which) {
+                case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57:
+
+                    if (!e.target.value.endsWith('.') && !e.target.value.endsWith(',')) {
+                        e.target.value = this.formatUs(parseFloat(currentValue.toString() + (e.which - 48).toString())).slice(0, -1);
+                    }
+
+                    return true;
+                case 9: /*Tab*/
+                    return true;
+                case 188: /*Comma*/ case 190: /*Dot*/
+                    var character = e.which === 188 ? ',' : '.';
+
+                    try {
+                        newValue = new LocalizedNumberParser(format).parse(currentValueString + character);
+
+                        if (Number.isNaN(newValue)) {
+                            throw new Error('The parser returned a non value');
+                        }
+
+                        return true;
+                    } catch (err) {
+                        e.preventDefault();
+                        console.error(`Can't add ${character} to ${e.target.value}`, err);
+                        return false;
+                    }
+                case 8: //Backspace
+                    if (currentValueString == null || currentValueString.trim() === '' || currentValueString.slice(0, -1).trim() === '') {
+                        return true;
+                    }
+
+                    e.target.value =
+                        this.formatUs(new LocalizedNumberParser(format).parse(currentValueString.slice(0, -1))) +
+                        e.target.value.charAt(e.target.value.length - 1);
+
+                    return true;
+                default:
+                    e.preventDefault();
+                    return false;
+            }
+        }, parseFormatted(numericalString, def) {
+            console.log(`Parsing ${numericalString} (${typeof numericalString}), `)
+
+            if (numericalString == null) {
+                return def;
+            }
+
+            const result = new LocalizedNumberParser(this.format).parse(numericalString);
+
+            if (Number.isNaN(result)) {
+                console.error(`Could not parse ${numericalString} (${typeof numericalString}) into a number according to format ${this.format}`);
+                return def;
+            }
+
+            return result;
+        }, extractDataFromObject(def, object, ...tags) {
+                if (object == null) {
+                    return def;
+                }
+
+                if (tags.length === 0) {
+                    return object;
+                }
+
+                let obj = object[tags[0]];
+
+                if (tags.length >= 1) {
+                    for (let i = 1; i < tags.length; i++) {
+                        obj = obj[tags[i]];
+
+                        if (obj == null) {
+                            break;
+                        }
+                    }
+                }
+
+                if (obj == null) {
+                    return def;
+                }
+
+                return obj;
+            },
     },
     async mounted () {
         this.game.id = parseInt(this.$route.params.id);
@@ -807,6 +938,10 @@ export default {
         this.openWebSocket();
 
         this.dictionary = dictionary;
+
+        if (dictionary.parameters.format != null) {
+            this.format = dictionary.parameters.format;
+        }
     }
 }
 </script>

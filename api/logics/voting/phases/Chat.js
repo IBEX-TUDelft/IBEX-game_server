@@ -57,12 +57,16 @@ class Chat extends JoinablePhase {
 
                 // Recording the chat events for showing at a later time
 
-                const chatLog = caller.results.chatLog.push({
+                caller.results.chatLog.push({
                     "time": time,
                     "sender": player.number,
                     "to": message.to,
-                    "text": message.text
+                    "text": encodeURIComponent(message.text).replaceAll("'", "&lsquo;")
                 });
+
+                console.log(caller.results.chatLog[caller.results.chatLog.length - 1]);
+                console.log(caller.results.chatLog);
+                console.log(JSON.stringify(caller.results.chatLog));
             }
         }], [
             'Click on a plot to chat with its owner'

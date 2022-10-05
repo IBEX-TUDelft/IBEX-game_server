@@ -159,6 +159,7 @@ export default {
             });
 
             data.results = game.data.results;
+            data.startTime = game.data.startTime;
 
             Controller.handleSuccess(res, data, 'Data available');
         });

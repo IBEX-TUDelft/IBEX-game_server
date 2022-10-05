@@ -39,7 +39,8 @@ export default class Voting extends Logic {
             "boundaries": self.data.boundaries,
             "conditions": self.data.conditions,
             "players": players,
-            "compensationOffers": []
+            "compensationOffers": [],
+            "over": self.over
         }
 
         let messages = null;
@@ -98,7 +99,7 @@ export default class Voting extends Logic {
             player.ready = playerData.ready;
         }
 
-        if (playerData.submittedCompensationOffers === true) {
+        if (self.data.players.find(p => p.role === 2).submittedCompensationOffers === true) {
             game.compensationOffers = self.data.compensationOffers;
             player.compensationOfferReceived = true;
         }

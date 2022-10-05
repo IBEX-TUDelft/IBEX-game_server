@@ -13,6 +13,9 @@
                 <b-navbar-nav>
                     <button :disabled="false" class="btn btn-success" @click="exportXlsx()">Export</button>
                 </b-navbar-nav>
+                <b-navbar-nav>
+                    <button :disabled="false" class="btn btn-success" @click="exportXlsxWide()">Export Wide</button>
+                </b-navbar-nav>
             </b-navbar>
         </div>
 
@@ -196,6 +199,96 @@
                 /* generate file and send to client */
                 XLSX.writeFile(wb, `${this.gameId}.analysis.xlsx`);
             },
+            exportXlsxWide() {
+                const self = this;
+
+                const wb = XLSX.utils.book_new();
+
+                const xls = [];
+
+
+                xls.push([
+                    'session', 'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
+                    '', 'Compensation_Req', 'Compensation_Offer', 'Compens_Delta', 'Vote', 'Num_Votes_for project', 'Total Value',
+                    'Project Realized', 'Optimal_Outcome'
+                ]);                
+
+                self.rounds.forEach(round => {
+                    const roundNr = round.round - 1;
+                    const winningCondition = self.getWinningCondition(round.round);
+                    
+                    const conditionTotals = [];
+
+                    self.players.forEach(player => {
+                        self.conditions.forEach((c, i) => {
+                            if (conditionTotals[i] === null) {
+                                conditionTotals[i] = 0;
+                            }
+
+                            const values = self.getPlayerValues(player.number, round.round);
+
+                            conditionTotals[i] += values[i];
+                        });
+                    });
+
+                    let max = 0;
+                    let bestConditions = [];
+
+                    conditionTotals.forEach((ct, i) => {
+                        if (ct < max) {
+                            return;
+                        } else if (ct === max) {
+                            bestConditions.push(i);
+                        } else {
+                            bestConditions = [i];
+                        }
+                    })
+
+                    self.players.forEach(player => {
+                        const values = self.getPlayerValues(player.number, round.round);
+                        const compensationReq = self.extractDataFromObject(self.compensationRequests[roundNr].find(cr => cr.number === player.number), 'compensationRequests', 1);
+                        const compensationOffer = player.role != 2 ? self.compensationOffers[roundNr][1] : '';
+                        const compensationDelta = player.role != 2 ? compensationOffer - compensationReq : '';
+
+                        let total = values[winningCondition];
+
+                        if (player.role === 2) {
+                            total -= self.players.filter(p => p.role === 3).length * self.compensationOffers[roundNr][winningCondition];
+                        } else {
+                            total += self.compensationOffers[roundNr][winningCondition];
+                        }
+
+                        xls.push([self.startTime,player.number,round.round, player.tag, player.role, self.ruleset, values[0], values[1],
+                        '',compensationReq, compensationOffer, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
+                        self.getStandingCounter(round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No'
+                        ]);
+                    });
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(xls);
+                XLSX.utils.book_append_sheet(wb, ws, `Session`);
+
+                XLSX.writeFile(wb, `${this.gameId}.analysis.xlsx`);
+            },
+            extractDataFromObject(object, ...tags) {
+                if (tags.length === 0 || object == null) {
+                    return object;
+                }
+
+                let obj = object[tags[0]];
+
+                if (tags.length >= 1) {
+                    for (let i = 1; i < tags.length; i++) {
+                        obj = obj[tags[i]];
+
+                        if (obj == null) {
+                            break;
+                        }
+                    }
+                }
+
+                return obj;
+            },
             getCompensationRequest(roundNumber, number, condition) {
                 const compensationRequests = this.compensationRequests[roundNumber - 1].find(acd => acd.number === number);
 
@@ -335,6 +428,7 @@
             this.conditions = response.data.data.conditions;
             this.players = response.data.data.players;
             this.rounds = response.data.data.results;
+            this.startTime = response.data.data.startTime;
             
             this.playerValues = extractProperty(this.rounds, 1, 'players');
             this.compensationRequests = extractProperty(this.rounds, 3, 'compensationRequests');

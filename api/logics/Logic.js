@@ -259,6 +259,8 @@ export default class {
     async start (wss) {
         this.wss = wss;
 
+        this.data.startTime = new Date().toLocaleString('nl', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})
+
         await this.beginRound();
     }
 
