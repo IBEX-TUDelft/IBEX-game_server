@@ -180,14 +180,25 @@ class Phase8 extends JoinablePhase {
 
                     const biddingSpeculators = p.speculators[winningCondition];
 
-                    let winningBidderIndex = 0;
+                    /*let winningBidderIndex = 0;
                     
                     if (biddingSpeculators.length >= 1) {
                         winningBidderIndex = Math.floor( Math.random() * biddingSpeculators.length );
                     }
 
-                    console.log(`Speculator who won: ${biddingSpeculators[winningBidderIndex]}`);
+                    console.log(`Speculator who won: ${biddingSpeculators[winningBidderIndex]}`);*/
 
+                    const speculationProfit = (p.v[winningCondition] - p.d[winningCondition]) / (2  * biddingSpeculators.length);
+
+                    landProfit.sniped = true;
+                    landProfit.speculator = biddingSpeculators;
+                    landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
+
+                    const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
+
+                    ownerSummary.secondRepurchase = (ownerSummary.secondRepurchase == null) ?
+                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.secondRepurchase;
+                    
                     for (let i = 0; i < biddingSpeculators.length; i++) {
                         const speculatorNumber = biddingSpeculators[i];
                         
@@ -198,13 +209,13 @@ class Phase8 extends JoinablePhase {
                             continue;
                         }
 
-                        if (i === winningBidderIndex) {
+                        /*if (i === winningBidderIndex) {
                             landProfit.sniped = true;
                             landProfit.speculator = speculatorNumber;
                             landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
 
                             console.log('Land profit updated');                                    
-                        }
+                        }*/
 
                         if (speculator.profit == null) {
                             speculator.profit =  [];
@@ -220,19 +231,19 @@ class Phase8 extends JoinablePhase {
                                 "role": owner.role
                             },
                             "snipes": [winningCondition === 0, winningCondition === 1, winningCondition === 2],
-                            "executed": i === winningBidderIndex
+                            "executed": true//i === winningBidderIndex
                         });
 
-                        if (i === winningBidderIndex) {
-                            const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
+                        //if (i === winningBidderIndex) {
+                            //const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
                             const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
 
-                            ownerSummary.secondRepurchase = (ownerSummary.secondRepurchase == null) ?
-                                -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.secondRepurchase;
+                            /*ownerSummary.secondRepurchase = (ownerSummary.secondRepurchase == null) ?
+                                -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.secondRepurchase;*/
 
                             speculatorSummary.secondRepurchase = (speculatorSummary.secondRepurchase == null) ?
-                                landProfit.snipeProfit : landProfit.snipeProfit + speculatorSummary.secondRepurchase;
-                        }
+                            speculationProfit : speculationProfit + speculatorSummary.secondRepurchase;
+                        //}
 
                         self.results.snipeOutcomes.push( {
                             "player": {
@@ -243,12 +254,12 @@ class Phase8 extends JoinablePhase {
                                 "number": owner.number,
                                 "role": owner.role
                             },
-                            "profit": i === winningBidderIndex ? landProfit.snipeProfit : 0
+                            "profit": speculationProfit//i === winningBidderIndex ? landProfit.snipeProfit : 0
                         });
 
                         speculator.profit.push({
                             "phase": 4,
-                            "amount": i === winningBidderIndex ? landProfit.snipeProfit : 0,
+                            "amount": speculationProfit,//i === winningBidderIndex ? landProfit.snipeProfit : 0,
                             "context": {
                                 "type": "speculation",
                                 "property": {
@@ -260,6 +271,20 @@ class Phase8 extends JoinablePhase {
                         });
 
                         console.log('Profit added to the speculator');
+
+                        self.wss.sendEvent(
+                            self.game.id,
+                            speculatorNumber,
+                            "profit",
+                            {
+                                "round": self.game.currentRound.number,
+                                "owner": owner.number,
+                                "sniped": true,
+                                "snipeProfit": speculationProfit,
+                                "condition": winningCondition,
+                                "declaration": p.d[winningCondition]
+                            }
+                        );
                     }
                 }
 
@@ -292,7 +317,7 @@ class Phase8 extends JoinablePhase {
 
                 console.log('Added profit to owner');
 
-                if (landProfit.speculator != null) {
+                /*if (landProfit.speculator != null) {
                     //TODO: remove extra info the speculators shouldn't know
                     self.wss.sendEvent(
                         self.game.id,
@@ -302,7 +327,7 @@ class Phase8 extends JoinablePhase {
                     );
 
                     console.log('Sent message to speculator');
-                }
+                }*/
 
                 self.wss.sendEvent(
                     self.game.id,

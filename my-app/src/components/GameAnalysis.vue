@@ -13,6 +13,9 @@
                 <b-navbar-nav class="ml-auto">
                     <button :disabled="false" class="btn btn-success" @click="exportXlsx">Export</button>
                 </b-navbar-nav>
+                <b-navbar-nav>
+                    <button :disabled="false" class="btn btn-success" @click="exportXlsxWide()">Export Wide</button>
+                </b-navbar-nav>
             </b-navbar>
         </div>
 
@@ -438,6 +441,128 @@
 
                 /* generate file and send to client */
                 XLSX.writeFile(wb, `${this.gameId}.analysis.xlsx`);
+            },
+            exportXlsxWide() {
+                const self = this;
+
+                const wb = XLSX.utils.book_new();
+
+                const xls = [];
+
+                xls.push([
+                    'session', 'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
+                    'Declaration1_noProject', 'Declaration1_projectA', 'Taxes1_noProject', 'Taxes1_projectA', 'ProjectOutcome', '',
+                    'Signal_PublicNP', 'sig_pubP', 'SigPrivateNP', 'SigPrivateP', '',
+                    'snipe1_TNP_owner1', 'snipe1_TNP_owner2', 'snipe1_TNP_owner3', 'snipe1_TNP_owner4', 'snipe1_TNP_owner5', 'snipe1_TNP_dev', '',
+                    'snipe1_TP_owner1', 'snipe1_TP_owner2', 'snipe1_TP_owner3', 'snipe1_TP_owner4', 'snipe1_TP_owner5', 'snipe1_TP_dev', '',
+                    'Dec1_Owner1_NP', 'Dec1_Owner2_NP', 'Dec1_Owner3_NP', 'Dec1_Owner4_NP', 'Dec1_Owner5_NP', 'Dec1_Dev_NP', '',
+                    'Dec1_Owner1_P', 'Dec1_Owner2_P', 'Dec1_Owner3_P', 'Dec1_Owner4_P', 'Dec1_Owner5_P', 'Dec1_Dev_P', '',
+                    'snipe1_TNP_owner1_result', 'snipe1_TNP_owner2_result', 'snipe1_TNP_owner3_result', 'snipe1_TNP_owner4_result', 'snipe1_TNP_owner5_result', 'snipe1_TNP_dev_result', '',
+                    'snipe1_TP_owner1_result', 'snipe1_TP_owner2_result', 'snipe1_TP_owner3_result', 'snipe1_TP_owner4_result', 'snipe1_TP_owner5_result', 'snipe1_TP_dev_result', '',
+                    'Declaration2_Outcome',	'Taxes2_Outcome', '',
+                    'snipe2_TO_owner1', 'snipe2_TO_owner2',	'snipe2_TO_owner3', 'snipe2_TO_owner4', 'snipe2_TO_owner5', 'snipe2_TO_dev', '',
+                    'Dec2_Owner1_O', 'Dec2_Owner2_O', 'Dec2_Owner3_O', 'Dec2_Owner4_O', 'Dec2_Owner5_O', 'Dec2_Dev_O', '',
+                    'snipe2_TO_owner1_result', 'snipe2_TO_owner2_result', 'snipe2_TO_owner3_result', 'snipe2_TO_owner4_result', 'snipe2_TO_owner5_result', 'snipe2_TO_dev_result', '',
+                    'Num_Bids_NP', 'Num_Asks_NP', 'Num_Buys_NP', 'Num_Sells_NP', 'Ending_Cash_NP', 'Ending_Shares_NP', '',
+                    'Num_Bids_P', 'Num_Asks_P', 'Num_Buys_P', 'Num_Sells_P', 'Ending_Cash_P', 'Ending_Shares_P', '',
+                    'snipe1_end_result', 'Property Value_min_Tax1', 'Trading_Result', 'snipe2_end_results', 'Property Value_min_Tax2'
+                ]);                
+
+                self.rounds.forEach(round => {
+                    const roundIdx = round.round - 1;
+
+                    self.players.forEach(player => {
+                        const xlsRow = [self.startTime,player.number,round.round, player.tag, player.role, self.ruleset];
+
+                        self.conditions.forEach((c) => { //Values
+                            const declaration = self.firstDeclarations[roundIdx].find(d => d.player === player.number);
+
+                            if (declaration == null) {
+                                xlsRow.push(null);
+                                return;
+                            }
+
+                            xlsRow.push(declaration.value[c.id]);
+                        });
+
+                        self.conditions.forEach((c) => { //First declarations
+                            const declaration = self.firstDeclarations[roundIdx].find(d => d.player === player.number);
+
+                            if (declaration == null) {
+                                xlsRow.push(null);
+                                return;
+                            }
+
+                            xlsRow.push(declaration.declaration[c.id]);
+                        });
+
+                        self.conditions.forEach((c) => { //Taxes
+                            const declaration = self.firstDeclarations[roundIdx].find(d => d.player === player.number);
+
+                            if (declaration == null) {
+                                xlsRow.push(null);
+                                return;
+                            }
+
+                            xlsRow.push(declaration.taxes[c.id]);
+                        });
+
+                        xlsRow.push(self.conditions[self.winningCondition].key); //outcome
+
+                        xlsRow.push(null);
+
+                        self.conditions.forEach((c) => { //Public signals
+                            const publicSignals = self.signals[roundIdx].publicSignal;
+
+                            if (publicSignals == null) {
+                                xlsRow.push(null);
+                                return;
+                            }
+
+                            xlsRow.push(publicSignals[c.id]);
+                        });
+
+                        self.conditions.forEach((c) => { //Private signals
+                            const privateSignals = self.signals[roundIdx].privateSignals;
+
+                            if (privateSignals == null) {
+                                xlsRow.push(null);
+                                return;
+                            }
+
+                            xlsRow.push(privateSignals[player.number - 1][c.id]);
+                        });
+
+                        xlsRow.push(null);
+
+                        xls.push(xlsRow);
+                    });
+
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(xls);
+                XLSX.utils.book_append_sheet(wb, ws, `Session`);
+
+                XLSX.writeFile(wb, `${this.gameId}.analysis.xlsx`);
+            },
+            extractDataFromObject(object, ...tags) {
+                if (tags.length === 0 || object == null) {
+                    return object;
+                }
+
+                let obj = object[tags[0]];
+
+                if (tags.length >= 1) {
+                    for (let i = 1; i < tags.length; i++) {
+                        obj = obj[tags[i]];
+
+                        if (obj == null) {
+                            break;
+                        }
+                    }
+                }
+
+                return obj;
             },
             getValue(declaration, property, index) {
                 let value

@@ -140,8 +140,8 @@
                                     <tr v-for="condition in game.conditions" :key="condition.id"
                                         :style="{'background-color': game.winningCondition === condition.id ? 'yellow' : 'white'}">
                                         <td>{{ condition.name }}</td>
-                                        <td>{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
-                                        <td>{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
+                                        <td class="text-right">{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
+                                        <td class="text-right">{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -887,32 +887,32 @@ export default {
 
             return result;
         }, extractDataFromObject(def, object, ...tags) {
-                if (object == null) {
-                    return def;
-                }
+            if (object == null) {
+                return def;
+            }
 
-                if (tags.length === 0) {
-                    return object;
-                }
+            if (tags.length === 0) {
+                return object;
+            }
 
-                let obj = object[tags[0]];
+            let obj = object[tags[0]];
 
-                if (tags.length >= 1) {
-                    for (let i = 1; i < tags.length; i++) {
-                        obj = obj[tags[i]];
+            if (tags.length >= 1) {
+                for (let i = 1; i < tags.length; i++) {
+                    obj = obj[tags[i]];
 
-                        if (obj == null) {
-                            break;
-                        }
+                    if (obj == null) {
+                        break;
                     }
                 }
+            }
 
-                if (obj == null) {
-                    return def;
-                }
+            if (obj == null) {
+                return def;
+            }
 
-                return obj;
-            },
+            return obj;
+        }
     },
     async mounted () {
         this.game.id = parseInt(this.$route.params.id);

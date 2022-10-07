@@ -20,14 +20,27 @@
                         :text-variant="(player.role != 1 && index + 1 === player.number) ? 'white' : 'black'"
                     >
                         <div class="row p-0" v-for="condition in game.conditions" :key="condition.id">
-                            <div v-if="game.winningCondition == null || game.winningCondition === condition.id">
-                                <div class="col-12 p-0" v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
+                            <div class="col" v-if="game.winningCondition == null || game.winningCondition === condition.id">
+                                <div class="row" v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
                                         && game.declarations[index] != null && player.hasToSpeculate">
-                                    <b-form-checkbox :value="(index + 1) + '.' + condition.id" >
-                                    {{ condition.name }} {{ getGameDeclaration(index, condition) }} ({{ getSniperProbability(index, condition.id)}}%)
-                                    </b-form-checkbox>
+                                    <div class="col-1 p-0">
+                                        <b-form-checkbox :value="(index + 1) + '.' + condition.id" />
+                                    </div>
+                                    <div class="col-4 p-0">
+                                        {{ condition.name }}
+                                    </div>
+                                    <div class="col-7 p-0 text-right">
+                                        {{ getGameDeclaration(index, condition) }} ({{ getSniperProbability(index, condition.id)}}%)
+                                    </div>
                                 </div>
-                                <div v-else class="col-12">{{ condition.name }}: {{ getGameDeclaration(index, condition) }}</div>
+                                <div v-else class="row">
+                                    <div class="col-6">
+                                        {{ condition.name }}:
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        {{ getGameDeclaration(index, condition) }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

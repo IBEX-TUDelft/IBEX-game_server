@@ -80,7 +80,7 @@ export default {
             return this.$parent.formatUs(num);
         },
         contractCompleted(contract) {
-            this.markets[contract.condition].price = contract.price;
+            this.markets[contract.condition].price = contract.median;
 
             this.markets.sort((m1, m2) => m2.price - m1.price);
 

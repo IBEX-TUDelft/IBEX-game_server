@@ -37,7 +37,7 @@ class Phase6 extends JoinablePhase {
                 }
 
                 if (order.type === 'ask') {
-                    if (order.price <= 0) {
+                    if (order.price != null && order.price < 0) {
                         wss.sendEvent(
                             game.id,
                             player.number,
@@ -64,6 +64,18 @@ class Phase6 extends JoinablePhase {
                         return; //Cannot have more asks than shares
                     }
                 } else if (order.type === 'bid') {
+                    if (order.price != null && order.price < 0) {
+                        wss.sendEvent(
+                            game.id,
+                            player.number,
+                            'order-refused',
+                            {
+                                "message": `Order prices must be non negative. Your price: ${order.price}`
+                            }
+                        );
+                        return; //Cannot ask or bid negative numbers
+                    }
+
                     const committedSumForCondition = phase.orders[condition].filter(o => o.sender === player.number && o.type === 'bid')
                         .map(o => o.price)
                         .reduce((a, b) => a + b, 0);
@@ -566,17 +578,6 @@ class Phase6 extends JoinablePhase {
             }
         );
 
-        self.wss.broadcastEvent (
-            self.game.id,
-            "contract-fulfilled",
-            {
-                "from": fromPlayer.number,
-                "to": toPlayer.number,
-                "price": price,
-                "condition": condition
-            }
-        );
-
         this.movementList[condition].push({
             "movement": {
                 "order": self.orderList[condition][self.orderList.length - 1],
@@ -595,6 +596,22 @@ class Phase6 extends JoinablePhase {
                 "shares" : toPlayer.wallet[condition].shares
             }
         });
+
+        const medianLastSeven = self.medianLastSeven(condition);
+
+        self.wss.broadcastEvent (
+            self.game.id,
+            "contract-fulfilled",
+            {
+                "from": fromPlayer.number,
+                "to": toPlayer.number,
+                "price": price,
+                "condition": condition,
+                "median": medianLastSeven
+            }
+        );
+
+        console.log(`Median last 7 (Condition ${condition}): ${medianLastSeven}`);
 
         console.log(fromPlayer);
         console.log(toPlayer);
@@ -651,6 +668,25 @@ class Phase6 extends JoinablePhase {
                 }
             }
         );
+    }
+
+    medianLastSeven(condition) {
+        const values = this.movementList[condition].map(m => m.movement.price).slice(-7);
+
+        if (values.length === 0) {
+            return null;
+        }
+        
+        values.sort(function(a,b){
+            return a-b;
+        });
+
+        var half = Math.floor(values.length / 2);
+  
+        if (values.length % 2)
+            return values[half];
+        
+        return (values[half - 1] + values[half]) / 2.0;
     }
 }
 

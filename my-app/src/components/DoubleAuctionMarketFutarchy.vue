@@ -40,6 +40,15 @@ export default {
         },
         numberOnly(e) {
             return this.$parent.numberOnly(e);
+        },
+        formatInput(e) {
+            return this.$parent.formatInput(e);
+        },
+        parseFormatted(numericalString, def) {
+            return this.$parent.parseFormatted(numericalString, def);
+        },
+        extractDataFromObject(def, object, ...tags) {
+            return this.$parent.extractDataFromObject(def, object, ...tags);
         }
     },
     components: {

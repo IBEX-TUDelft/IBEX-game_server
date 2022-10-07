@@ -22,7 +22,7 @@
 
                 <div class="col-4">
                     <div class="row-12">
-                        <b-form-input @keydown="$parent.numberOnly" type="number" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
+                        <b-form-input @keydown="formatInput" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
                     </div>
                 </div>
 
@@ -68,10 +68,10 @@
                     </div>
                 </div>
 
-                <div class="d-flex flex-col col-4" style="height: 200px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
-                    <table class="table table-bordered text-center">
+                <div class="d-flex flex-col col-4" style="height: 200px; display: flex; border: 1px solid; overflow: scroll;">
+                    <table class="table table-bordered text-center" style="margin-bottom: auto;">
                         <tr v-for="bid in bids" :key="bid.id">
-                            <td>{{ formatUs(bid.price) }}{{bid.sender == player.number ? '*' : ''}}</td>
+                            <td class="p-1">{{ formatUs(bid.price) }}{{bid.sender == player.number ? '*' : ''}}</td>
                         </tr>
                     </table>
                 </div>
@@ -89,7 +89,7 @@
                 </div>
 
                 <div class="d-flex flex-column col-4">
-                    <b-form-input @keydown="$parent.numberOnly" type="number" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
+                    <b-form-input @keydown="formatInput" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
                 </div>
             </div>
 
@@ -177,7 +177,7 @@ export default {
                     }
 
                     order = {
-                        "price": parseFloat(self.ask_price),
+                        "price": now ? 0 : self.parseFormatted(self.ask_price),
                         "quantity": 1,
                         "condition": self.$props.condition,
                         "type": type,
@@ -195,7 +195,7 @@ export default {
                     }
 
                     order = {
-                        "price": parseFloat(self.bid_price),
+                        "price": now ? 0 : self.parseFormatted(self.bid_price),
                         "quantity": 1,
                         "condition": self.$props.condition,
                         "type": type,
@@ -223,30 +223,17 @@ export default {
             this.$props.connection.send(JSON.stringify(msg));
         },
         getMedianPriceAsInt() {
-            if (this.contracts.length === 0) {
+            if (this.contracts == null || this.contracts.length === 0) {
+                console.log(`Current median price: 0`);
                 return 0;
             }
-            
-            let sum = 0;
 
-            for (let i = 0; i < this.contracts.length; i++) {
-                sum += this.contracts[i].price;
-            }
+            console.log(`Current median price: ${this.contracts[this.contracts.length - 1].median}`);
 
-            return Math.round(sum * 100 / this.contracts.length) / 100;
+            return this.contracts[this.contracts.length - 1].median;
         },
         getMedianPrice() {
-            if (this.contracts.length === 0) {
-                return '-';
-            }
-
-            let sum = 0;
-
-            for (let i = 0; i < this.contracts.length; i++) {
-                sum += this.contracts[i].price;
-            }
-
-            return this.formatUs(Math.round(sum * 100 / this.contracts.length) / 100);
+            return this.formatUs(this.getMedianPriceAsInt());
         },
         formatUs(num) {
             return this.$parent.formatUs(num);
@@ -346,6 +333,15 @@ export default {
                 default:
                     throw new Error(`Type was ${order.type}. Can be only ask|bid`);
             }
+        },
+        formatInput(e) {
+            return this.$parent.formatInput(e);
+        },
+        parseFormatted(numericalString, def) {
+            return this.$parent.parseFormatted(numericalString, def);
+        },
+        extractDataFromObject(def, object, ...tags) {
+            return this.$parent.extractDataFromObject(def, object, ...tags);
         }
     },
     async mounted() {

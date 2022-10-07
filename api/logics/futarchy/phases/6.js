@@ -38,6 +38,18 @@ class Phase6 extends JoinablePhase {
                 }
 
                 if (order.type === 'ask') {
+                    if (order.price != null && order.price < 0) {
+                        wss.sendEvent(
+                            game.id,
+                            player.number,
+                            'order-refused',
+                            {
+                                "message": `Order prices must be non negative. Your price: ${order.price}`
+                            }
+                        );
+                        return; //Cannot ask or bid negative numbers
+                    }
+
                     const activeAsksForCondition = phase.orders[condition].filter(o => o.sender === player.number && o.type === 'ask').length;
 
                     if (player.wallet[condition].shares <= activeAsksForCondition) {
@@ -53,6 +65,18 @@ class Phase6 extends JoinablePhase {
                         return; //Cannot have more asks than shares
                     }
                 } else if (order.type === 'bid') {
+                    if (order.price != null && order.price < 0) {
+                        wss.sendEvent(
+                            game.id,
+                            player.number,
+                            'order-refused',
+                            {
+                                "message": `Order prices must be non negative. Your price: ${order.price}`
+                            }
+                        );
+                        return; //Cannot ask or bid negative numbers
+                    }
+
                     const committedSumForCondition = phase.orders[condition].filter(o => o.sender === player.number && o.type === 'bid')
                         .map(o => o.price)
                         .reduce((a, b) => a + b, 0);
@@ -222,7 +246,7 @@ class Phase6 extends JoinablePhase {
         let winningQuotation = 0;
 
         for (let condition = 0; condition < self.game.conditions.length; condition++) {
-            const list = this.movementList[condition];
+            /*const list = this.movementList[condition];
 
             if (list.length === 0) { //Not traded? Then it is not considered palatable
                 continue;
@@ -239,6 +263,17 @@ class Phase6 extends JoinablePhase {
             if (this.game.quotations[condition] > winningQuotation) {
                 winningQuotation = this.game.quotations[condition];
                 winningCondition = condition;
+            }*/
+
+            const median = this.medianLastSeven(condition);
+
+            if (median == null) {
+                continue;
+            }
+
+            if (median > winningQuotation) {
+                winningQuotation = median;
+                winningCondition = condition;
             }
         }
 
@@ -248,7 +283,7 @@ class Phase6 extends JoinablePhase {
 
         this.results.winningCondition = winningCondition;
 
-        console.log(`The winning condition is ${winningCondition}, with a price of ${winningQuotation}. Here the full list: ${this.game.quotations}`);
+        console.log(`The winning condition is ${winningCondition}, with a median price of ${winningQuotation}. Here the full list: ${this.game.quotations}`);
 
         err = self.wss.broadcastEvent(
             self.game.id,
@@ -309,7 +344,7 @@ class Phase6 extends JoinablePhase {
 
                     const biddingSpeculators = p.speculators[winningCondition];
 
-                    let winningBidderIndex = 0;
+                    /*let winningBidderIndex = 0;
                     
                     if (biddingSpeculators.length >= 1) {
                         winningBidderIndex = Math.floor( Math.random() * biddingSpeculators.length );
@@ -317,7 +352,18 @@ class Phase6 extends JoinablePhase {
 
                     const winnerNumber = biddingSpeculators[winningBidderIndex];
 
-                    console.log(`Speculator who won: ${winnerNumber}`);
+                    console.log(`Speculator who won: ${winnerNumber}`);*/
+
+                    const speculationProfit = (p.v[winningCondition] - p.d[winningCondition]) / (2  * biddingSpeculators.length);
+
+                    landProfit.sniped = true;
+                    landProfit.speculator = biddingSpeculators;
+                    landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
+
+                    const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
+
+                    ownerSummary.firstRepurchase = (ownerSummary.firstRepurchase == null) ?
+                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;
 
                     for (let i = 0; i < self.game.players.length; i++) {
                         const speculator = self.game.players[i];
@@ -330,13 +376,13 @@ class Phase6 extends JoinablePhase {
                             continue;
                         }
 
-                        if (speculator.number === winnerNumber) {
+                        /*if (speculator.number === winnerNumber) {
                             landProfit.sniped = true;
                             landProfit.speculator = speculator.number;
                             landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
 
                             console.log('Land profit updated');                                    
-                        }
+                        }*/
 
                         if (speculator.profit == null) {
                             speculator.profit =  [];
@@ -356,7 +402,7 @@ class Phase6 extends JoinablePhase {
                                 p.speculators[1].includes(speculator.number),
                                 p.speculators[2].includes(speculator.number),
                             ],
-                            "executed": speculator.number === winnerNumber
+                            "executed": true//speculator.number === winnerNumber
                         });
 
                         self.results.snipeOutcomes.push( {
@@ -368,23 +414,23 @@ class Phase6 extends JoinablePhase {
                                 "number": owner.number,
                                 "role": owner.role
                             },
-                            "profit": speculator.number === winnerNumber ? landProfit.snipeProfit : 0
+                            "profit": speculationProfit//speculator.number === winnerNumber ? landProfit.snipeProfit : 0
                         });
 
-                        if (speculator.number === winnerNumber) {
-                            const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
+                        /*if (speculator.number === winnerNumber) {
+                            const ownerSummary = owner.summaries[self.game.currentRound.number - 1];*/
                             const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
 
-                            ownerSummary.firstRepurchase = (ownerSummary.firstRepurchase == null) ?
-                                -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;
+                            /*ownerSummary.firstRepurchase = (ownerSummary.firstRepurchase == null) ?
+                                -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;*/
 
                             speculatorSummary.firstRepurchase = (speculatorSummary.firstRepurchase == null) ?
-                                landProfit.snipeProfit : landProfit.snipeProfit + speculatorSummary.firstRepurchase;
-                        }
+                                speculationProfit : speculationProfit + speculatorSummary.firstRepurchase;
+                        //}
 
                         speculator.profit.push({
                             "phase": 4,
-                            "amount": speculator.number === winnerNumber ? landProfit.snipeProfit : 0,
+                            "amount": speculationProfit,//speculator.number === winnerNumber ? landProfit.snipeProfit : 0,
                             "context": {
                                 "type": "speculation",
                                 "property": {
@@ -396,6 +442,20 @@ class Phase6 extends JoinablePhase {
                         });
 
                         console.log('Profit added to the speculator');
+
+                        self.wss.sendEvent(
+                            self.game.id,
+                            speculator.number,
+                            "profit",
+                            {
+                                "round": self.game.currentRound.number,
+                                "owner": owner.number,
+                                "sniped": true,
+                                "snipeProfit": speculationProfit,
+                                "condition": winningCondition,
+                                "declaration": p.d[winningCondition]
+                            }
+                        );
                     }
                 }
 
@@ -428,7 +488,7 @@ class Phase6 extends JoinablePhase {
 
                 console.log('Added profit to owner');
 
-                if (landProfit.speculator != null) {
+                /*if (landProfit.speculator != null) {
                     //TODO: remove extra info the speculators shouldn't know
                     self.wss.sendEvent(
                         self.game.id,
@@ -438,7 +498,7 @@ class Phase6 extends JoinablePhase {
                     );
 
                     console.log('Sent message to speculator');
-                }
+                }*/
 
                 self.wss.sendEvent(
                     self.game.id,
@@ -798,17 +858,6 @@ class Phase6 extends JoinablePhase {
             }
         );
 
-        self.wss.broadcastEvent (
-            self.game.id,
-            "contract-fulfilled",
-            {
-                "from": fromPlayer.number,
-                "to": toPlayer.number,
-                "price": price,
-                "condition": condition
-            }
-        );
-
         this.movementList[condition].push({
             "movement": {
                 "order": self.orderList[condition][self.orderList.length - 1],
@@ -827,6 +876,22 @@ class Phase6 extends JoinablePhase {
                 "shares" : toPlayer.wallet[condition].shares
             }
         });
+
+        const medianLastSeven = self.medianLastSeven(condition);
+
+        console.log(`Median last 7 (Condition ${condition}): ${medianLastSeven}`);
+        
+        self.wss.broadcastEvent (
+            self.game.id,
+            "contract-fulfilled",
+            {
+                "from": fromPlayer.number,
+                "to": toPlayer.number,
+                "price": price,
+                "condition": condition,
+                "median": medianLastSeven
+            }
+        );
 
         console.log(fromPlayer);
         console.log(toPlayer);
@@ -879,6 +944,25 @@ class Phase6 extends JoinablePhase {
                 }
             }
         );
+    }
+
+    medianLastSeven(condition) {
+        const values = this.movementList[condition].map(m => m.movement.price).slice(-7);
+
+        if (values.length === 0) {
+            return null;
+        }
+
+        values.sort(function(a,b){
+            return a-b;
+        });
+
+        var half = Math.floor(values.length / 2);
+  
+        if (values.length % 2)
+            return values[half];
+        
+        return (values[half - 1] + values[half]) / 2.0;
     }
 }
 

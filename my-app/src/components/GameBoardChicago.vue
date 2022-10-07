@@ -65,8 +65,8 @@
                                 <tr v-for="condition in game.conditions" :key="condition.id"
                                     :style="{'background-color': game.winningCondition === condition.id ? 'yellow' : 'white'}">
                                     <td>{{ condition.name }}</td>
-                                    <td>{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
-                                    <td>{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
+                                    <td class="text-right">{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
+                                    <td class="text-right">{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -85,35 +85,35 @@
                             <th scope="col">Condition</th>
                             <th scope="col">Value</th>
                             <th scope="col">Declaration</th>
-                            <th scope="col">Tax Bill</th>
+                            <th scope="col">Tax Bill ({{formatUs(game.taxRate)}}%)</th>
                             <th scope="col">Profit</th>
                             <th scope="col">Sniper Prob.</th>
                         </thead>
                         <tbody>
                             <tr v-for="condition in game.conditions" :key="condition.id">
                                 <td>{{ condition.name }}</td>
-                                <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                <td class="text-right">{{ formatUs(player.property.v[condition.id]) }}</td>
                                 <td>
-                                    <b-form-input @keydown="numberOnly" v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" type="number" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
+                                    <b-form-input @keydown="formatInput" v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
                                     <div v-else>
                                         <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
-                                            <div v-if="player.declaration != null && player.declaration[condition.id] != null">
+                                            <div class="text-right" v-if="player.declaration != null && player.declaration[condition.id] != null">
                                                 {{ player.declaration[condition.id]}}
                                             </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
-                                        {{ player.declaration != null ? formatUs(player.declaration[condition.id] * game.taxRate / 100) : '' }}
+                                        {{ formatUs(parseFormatted(player.declaration[condition.id], 0) * game.taxRate / 100) }}
                                     </div>
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
-                                        {{ player.declaration != null ? formatUs(player.property.v[condition.id] - player.declaration[condition.id]* ( game.taxRate) / 100): '' }}
+                                        {{ formatUs(parseFormatted(player.declaration[condition.id], 0) - parseFormatted(player.declaration[condition.id], 0)* ( game.taxRate) / 100) }}
                                     </div>
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <div v-if="game.winningCondition == null || game.winningCondition === condition.id">
                                         {{ getMySniperProbability(condition.id) }}%
                                     </div>
@@ -129,7 +129,7 @@
                     </div>
                 </b-row>
 
-                <b-row class="d-flex flex-row no-gutters p-1" v-if="player.role > 1">
+                <!--b-row class="d-flex flex-row no-gutters p-1" v-if="player.role > 1">
                     <div class="text-center mb-1"><b>Results</b></div>
                     <table class="table table-bordered">
                         <thead class="thead-dark">
@@ -146,12 +146,12 @@
                             <tr v-for="pEv in player.profitEvents" :key="pEv.id">
                                 <td>{{pEv.round}}.{{pEv.phase}}</td>
                                 <td>{{pEv.condition}}</td>
-                                <td>{{formatUs(pEv.value)}}</td>
-                                <td>{{formatUs(pEv.declaration)}}</td>
+                                <td class="text-right">{{formatUs(pEv.value)}}</td>
+                                <td class="text-right">{{formatUs(pEv.declaration)}}</td>
                                 <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
-                                <td>{{formatUs(pEv.snipeProfit)}}</td>
-                                <td>{{formatUs(pEv.taxes)}}</td>
-                                <td>{{formatUs(pEv.total)}}</td>
+                                <td class="text-right">{{formatUs(pEv.snipeProfit)}}</td>
+                                <td class="text-right">{{formatUs(pEv.taxes)}}</td>
+                                <td class="text-right">{{formatUs(pEv.total)}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -173,13 +173,13 @@
                                 <td>{{pEv.round}}.{{pEv.phase}}</td>
                                 <td>{{pEv.condition}}</td>
                                 <td>{{pEv.property}}</td>
-                                <td>{{formatUs(pEv.declaration)}}</td>
+                                <td class="text-right">{{formatUs(pEv.declaration)}}</td>
                                 <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
-                                <td>{{formatUs(pEv.snipeProfit)}}</td>
+                                <td class="text-right">{{formatUs(pEv.snipeProfit)}}</td>
                             </tr>
                         </tbody>
                     </table>
-                </b-row>
+                </b-row-->
 
             </div>
         </b-row>
@@ -207,15 +207,9 @@
     import Acknowledge from './modals/Acknowledge.vue';
     import Summaries from './Summaries.vue';
     import dictionary from '../assets/harberger.json';
-
+    import { LocalizedNumberParser } from 'localized-number-parser';
     import { getGameStatus } from '../services/GameService'
     import EventService from '../services/EventService';
-
-    const roleMap = {
-        1: "Sniper",
-        2: "Developer",
-        3: "Owner"
-    };
 
     const styleMap = {
         "success": "alert-success",
@@ -366,7 +360,7 @@
                     high = this.player.boundaries.projectB.high;
                 }
 
-                const snipingProbability = (high - this.player.declaration[condition]) * 100 / (high - low);
+                const snipingProbability = (high - this.parseFormatted(this.player.declaration[condition],0)) * 100 / (high - low);
 
                 return Math.max(Math.min(snipingProbability, 100), 0).toFixed(2);
             },
@@ -499,7 +493,7 @@
                         continue;
                     }
 
-                    const v = parseInt(self.player.declaration[i]);
+                    const v = this.parseFormatted(self.player.declaration[i]);
 
                     console.log(v);
 
@@ -622,7 +616,7 @@
                 }
 
                 if (self.player.property != null && self.player.property.d != null) {
-                    self.player.declaration = self.player.property.d;
+                    self.player.declaration = self.player.property.d.map(n => self.formatUs(n));
                 }
 
                 if (self.player.S != null) {
@@ -725,6 +719,9 @@
                                 break;
                             case 'phase-instructions':
                                 self.player.instructions = ev.data.instructions;
+
+                                self.acknowledge(`Phase Instructions`, ev.data.instructions);
+
                                 break;
                             case "assign-role":
                                 self.game.boundaries = ev.data.boundaries;
@@ -750,13 +747,14 @@
                                 self.game.round = ev.data.round;
                                 self.game.phase = ev.data.phase;
 
-                                if (self.game.phase === 1 || self.game.phase === 7) {
+                                if (self.game.phase === 1) {
                                     self.game.declarations = [null, null, null];
+                                    self.player.declaration = [null, null, null];
+                                    self.player.hasToDeclare = true;
+                                }
 
-                                    if (self.player.role > 1) {
-                                        self.player.hasToDeclare = true;
-                                        self.player.declaration = [null, null, null];
-                                    }
+                                if (self.game.phase === 7) {
+                                    self.player.hasToDeclare = true;
                                 }
 
                                 if ((self.game.phase === 3 || self.game.phase === 8) && self.player.role === 1) {
@@ -813,7 +811,7 @@
                                         "declaration": ev.data.declaration,
                                         "sniped": ev.data.sniped,
                                         "snipeProfit": ev.data.snipeProfit,
-                                        "property": `${roleMap[ev.data.role]} ${ev.data.owner}`
+                                        "property": self.game.players.find(p => p.number === ev.data.owner).tag
                                     });
                                 } else { //Owner
                                     self.player.profitEvents.push({
@@ -973,6 +971,120 @@
                 }
 
                 return true;
+            }, formatInput(e) {
+                if (e == null) {
+                    return;
+                }
+                if (![8,9,48,49,50,51,52,53,54,55,56,57,188,190].includes(e.which)) {
+                    console.log(`Sorry ${e.which}`)
+                    e.preventDefault();
+                    return false;
+                }
+
+                let format = this.format;
+
+                if (Number.isNaN(new LocalizedNumberParser(format).parse(e.target.value))) {
+                    return true;
+                }
+
+                const currentValueString = e.target.value;
+                let currentValue = null;
+
+                try {
+                    currentValue = new LocalizedNumberParser(format).parse(currentValueString);
+
+                    if (currentValue != null) {
+                        console.log(`Current value string: ${currentValueString}, parsed into ${currentValue} (${typeof currentValue}). Format: ${format}`);
+                    } else {
+                        console.log(`Current value string: ${currentValueString} can't be parsed into a ${format} value because the parser return a null value`);
+                    }
+                } catch (err) {
+                    console.err(`Current value string: ${currentValueString} can't be parsed into a ${format} value because of an exception`, err);
+                }
+
+                let newValue;
+
+                switch(e.which) {
+                    case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57:
+
+                        if (!e.target.value.endsWith('.') && !e.target.value.endsWith(',')) {
+                            e.target.value = this.formatUs(parseFloat(currentValue.toString() + (e.which - 48).toString())).slice(0, -1);
+                        }
+
+                        return true;
+                    case 9: /*Tab*/
+                        return true;
+                    case 188: /*Comma*/ case 190: /*Dot*/
+                        var character = e.which === 188 ? ',' : '.';
+
+                        try {
+                            newValue = new LocalizedNumberParser(format).parse(currentValueString + character);
+
+                            if (Number.isNaN(newValue)) {
+                                throw new Error('The parser returned a non value');
+                            }
+
+                            return true;
+                        } catch (err) {
+                            e.preventDefault();
+                            console.error(`Can't add ${character} to ${e.target.value}`, err);
+                            return false;
+                        }
+                    case 8: //Backspace
+                        if (currentValueString == null || currentValueString.trim() === '' || currentValueString.slice(0, -1).trim() === '') {
+                            return true;
+                        }
+
+                        e.target.value =
+                            this.formatUs(new LocalizedNumberParser(format).parse(currentValueString.slice(0, -1))) +
+                            e.target.value.charAt(e.target.value.length - 1);
+
+                        return true;
+                    default:
+                        e.preventDefault();
+                        return false;
+                }
+            }, parseFormatted(numericalString, def) {
+                console.log(`Parsing ${numericalString} (${typeof numericalString}), `)
+
+                if (numericalString == null) {
+                    return def;
+                }
+
+                const result = new LocalizedNumberParser(this.format).parse(numericalString);
+
+                if (Number.isNaN(result)) {
+                    console.error(`Could not parse ${numericalString} (${typeof numericalString}) into a number according to format ${this.format}`);
+                    return def;
+                }
+
+                return result;
+            }, extractDataFromObject(def, object, ...tags) {
+                if (object == null) {
+                    return def;
+                }
+
+                if (tags.length === 0) {
+                    return object;
+                }
+
+                let obj = object[tags[0]];
+
+                if (tags.length >= 1) {
+                    for (let i = 1; i < tags.length; i++) {
+                        obj = obj[tags[i]];
+
+                        if (obj == null) {
+                            break;
+                        }
+                    }
+                }
+
+                if (obj == null) {
+                    return def;
+                }
+
+                return obj;
             }
         },
         mounted () {
@@ -983,6 +1095,10 @@
             window.vue = this;
 
             this.dictionary = dictionary;
+
+            if (dictionary.parameters.format != null) {
+                this.format = dictionary.parameters.format;
+            }
 
             console.log(`${process.env.VUE_APP_API}`);
 
