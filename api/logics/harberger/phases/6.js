@@ -11,7 +11,9 @@ class Phase6 extends JoinablePhase {
     results = {
         snipes: [],
         snipeOutcomes: [],
-        log: [[],[],[]]
+        log: [[],[],[]],
+        wallets: [],
+        finalPrices: []
     }
 
     constructor(game, wss) {
@@ -211,6 +213,23 @@ class Phase6 extends JoinablePhase {
         }], [
             'Trade shares, they represent a percentage of the final taxes on the winning project'
         ]);
+    }
+
+    async onExit () {
+        await super.onExit();
+
+        const self = this;
+
+        this.results.wallets.push(...this.game.players.map(p => {
+            return {
+                "number": p.number,
+                "wallet": p.wallet
+            };
+        }));
+
+        self.game.conditions.forEach(condition => {
+            self.results.finalPrices.push(self.medianLastSeven(condition.id));
+        });
     }
 
     async onEnter () {

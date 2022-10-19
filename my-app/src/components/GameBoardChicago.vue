@@ -90,11 +90,11 @@
                             <th scope="col">Sniper Prob.</th>
                         </thead>
                         <tbody>
-                            <tr v-for="condition in game.conditions" :key="condition.id">
+                            <tr v-for="condition in game.conditions.filter(c => game.winningCondition == null || game.winningCondition === c.id)" :key="condition.id">
                                 <td>{{ condition.name }}</td>
                                 <td class="text-right">{{ formatUs(player.property.v[condition.id]) }}</td>
                                 <td>
-                                    <b-form-input @keydown="formatInput" v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
+                                    <b-form-input @keydown="isAllowed" @input="player.declaration[condition.id] = reformat(player.declaration[condition.id])" v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
                                     <div v-else>
                                         <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
                                             <div class="text-right" v-if="player.declaration != null && player.declaration[condition.id] != null">
@@ -110,7 +110,7 @@
                                 </td>
                                 <td class="text-right">
                                     <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
-                                        {{ formatUs(parseFormatted(player.declaration[condition.id], 0) - parseFormatted(player.declaration[condition.id], 0)* ( game.taxRate) / 100) }}
+                                        {{ formatUs(player.property.v[condition.id] - parseFormatted(player.declaration[condition.id], 0)* ( game.taxRate) / 100) }}
                                     </div>
                                 </td>
                                 <td class="text-right">
@@ -128,58 +128,6 @@
                         <button v-if="(game.phase === 2 || game.phase === 7) && player.hasToDeclare" type="button" @click='submitDeclaration()' class="btn btn-primary" >Submit</button>
                     </div>
                 </b-row>
-
-                <!--b-row class="d-flex flex-row no-gutters p-1" v-if="player.role > 1">
-                    <div class="text-center mb-1"><b>Results</b></div>
-                    <table class="table table-bordered">
-                        <thead class="thead-dark">
-                            <th scope="col">Round</th>
-                            <th scope="col">Condition</th>
-                            <th scope="col">Value</th>
-                            <th scope="col">Declaration</th>
-                            <th scope="col">Sniped</th>
-                            <th scope="col">Snipe Profit/Loss</th>
-                            <th scope="col">Taxes</th>
-                            <th scope="col">Round Profit</th>
-                        </thead>
-                        <tbody>
-                            <tr v-for="pEv in player.profitEvents" :key="pEv.id">
-                                <td>{{pEv.round}}.{{pEv.phase}}</td>
-                                <td>{{pEv.condition}}</td>
-                                <td class="text-right">{{formatUs(pEv.value)}}</td>
-                                <td class="text-right">{{formatUs(pEv.declaration)}}</td>
-                                <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
-                                <td class="text-right">{{formatUs(pEv.snipeProfit)}}</td>
-                                <td class="text-right">{{formatUs(pEv.taxes)}}</td>
-                                <td class="text-right">{{formatUs(pEv.total)}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </b-row>
-
-                <b-row class="d-flex flex-row no-gutters p-1" v-if="player.role == 1">
-                    <div class="text-center mb-1"><b>Results</b></div>
-                    <table class="table table-bordered">
-                        <thead class="thead-dark">
-                            <th scope="col">Round</th>
-                            <th scope="col">Condition</th>
-                            <th scope="col">Property</th>
-                            <th scope="col">Declaration</th>
-                            <th scope="col">Sniped</th>
-                            <th scope="col">Profit</th>
-                        </thead>
-                        <tbody>
-                            <tr v-for="pEv in player.profitEvents" :key="pEv.id">
-                                <td>{{pEv.round}}.{{pEv.phase}}</td>
-                                <td>{{pEv.condition}}</td>
-                                <td>{{pEv.property}}</td>
-                                <td class="text-right">{{formatUs(pEv.declaration)}}</td>
-                                <td>{{pEv.sniped ? 'Y' : 'N'}}</td>
-                                <td class="text-right">{{formatUs(pEv.snipeProfit)}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </b-row-->
 
             </div>
         </b-row>
@@ -210,6 +158,7 @@
     import { LocalizedNumberParser } from 'localized-number-parser';
     import { getGameStatus } from '../services/GameService'
     import EventService from '../services/EventService';
+    import FormatService from '../services/FormatService';
 
     const styleMap = {
         "success": "alert-success",
@@ -477,7 +426,10 @@
                 this.checkedPlots = [];
             },
             conditionToString(c) {
-                return conditionMap[c];
+                if (this.game.conditions[c] != null)
+                    return this.game.conditions[c].name;
+                
+                return null;
             },
             submitDeclaration() {
                 const self = this;
@@ -498,7 +450,7 @@
                     console.log(v);
 
                     if (isNaN(v) || v == null) {
-                        myWarnings.push(`Your declaration under condition ${conditionMap[i]} is empty: it might result in a massive loss`);
+                        myWarnings.push(`Your declaration under condition ${this.conditionToString(i)} is empty: it might result in a massive loss`);
                         continue;
                     }
 
@@ -518,11 +470,11 @@
                     }
 
                     if (v < low) {
-                        myWarnings.push(`Your declaration under condition ${conditionMap[i]} is less than the known minimum value (${low}), speculators will certainly target you`);
+                        myWarnings.push(`Your declaration under condition ${this.conditionToString(i)} is less than the known minimum value (${low}), speculators will certainly target you`);
                     }
 
                     if (v > high) {
-                        myWarnings.push(`Your declaration under condition ${conditionMap[i]} is greater than the known maximum value (${high}), this is certainly not optimal`);
+                        myWarnings.push(`Your declaration under condition ${this.conditionToString(i)} is greater than the known maximum value (${high}), this is certainly not optimal`);
                     }
                 }
 
@@ -542,22 +494,14 @@
                         "type": "declare",
                         "declaration": myDeclarations
                     });
+
+                    self.game.declarations[self.player.number - 1].d = myDeclarations;
                 }
 
                 this.modals.errorList.show = true;
             },
             formatUs(num) {
-                if (num == null || typeof num != 'number') {
-                    return num;
-                }
-
-                let format = 'en-US';
-
-                if (this.dictionary.parameters.format != null) {
-                    format = this.dictionary.parameters.format;
-                }
-
-                return (Math.round(num * 100) / 100).toLocaleString(format);
+                return this.formatService.format(num);
             },
             completeCurrentPhase() {
                 const self = this;
@@ -753,6 +697,11 @@
                                     self.player.hasToDeclare = true;
                                 }
 
+                                if (self.game.phase === 6) {
+                                    setTimeout(() => {
+                                        EventService.emit('clear-contracts');
+                                    }, 50)
+                                }
                                 if (self.game.phase === 7) {
                                     self.player.hasToDeclare = true;
                                 }
@@ -959,23 +908,28 @@
                 this.modals.confirm.show = false;
 
                 return result;
-            },
-            numberOnly(e) {
-                console.log(e.which);
-
-                const allowed = [8,9,48,49,50,51,52,53,54,55,56,57,190];
-
-                if (!allowed.includes(e.which)) {
+            }, isAllowed(e) {
+                if (![8,9,37,38,39,40,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,105,104,105,188,190].includes(e.which)) {
+                    console.log(`Sorry ${e.which}`)
                     e.preventDefault();
                     return false;
                 }
 
                 return true;
+            },reformat(stringValue) {
+                if (stringValue == null || stringValue.trim() === '') {
+                    return stringValue;
+                }
+
+                return this.formatService.reformat(stringValue);
             }, formatInput(e) {
                 if (e == null) {
                     return;
                 }
-                if (![8,9,48,49,50,51,52,53,54,55,56,57,188,190].includes(e.which)) {
+
+                console.log('You typed ' + e.which);
+
+                if (![8,9,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,105,104,105,188,190].includes(e.which)) {
                     console.log(`Sorry ${e.which}`)
                     e.preventDefault();
                     return false;
@@ -1009,6 +963,13 @@
 
                         if (!e.target.value.endsWith('.') && !e.target.value.endsWith(',')) {
                             e.target.value = this.formatUs(parseFloat(currentValue.toString() + (e.which - 48).toString())).slice(0, -1);
+                        }
+
+                        return true;
+                    case 96: case 97: case 98: case 99: case 100: case 101: case 102: case 103: case 104: case 105:
+
+                        if (!e.target.value.endsWith('.') && !e.target.value.endsWith(',')) {
+                            e.target.value = this.formatUs(parseFloat(currentValue.toString() + (e.which - 96).toString())).slice(0, -1);
                         }
 
                         return true;
@@ -1099,6 +1060,8 @@
             if (dictionary.parameters.format != null) {
                 this.format = dictionary.parameters.format;
             }
+
+            this.formatService = new FormatService(this.format);
 
             console.log(`${process.env.VUE_APP_API}`);
 

@@ -154,7 +154,10 @@ export default {
                     "number": p.number,
                     "tag": p.tag,
                     "role": p.role,
-                    "values": p.property != null ? p.property.v : null
+                    "values": p.property != null ? p.property.v : null,
+                    "balance": p.balance,
+                    "shares": p.shares,
+                    "cashForSniping": p.cashForSniping
                 }
             });
 

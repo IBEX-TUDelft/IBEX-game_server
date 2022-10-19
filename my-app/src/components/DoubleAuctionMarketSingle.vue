@@ -22,7 +22,7 @@
 
                 <div class="col-4">
                     <div class="row-12">
-                        <b-form-input @keydown="formatInput" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
+                        <b-form-input @keydown="isAllowed" @input="ask_price = reformat(ask_price)" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
                     </div>
                 </div>
 
@@ -64,7 +64,7 @@
                     </div>
 
                     <div v-if="player.wallet != null && player.wallet[condition] != null" class="d-flex flex-row mt-2">
-                        Cash: {{ player.wallet[condition].balance }}
+                        Cash: {{ formatUs(player.wallet[condition].balance) }}
                     </div>
                 </div>
 
@@ -89,7 +89,7 @@
                 </div>
 
                 <div class="d-flex flex-column col-4">
-                    <b-form-input @keydown="formatInput" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
+                    <b-form-input @keydown="isAllowed" @input="bid_price = reformat(bid_price)" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
                 </div>
             </div>
 
@@ -228,6 +228,8 @@ export default {
                 return 0;
             }
 
+            console.log(this.contracts);
+
             console.log(`Current median price: ${this.contracts[this.contracts.length - 1].median}`);
 
             return this.contracts[this.contracts.length - 1].median;
@@ -334,8 +336,14 @@ export default {
                     throw new Error(`Type was ${order.type}. Can be only ask|bid`);
             }
         },
+        reformat(e) {
+            return this.$parent.reformat(e);
+        },
         formatInput(e) {
             return this.$parent.formatInput(e);
+        },
+        isAllowed(e) {
+            return this.$parent.isAllowed(e);
         },
         parseFormatted(numericalString, def) {
             return this.$parent.parseFormatted(numericalString, def);
@@ -412,6 +420,10 @@ export default {
         });
 
         console.log('COMPONENT ' + this.condition + ' READY TO CAPTURE ' + 'data-recovered');
+
+        EventService.on('clear-contracts', () => {
+            self.contracts.length = 0;
+        });
 
         EventService.emit('component-ready');
     }

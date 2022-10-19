@@ -12,7 +12,9 @@ class Phase6 extends JoinablePhase {
         snipes: [],
         snipeOutcomes: [],
         log: [[],[],[]],
-        winningCondition: null
+        winningCondition: null,
+        wallets: [],
+        finalPrices: []
     }
 
     constructor(game, wss) {
@@ -229,6 +231,17 @@ class Phase6 extends JoinablePhase {
 
         const self = this;
 
+        this.results.wallets.push(...this.game.players.map(p => {
+            return {
+                "number": p.number,
+                "wallet": p.wallet
+            };
+        }));
+
+        self.game.conditions.forEach(condition => {
+            self.results.finalPrices.push(self.medianLastSeven(condition.id));
+        });
+
         let err = this.wss.broadcastEvent(
             self.game.id,
             "reset-timer",
@@ -246,25 +259,6 @@ class Phase6 extends JoinablePhase {
         let winningQuotation = 0;
 
         for (let condition = 0; condition < self.game.conditions.length; condition++) {
-            /*const list = this.movementList[condition];
-
-            if (list.length === 0) { //Not traded? Then it is not considered palatable
-                continue;
-            }
-
-            list.map(i => i.movement.price).reduce((a,b) => a + b);
-
-            //const last = list[list.length - 1];
-
-            //this.game.quotations[condition] = last.movement.price;
-
-            this.game.quotations[condition] = list.map(i => i.movement.price).reduce((a,b) => a + b) / list.length;
-
-            if (this.game.quotations[condition] > winningQuotation) {
-                winningQuotation = this.game.quotations[condition];
-                winningCondition = condition;
-            }*/
-
             const median = this.medianLastSeven(condition);
 
             if (median == null) {
@@ -344,16 +338,6 @@ class Phase6 extends JoinablePhase {
 
                     const biddingSpeculators = p.speculators[winningCondition];
 
-                    /*let winningBidderIndex = 0;
-                    
-                    if (biddingSpeculators.length >= 1) {
-                        winningBidderIndex = Math.floor( Math.random() * biddingSpeculators.length );
-                    }
-
-                    const winnerNumber = biddingSpeculators[winningBidderIndex];
-
-                    console.log(`Speculator who won: ${winnerNumber}`);*/
-
                     const speculationProfit = (p.v[winningCondition] - p.d[winningCondition]) / (2  * biddingSpeculators.length);
 
                     landProfit.sniped = true;
@@ -375,14 +359,6 @@ class Phase6 extends JoinablePhase {
                         ) {
                             continue;
                         }
-
-                        /*if (speculator.number === winnerNumber) {
-                            landProfit.sniped = true;
-                            landProfit.speculator = speculator.number;
-                            landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
-
-                            console.log('Land profit updated');                                    
-                        }*/
 
                         if (speculator.profit == null) {
                             speculator.profit =  [];

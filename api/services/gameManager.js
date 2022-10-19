@@ -80,6 +80,7 @@ export default {
                 gamePlayers.forEach(p => {
                     p.shares = parseInt(p.shares);
                     p.balance = parseInt(p.balance);
+                    p.cashForSniping = gameData.parameters.cash_for_snipers;
                     p.game_id = parseInt(p.game_id);
                 })
 
@@ -102,7 +103,6 @@ export default {
                     case 'harberger':
                         game = new Harberger(gameData);
                         await game.init();
-                        //game = await Harberger.create(gameData);
                         break;
                     case 'futarchy':
                         game = new Futarchy(gameData);

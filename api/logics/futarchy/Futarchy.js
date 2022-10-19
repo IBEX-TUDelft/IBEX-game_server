@@ -97,12 +97,15 @@ export default class Futarchy extends Logic {
             self.data.currentPhase.movementList.forEach((conditionList, condition) => {
                 const simplifiedConditionList = [];
 
+                const median = self.medianLastSeven(conditionList);
+
                 conditionList.forEach(tx => {
                     simplifiedConditionList.push({
                         "from": tx.from.number,
                         "to": tx.to.number,
                         "price": tx.movement.price,
-                        "condition": condition
+                        "condition": condition,
+                        "median": median
                     });
                 });
 
@@ -133,5 +136,24 @@ export default class Futarchy extends Logic {
         console.log(data);
 
         return data;
+    }
+
+    medianLastSeven(list) {
+        const values = list.map(m => m.movement.price).slice(-7);
+
+        if (values.length === 0) {
+            return null;
+        }
+
+        values.sort(function(a,b){
+            return a-b;
+        });
+
+        var half = Math.floor(values.length / 2);
+  
+        if (values.length % 2)
+            return values[half];
+        
+        return (values[half - 1] + values[half]) / 2.0;
     }
 }

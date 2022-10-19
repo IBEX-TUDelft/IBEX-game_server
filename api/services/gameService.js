@@ -26,6 +26,7 @@ export default {
             {key: "speculator_balance", type: "number", value: gameParameters.speculators.balance},
             {key: "speculator_shares", type: "number", value: gameParameters.speculators.shares},
             {key: "max_lot_purchases", type: "number", value: gameParameters.speculators.max_lot_purchases},
+            {key: "cash_for_snipers", type: "number", value: gameParameters.speculators.cash_for_snipers},
 
             {key: "developers_count", type: "number", value: gameParameters.developers.count},
             {key: "developer_balance", type: "number", value: gameParameters.developers.balance},
@@ -113,11 +114,13 @@ export default {
 
             let balance;
             let shares;
+            let cashForSniping = 0;
 
             switch (role) {
                 case 1:
                     balance = gameParameters.speculators.balance;
                     shares = gameParameters.speculators.shares;
+                    cashForSniping = gameParameters.speculators.cash_for_snipers;
                     break;
                 case 2:
                     balance = gameParameters.developers.balance;
@@ -145,6 +148,7 @@ export default {
                 player_number: i + 1,
                 balance: balance,
                 shares: shares,
+                cashForSniping: cashForSniping,
                 player_role: role
             };
 

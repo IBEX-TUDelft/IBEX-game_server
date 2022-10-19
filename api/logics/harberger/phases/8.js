@@ -5,6 +5,7 @@ class Phase8 extends JoinablePhase {
 
     startTime = 0;
     results = {
+        cashForSniping: [],
         snipes: [],
         snipeOutcomes: []
     };
@@ -354,6 +355,11 @@ class Phase8 extends JoinablePhase {
         console.log(`Total shares: ${totalShares}`);
 
         this.game.players.forEach(player => {
+            self.results.cashForSniping.push({
+                "number": player.number,
+                "cashForSniping": player.cashForSniping
+            });
+
             const summary = player.summaries[self.game.currentRound.number - 1];
 
             summary.cash = player.wallet[winningCondition].balance;

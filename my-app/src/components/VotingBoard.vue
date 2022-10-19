@@ -50,7 +50,7 @@
                                             <td>{{ condition.name }}</td>
                                             <td>{{ formatUs(player.property.v[condition.id]) }}</td>
                                             <td v-if="game.phase >= 4">
-                                                <b-form-input @keydown="formatInput"  v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                                <b-form-input @keydown="isAllowed" @input="game.compensationOffers[condition.id] = reformat(game.compensationOffers[condition.id])"  v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
                                                 <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                             </td>
                                             <td v-if="game.phase === 4">
@@ -74,7 +74,7 @@
                                             <td>{{ condition.name }}</td>
                                             <td>{{ formatUs(player.property.v[condition.id]) }}</td>
                                             <td v-if="game.phase >= 3">
-                                                <b-form-input @keydown="formatInput" v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                                <b-form-input @keydown="isAllowed" @input="player.compensationRequests[condition.id] = reformat(player.compensationRequests[condition.id])" v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
                                                 <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
                                             </td>
                                             <td v-if="game.phase >= 6">
@@ -257,6 +257,7 @@ import Acknowledge from './modals/Acknowledge.vue';
 import { getGameStatus } from '../services/GameService'
 import dictionary from '../assets/voting.json';
 import { LocalizedNumberParser } from 'localized-number-parser';
+import FormatService from '../services/FormatService';
 
 export default {
     data() {
@@ -641,11 +642,9 @@ export default {
             }
         },
         formatUs(num) {
-            if (num == null || typeof num != 'number') {
-                return num;
-            }
-
-            return (Math.round(num * 100) / 100).toLocaleString(this.format);
+            return this.formatService.format(num);
+        }, reformat(stringValue) {
+            return this.formatService.reformat(stringValue);
         },
         signalReady() {
             const self = this;
@@ -798,79 +797,6 @@ export default {
             this.modals.confirm.show = false;
 
             return result;
-        }, formatInput(e) {
-            if (e == null) {
-                return;
-            }
-            if (![8,9,48,49,50,51,52,53,54,55,56,57,188,190].includes(e.which)) {
-                console.log(`Sorry ${e.which}`)
-                e.preventDefault();
-                return false;
-            }
-
-            let format = this.format;
-
-            if (Number.isNaN(new LocalizedNumberParser(format).parse(e.target.value))) {
-                return true;
-            }
-
-            const currentValueString = e.target.value;
-            let currentValue = null;
-
-            try {
-                currentValue = new LocalizedNumberParser(format).parse(currentValueString);
-
-                if (currentValue != null) {
-                    console.log(`Current value string: ${currentValueString}, parsed into ${currentValue} (${typeof currentValue}). Format: ${format}`);
-                } else {
-                    console.log(`Current value string: ${currentValueString} can't be parsed into a ${format} value because the parser return a null value`);
-                }
-            } catch (err) {
-                console.err(`Current value string: ${currentValueString} can't be parsed into a ${format} value because of an exception`, err);
-            }
-
-            let newValue;
-
-            switch(e.which) {
-                case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57:
-
-                    if (!e.target.value.endsWith('.') && !e.target.value.endsWith(',')) {
-                        e.target.value = this.formatUs(parseFloat(currentValue.toString() + (e.which - 48).toString())).slice(0, -1);
-                    }
-
-                    return true;
-                case 9: /*Tab*/
-                    return true;
-                case 188: /*Comma*/ case 190: /*Dot*/
-                    var character = e.which === 188 ? ',' : '.';
-
-                    try {
-                        newValue = new LocalizedNumberParser(format).parse(currentValueString + character);
-
-                        if (Number.isNaN(newValue)) {
-                            throw new Error('The parser returned a non value');
-                        }
-
-                        return true;
-                    } catch (err) {
-                        e.preventDefault();
-                        console.error(`Can't add ${character} to ${e.target.value}`, err);
-                        return false;
-                    }
-                case 8: //Backspace
-                    if (currentValueString == null || currentValueString.trim() === '' || currentValueString.slice(0, -1).trim() === '') {
-                        return true;
-                    }
-
-                    e.target.value =
-                        this.formatUs(new LocalizedNumberParser(format).parse(currentValueString.slice(0, -1))) +
-                        e.target.value.charAt(e.target.value.length - 1);
-
-                    return true;
-                default:
-                    e.preventDefault();
-                    return false;
-            }
         }, parseFormatted(numericalString, def) {
             console.log(`Parsing ${numericalString} (${typeof numericalString}), `)
 
@@ -912,6 +838,14 @@ export default {
             }
 
             return obj;
+        }, isAllowed(e) {
+            if (![8,9,37,38,39,40,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,105,104,105,188,190].includes(e.which)) {
+                console.log(`Sorry ${e.which}`)
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
         }
     },
     async mounted () {
@@ -942,6 +876,8 @@ export default {
         if (dictionary.parameters.format != null) {
             this.format = dictionary.parameters.format;
         }
+
+        this.formatService = new FormatService(this.format);
     }
 }
 </script>

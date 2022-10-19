@@ -41,8 +41,14 @@ export default {
         numberOnly(e) {
             return this.$parent.numberOnly(e);
         },
+        reformat(e) {
+            return this.$parent.reformat(e);
+        },
         formatInput(e) {
             return this.$parent.formatInput(e);
+        },
+        isAllowed(e) {
+            return this.$parent.isAllowed(e);
         },
         parseFormatted(numericalString, def) {
             return this.$parent.parseFormatted(numericalString, def);

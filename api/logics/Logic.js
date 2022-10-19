@@ -201,37 +201,6 @@ export default class {
 
         this.data.results = [];
 
-        /*self.data.V = [0, 0, 0];
-
-        self.data.properties.forEach(p => {
-            for (let j = 0; j < 3; j++) {
-                self.data.V[j] += p.v[j];
-            }    
-        });
-
-        console.log(`V = ${self.data.V}`);
-
-        //TODO: for the moment the signals are pregenerated and last for the whole game. Shall we regenerate them at each turn?
-        if (self.data.type != 'Voting') {
-            for (let i = 0; i < self.data.players.length; i++) {
-                const player = self.data.players[i];
-
-                for (let j = 0; j < 3; j++) {
-                    const delta = (self.data.parameters.signal_high - self.data.parameters.signal_low) * Math.random();
-
-                    const coefficient = self.data.parameters.signal_low + delta;
-
-                    console.log(`delta1 = ${delta}, coefficient1 = ${coefficient}`);
-
-                    const normalizedTaxRate = self.data.parameters.tax_rate_final / 100;
-
-                    player.S[j] = Math.round(self.data.V[j] * coefficient * normalizedTaxRate / 100);
-                }
-
-                console.log(`${player.name} S = ${player.S}`);
-            }
-        }*/
-
         await GameRepository.saveData(self.data.id, self.data);
     }
 
@@ -454,13 +423,16 @@ export default class {
                 player.wallet = [
                     {
                         "balance": player.balance,
-                        "shares": player.shares
+                        "shares": player.shares,
+                        "cashForSniping": player.cashForSniping
                     }, {
                         "balance": player.balance,
-                        "shares": player.shares
+                        "shares": player.shares,
+                        "cashForSniping": player.cashForSniping
                     }, {
                         "balance": player.balance,
-                        "shares": player.shares
+                        "shares": player.shares,
+                        "cashForSniping": player.cashForSniping
                     }
                 ];
             }

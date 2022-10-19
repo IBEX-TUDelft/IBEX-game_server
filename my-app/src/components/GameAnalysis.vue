@@ -10,7 +10,7 @@
                         Results Overview
                     </b-navbar-brand>
                 </div>
-                <b-navbar-nav class="ml-auto">
+                <b-navbar-nav class="ml-auto mr-2">
                     <button :disabled="false" class="btn btn-success" @click="exportXlsx">Export</button>
                 </b-navbar-nav>
                 <b-navbar-nav>
@@ -222,6 +222,7 @@
         data() {
             return {
                 gameId: null,
+                startTime: null,
                 ruleset: null,
                 firstDeclarations: [],
                 signals: null,
@@ -232,7 +233,11 @@
                 secondSnipes: [],
                 secondSnipeResults: [],
                 roundIndex: 0,
-                indexes: []
+                indexes: [],
+                log: null,
+                finalPrices: [],
+                wallets: [],
+                cashForSniping: []
             };
         },
         components: {
@@ -468,8 +473,26 @@
                     'snipe1_end_result', 'Property Value_min_Tax1', 'Trading_Result', 'snipe2_end_results', 'Property Value_min_Tax2'
                 ]);                
 
+                const ownerNumbers = [null, null, null, null, null, null];
+
+                self.players.forEach(p => {
+                    if (p.role === 1) {
+                        return;
+                    }
+
+                    if (p.role === 3) {
+                        const index = parseInt(p.tag.split(' ')[1]);
+
+                        ownerNumbers[index - 1] = p.number;
+                    } else if (p.role === 2) {
+                        ownerNumbers[5] = p.number;
+                    }
+                });
+
                 self.rounds.forEach(round => {
                     const roundIdx = round.round - 1;
+
+                    const winningCondition = self.winningCondition[roundIdx];
 
                     self.players.forEach(player => {
                         const xlsRow = [self.startTime,player.number,round.round, player.tag, player.role, self.ruleset];
@@ -507,7 +530,7 @@
                             xlsRow.push(declaration.taxes[c.id]);
                         });
 
-                        xlsRow.push(self.conditions[self.winningCondition].key); //outcome
+                        xlsRow.push(self.conditions[winningCondition].key); //outcome
 
                         xlsRow.push(null);
 
@@ -534,6 +557,207 @@
                         });
 
                         xlsRow.push(null);
+
+                        self.conditions.forEach((c) => {
+                            //First Sniping Attempts
+                            if (player.role != 1) {
+                                xlsRow.push(null, null, null, null, null, null);
+                            } else {
+                                ownerNumbers.forEach(on => {
+                                    if (on == null) {
+                                        xlsRow.push(null);
+                                        return;                                    
+                                    }
+
+                                    const snipe = self.firstSnipes[roundIdx].find(fs => fs.player.number === player.number && fs.target.number === on);
+
+                                    if (snipe == null) {
+                                        xlsRow.push('N');
+                                        return;
+                                    }
+
+                                    xlsRow.push(self.getYesOrNo(snipe.snipes[c.id]));
+                                });
+                            }
+
+                            xlsRow.push(null);//End of First Sniping Attempts
+                        });
+
+                        self.conditions.forEach((c) => {
+                            //First Declarations
+                            if (player.role != 1) {
+                                xlsRow.push(null, null, null, null, null, null);
+                            } else {
+                                ownerNumbers.forEach(on => {
+                                    if (on == null) {
+                                        xlsRow.push(null);
+                                        return;
+                                    }
+
+                                    const decl = self.firstDeclarations[roundIdx].find(fd => fd.player === on);
+
+                                    if (decl == null) {
+                                        xlsRow.push(null);
+                                    } else {
+                                        xlsRow.push(decl.declaration[c.id]);
+                                    }
+                                });
+                            }
+
+                            xlsRow.push(null);//End of First Declarations
+                        });
+
+                        self.conditions.forEach((c) => {
+                            //First Snipe Results
+                            if (player.role != 1) {
+                                xlsRow.push(null, null, null, null, null, null);
+                            } else {
+                                ownerNumbers.forEach(on => {
+                                    if (on == null) {
+                                        xlsRow.push(null);
+                                        return;
+                                    }
+
+                                    const result = self.firstSnipeResults[roundIdx].find(fd => fd.player.number === player.number && fd.target.number === on);
+
+                                    if (result == null) {
+                                        xlsRow.push(null);
+                                    } else {
+                                        if (c.id === winningCondition) {
+                                            xlsRow.push(result.profit);
+                                        } else {
+                                            xlsRow.push(null);
+                                        }
+                                    }
+                                });
+                            }
+
+                            xlsRow.push(null);//End of First Snipe Results
+                        });
+
+                        //Second Declarations and Taxes
+                        const secondDeclaration = self.secondDeclarations[roundIdx].find(d => d.player === player.number);
+
+                        if (secondDeclaration == null) {
+                            xlsRow.push(null, null);
+                        } else {
+                            xlsRow.push(secondDeclaration.declaration[winningCondition]);
+                            xlsRow.push(secondDeclaration.taxes[winningCondition]);
+                        }//End pf Second Declarations and Taxes
+
+                        xlsRow.push(null);
+
+                        //Second Sniping Attempts
+                        if (player.role != 1) {
+                            xlsRow.push(null, null, null, null, null, null);
+                        } else {
+                            ownerNumbers.forEach(on => {
+                                if (on == null) {
+                                    xlsRow.push(null);
+                                    return;                                    
+                                }
+
+                                const snipe = self.secondSnipes[roundIdx].find(fs => fs.player.number === player.number && fs.target.number === on);
+
+                                if (snipe == null) {
+                                    xlsRow.push('N');
+                                    return;
+                                }
+
+                                xlsRow.push(self.getYesOrNo(snipe.snipes[winningCondition]));
+                            });
+                        }
+
+                        xlsRow.push(null);//End of First Sniping Attempts
+
+                        //Second Declarations
+                        if (player.role != 1) {
+                            xlsRow.push(null, null, null, null, null, null);
+                        } else {
+                            ownerNumbers.forEach(on => {
+                                if (on == null) {
+                                    xlsRow.push(null);
+                                    return;
+                                }
+
+                                const decl = self.secondDeclarations[roundIdx].find(fd => fd.player === on);
+
+                                if (decl == null) {
+                                    xlsRow.push(null);
+                                } else {
+                                    xlsRow.push(decl.declaration[winningCondition]);
+                                }
+                            });
+                        }
+
+                        xlsRow.push(null);//End of Second Declarations
+
+                        //Second Snipe Results
+                        if (player.role != 1) {
+                            xlsRow.push(null, null, null, null, null, null);
+                        } else {
+                            ownerNumbers.forEach(on => {
+                                if (on == null) {
+                                    xlsRow.push(null);
+                                    return;
+                                }
+
+                                const result = self.secondSnipeResults[roundIdx].find(fd => fd.player.number === player.number && fd.target.number === on);
+
+                                if (result == null) {
+                                    xlsRow.push(null);
+                                } else {
+                                    xlsRow.push(result.profit);
+                                }
+                            });
+                        }
+
+                        xlsRow.push(null);//End of Second Snipe Results
+
+                        //Market Results
+                        self.conditions.forEach((c) => {
+                            const myActions = self.log[roundIdx][c.id]; //.filter(l => l.actor.number === player.number);
+
+                            xlsRow.push(myActions.filter(a => a.action === 'added Sell' && a.actor.number === player.number).length);
+                            xlsRow.push(myActions.filter(a => a.action === 'added Buy' && a.actor.number === player.number).length);
+                            xlsRow.push(myActions.filter(a => a.buyer != null && a.buyer.number === player.number).length);
+                            xlsRow.push(myActions.filter(a => a.seller != null && a.seller.number === player.number).length);
+                            xlsRow.push(self.wallets[roundIdx].find(w => w.number === player.number).wallet[c.id].balance);
+                            xlsRow.push(self.wallets[roundIdx].find(w => w.number === player.number).wallet[c.id].shares);
+                            xlsRow.push(null);
+                        });
+
+                        let firstSnipeResult;
+                        let firstTaxes;
+                        let tradingResult;
+                        let secondSnipeResult;
+                        let secondTaxes;
+
+                        tradingResult = (self.wallets[roundIdx].find(w => w.number === player.number).wallet[winningCondition].balance - player.balance) +
+                        (self.wallets[roundIdx].find(w => w.number === player.number).wallet[winningCondition].shares - player.shares) * self.finalPrices[roundIdx][winningCondition]
+
+                        //Aggregate Results
+                        if (player.role === 1) {
+                            firstSnipeResult = self.firstSnipeResults[roundIdx].filter(sr => sr.player.number === player.number && sr.profit != null)
+                                .map(sr => sr.profit).reduce((a, b) => a + b, 0);
+                            firstTaxes = null; //Always for snipers
+                            secondSnipeResult = self.secondSnipeResults[roundIdx].filter(sr => sr.player.number === player.number && sr.profit != null)
+                                .map(sr => sr.profit).reduce((a, b) => a + b, 0);
+                            secondTaxes = null; //Always for snipers
+                        } else if (player.role === 2 || player.role === 3) {
+                            firstSnipeResult = self.firstSnipeResults[roundIdx].filter(sr => sr.target.number === player.number && sr.profit != null)
+                                .map(sr => sr.profit).reduce((a, b) => a - b, 0);
+                            firstTaxes = self.firstDeclarations[roundIdx].find(d => d.player === player.number).taxes[self.winningCondition];
+                            secondSnipeResult = self.secondSnipeResults[roundIdx].filter(sr => sr.target.number === player.number && sr.profit != null)
+                                .map(sr => sr.profit).reduce((a, b) => a - b, 0);
+                            secondTaxes = self.secondDeclarations[roundIdx].find(d => d.player === player.number).taxes[self.winningCondition];
+                        }
+
+                        xlsRow.push(firstSnipeResult);
+                        xlsRow.push(firstTaxes);
+                        xlsRow.push(tradingResult);
+                        xlsRow.push(secondSnipeResult);
+                        xlsRow.push(secondTaxes);
 
                         xls.push(xlsRow);
                     });
@@ -652,6 +876,7 @@
             this.ruleset = response.data.data.ruleset;
             this.players = response.data.data.players;
             this.conditions = response.data.data.conditions;
+            this.startTime = response.data.data.startTime;
 
             function extractProperty (rounds, phase, property) {
                 const result = [];
@@ -672,6 +897,10 @@
             this.secondDeclarations = extractProperty(this.rounds, 7, 'declarations');
             this.secondSnipes = extractProperty(this.rounds, 8, 'snipes');
             this.secondSnipeResults = extractProperty(this.rounds, 8, 'snipeOutcomes');
+            this.log = extractProperty(this.rounds, 6, 'log');
+            this.wallets = extractProperty(this.rounds, 6, 'wallets');
+            this.finalPrices = extractProperty(this.rounds, 6, 'finalPrices');
+            this.cashForSniping = extractProperty(this.rounds, 8, 'cashForSniping');
 
             if (this.ruleset == 'Harberger') {
                 this.winningCondition = extractProperty(this.rounds, 3, 'winningCondition');
