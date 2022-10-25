@@ -53,19 +53,11 @@ class Phase4 extends JoinablePhase {
 
                     const biddingSpeculators = p.speculators[winningCondition];
 
-                    /*let winningBidderIndex = 0;
-                    
-                    if (biddingSpeculators.length >= 1) {
-                        winningBidderIndex = Math.floor( Math.random() * biddingSpeculators.length );
-                    }
-
-                    console.log(`Speculator who won: ${biddingSpeculators[winningBidderIndex]}`);*/
-
                     const speculationProfit = (p.v[winningCondition] - p.d[winningCondition]) / (2  * biddingSpeculators.length);
 
                     landProfit.sniped = true;
                     landProfit.speculator = biddingSpeculators;
-                    landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
+                    landProfit.snipeProfit = speculationProfit; //p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
 
                     const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
 

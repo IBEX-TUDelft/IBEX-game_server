@@ -10,7 +10,7 @@
                         Results Overview
                     </b-navbar-brand>
                 </b-navbar-nav>
-                <b-navbar-nav>
+                <b-navbar-nav class="mr-1">
                     <button :disabled="false" class="btn btn-success" @click="exportXlsx()">Export</button>
                 </b-navbar-nav>
                 <b-navbar-nav>
@@ -221,11 +221,13 @@
 
                     self.players.forEach(player => {
                         self.conditions.forEach((c, i) => {
-                            if (conditionTotals[i] === null) {
+                            if (conditionTotals[i] == null) {
                                 conditionTotals[i] = 0;
                             }
 
                             const values = self.getPlayerValues(player.number, round.round);
+
+                            console.log(values[i]);
 
                             conditionTotals[i] += values[i];
                         });
@@ -241,8 +243,15 @@
                             bestConditions.push(i);
                         } else {
                             bestConditions = [i];
+                            max = ct;
                         }
                     })
+
+                    console.log('Condition totals: ');
+                    console.log(conditionTotals);
+                    console.log('Best conditions: ');
+                    console.log(bestConditions);
+                    console.log('Value: ' + max);
 
                     self.players.forEach(player => {
                         const values = self.getPlayerValues(player.number, round.round);

@@ -61,7 +61,7 @@ class Chat extends JoinablePhase {
                     "time": time,
                     "sender": player.number,
                     "to": message.to,
-                    "text": encodeURIComponent(message.text).replaceAll("'", "&lsquo;")
+                    "text": message.text.replaceAll("'", "&lsquo;")
                 });
 
                 console.log(caller.results.chatLog[caller.results.chatLog.length - 1]);

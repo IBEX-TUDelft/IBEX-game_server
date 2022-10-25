@@ -489,6 +489,9 @@
                     }
                 });
 
+                console.log("Owner numbers: ");
+                console.log(ownerNumbers);
+
                 self.rounds.forEach(round => {
                     const roundIdx = round.round - 1;
 
@@ -576,7 +579,7 @@
                                         return;
                                     }
 
-                                    xlsRow.push(self.getYesOrNo(snipe.snipes[c.id]));
+                                    xlsRow.push(snipe.snipes[c.id] == null || !snipe.snipes[c.id] ? 'N' : 'Y');
                                 });
                             }
 
@@ -664,7 +667,7 @@
                                     return;
                                 }
 
-                                xlsRow.push(self.getYesOrNo(snipe.snipes[winningCondition]));
+                                xlsRow.push(snipe.snipes[winningCondition] == null || !snipe.snipes[winningCondition] ? 'N' : 'Y');
                             });
                         }
 

@@ -3,250 +3,272 @@
         <confirm></confirm>
         <acknowledge></acknowledge>
 
-        <div>
-            <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
-                <b-navbar-nav>
-                    <b-navbar-brand>
-                        {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
-                    </b-navbar-brand>
-                </b-navbar-nav>
-                <b-navbar-nav class="ml-auto">
-                    <b-nav-item active v-if="timer.on === true">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
-                    <b-nav-item active v-if="!game.over">Round: {{ game.round }}</b-nav-item>
-                    <b-nav-item active v-if="!game.over">Phase: {{ game.phase }}</b-nav-item>
-                    <b-nav-item active v-if="game.over">Game Over</b-nav-item>
-                </b-navbar-nav>
-            </b-navbar>
-        </div>
+        <b-row class="no-gutters justify-content-center">
+            <b-col>
+                <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
+                    <b-navbar-nav>
+                        <b-navbar-brand>
+                            {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
+                        </b-navbar-brand>
+                    </b-navbar-nav>
+                    <b-navbar-nav class="ml-auto">
+                        <b-nav-item active v-if="timer.on === true">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
+                        <b-nav-item active v-if="!game.over">Round: {{ game.round }}</b-nav-item>
+                        <b-nav-item active v-if="!game.over">Phase: {{ game.phase }}</b-nav-item>
+                        <b-nav-item active v-if="game.over">Game Over</b-nav-item>
+                    </b-navbar-nav>
+                </b-navbar>
+            </b-col>
+        </b-row>
 
-        <div v-if="game.phase < 7" class="b-container mt-1 mx-5">
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase === 0">
+            <b-col class="d-flex align-items-center justify-content-center flex-column">
+                <b-row class="">
+                    <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
+                    <div v-else>Waiting all players to join ...</div>
+                </b-row>
+            </b-col>
+        </b-row>
 
-            <div class="row d-flex align-items-center justify-content-center" style="height: 500px;" v-if="game.phase === 0">
-                <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
-                <div v-else>Waiting all players to join ...</div>
-            </div>
+        <b-row v-if="game.phase < 7" class="flex-row no-gutters">
 
-            <div class="row" v-if="game.phase >= 1">
-                <div class="col-8">
-                    <div v-if="game.phase >= 2" class="row mb-3">
-                        <div class="col-12 text-center">
-                            <b>{{ resolvePlaceHolder('conditions-plot-values-title') }}</b>
-                        </div>
+            <div class="d-flex flex-column col-8" v-if="game.phase >= 1">
+                <b-row v-if="game.phase >= 2" class="no-gutters py-1 px-2">
+                    <div class="col-12 text-center">
+                        <b>{{ resolvePlaceHolder('conditions-plot-values-title') }}</b>
                     </div>
+                </b-row>
 
-                    <div v-if="game.phase >= 2" class="row mb-3">
-                        <b-form-group>
+                <b-row v-if="game.phase >= 2" class="no-gutters py-1 px-2">
+                    <b-form-group>
 
-                            <div class="col-12">
-                                <table v-if="player.role === 2" class="table table-bordered" style="table-layout: fixed;">
-                                    <thead class="thead-dark">
-                                        <th scope="col">Condition</th>
-                                        <th scope="col">Value</th>
-                                        <th v-if="game.phase >= 4" scope="col">Offer</th>
-                                        <th v-if="game.phase === 4" scope="col">Profit</th>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="condition in game.conditions" :key="condition.id">
-                                            <td>{{ condition.name }}</td>
-                                            <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                            <td v-if="game.phase >= 4">
-                                                <b-form-input @keydown="isAllowed" @input="game.compensationOffers[condition.id] = reformat(game.compensationOffers[condition.id])"  v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
-                                                <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
-                                            </td>
-                                            <td v-if="game.phase === 4">
-                                                <div>{{ formatUs(player.property.v[condition.id] - parseFormatted(extractDataFromObject('0', game.compensationOffers, condition.id)) * game.players.filter(p => p.role === 3).length) }}</div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <table v-if="player.role === 3" class="table table-bordered" style="table-layout: fixed;">
-                                    <thead class="thead-dark">
-                                        <th scope="col">Condition</th>
-                                        <th scope="col">Value</th>
-                                        <th v-if="game.phase >= 3" scope="col">Request</th>
-                                        <th v-if="game.phase >= 6" scope="col">Offer</th>
-                                        <th v-if="game.phase === 3 || game.phase === 6" scope="col">Profit</th>
-                                        <th v-if="game.phase === 6" scope="col">Vote</th>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="condition in game.conditions" :key="condition.id">
-                                            <td>{{ condition.name }}</td>
-                                            <td>{{ formatUs(player.property.v[condition.id]) }}</td>
-                                            <td v-if="game.phase >= 3">
-                                                <b-form-input @keydown="isAllowed" @input="player.compensationRequests[condition.id] = reformat(player.compensationRequests[condition.id])" v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
-                                                <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
-                                            </td>
-                                            <td v-if="game.phase >= 6">
-                                                <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
-                                            </td>
-                                            <td v-if="game.phase === 3">
-                                                {{ formatUs(player.property.v[condition.id] + parseFormatted(player.compensationRequests[condition.id], 0)) }}
-                                            </td>
-                                            <td v-if="game.phase === 6">
-                                                {{ formatUs(player.property.v[condition.id] + extractDataFromObject(0, game.compensationOffers, condition.id)) }}
-                                            </td>
-                                            <td v-if="game.phase === 6" style="background-color: yellow;">
-                                                <b-form-radio
-                                                    v-model="forms.selectedCondition"
-                                                    :name="'select-condition-' + condition.id"
-                                                    :value="condition.id"
-                                                />
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                        </b-form-group>
-
-                        <div class="col-12 mb-1 text-center">
-                            <button v-if="!player.compensationRequestReceived && game.phase === 3 && player.role === 3" type="button" @click='submitCompensationRequest()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-request-button') }}</button>
-                            <button v-if="!player.compensationOfferReceived && player.role === 2 && game.phase === 4" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-offer-button') }}</button>
-                            <button v-if="!player.compensationDecisionReceived && player.role === 3 && game.phase === 6" type="button" @click='submitCompensationDecisions()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-decision-button') }}</button>
-                        </div>
-                    </div>
-
-                    <div v-if="game.phase >= 1" class="row mb-3">
-                        <div class="col-12 text-center">
-                            <b>{{ resolvePlaceHolder('plot-matrix') }}</b>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3" v-for="offset in [0,3]" :key="offset">
-                        <div class="col-4" v-for="index in [0 + offset, 1 + offset, 2 + offset]" :key="index">
-                            <DeveloperCard
-                                v-if="game != null && game.players != null && game.players[index] != null"
-                                :ref="'playerCard' + index"
-                                :role="player.role"
-                                :player="game.players[index]"
-                                :game="game"
-                                :owned="player.number === game.players[index].number"
-                            />
-                        </div>
-                    </div>
-
-                    <div v-if="game.boundaries != null"  class="row">
-
-                        <div v-for="role in ['owner', 'developer']" :key="role" class="col-6">
-                            <div class="text-center mb-1"><b>Value Ranges ({{ role }})</b></div>
-                            <table class="table table-bordered" style="table-layout: fixed;">
+                        <div class="col-12 p-0">
+                            <table v-if="player.role === 2" class="table table-bordered" style="table-layout: fixed;">
                                 <thead class="thead-dark">
                                     <th scope="col">Condition</th>
-                                    <th scope="col">Minimum Value</th>
-                                    <th scope="col">Maximum Value</th>
+                                    <th scope="col">Value</th>
+                                    <th v-if="game.phase >= 4" scope="col">Offer</th>
+                                    <th v-if="game.phase === 4" scope="col">Profit</th>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="condition in game.conditions" :key="condition.id"
-                                        :style="{'background-color': game.winningCondition === condition.id ? 'yellow' : 'white'}">
+                                    <tr v-for="condition in game.conditions" :key="condition.id">
                                         <td>{{ condition.name }}</td>
-                                        <td class="text-right">{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
-                                        <td class="text-right">{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
+                                        <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                        <td v-if="game.phase >= 4">
+                                            <b-form-input @keydown="isAllowed" @input="game.compensationOffers[condition.id] = reformat(game.compensationOffers[condition.id])"  v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
+                                        </td>
+                                        <td v-if="game.phase === 4">
+                                            <div>{{ formatUs(player.property.v[condition.id] - parseFormatted(extractDataFromObject('0', game.compensationOffers, condition.id)) * game.players.filter(p => p.role === 3).length) }}</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table v-if="player.role === 3" class="table table-bordered" style="table-layout: fixed;">
+                                <thead class="thead-dark">
+                                    <th scope="col">Condition</th>
+                                    <th scope="col">Value</th>
+                                    <th v-if="game.phase >= 3" scope="col">Request</th>
+                                    <th v-if="game.phase >= 6" scope="col">Offer</th>
+                                    <th v-if="game.phase === 3 || game.phase === 6" scope="col">Profit</th>
+                                    <th v-if="game.phase === 6" scope="col">Vote</th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="condition in game.conditions" :key="condition.id">
+                                        <td>{{ condition.name }}</td>
+                                        <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                        <td v-if="game.phase >= 3">
+                                            <b-form-input @keydown="isAllowed" @input="player.compensationRequests[condition.id] = reformat(player.compensationRequests[condition.id])" v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
+                                        </td>
+                                        <td v-if="game.phase >= 6">
+                                            <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
+                                        </td>
+                                        <td v-if="game.phase === 3">
+                                            {{ formatUs(player.property.v[condition.id] + parseFormatted(player.compensationRequests[condition.id], 0)) }}
+                                        </td>
+                                        <td v-if="game.phase === 6">
+                                            {{ formatUs(player.property.v[condition.id] + extractDataFromObject(0, game.compensationOffers, condition.id)) }}
+                                        </td>
+                                        <td v-if="game.phase === 6" style="background-color: yellow;">
+                                            <b-form-radio
+                                                v-model="forms.selectedCondition"
+                                                :name="'select-condition-' + condition.id"
+                                                :value="condition.id"
+                                            />
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                        
+                    </b-form-group>
 
+                    <div class="col-12 mb-1 text-center">
+                        <button v-if="!player.compensationRequestReceived && game.phase === 3 && player.role === 3" type="button" @click='submitCompensationRequest()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-request-button') }}</button>
+                        <button v-if="!player.compensationOfferReceived && player.role === 2 && game.phase === 4" type="button" @click='submitCompensationOffers()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-offer-button') }}</button>
+                        <button v-if="!player.compensationDecisionReceived && player.role === 3 && game.phase === 6" type="button" @click='submitCompensationDecisions()' class="btn btn-primary" >{{ resolvePlaceHolder('submit-decision-button') }}</button>
                     </div>
+                </b-row>
 
-                </div>
+                <b-row v-if="game.phase >= 1" class="no-gutters py-1 px-2">
+                    <div class="col-12 text-center">
+                        <b>{{ resolvePlaceHolder('plot-matrix') }}</b>
+                    </div>
+                </b-row>
 
-                <div class="col-4"> <!-- Player list -->
+                <b-row class="no-gutters py-1 px-2" >
+                    <div class="col-4 px-1" v-for="index in [0,1,2]" :key="index">
+                        <DeveloperCard
+                            v-if="game != null && game.players != null && game.players[index] != null"
+                            :ref="'playerCard' + index"
+                            :role="player.role"
+                            :player="game.players[index]"
+                            :game="game"
+                            :owned="player.number === game.players[index].number"
+                        />
+                    </div>
+                </b-row>
 
-                    <div v-if="game.phase === 4 && player.role === 2" class="row mb-3"><div class="col-12 text-center"><b>Requests</b></div></div>
+                <b-row class="no-gutters pb-1 px-2" v-if="game.players.length > 3">
+                    <div class="col-4 px-1" v-for="index in [3,4,5]" :key="index">
+                        <DeveloperCard
+                            v-if="game != null && game.players != null && game.players[index] != null"
+                            :ref="'playerCard' + index"
+                            :role="player.role"
+                            :player="game.players[index]"
+                            :game="game"
+                            :owned="player.number === game.players[index].number"
+                        />
+                    </div>
+                </b-row>
 
-                    <div v-if="game.phase === 4 && player.role === 2" class="row mb-3">
-                        <table class="table table-bordered" style="table-layout: fixed;">
+                <b-row v-if="game.boundaries != null"  class="no-gutters py-1 px-2">
+
+                    <div v-for="role in ['owner', 'developer']" :key="role" class="col-6 p-1">
+                        <div class="text-center"><b>Value Ranges ({{ role }})</b></div>
+                        <table class="table table-bordered mb-0" style="table-layout: fixed;">
                             <thead class="thead-dark">
-                                <th scope="col">Player</th>
-                                <th scope="col">Request</th>
+                                <th scope="col">Condition</th>
+                                <th scope="col">Minimum Value</th>
+                                <th scope="col">Maximum Value</th>
                             </thead>
                             <tbody>
-                                <tr v-for="p in game.players.filter(p => p.role === 3).map(p => { return { n: p.number, t: p.tag, r: p.property.lastOffer[1] }; }).sort((a, b) => b.r - a.r)"
-                                    :key="p.n">
-                                    <td>{{ p.t }}</td>
-                                    <td>{{ formatUs(p.r) }}</td>
+                                <tr v-for="condition in game.conditions" :key="condition.id"
+                                    :style="{'background-color': game.winningCondition === condition.id ? 'yellow' : 'white'}">
+                                    <td>{{ condition.name }}</td>
+                                    <td class="text-right">{{ formatUs(game.boundaries[role][condition.key].low) }}</td>
+                                    <td class="text-right">{{ formatUs(game.boundaries[role][condition.key].high) }}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <div v-if="game.phase > 1" class="row mb-3"><div class="col-12 text-center"><b>Chat</b></div></div>
+                </b-row>
 
-                    <div v-if="game.phase === 2 || game.phase === 5" class="row mb-3">
-                        <div class="col-6">
-                            <b-form-checkbox-group
-                                id="message-recipients"
-                                v-model="forms.messageRecipients"
-                                name="message-recipients"
-                                stacked
-                            >
-                                <b-form-checkbox v-for="p in game.players.filter(i => i.number != player.number)" :key="p.number" :value="p.number">
-                                    {{ p.tag }}</b-form-checkbox>
-                            </b-form-checkbox-group>
-                        </div>
-                        <div class="col-6 text-center">
-                            <b-button size="sm" block @click="forms.messageRecipients = game.players.filter(p => p.number != player.number).map(p => p.number)" variant="primary" class="mb-1">Select All</b-button>
-                            <b-button size="sm" block @click="forms.messageRecipients = game.players.filter(p => p.role != 2 && p.number != player.number).map(p => p.number)" variant="primary" class="mb-1">Select Owners</b-button>
-                            <b-button size="sm" block @click="forms.messageRecipients = []" variant="primary">Deselect All</b-button>
-                        </div>
-                    </div>
-
-                    <div v-if="game.phase === 2 || game.phase === 5" class="row mb-1">
-                        <b-form-textarea
-                            id="message"
-                            v-model="forms.outgoingChatMessage"
-                            placeholder="Your message ..."
-                            rows="3"
-                            max-rows="6"
-                        ></b-form-textarea>
-                    </div>
-
-                    <div v-if="game.phase === 2 || game.phase === 5" class="row mb-1 justify-content-center">
-                        <b-button @click="sendChatMessage" variant="primary">Send</b-button>
-                    </div>
-
-                    <div class="row">
-                        <div v-for="box in game.messageBoxes" :key="box.participants" class="col-12 mb-1 px-0">
-                            <b-card
-                                :header="box.participants"
-                                header-tag="header"
-                                @click="forms.messageRecipients = box.people.filter(i => i != player.number)"
-                            >
-                                <b-card-text class="px-0">
-                                    <div v-for="message in box.messages" :key="message.time">
-                                        <b>{{ (message.sender === player.number ? 'You' : game.players.find(p => p.number === message.sender).tag) }}</b>: {{ message.text }}
-                                    </div>
-                                </b-card-text>
-                            </b-card>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div v-else class="b-container mt-1 mx-5">
-            <div v-if="game.phase === 7" class="row mb-3">
-                <div class="col-12 text-center"><b>Final Result</b></div>
             </div>
 
-            <div v-if="game.phase === 7" class="row mb-3">
-                <table class="table table-bordered">
-                    <thead class="thead-dark">
-                        <th scope="col">Condition</th>
-                        <th scope="col">Value</th>
-                        <th scope="col">Compensations</th>
-                        <th scope="col">Total</th>
-                    </thead>
-                    <tbody>
-                        <td>{{ game.conditions[player.result.condition].name }}</td>
-                        <td>{{ formatUs(player.result.value) }}</td>
-                        <td>{{ player.result.compensation != null ? formatUs(player.result.compensation) : 0 }}</td>
-                        <td>{{ formatUs(player.result.value + player.result.compensation) }}</td>
-                    </tbody>
-                </table>
+            <div class="d-flex flex-column col-4" v-if="game.phase >= 1"> <!-- Player list -->
+
+                <b-row v-if="game.phase === 4 && player.role === 2" class="no-gutters py-1 px-2"><div class="col-12 text-center"><b>Requests</b></div></b-row>
+
+                <b-row v-if="game.phase === 4 && player.role === 2" class="no-gutters py-1 px-2">
+                    <table class="table table-bordered" style="table-layout: fixed;">
+                        <thead class="thead-dark">
+                            <th scope="col">Player</th>
+                            <th scope="col">Request</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="p in game.players.filter(p => p.role === 3).map(p => { return { n: p.number, t: p.tag, r: p.property.lastOffer[1] }; }).sort((a, b) => b.r - a.r)"
+                                :key="p.n">
+                                <td>{{ p.t }}</td>
+                                <td>{{ formatUs(p.r) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </b-row>
+
+                <b-row v-if="game.phase > 1" class="no-gutters py-1 px-2"><div class="col-12 text-center"><b>Chat</b></div></b-row>
+
+                <b-row v-if="game.phase === 2 || game.phase === 5" class="d-flex flex-row no-gutters py-1 px-2">
+                    <div class="col-6">
+                        <b-form-checkbox-group
+                            id="message-recipients"
+                            v-model="forms.messageRecipients"
+                            name="message-recipients"
+                            stacked
+                        >
+                            <b-form-checkbox v-for="p in game.players.filter(i => i.number != player.number)" :key="p.number" :value="p.number">
+                                {{ p.tag }}</b-form-checkbox>
+                        </b-form-checkbox-group>
+                    </div>
+                    <div class="col-6 text-center">
+                        <b-button size="sm" block @click="forms.messageRecipients = game.players.filter(p => p.number != player.number).map(p => p.number)" variant="primary" class="mb-1">Select All</b-button>
+                        <b-button size="sm" block @click="forms.messageRecipients = game.players.filter(p => p.role != 2 && p.number != player.number).map(p => p.number)" variant="primary" class="mb-1">Select Owners</b-button>
+                        <b-button size="sm" block @click="forms.messageRecipients = []" variant="primary">Deselect All</b-button>
+                    </div>
+                </b-row>
+
+                <b-row v-if="game.phase === 2 || game.phase === 5" class="no-gutters py-1 px-2">
+                    <b-form-textarea
+                        id="message"
+                        v-model="forms.outgoingChatMessage"
+                        placeholder="Your message ..."
+                        rows="3"
+                        max-rows="6"
+                    ></b-form-textarea>
+                </b-row>
+
+                <b-row v-if="game.phase === 2 || game.phase === 5" class="no-gutters justify-content-center py-1 px-2">
+                    <b-button @click="sendChatMessage" variant="primary">Send</b-button>
+                </b-row>
+
+                <b-row class="d-flex flex-1 flex-row no-gutters py-1 px-2" style="height: 300px; display: flex; overflow: scroll;">
+                    <div v-for="box in game.messageBoxes" :key="box.participants" class="col-12 mb-1 px-0">
+                        <b-card
+                            :header="box.participants"
+                            header-tag="header"
+                            @click="forms.messageRecipients = box.people.filter(i => i != player.number)"
+                        >
+                            <b-card-text class="px-0">
+                                <div v-for="message in box.messages" :key="message.time">
+                                    <b>{{ (message.sender === player.number ? 'You' : game.players.find(p => p.number === message.sender).tag) }}</b>: {{ message.text }}
+                                </div>
+                            </b-card-text>
+                        </b-card>
+                    </div>
+                </b-row>
             </div>
-        </div>
+
+        </b-row>
+
+        <b-row v-else class="flex-row no-gutters no-gutters pb-1 px-2">
+            <b-col class="d-flex flex-column">
+                <b-row v-if="game.phase === 7" class="d-flex flex-row no-gutters mb-1">
+                    <div class="col-12 text-center"><b>Final Result</b></div>
+                </b-row>
+
+                <b-row v-if="game.phase === 7" class="d-flex flex-row no-gutters">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <th scope="col">Condition</th>
+                            <th scope="col">Value</th>
+                            <th scope="col">Compensations</th>
+                            <th scope="col">Votes For</th>
+                            <th scope="col">Total</th>
+                        </thead>
+                        <tbody>
+                            <td>{{ game.conditions[player.result.condition].name }}</td>
+                            <td>{{ formatUs(player.result.value) }}</td>
+                            <td>{{ player.result.compensation != null ? formatUs(player.result.compensation) : 0 }}</td>
+                            <td>{{ player.result.tally }}</td>
+                            <td>{{ formatUs(player.result.value + player.result.compensation) }}</td>
+                        </tbody>
+                    </table>
+                </b-row>
+            </b-col>
+        </b-row>
     </div></b-col>
 </template>
 

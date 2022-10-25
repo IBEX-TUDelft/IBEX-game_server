@@ -48,14 +48,28 @@ export default class Voting extends Logic {
         console.log('RESULTS');
         console.log(self.data.results);
 
-        if (self.data.currentRound.phase === 2) {
-            messages = self.data.currentPhase.results.chatLog;
+        if (self.data.currentRound.phase === 2 || self.data.currentRound.phase === 5) {
+            messages = self.data.currentPhase.results.chatLog.map(m => {
+                return {
+                    "time": m.time,
+                    "sender": m.sender,
+                    "to": m.to,
+                    "text": m.text.replaceAll("&lsquo;", "'")
+                }
+            });
         } else if (self.data.currentRound.phase > 2) {
             const results = self.data.results.find(r => r.round === self.data.currentRound.number);
 
             console.log(results);
 
-            messages = results.phase[2].chatLog;
+            messages = results.phase[2].chatLog.map(m => {
+                return {
+                    "time": m.time,
+                    "sender": m.sender,
+                    "to": m.to,
+                    "text": m.text.replaceAll("&lsquo;", "'")
+                }
+            });
         }
 
         if (messages != null) {
@@ -85,8 +99,10 @@ export default class Voting extends Logic {
             "instructions": self.data.currentPhase.instructions[playerData.role - 1]
         };
 
-        if (self.data.currentRound.phase >= 7) {
+        if (self.data.currentRound.phase >= 7) { //TODO: fix this
             game.winningCondition = self.data.winningCondition;
+            //game.standings = self.data.results.find(r => r.round === self.data.currentRound.number).phase[6].standings
+                //.find(s => s.id === game.winningCondition);
         }
 
         if (playerData != null) {
