@@ -64,9 +64,9 @@ class Phase3 extends JoinablePhase {
                 player.doneSpeculating = true;
             }
         }], [
-            'Analyse all declarations and choose which ones to target, under all conditions',
-            'Wait for the speculators to make their decisions',
-            'Wait for the speculators to make their decisions'
+            'Analyse all declarations under all conditions. Choose which, if any, properties you want to buy at the declared value.',
+            'Wait for the speculators to make their decisions.',
+            'Wait for the speculators to make their decisions.'
         ]);
     }
 
@@ -83,10 +83,10 @@ class Phase3 extends JoinablePhase {
 
         self.game.players.filter(p => p.role === 1).forEach(p => {p.doneSpeculating = false});
 
-        self.wss.broadcastInfo(self.game.id, 'Click on the properties you are interested in. Be fast or the other speculators will take them first!', 1);
-        self.wss.broadcastInfo(self.game.id, 'Check the table of declared values. If you think some property is undervalued, you can buy it and make profit', 1);
-        self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 2);
-        self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to do their move', 3);
+        self.wss.broadcastInfo(self.game.id, 'Click on the properties you are interested in.', 1);
+        self.wss.broadcastInfo(self.game.id, 'Check the table of declared values. Choose which, if any, properties you want to buy at the declared value.', 1);
+        self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to make their decisions.', 2);
+        self.wss.broadcastInfo(self.game.id, 'Wait for the speculators to  make their decisions.', 3);
 
         // 1. calculate D
 
