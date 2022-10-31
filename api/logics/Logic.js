@@ -218,6 +218,10 @@ export default class {
             return;
         }
 
+        if (this.over) {
+            return;
+        }
+
         const transition = await this.data.currentPhase.onMessage(ws, message);
 
         if (transition) {
@@ -315,6 +319,8 @@ export default class {
         let number = 1;
 
         if (this.data.currentRound != null) {
+            this.addSummaries();
+
             number = this.data.currentRound.number + 1;
 
             this.data.rounds.push(this.data.currentRound);
@@ -370,6 +376,8 @@ export default class {
             console.log('The game is over');
             this.wss.broadcastEvent(this.data.id, "game-over", {});
             this.over = true;
+            clearInterval(this.phaseCheckingInterval);
+            
             return;
         }
 
@@ -444,4 +452,45 @@ export default class {
         };
     }
 
+    getSummary(number) {
+        return {
+        };
+    }
+
+    getSummaries(number) {
+        const playerData = this.data.players.find(p => p.number === number);
+
+        console.log(playerData.summaries);
+
+        return playerData.summaries == null ? [] : playerData.summaries;
+    }
+
+    addSummaries() {
+        console.log(`Adding summaries (round ${this.data.currentRound.number})`);
+
+        const self = this;
+
+        this.data.players.forEach(player => {
+            const playerSummary = self.getSummary(player.number);
+
+            playerSummary.round = self.data.currentRound.number;
+
+            if (player.summaries == null) {
+                player.summaries = [];
+            }
+
+            player.summaries.push(playerSummary);
+
+            const err = self.wss.sendEvent(
+                self.data.id,
+                player.number,
+                "round-summary",
+                playerSummary
+            );
+
+            if (err != null) {
+                console.error(err);
+            }    
+        })
+    }
 }

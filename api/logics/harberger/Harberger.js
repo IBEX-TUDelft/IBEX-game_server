@@ -130,6 +130,8 @@ export default class Harberger extends Logic {
             timer = self.data.currentPhase.timer.visibleTimeout
         }
 
+        player.summaries = this.getSummaries(number);
+        
         const data = {
             "game": game,
             "player": player,
