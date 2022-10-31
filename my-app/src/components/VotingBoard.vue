@@ -243,27 +243,31 @@
 
         </b-row>
 
-        <b-row v-else class="flex-row no-gutters no-gutters pb-1 px-2">
+        <b-row class="flex-row no-gutters no-gutters pb-1 px-2">
             <b-col class="d-flex flex-column">
-                <b-row v-if="game.phase === 7" class="d-flex flex-row no-gutters mb-1">
-                    <div class="col-12 text-center"><b>Final Result</b></div>
+                <b-row class="d-flex flex-row no-gutters mb-1">
+                    <div class="col-12 text-center"><b>Results (Current round in yellow)</b></div>
                 </b-row>
 
-                <b-row v-if="game.phase === 7" class="d-flex flex-row no-gutters">
-                    <table class="table table-bordered">
+                <b-row class="d-flex flex-row no-gutters">
+                    <table class="table table-bordered" style="table-layout: fixed;">
                         <thead class="thead-dark">
-                            <th scope="col">Condition</th>
+                            <th scope="col">Round</th>
+                            <th scope="col">Winning Condition</th>
                             <th scope="col">Value</th>
                             <th scope="col">Compensations</th>
                             <th scope="col">Votes For</th>
                             <th scope="col">Total</th>
                         </thead>
                         <tbody>
-                            <td>{{ game.conditions[player.result.condition].name }}</td>
-                            <td>{{ formatUs(player.result.value) }}</td>
-                            <td>{{ player.result.compensation != null ? formatUs(player.result.compensation) : 0 }}</td>
-                            <td>{{ player.result.tally }}</td>
-                            <td>{{ formatUs(player.result.value + player.result.compensation) }}</td>
+                            <tr v-for="summary in getSummaries()" :key="summary.round" :style="summary.round === game.round && !game.over ? 'background-color: yellow;' : ''">
+                                <td>{{ summary.round }}</td>
+                                <td>{{ summary.condition == null ? 'To be Determined' : game.conditions[summary.condition].name }}</td>
+                                <td>{{ summary.value == null ? '' : formatUs(summary.value) }}</td>
+                                <td>{{ summary.compensation == null ? '' : formatUs(summary.compensation) }}</td>
+                                <td>{{ summary.tally }}</td>
+                                <td>{{ summary.profit == null ? '' : formatUs(summary.profit)}}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </b-row>
@@ -323,7 +327,8 @@ export default {
                 compensationOfferReceived: false,
                 compensationDecisions: [],
                 compensationDecisionReceived: false,
-                result: null
+                result: null,
+                summaries: []
             },
             modals: {
                 confirm: {
@@ -513,6 +518,9 @@ export default {
                             self.forms.selectedCondition = 0;*/
 
                             break;
+                        case 'round-summary':
+                            self.player.summaries.push(ev.data);
+                            break;
                         case 'game-over':
                             self.game.over = true;
                             break;
@@ -619,6 +627,10 @@ export default {
                 self.player[prop] = null;
             }
 
+            if (self.player.summaries == null) {
+                self.player.summaries = [];
+            }
+
             self.player.compensationRequestReceived = false;
             self.player.compensationOfferReceived = false;
             self.player.compensationDecisionReceived = false;
@@ -654,7 +666,7 @@ export default {
                     player.property.lastOffer = cr.compensationRequests;
                 })
             }
-            
+
             if (gameData.timer != null) {
                 self.timer.end = gameData.timer > Date.now() ? gameData.timer : Date.now();
 
@@ -868,6 +880,26 @@ export default {
             }
 
             return true;
+        }, getSummary() {
+            const summary = {};
+            
+            summary.round = this.game.round;
+
+            if (this.game.phase === 7) {
+                summary.condition = this.player.result.condition;
+                summary.value = this.player.property.v[this.player.result.condition];
+                summary.compensation = this.player.result.compensation;
+                summary.tally = this.player.result.tally;
+                summary.profit = this.player.result.value + this.player.result.compensation;
+            }
+
+            return summary;
+        }, getSummaries() {
+            if (this.game.over === true) {
+                return this.player.summaries;
+            }
+
+            return [...this.player.summaries, this.getSummary()];
         }
     },
     async mounted () {

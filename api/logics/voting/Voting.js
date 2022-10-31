@@ -99,10 +99,9 @@ export default class Voting extends Logic {
             "instructions": self.data.currentPhase.instructions[playerData.role - 1]
         };
 
-        if (self.data.currentRound.phase >= 7) { //TODO: fix this
+        if (self.data.currentRound.phase === 7) {
             game.winningCondition = self.data.winningCondition;
-            //game.standings = self.data.results.find(r => r.round === self.data.currentRound.number).phase[6].standings
-                //.find(s => s.id === game.winningCondition);
+            game.standings = self.data.currentPhase.results.standings;
         }
 
         if (playerData != null) {
@@ -138,6 +137,10 @@ export default class Voting extends Logic {
                 "value": player.property.v[self.data.winningCondition],
                 "compensation": (player.role === 2) ? - compensation * (self.data.players.length - 1) : compensation
             }
+
+            if (self.data.currentRound.phase === 7) {
+                player.result.tally = game.standings[self.data.winningCondition].counter;
+            }
         }
 
         let timer = null;
@@ -146,6 +149,8 @@ export default class Voting extends Logic {
             timer = self.data.currentPhase.timer.visibleTimeout
         }
 
+        player.summaries = this.getSummaries(number);
+
         const data = {
             "game": game,
             "player": player,
@@ -153,5 +158,29 @@ export default class Voting extends Logic {
         };
 
         return data;
+    }
+
+    getSummary(number) {
+        const summary = {};
+
+        summary.round = this.data.currentRound.number;
+
+        if (this.data.currentRound.phase === 7) {
+            const playerData = this.data.players.find(p => p.number === number);
+
+            summary.condition = this.data.winningCondition;
+            summary.value = playerData.property.v[this.data.winningCondition];
+            summary.tally = this.data.currentPhase.results.standings[this.data.winningCondition].counter;
+
+            if (playerData.role === 2) {
+                summary.compensation = - this.data.compensationOffers[this.data.winningCondition] * ( this.data.players.length - 1);
+                summary.profit = summary.value - summary.compensation * ( this.data.players.length - 1);
+            } else {
+                summary.compensation = this.data.compensationOffers[this.data.winningCondition];
+                summary.profit = summary.value + summary.compensation;
+            }
+        }
+
+        return summary;
     }
 }
