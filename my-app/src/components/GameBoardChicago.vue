@@ -567,6 +567,8 @@
                 this.phase = 0;
                 this.game.declaration = [null, null, null],
                 this.publicSignal = "TBD";
+
+                this.game.players.forEach(p => p.snipe = null);
             },
             recover(gameData) {
                 const self = this;
@@ -810,6 +812,11 @@
 
                                 ev.data.snipes.forEach(sn => {
                                     profit += sn.profit;
+
+                                    if (self.player.role === 1) {
+                                        const target = self.game.players.find(p => p.number === sn.target.number);
+                                        target.snipe = sn.profit;
+                                    }
                                 });
 
                                 if (self.player.role !== 1) {
@@ -824,6 +831,11 @@
 
                                 ev.data.snipes.forEach(sn => {
                                     secondProfit += sn.profit;
+
+                                    if (self.player.role === 1) {
+                                        const target = self.game.players.find(p => p.number === sn.target.number);
+                                        target.snipe = sn.profit;
+                                    }
                                 });
 
                                 if (self.player.role !== 1) {

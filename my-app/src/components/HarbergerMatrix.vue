@@ -13,7 +13,7 @@
             <div class="row p-0" v-for="offset in [0,3]" :key="offset">
                 <div class="col-4 p-1" v-for="index in [0 + offset, 1 + offset, 2 + offset]" :key="index">
                     <b-card 
-                        :header="getDeclarationPlayer(index)"
+                        :header="getHeader(index)"
                         header-tag="header"
 
                         :bg-variant="(player.role != 1 && index + 1 === player.number) ? 'primary' : 'light'"
@@ -82,6 +82,44 @@ export default {
             }
 
             return this.formatUs(declarations[index].d[condition.id])
+        },
+        getHeader(index) {
+            return `${this.$props.getDeclarationPlayer(index)}${this.getSnipeFormatted(index)}`;
+        },
+        getSnipeFormatted(index) {
+            if (this.$props.player.role != 1) {
+                return '';
+            }
+
+            let tag = '';
+
+            switch(index) {
+                case 0:
+                    tag = 'Owner 1';
+                    break;
+                case 1:
+                    tag = 'Developer';
+                    break;
+                default:
+                    tag = `Owner ${index}`;
+            }
+
+            const player = this.$parent.game.players.find(p => p.tag === tag);
+
+            if (player == null) {
+                console.log(`Player ${index + 1} not found.`);
+                return '';
+            }
+
+            if (player.role === 1) {
+                return '';
+            }
+
+            if (player.snipe == null) {
+                return '';
+            }
+            
+            return ` (Last snipe: ${player.snipe})`;
         }
     }
 }

@@ -176,11 +176,13 @@ export default class Futarchy extends Logic {
                     .phase[6].snipeOutcomes.filter(so => so.player.number === number);
 
                 summary.firstRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a + b, 0);
+                summary.snipes = outcomes;
             } else {
                 outcomes = this.data.results.find(r => r.round === this.data.currentRound.number)
                     .phase[6].snipeOutcomes.filter(so => so.target.number === number);
 
                 summary.firstRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a - b, 0);
+                summary.snipes = outcomes;
             }
 
             const playerWallets = this.data.results.find(r => r.round === this.data.currentRound.number)
@@ -216,11 +218,13 @@ export default class Futarchy extends Logic {
                     .phase[8].snipeOutcomes.filter(so => so.player.number === number);
 
                 summary.secondRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a + b, 0);
+                summary.snipes = outcomes;
             } else {
                 outcomes = this.data.results.find(r => r.round === this.data.currentRound.number)
                     .phase[8].snipeOutcomes.filter(so => so.target.number === number);
 
                 summary.secondRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a - b, 0);
+                summary.snipes = outcomes;
             }
 
             summary.market.price = this.data.results.find(r => r.round === this.data.currentRound.number)

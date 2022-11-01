@@ -8,13 +8,14 @@
             <div class="row-12">
                 <table class="table table-bordered" style="table-layout: fixed;">
                     <col />
-                    <col />
+                    <col v-if="$parent.player.role != 1" />
                     <colgroup v-if="$parent.player.role != 1" span="4"></colgroup>
                     <colgroup span="2"></colgroup>
                     <colgroup span="2"></colgroup>
                     <col />
                     <thead class="thead-dark text-center">
-                        <th colspan="2"></th>
+                        <th v-if="$parent.player.role != 1" colspan="2"></th>
+                        <th v-else></th>
                         <th v-if="$parent.player.role != 1" colspan="4" scope="colgroup">Tax Payments</th>
                         <th colspan="2" scope="colgroup">Repurchase Gains/Losses</th>
                         <th colspan="2" scope="colgroup">Financial Market Earnings</th>
@@ -22,7 +23,7 @@
                     </thead>
                     <thead class="thead-dark">
                         <th>Round</th>
-                        <th>Value</th>
+                        <th v-if="$parent.player.role != 1" >Value</th>
                         <th v-if="$parent.player.role != 1">Declaration (1)</th>
                         <th v-if="$parent.player.role != 1">Tax (1)</th>
                         <th v-if="$parent.player.role != 1">Declaration (2)</th>
@@ -36,7 +37,7 @@
                     <tbody>
                         <tr v-for="summary in summaries" :key="summary.round" :style="summary.round === $parent.game.round && !$parent.game.over ? 'background-color: yellow;' : ''">
                             <td>{{ summary.round }}</td>
-                            <td>{{ formatForPrinting(summary.value) }}</td>
+                            <td v-if="$parent.player.role != 1" >{{ formatForPrinting(summary.value) }}</td>
                             <td v-if="$parent.player.role != 1">{{ formatForPrinting(summary.firstDeclaration) }}</td>
                             <td v-if="$parent.player.role != 1">{{ formatForPrinting(summary.firstTaxes, true) }}</td>
                             <td v-if="$parent.player.role != 1">{{ formatForPrinting(summary.secondDeclaration) }}</td>
