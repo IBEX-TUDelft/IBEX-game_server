@@ -39,19 +39,35 @@ class Phase6 extends JoinablePhase {
                     return;
                 }
 
-                if (order.type === 'ask') {
-                    if (order.price != null && order.price < 0) {
-                        wss.sendEvent(
-                            game.id,
-                            player.number,
-                            'order-refused',
-                            {
-                                "message": `Order prices must be non negative. Your price: ${order.price}`
-                            }
-                        );
-                        return; //Cannot ask or bid negative numbers
-                    }
+                if (order.price  == null) {
+                    wss.sendEvent(
+                        game.id,
+                        player.number,
+                        'order-refused',
+                        {
+                            "message": `Order price was not filled.`
+                        }
+                    );
+                    return; //Cannot ask or bid negative numbers
+                }
 
+                if (typeof order.price != 'number') {
+                    order.price = parseFloat(order.price);
+                }
+
+                if (order.price < 0) {
+                    wss.sendEvent(
+                        game.id,
+                        player.number,
+                        'order-refused',
+                        {
+                            "message": `Order prices must be non negative. Your price: ${order.price}`
+                        }
+                    );
+                    return; //Cannot ask or bid negative numbers
+                }
+
+                if (order.type === 'ask') {
                     const activeAsksForCondition = phase.orders[condition].filter(o => o.sender === player.number && o.type === 'ask').length;
 
                     if (player.wallet[condition].shares <= activeAsksForCondition) {
@@ -67,18 +83,6 @@ class Phase6 extends JoinablePhase {
                         return; //Cannot have more asks than shares
                     }
                 } else if (order.type === 'bid') {
-                    if (order.price != null && order.price < 0) {
-                        wss.sendEvent(
-                            game.id,
-                            player.number,
-                            'order-refused',
-                            {
-                                "message": `Order prices must be non negative. Your price: ${order.price}`
-                            }
-                        );
-                        return; //Cannot ask or bid negative numbers
-                    }
-
                     const committedSumForCondition = phase.orders[condition].filter(o => o.sender === player.number && o.type === 'bid')
                         .map(o => o.price)
                         .reduce((a, b) => a + b, 0);
@@ -132,7 +136,15 @@ class Phase6 extends JoinablePhase {
                 const result = phase.fulfillOrder(order, player.number);
 
                 if (result.type == "error") {
-                    WS.error(ws, `Game ${message.gameId}, could not fulfill your order: ${result.message}`);
+                    wss.sendEvent(
+                        game.id,
+                        player.number,
+                        'order-refused',
+                        {
+                            "message": `Could not fulfill your order: ${result.message}`
+                        }
+                    );
+                    //WS.error(ws, `Game ${message.gameId}, could not fulfill your order: ${result.message}`);
                 }
 
                 if (result.quantity > 0 && !order.now) {
@@ -295,7 +307,7 @@ class Phase6 extends JoinablePhase {
 
         self.wss.broadcastInfo(self.game.id, 'Reconciliation in progress ...');
 
-        self.game.players.forEach(player => {
+        /*self.game.players.forEach(player => {
             const summary = player.summaries[self.game.currentRound.number - 1];
 
             summary.value = player.property == null ? 0 : player.property.v[winningCondition]
@@ -304,7 +316,7 @@ class Phase6 extends JoinablePhase {
 
             delete summary.initialDeclarations;
             delete summary.initialTaxes;
-        });
+        });*/
 
         self.game.properties.forEach(p => {
             try {
@@ -342,12 +354,12 @@ class Phase6 extends JoinablePhase {
 
                     landProfit.sniped = true;
                     landProfit.speculator = biddingSpeculators;
-                    landProfit.snipeProfit = speculationProfit; //p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
+                    landProfit.snipeProfit = speculationProfit;
 
-                    const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
+                    /*const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
 
                     ownerSummary.firstRepurchase = (ownerSummary.firstRepurchase == null) ?
-                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;
+                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;*/
 
                     for (let i = 0; i < self.game.players.length; i++) {
                         const speculator = self.game.players[i];
@@ -390,23 +402,17 @@ class Phase6 extends JoinablePhase {
                                 "number": owner.number,
                                 "role": owner.role
                             },
-                            "profit": speculationProfit//speculator.number === winnerNumber ? landProfit.snipeProfit : 0
+                            "profit": speculationProfit
                         });
 
-                        /*if (speculator.number === winnerNumber) {
-                            const ownerSummary = owner.summaries[self.game.currentRound.number - 1];*/
-                            const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
+                        /*const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
 
-                            /*ownerSummary.firstRepurchase = (ownerSummary.firstRepurchase == null) ?
-                                -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;*/
-
-                            speculatorSummary.firstRepurchase = (speculatorSummary.firstRepurchase == null) ?
-                                speculationProfit : speculationProfit + speculatorSummary.firstRepurchase;
-                        //}
+                        speculatorSummary.firstRepurchase = (speculatorSummary.firstRepurchase == null) ?
+                            speculationProfit : speculationProfit + speculatorSummary.firstRepurchase;*/
 
                         speculator.profit.push({
                             "phase": 4,
-                            "amount": speculationProfit,//speculator.number === winnerNumber ? landProfit.snipeProfit : 0,
+                            "amount": speculationProfit,
                             "context": {
                                 "type": "speculation",
                                 "property": {
@@ -464,18 +470,6 @@ class Phase6 extends JoinablePhase {
 
                 console.log('Added profit to owner');
 
-                /*if (landProfit.speculator != null) {
-                    //TODO: remove extra info the speculators shouldn't know
-                    self.wss.sendEvent(
-                        self.game.id,
-                        landProfit.speculator,
-                        "profit",
-                        landProfit
-                    );
-
-                    console.log('Sent message to speculator');
-                }*/
-
                 self.wss.sendEvent(
                     self.game.id,
                     owner.number,
@@ -491,6 +485,20 @@ class Phase6 extends JoinablePhase {
 
         this.game.properties.forEach(p => { p.speculators = null; });
         this.game.players.filter(p => p.role === 1).forEach(p => { p.doneSpeculating = false; });
+
+        this.game.players.forEach(player => {
+            const firstSnipes = self.results.snipeOutcomes
+                .filter(so => so.player.number === player.number || so.target.number === player.number);
+
+            self.wss.sendEvent(
+                self.game.id,
+                player.number,
+                "first-snipes",
+                {
+                    "snipes": firstSnipes
+                }
+            );
+        });
     }
 
     testComplete () {

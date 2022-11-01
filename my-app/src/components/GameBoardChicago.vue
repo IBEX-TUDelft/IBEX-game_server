@@ -142,7 +142,7 @@
         />
         <DoubleAuctionMarketFutarchy ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Futarchy'"/>
 
-        <Summaries v-if="game.phase === 9" :summaries="player.summaries"/>
+        <Summaries :summaries="getSummaries()"/>
         
     </div></b-col>
 </template>
@@ -220,7 +220,9 @@
                     taxRate: null,
                     publicSignal: "TBD",
                     players: [],
-                    conditions: []
+                    conditions: [],
+                    initialTaxRate: null,
+                    finalTaxRate: null
                 },
                 player: {
                     instructions: "",
@@ -236,7 +238,14 @@
                     hasToDeclare: false,
                     hasToSpeculate: false,
                     ready: false,
-                    summaries: []
+                    summaries: [],
+                    firstDeclaration: null,
+                    firstTaxes: null,
+                    firstRepurchase: null,
+                    market: null,
+                    secondDeclaration: null,
+                    secondTaxes: null,
+                    secondRepurchase: null
                 },
             };
         },
@@ -495,7 +504,15 @@
                         "declaration": myDeclarations
                     });
 
-                    self.game.declarations[self.player.number - 1].d = myDeclarations;
+                    console.log(self.game.declarations);
+
+                    if (self.game.declarations[self.player.number - 1] == null) {
+                        self.game.declarations[self.player.number - 1] = {
+                            "d": myDeclarations
+                        };
+                    } else {
+                        self.game.declarations[self.player.number - 1].d = myDeclarations;
+                    }
                 }
 
                 this.modals.errorList.show = true;
@@ -538,6 +555,14 @@
                 this.player.ready = false;
                 this.player.signals = [];
 
+                this.player.firstDeclaration = null;
+                this.player.firstTaxes = null;
+                this.player.firstRepurchase = null;
+                this.player.market = null;
+                this.player.secondDeclaration = null;
+                this.player.secondTaxes = null;
+                this.player.secondRepurchase = null;
+
                 this.game.winningCondition = null,
                 this.phase = 0;
                 this.game.declaration = [null, null, null],
@@ -553,6 +578,10 @@
                 
                 for (const prop in gameData.player) {
                     self.player[prop] = gameData.player[prop];
+                }
+
+                if (self.player.summaries == null) {
+                    self.player.summaries = [];
                 }
 
                 if (self.player.doneSpeculating != null) {
@@ -671,6 +700,8 @@
                                 self.game.boundaries = ev.data.boundaries;
                                 self.game.conditions = ev.data.conditions;
                                 self.game.taxRate = ev.data.taxRate;
+                                self.game.initialTaxRate = ev.data.initialTaxRate;
+                                self.game.finalTaxRate = ev.data.finalTaxRate;
                                 self.player.role = ev.data.role;
                                 self.player.balance = ev.data.balance;
                                 self.player.shares = ev.data.shares;
@@ -714,6 +745,30 @@
                                 if (ev.data.phase === 0) { //New round
                                     self.resetToPhaseZero();
                                 }
+
+                                if (self.game.winningCondition != null) {
+                                    if (self.game.phase < 7 && self.player.firstDeclaration == null) {
+                                        self.player.firstDeclaration = self.parseFormatted(self.player.declaration[self.game.winningCondition]);
+                                        self.player.firstTaxes = self.game.initialTaxRate * self.player.firstDeclaration / 100;
+                                    }
+
+                                    if (self.game.phase > 6) {
+                                        if (self.player.market == null) {
+                                            self.player.market = {};
+                                        }
+
+                                        self.player.market.balance = self.player.wallet[self.game.winningCondition].balance;
+                                        self.player.market.shares = self.player.wallet[self.game.winningCondition].shares;
+                                    }
+
+                                    if (
+                                        self.game.phase > 7 ||
+                                        (self.game.phase === 7 && self.player.hasToDeclare === false)
+                                    ) {
+                                        self.player.secondDeclaration = self.parseFormatted(self.player.declaration[self.game.winningCondition]);
+                                        self.player.secondTaxes = self.game.finalTaxRate * self.player.secondDeclaration / 100;
+                                    }
+                                }
                                 break;
                             case "set-timer":
                                 self.timer.end = ev.data.end;
@@ -749,6 +804,34 @@
 
                                 console.log(self.game.declarations);
 
+                                break;
+                            case 'first-snipes':
+                                var profit = 0;
+
+                                ev.data.snipes.forEach(sn => {
+                                    profit += sn.profit;
+                                });
+
+                                if (self.player.role !== 1) {
+                                    profit = -profit;
+                                }
+
+                                self.player.firstRepurchase = profit;
+
+                                break;
+                            case 'second-snipes':
+                                var secondProfit = 0;
+
+                                ev.data.snipes.forEach(sn => {
+                                    secondProfit += sn.profit;
+                                });
+
+                                if (self.player.role !== 1) {
+                                    secondProfit = -secondProfit;
+                                }
+
+                                self.player.secondRepurchase = secondProfit;
+                                
                                 break;
                             case "profit": {
                                 if (self.player.role === 1) { //Speculator
@@ -839,6 +922,14 @@
                                 break;
                             case 'game-over':
                                 self.game.over = true;
+                                break;
+                            case 'final-price':
+                                self.player.market = {
+                                    "price": ev.data.price,
+                                    "balance": self.player.wallet[self.game.winningCondition].balance,
+                                    "shares": self.player.wallet[self.game.winningCondition].shares
+                                };
+                                
                                 break;
                             default:
                                 console.error(`Type ${ev.eventType} was not understood`);
@@ -1046,6 +1137,42 @@
                 }
 
                 return obj;
+            }, getSummary() { //TODO
+                const summary = {};
+                
+                summary.round = this.game.round;
+
+                if (this.game.winningCondition == null) {
+                    return summary;
+                }
+
+                const winningCondition = this.game.winningCondition;
+
+                summary.condition = winningCondition;
+
+                if (this.player.role != 1) {
+                    summary.value = this.player.property.v[winningCondition];
+
+                    summary.firstDeclaration = this.player.firstDeclaration;
+                    summary.firstTaxes = this.player.firstTaxes;
+
+                    summary.secondDeclaration = this.player.secondDeclaration;
+                    summary.secondTaxes = this.player.secondTaxes;
+                }
+
+                summary.firstRepurchase = this.player.firstRepurchase;
+
+                summary.market = this.player.market;
+
+                summary.secondRepurchase = this.player.secondRepurchase;
+                
+                return summary;
+            }, getSummaries() {
+                if (this.game.over === true) {
+                    return this.player.summaries;
+                }
+
+                return [...this.player.summaries, this.getSummary()];
             }
         },
         mounted () {

@@ -42,9 +42,8 @@ export default class Futarchy extends Logic {
             "over": self.over
         }
 
-        const player = {
-            "instructions": self.data.currentPhase.instructions[playerData.role - 1]
-        };
+        const player = this.getSummary(number);
+        player.instructions = self.data.currentPhase.instructions[playerData.role - 1];
 
         if (playerData != null) {
             player.name = playerData.name;
@@ -54,7 +53,6 @@ export default class Futarchy extends Logic {
             player.recovery = playerData.recovery;
             player.ready = playerData.ready;
             player.wallet = playerData.wallet;
-            player.summaries = playerData.summaries;
 
             if (playerData.role === 1) {
                 player.doneSpeculating = playerData.doneSpeculating;
@@ -82,6 +80,14 @@ export default class Futarchy extends Logic {
                     "number": p.number,
                     "d": p.property.d
                 });
+
+                if (declarationData.d == null) {
+                    if (player.secondDeclaration != null) {
+                        declarationData.d = player.secondDeclaration;    
+                    } else {
+                        declarationData.d = player.firstDeclaration;
+                    }
+                }
             });
 
             game.declarations = declarationData;
@@ -138,6 +144,90 @@ export default class Futarchy extends Logic {
         console.log(data);
 
         return data;
+    }
+
+    getSummary(number) {
+        const summary = {};
+
+        summary.round = this.data.currentRound.number;
+
+        if (this.data.winningCondition == null) {
+            return summary;
+        }
+
+        const playerData = this.data.players.find(p => p.number === number);
+
+        summary.condition = this.data.winningCondition;
+
+        console.log(`Winning condition: ${summary.condition}`);
+
+        if (playerData.role != 1) {
+            summary.value = playerData.property.v[this.data.winningCondition];
+            summary.firstDeclaration = this.data.results.find(r => r.round === this.data.currentRound.number)
+                .phase[2].declarations.find(pd => pd.player === number).declaration[this.data.winningCondition];
+            summary.firstTaxes = summary.firstDeclaration * this.data.parameters.tax_rate_initial / 100;
+        }
+
+        if (this.data.currentRound.phase > 6) {
+            let outcomes;
+
+            if (playerData.role === 1) {
+                outcomes = this.data.results.find(r => r.round === this.data.currentRound.number)
+                    .phase[4].snipeOutcomes.filter(so => so.player.number === number);
+
+                summary.firstRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a + b, 0);
+            } else {
+                outcomes = this.data.results.find(r => r.round === this.data.currentRound.number)
+                    .phase[4].snipeOutcomes.filter(so => so.target.number === number);
+
+                summary.firstRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a - b, 0);
+            }
+
+            const playerWallets = this.data.results.find(r => r.round === this.data.currentRound.number)
+                .phase[6].wallets.find(pw => pw.number === number);
+            
+            console.log('Player Wallets');
+            console.log(playerWallets);
+
+            const playerWallet = playerWallets.wallet[summary.condition];
+
+            console.log(playerWallet);
+
+            summary.market = {};
+
+            summary.market.balance = playerWallet.balance;
+            summary.market.shares = playerWallet.shares;
+        }
+
+        if (this.data.currentRound.phase > 7) {
+            if (playerData.role != 1) {
+                summary.secondDeclaration = this.data.results.find(r => r.round === this.data.currentRound.number)
+                    .phase[7].declarations.find(pd => pd.player === number).declaration[this.data.winningCondition];
+
+                summary.secondTaxes = summary.secondDeclaration * this.data.parameters.tax_rate_final / 100;
+            }
+        }
+
+        if (this.data.currentRound.phase > 8) {
+            let outcomes;
+
+            if (playerData.role === 1) {
+                outcomes = this.data.results.find(r => r.round === this.data.currentRound.number)
+                    .phase[8].snipeOutcomes.filter(so => so.player.number === number);
+
+                summary.secondRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a + b, 0);
+            } else {
+                outcomes = this.data.results.find(r => r.round === this.data.currentRound.number)
+                    .phase[8].snipeOutcomes.filter(so => so.target.number === number);
+
+                summary.secondRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a - b, 0);
+            }
+
+            summary.market.price = this.data.results.find(r => r.round === this.data.currentRound.number)
+                .phase[8].finalPrice;
+        }
+
+        return summary;
     }
 
     medianLastSeven(list) {

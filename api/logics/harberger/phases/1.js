@@ -37,6 +37,8 @@ class Phase1 extends JoinablePhase {
                 "property": player.property,
                 "boundaries": self.game.boundaries,
                 "taxRate": self.game.parameters.tax_rate_initial,
+                "initialTaxRate": self.game.parameters.tax_rate_initial,
+                "finalTaxRate": self.game.parameters.tax_rate_final,
                 "conditions": self.game.conditions
             });
 

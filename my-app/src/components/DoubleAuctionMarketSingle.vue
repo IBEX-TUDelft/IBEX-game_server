@@ -1,4 +1,5 @@
-<template><div class="container-fluid">
+<template>
+<div class="container-fluid">
     <div class="row justify-content-center">
         <h3 class="text-center">{{ conditionName }}</h3>
     </div>
@@ -95,20 +96,29 @@
 
         </div>
 
-        <div class="d-flex flex-column col-2 p-0">
-            <div class="text-center"><b>Contracts</b></div>
-            <table class="table table-bordered text-center">
-                <tbody>
-                    <tr v-for="contract in contracts" :key="contract.id">
-                        <td>{{ formatUs(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '') }}</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="d-flex flex-column col-2 ">
+
+            <b-row class="justify-content-center">
+                <b>Contracts</b>
+            </b-row>
+
+            <b-row style="display: flex; height: 281px; overflow: scroll;">
+                <table class="table table-bordered mb-auto" style="table-layout: fixed;">
+                    <tbody>
+                        <tr style="height: 40px;" v-for="contract in contracts" :key="contract.id">
+                            <td class="justify-content-center align-items-center p-0">
+                                <div class="text-center" style="font-size: 16px; margin-top: 8px;">{{ formatUs(contract.price) + ((contract.from == player.number) || (contract.to == player.number) ? '*' : '') }}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </b-row>
         </div>
         
     </div>
 
-</div></template>
+</div>
+</template>
 
 <script>
 import EventService from '../services/EventService';
@@ -228,11 +238,7 @@ export default {
                 return 0;
             }
 
-            console.log(this.contracts);
-
-            console.log(`Current median price: ${this.contracts[this.contracts.length - 1].median}`);
-
-            return this.contracts[this.contracts.length - 1].median;
+            return this.contracts[0].median;
         },
         getMedianPrice() {
             return this.formatUs(this.getMedianPriceAsInt());
@@ -261,15 +267,13 @@ export default {
                 case "ask":
                     list = this.asks;
                     break;
-                case "bid":/*if (self.$props.condition === event.update.condition) {
-                this.orderEvent(event.order, "contract");
-            }*/
+                case "bid":
                     list = this.bids;
                     break;
                 case "contract":
                     order.id = this.contracts.length;
 
-                    this.contracts.push(order);
+                    this.contracts.unshift(order);
 
                     return;
                 default:
@@ -355,6 +359,8 @@ export default {
     async mounted() {
         const self = this;
 
+        self.contracts.length = 0;
+        
         console.log('COMPONENT READY ' + this.condition);
 
         EventService.on('add-order', (event) => {

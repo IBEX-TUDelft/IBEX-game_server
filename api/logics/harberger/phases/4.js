@@ -57,12 +57,12 @@ class Phase4 extends JoinablePhase {
 
                     landProfit.sniped = true;
                     landProfit.speculator = biddingSpeculators;
-                    landProfit.snipeProfit = speculationProfit; //p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
+                    landProfit.snipeProfit = speculationProfit;
 
-                    const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
+                    /*const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
 
                     ownerSummary.firstRepurchase = (ownerSummary.firstRepurchase == null) ?
-                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;
+                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;*/
 
                     for (let i = 0; i < biddingSpeculators.length; i++) {
                         const speculatorNumber = biddingSpeculators[i];
@@ -73,14 +73,6 @@ class Phase4 extends JoinablePhase {
                             console.log(`Speculator with id ${speculatorNumber} not found`);
                             continue;
                         }
-
-                        /*if (i === winningBidderIndex) {
-                            landProfit.sniped = true;
-                            landProfit.speculator = biddingSpeculators;
-                            landProfit.snipeProfit = p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
-
-                            console.log('Land profit updated');                                    
-                        }*/
 
                         if (speculator.profit == null) {
                             speculator.profit =  [];
@@ -96,7 +88,7 @@ class Phase4 extends JoinablePhase {
                                 "role": owner.role
                             },
                             "snipes": [winningCondition === 0, winningCondition === 1, winningCondition === 2],
-                            "executed": true//i === winningBidderIndex
+                            "executed": true
                         });
 
                         self.results.snipeOutcomes.push( {
@@ -108,23 +100,17 @@ class Phase4 extends JoinablePhase {
                                 "number": owner.number,
                                 "role": owner.role
                             },
-                            "profit": speculationProfit//i === winningBidderIndex ? landProfit.snipeProfit : 0
+                            "profit": speculationProfit
                         });
 
-                        //if (i === winningBidderIndex) {
-                            //const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
-                            const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
+                        /*const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
 
-                            /*ownerSummary.firstRepurchase = (ownerSummary.firstRepurchase == null) ?
-                                -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;*/
-
-                            speculatorSummary.firstRepurchase = (speculatorSummary.firstRepurchase == null) ?
-                                speculationProfit : speculationProfit + speculatorSummary.firstRepurchase;
-                        //}
+                        speculatorSummary.firstRepurchase = (speculatorSummary.firstRepurchase == null) ?
+                            speculationProfit : speculationProfit + speculatorSummary.firstRepurchase;*/
 
                         speculator.profit.push({
                             "phase": 4,
-                            "amount": speculationProfit,//i === winningBidderIndex ? landProfit.snipeProfit : 0,
+                            "amount": speculationProfit,
                             "context": {
                                 "type": "speculation",
                                 "property": {
@@ -213,8 +199,24 @@ class Phase4 extends JoinablePhase {
     async onExit () {
         super.onExit();
 
+        const self = this;
+
         this.game.players.filter(p => p.role === 1).forEach(p => { p.doneSpeculating = false; });
         this.game.properties.forEach(p => { p.speculators = null; });
+
+        this.game.players.forEach(player => {
+            const firstSnipes = self.results.snipeOutcomes
+                .filter(so => so.player.number === player.number || so.target.number === player.number);
+
+            self.wss.sendEvent(
+                self.game.id,
+                player.number,
+                "first-snipes",
+                {
+                    "snipes": firstSnipes
+                }
+            );
+        });
     }
 
     testComplete () {

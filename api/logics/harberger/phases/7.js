@@ -62,7 +62,7 @@ class Phase7 extends JoinablePhase {
 
         const self = this;
 
-        self.game.players.forEach(player => {
+        /*self.game.players.forEach(player => {
             const summary = player.summaries[self.game.currentRound.number - 1];
 
             if (player.property == null) {
@@ -74,7 +74,7 @@ class Phase7 extends JoinablePhase {
                 summary.secondDeclaration = declaration.declaration[self.game.winningCondition];
                 summary.secondTaxes = declaration.taxes[self.game.winningCondition];
             }
-        });
+        });*/
     }
 
     testComplete () {

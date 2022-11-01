@@ -314,8 +314,6 @@ export default class {
     }
 
     async beginRound () {
-        this.refreshWallet();
-
         let number = 1;
 
         if (this.data.currentRound != null) {
@@ -326,6 +324,8 @@ export default class {
             this.data.rounds.push(this.data.currentRound);
         }
 
+        this.refreshWallet();
+        
         let ownerCounter = 0;
 
         this.data.players.forEach(p => {

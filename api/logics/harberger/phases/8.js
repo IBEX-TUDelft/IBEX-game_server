@@ -7,7 +7,8 @@ class Phase8 extends JoinablePhase {
     results = {
         cashForSniping: [],
         snipes: [],
-        snipeOutcomes: []
+        snipeOutcomes: [],
+        finalPrice: null
     };
 
     constructor(game, wss) {
@@ -70,6 +71,10 @@ class Phase8 extends JoinablePhase {
 
     async onEnter () {
         await super.onEnter();
+
+        this.game.properties.forEach(property => {
+            property.speculators = [[], [], []];
+        });
 
         const self = this;
 
@@ -185,12 +190,12 @@ class Phase8 extends JoinablePhase {
 
                     landProfit.sniped = true;
                     landProfit.speculator = biddingSpeculators;
-                    landProfit.snipeProfit = speculationProfit; //p.v[winningCondition] - Math.round(0.5 * (p.v[winningCondition] + p.d[winningCondition]));
+                    landProfit.snipeProfit = speculationProfit;
 
-                    const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
+                    /*const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
 
                     ownerSummary.secondRepurchase = (ownerSummary.secondRepurchase == null) ?
-                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.secondRepurchase;
+                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.secondRepurchase;*/
                     
                     for (let i = 0; i < biddingSpeculators.length; i++) {
                         const speculatorNumber = biddingSpeculators[i];
@@ -219,10 +224,10 @@ class Phase8 extends JoinablePhase {
                             "executed": true
                         });
 
-                        const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
+                        /*const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
 
                         speculatorSummary.secondRepurchase = (speculatorSummary.secondRepurchase == null) ?
-                            speculationProfit : speculationProfit + speculatorSummary.secondRepurchase;
+                            speculationProfit : speculationProfit + speculatorSummary.secondRepurchase;*/
 
                         self.results.snipeOutcomes.push( {
                             "player": {
@@ -320,16 +325,31 @@ class Phase8 extends JoinablePhase {
 
         console.log(`Total shares: ${totalShares}`);
 
+        self.results.finalPrice = taxPot / totalShares;
+
+        let err = self.wss.broadcastEvent(
+            self.game.id,
+            "final-price",
+            {
+                "price": self.results.finalPrice,
+                "winningCondition": self.game.winningCondition
+            }
+        );
+
+        if (err != null) {
+            console.log(err);
+        }
+
         this.game.players.forEach(player => {
             self.results.cashForSniping.push({
                 "number": player.number,
                 "cashForSniping": player.cashForSniping
             });
 
-            const summary = player.summaries[self.game.currentRound.number - 1];
+            /*const summary = player.summaries[self.game.currentRound.number - 1];
 
             summary.cash = player.wallet[winningCondition].balance;
-            summary.sharesPayoff = taxPot * player.wallet[winningCondition].shares / totalShares;
+            summary.sharesPayoff = taxPot * player.wallet[winningCondition].shares / totalShares;*/
 
             if (player.profit == null) {
                 player.profit = [];
@@ -374,12 +394,12 @@ class Phase8 extends JoinablePhase {
                 taxProfitBill
             );
 
-            self.wss.sendEvent(
+            /*self.wss.sendEvent(
                 self.game.id,
                 player.number,
                 "round-summary",
                 summary
-            );
+            );*/
         });
 
         this.game.players.forEach(player => {
@@ -391,6 +411,20 @@ class Phase8 extends JoinablePhase {
                 "total-profit",
                 {
                     "amount": profit
+                }
+            );
+        });
+
+        this.game.players.forEach(player => {
+            const secondSnipes = self.results.snipeOutcomes
+                .filter(so => so.player.number === player.number || so.target.number === player.number);
+
+            self.wss.sendEvent(
+                self.game.id,
+                player.number,
+                "second-snipes",
+                {
+                    "snipes": secondSnipes
                 }
             );
         });

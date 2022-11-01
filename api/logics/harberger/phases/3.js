@@ -68,6 +68,10 @@ class Phase3 extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
 
+        this.game.properties.forEach(property => {
+            property.speculators = [[], [], []];
+        });
+        
         const self = this;
 
         self.endTime = Date.now() + self.game.parameters.minutes_for_sniping * 60 * 1000;
@@ -136,14 +140,14 @@ class Phase3 extends JoinablePhase {
                 });
             }
 
-            const summary = {
+            /*const summary = {
                 "round": self.game.currentRound.number,
                 "value": property == null ? 0 : property.v[winningCondition],
                 "firstDeclaration": property == null ? 0 : property.d[winningCondition],
                 "firstTaxes": property == null ? 0 : property.d[winningCondition] * self.game.parameters.tax_rate_initial / 100,
             }
 
-            p.summaries.push(summary);
+            p.summaries.push(summary);*/
         });
 
         let err = self.wss.broadcastEvent(
