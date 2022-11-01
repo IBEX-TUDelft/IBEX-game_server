@@ -173,12 +173,12 @@ export default class Futarchy extends Logic {
 
             if (playerData.role === 1) {
                 outcomes = this.data.results.find(r => r.round === this.data.currentRound.number)
-                    .phase[4].snipeOutcomes.filter(so => so.player.number === number);
+                    .phase[6].snipeOutcomes.filter(so => so.player.number === number);
 
                 summary.firstRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a + b, 0);
             } else {
                 outcomes = this.data.results.find(r => r.round === this.data.currentRound.number)
-                    .phase[4].snipeOutcomes.filter(so => so.target.number === number);
+                    .phase[6].snipeOutcomes.filter(so => so.target.number === number);
 
                 summary.firstRepurchase = outcomes.map(o => o.profit).reduce((a, b) => a - b, 0);
             }

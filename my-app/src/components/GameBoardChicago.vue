@@ -747,7 +747,7 @@
                                 }
 
                                 if (self.game.winningCondition != null) {
-                                    if (self.game.phase < 7 && self.player.firstDeclaration == null) {
+                                    if (self.game.phase <= 7 && self.player.firstDeclaration == null) {
                                         self.player.firstDeclaration = self.parseFormatted(self.player.declaration[self.game.winningCondition]);
                                         self.player.firstTaxes = self.game.initialTaxRate * self.player.firstDeclaration / 100;
                                     }

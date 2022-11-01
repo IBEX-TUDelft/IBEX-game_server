@@ -736,8 +736,10 @@
                         let secondSnipeResult;
                         let secondTaxes;
 
+                        const finalPrice = self.finalPrice[roundIdx];
+
                         tradingResult = (self.wallets[roundIdx].find(w => w.number === player.number).wallet[winningCondition].balance - player.balance) +
-                        (self.wallets[roundIdx].find(w => w.number === player.number).wallet[winningCondition].shares - player.shares) * self.finalPrices[roundIdx][winningCondition]
+                        (self.wallets[roundIdx].find(w => w.number === player.number).wallet[winningCondition].shares - player.shares) * finalPrice
 
                         //Aggregate Results
                         if (player.role === 1) {
@@ -904,6 +906,7 @@
             this.wallets = extractProperty(this.rounds, 6, 'wallets');
             this.finalPrices = extractProperty(this.rounds, 6, 'finalPrices');
             this.cashForSniping = extractProperty(this.rounds, 8, 'cashForSniping');
+            this.finalPrice = extractProperty(this.rounds, 8, 'finalPrice');
 
             if (this.ruleset == 'Harberger') {
                 this.winningCondition = extractProperty(this.rounds, 3, 'winningCondition');
