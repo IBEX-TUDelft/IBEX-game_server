@@ -48,17 +48,17 @@
                                     <th scope="col">Condition</th>
                                     <th scope="col">Value</th>
                                     <th v-if="game.phase >= 4" scope="col">Offer</th>
-                                    <th v-if="game.phase === 4" scope="col">Profit</th>
+                                    <th v-if="game.phase === 4 || game.phase === 5 || game.phase === 6" scope="col">Profit</th>
                                 </thead>
                                 <tbody>
                                     <tr v-for="condition in game.conditions" :key="condition.id">
                                         <td>{{ condition.name }}</td>
-                                        <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                        <td>{{ formatUs(player.property.v[condition.id]) }} {{ condition.id === 0 ? '' : '(' + formatUs(player.property.v[condition.id] - player.property.v[0]) + ')' }}</td>
                                         <td v-if="game.phase >= 4">
                                             <b-form-input @keydown="isAllowed" @input="game.compensationOffers[condition.id] = reformat(game.compensationOffers[condition.id])"  v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
                                             <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                         </td>
-                                        <td v-if="game.phase === 4">
+                                        <td v-if="game.phase === 4 || game.phase === 5 || game.phase === 6">
                                             <div>{{ formatUs(player.property.v[condition.id] - parseFormatted(extractDataFromObject('0', game.compensationOffers, condition.id)) * game.players.filter(p => p.role === 3).length) }}</div>
                                         </td>
                                     </tr>
@@ -70,25 +70,25 @@
                                     <th scope="col">Condition</th>
                                     <th scope="col">Value</th>
                                     <th v-if="game.phase >= 3" scope="col">Request</th>
-                                    <th v-if="game.phase >= 6" scope="col">Offer</th>
-                                    <th v-if="game.phase === 3 || game.phase === 6" scope="col">Profit</th>
+                                    <th v-if="game.phase >= 5" scope="col">Offer</th>
+                                    <th v-if="game.phase === 3 || game.phase === 4 || game.phase === 5 || game.phase === 6" scope="col">Profit</th>
                                     <th v-if="game.phase === 6" scope="col">Vote</th>
                                 </thead>
                                 <tbody>
                                     <tr v-for="condition in game.conditions" :key="condition.id">
                                         <td>{{ condition.name }}</td>
-                                        <td>{{ formatUs(player.property.v[condition.id]) }}</td>
+                                        <td>{{ formatUs(player.property.v[condition.id]) }} {{ condition.id === 0 ? '' : '(' + formatUs(player.property.v[condition.id] - player.property.v[0]) + ')' }}</td>
                                         <td v-if="game.phase >= 3">
                                             <b-form-input @keydown="isAllowed" @input="player.compensationRequests[condition.id] = reformat(player.compensationRequests[condition.id])" v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
                                             <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
                                         </td>
-                                        <td v-if="game.phase >= 6">
+                                        <td v-if="game.phase >= 5">
                                             <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                         </td>
-                                        <td v-if="game.phase === 3">
+                                        <td v-if="game.phase === 3 || game.phase === 4">
                                             {{ formatUs(player.property.v[condition.id] + parseFormatted(player.compensationRequests[condition.id], 0)) }}
                                         </td>
-                                        <td v-if="game.phase === 6">
+                                        <td v-if="game.phase === 5 || game.phase == 6">
                                             {{ formatUs(player.property.v[condition.id] + extractDataFromObject(0, game.compensationOffers, condition.id)) }}
                                         </td>
                                         <td v-if="game.phase === 6" style="background-color: yellow;">
@@ -838,6 +838,10 @@ export default {
                 return def;
             }
 
+            if (typeof numericalString == 'number') {
+                return numericalString;
+            }
+
             const result = new LocalizedNumberParser(this.format).parse(numericalString);
 
             if (Number.isNaN(result)) {
@@ -900,6 +904,26 @@ export default {
             }
 
             return [...this.player.summaries, this.getSummary()];
+        }, getRequestMedian() {
+            const items = this.game.players.filter(p => p.role === 3)
+                .filter(p => p.property.lastOffer != null)
+                .map(p => { return { n: p.number, t: p.tag, r: p.property.lastOffer[1] }; })
+                .sort((a, b) => b.r - a.r);
+            
+            if (items == null) {
+                return 0;
+            }
+
+            if (items.length === 1) {
+                return items[0].r;
+            }
+
+            var half = Math.floor(items.length / 2);
+    
+            if (items.length % 2)
+                return items[half].r;
+            
+            return (items[half - 1].r + items[half].r) / 2.0;
         }
     },
     async mounted () {

@@ -660,6 +660,13 @@
                     }
                 }
 
+                self.player.snipes.forEach(sn => {
+                    if (self.player.role === 1) {
+                        const target = self.game.players.find(p => p.number === sn.target.number);
+                        target.snipe = sn.profit;
+                    }
+                });
+                
                 if (gameData.timer != null) {
                     self.timer.end = gameData.timer > Date.now() ? gameData.timer : Date.now();
 

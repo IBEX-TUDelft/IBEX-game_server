@@ -2,7 +2,7 @@
     <div v-if="player != null">
         <b-card 
             v-if="role === 2"
-            :header="player.role === 2 ? player.tag : player.tag + '\'s Compensation Request'"
+            :header="player.role === 2 ? player.tag + ' (Median Request)' : player.tag + '\'s Compensation Request'"
             header-tag="header"
             class="mb-1"
             :bg-variant="owned ? 'primary' : 'light'"
@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div v-if="player.role === 2" class="col-12 text-center">
-                    -
+                    {{ $parent.formatUs($parent.getRequestMedian()) }}
                 </div>
             </div>
         </b-card>
