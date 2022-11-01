@@ -910,7 +910,7 @@ export default {
                 .map(p => { return { n: p.number, t: p.tag, r: p.property.lastOffer[1] }; })
                 .sort((a, b) => b.r - a.r);
             
-            if (items == null) {
+            if (items == null || items.length === 0) {
                 return 0;
             }
 
