@@ -906,7 +906,7 @@ export default {
             return [...this.player.summaries, this.getSummary()];
         }, getRequestMedian() {
             const items = this.game.players.filter(p => p.role === 3)
-                .filter(p => p.property.lastOffer != null)
+                .filter(p => p.property != null && p.property.lastOffer != null)
                 .map(p => { return { n: p.number, t: p.tag, r: p.property.lastOffer[1] }; })
                 .sort((a, b) => b.r - a.r);
             
