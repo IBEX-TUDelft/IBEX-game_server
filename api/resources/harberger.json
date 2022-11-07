@@ -2,24 +2,24 @@
     "instructions": {
         "phases": [{
             "number": 0,
-            "speculator": "Wait for all players to be ready",
-            "owner": "Wait for all players to be ready",
-            "developer": "Wait for all players to be ready"
+            "speculator": "Please wait for all players to be ready.",
+            "owner": "Please wait for all players to be ready.",
+            "developer": "Please wait for all players to be ready."
         }, {
             "number": 1,
-            "speculator": "All the players are ready, the round will start shortly",
-            "owner": "All the players are ready, the round will start shortly",
-            "developer": "All the players are ready, the round will start shortly"
+            "speculator": "All the players are ready, the round will start shortly.",
+            "owner": "All the players are ready, the round will start shortly.",
+            "developer": "All the players are ready, the round will start shortly."
         }, {
             "number": 2,
-            "speculator": "Wait for all property owners to send their declarations",
-            "owner": "Fill the declaration with a value under all conditions. Use the real value as a reference",
-            "developer": "Fill the declaration with a value under all conditions. Use the real value as a reference"
+            "speculator": "Wait for all property owners to make their declarations.",
+            "owner": "Fill the declaration with a value under all conditions. You can use the real value as a reference.",
+            "developer": "Fill the declaration with a value under all conditions. You can use the real value as a reference."
         }, {
             "number": 3,
-            "speculator": "Analyse all declarations and choose which ones to target, under all conditions",
-            "owner": "Wait for the speculators to make their decisions",
-            "developer": "Wait for the speculators to make their decisions"
+            "speculator": "Please look at the declarations and choose which properties, if any, you want to target.",
+            "owner": "Wait for the speculators to make their decisions.",
+            "developer": "Wait for the speculators to make their decisions."
         }, {
             "number": 4,
             "speculator": "Reconciliation in progress, please wait ...",
@@ -32,24 +32,24 @@
             "developer": "Saving the results, please wait ..."
         }, {
             "number": 6,
-            "speculator": "Trade shares, they represent a percentage of the final taxes on the winning project",
-            "owner": "Trade shares, they represent a percentage of the final taxes on the winning project",
-            "developer": "Trade shares, they represent a percentage of the final taxes on the winning project"
+            "speculator": "Trade shares, they represent a percentage of the final taxes with the selected project choice.",
+            "owner": "Trade shares, they represent a percentage of the final taxes with the selected project choice.",
+            "developer": "Trade shares, they represent a percentage of the final taxes with the selected project choice."
         }, {
             "number": 7,
-            "speculator": "Wait for all property owners to send their declarations",
-            "owner": "Fill the declaration with a value under all conditions. Use the real value as a reference",
-            "developer": "Fill the declaration with a value under all conditions. Use the real value as a reference"
+            "speculator": "Please wait for all property owners to send their declarations.",
+            "owner": "Please provide a declaration of the value for all project choices. You can use the real value as a reference.",
+            "developer": "Please provide a declaration of the value for aall project choices. You can use the real value as a reference."
         }, {
             "number": 8,
-            "speculator": "Analyse all declarations and choose which ones to target, under all conditions",
-            "owner": "Wait for the speculators to make their decisions",
-            "developer": "Wait for the speculators to make their decisions"
+            "speculator": "Analyse all declarations and choose which ones to target, under all conditions.",
+            "owner": "Wait for the speculators to make their decisions.",
+            "developer": "Wait for the speculators to make their decisions."
         }, {
             "number": 9,
-            "speculator": "Take a look at the results of this round",
-            "owner": "Take a look at the results of this round",
-            "developer": "Take a look at the results of this round"
+            "speculator": "Take a look at the results of this round.",
+            "owner": "Take a look at the results of this round.",
+            "developer": "Take a look at the results of this round."
         }]
     }, "placeHolders": {
         "ready-button": "I am Ready",
@@ -57,22 +57,22 @@
         "property-matrix-header": "Declarations",
         "value-ranges-owner-header": "Value Ranges (Owner)",
         "value-ranges-developer-header": "Value Ranges (Developer)",
-        "value-ranges-condition": "Condition",
+        "value-ranges-condition": "Project choice",
         "value-ranges-minimum": "Minimum",
         "value-ranges-maximum": "Maximum",
         "my-value-info-header": "My Value Information",
-        "my-value-info-condition": "Condition",
+        "my-value-info-condition": "Project choice",
         "my-value-info-value": "Value",
         "my-value-info-declaration": "Declaration",
         "my-value-info-tax": "Tax Bill",
         "my-value-info-profit": "Profit",
-        "my-value-info-sniping": "Sniper Prob.",
-        "declaration-warning-description": "There are some caveats with your declaration. Do you want to submit it anyway?It will not be possible to change it at a later time.",
-        "declaration-submit-description": "Do you want to proceed and submit your declaration? It will not be possible to change it at a later time. ",
-        "noProject-declaration-low-warning": "Your declaration under condition No Project is empty: it might result in a massive loss",
-        "noProject-declaration-high-warning": "Your declaration under condition No Project is greater than the known maximum value, this is certainly not optimal.",
-        "projectA-declaration-low-warning": "Your declaration under condition Project A is empty: it might result in a massive loss",
-        "projectA-declaration-high-warning": "Your declaration under condition Project A is greater than the known maximum value, this is certainly not optimal",
-        "speculator-submit-confirm": "Do you confirm your choices?"
+        "my-value-info-sniping": "Value percentile",
+        "declaration-warning-description": "There are some caveats with your declaration. Do you want to submit it anyway? It will not be possible to change it at a later time.",
+        "declaration-submit-description": "Do you want to proceed and submit your declaration? It will not be possible to change it at a later time.",
+        "noProject-declaration-low-warning": "Your declaration under condition No Project is empty. This will be assumed to be 0 and might result in a massive loss. Are you sure you want to submit this declaration?",
+        "noProject-declaration-high-warning": "Your declaration under condition No Project is greater than the known maximum value. Are you sure you want to submit this declaration?",
+        "projectA-declaration-low-warning": "Your declaration under condition Project A is empty. This will be assumed to be 0 and might result in a massive loss. Are you sure you want to submit this declaration?",
+        "projectA-declaration-high-warning": "Your declaration under condition Project A is greater than the known maximum value. Are you sure you want to submit this declaration?",
+        "speculator-submit-confirm": "Do you want to confirm your choices?"
     }
 }
