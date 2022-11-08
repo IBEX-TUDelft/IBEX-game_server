@@ -4,9 +4,9 @@
 1.  Make sure your code is up to date, if it's not, run `git pull`
 2. After checking the code out, Go to the my-app directory
 3. Copy the .env.example to a file ending in .env : current values should be suitable in all cases.
-
-4. Run `npm i` to download all dependencies
-5. Run `npm run build` to build the static app: it will generate a dist directory with the static files.
+(make sure nodeJS and NPM are installed, check with 'node -v' and 'npm -v')
+4. Go to the harberger-vue folder and run `npm i` to download all dependencies
+5. In the same folder, run `npm run build` to build the static app: it will generate a dist directory with the static files.
 6. Copy the content of dist to your server root. For example, if you use apache2 on Linux, that would be /var/www/html and the command to run would be
 `sudo cp -R dist/* /var/www/html`
 7. Make sure your server has the right configuration to be accessible from wherever you need.
