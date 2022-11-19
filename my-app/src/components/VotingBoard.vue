@@ -46,7 +46,7 @@
                             <table v-if="player.role === 2" class="table table-bordered" style="table-layout: fixed;">
                                 <thead class="thead-dark">
                                     <th scope="col">Condition</th>
-                                    <th scope="col">Value</th>
+                                    <th scope="col">Value (Project Impact)</th>
                                     <th v-if="game.phase >= 4" scope="col">Offer</th>
                                     <th v-if="game.phase === 4 || game.phase === 5 || game.phase === 6" scope="col">Profit</th>
                                 </thead>
@@ -68,7 +68,7 @@
                             <table v-if="player.role === 3" class="table table-bordered" style="table-layout: fixed;">
                                 <thead class="thead-dark">
                                     <th scope="col">Condition</th>
-                                    <th scope="col">Value</th>
+                                    <th scope="col">Value (Project Impact)</th>
                                     <th v-if="game.phase >= 3" scope="col">Request</th>
                                     <th v-if="game.phase >= 5" scope="col">Offer</th>
                                     <th v-if="game.phase === 3 || game.phase === 4 || game.phase === 5 || game.phase === 6" scope="col">Profit</th>
@@ -260,7 +260,7 @@
                             <th scope="col">Total</th>
                         </thead>
                         <tbody>
-                            <tr v-for="summary in getSummaries()" :key="summary.round" :style="summary.round === game.round && !game.over ? 'background-color: yellow;' : ''">
+                            <tr v-for="summary in getSummaries().reverse()" :key="summary.round" :style="summary.round === game.round && !game.over ? 'background-color: yellow;' : ''">
                                 <td>{{ summary.round }}</td>
                                 <td>{{ summary.condition == null ? 'To be Determined' : game.conditions[summary.condition].name }}</td>
                                 <td>{{ summary.value == null ? '' : formatUs(summary.value) }}</td>

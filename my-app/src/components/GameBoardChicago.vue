@@ -142,7 +142,7 @@
         />
         <DoubleAuctionMarketFutarchy ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Futarchy'"/>
 
-        <Summaries :summaries="getSummaries()"/>
+        <Summaries ref="summaries" :summaries="player.summaries"/>
         
     </div></b-col>
 </template>
@@ -660,12 +660,14 @@
                     }
                 }
 
-                self.player.snipes.forEach(sn => {
-                    if (self.player.role === 1) {
-                        const target = self.game.players.find(p => p.number === sn.target.number);
-                        target.snipe = sn.profit;
-                    }
-                });
+                if (self.player.sniped != null) {
+                    self.player.snipes.forEach(sn => {
+                        if (self.player.role === 1) {
+                            const target = self.game.players.find(p => p.number === sn.target.number);
+                            target.snipe = sn.profit;
+                        }
+                    });
+                }
                 
                 if (gameData.timer != null) {
                     self.timer.end = gameData.timer > Date.now() ? gameData.timer : Date.now();
@@ -778,6 +780,9 @@
                                         self.player.secondTaxes = self.game.finalTaxRate * self.player.secondDeclaration / 100;
                                     }
                                 }
+
+                                self.updateSummary();
+
                                 break;
                             case "set-timer":
                                 self.timer.end = ev.data.end;
@@ -937,7 +942,15 @@
                                 self.acknowledge('order-refused', ev.data.message);
                                 break;
                             case 'round-summary':
-                                self.player.summaries.push(ev.data);
+                                var summaryIdx = self.player.summaries.findIndex(s => s.round = ev.data.round);
+
+                                if (summaryIdx != -1) {
+                                    console.log(`Removing the result row of round ${ev.data.round} with the consolidated one from the server`);
+                                    self.player.summaries[summaryIdx] = ev.data;
+                                } else {
+                                    console.log(`Adding the result row of round ${ev.data.round} from the server`);
+                                    self.player.summaries.unshift(ev.data);
+                                }
                                 break;
                             case 'game-over':
                                 self.game.over = true;
@@ -1186,12 +1199,18 @@
                 summary.secondRepurchase = this.player.secondRepurchase;
                 
                 return summary;
-            }, getSummaries() {
-                if (this.game.over === true) {
-                    return this.player.summaries;
+            }, updateSummary() {
+                const summaryIdx = this.player.summaries.findIndex(s => s.round === this.game.round);
+
+                if (summaryIdx == -1) {
+                    console.log(`Adding a new summary of round ${this.game.round}`);
+                    this.player.summaries.unshift(this.getSummary());
+                } else {
+                    console.log(`Updating the summary of round ${this.game.round} (element ${summaryIdx})`);
+                    this.player.summaries[summaryIdx] = this.getSummary();
                 }
 
-                return [...this.player.summaries, this.getSummary()];
+                this.$refs['summaries'].$forceUpdate();
             }
         },
         mounted () {
@@ -1238,6 +1257,11 @@
                         EventService.emit('data-recovered', response.gameData);
                     });
                 }
+
+                self.updateSummary();
+
+                console.log('REFS');
+                console.log(self.$refs);
 
                 try {
                     self.openWebSocket();
