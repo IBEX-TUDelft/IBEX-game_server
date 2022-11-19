@@ -1,10 +1,10 @@
 # Voting, Harberger and Futarchy Setup
 
 ## Front-end
-1.  Make sure your code is up to date, if it's not, run `git pull`
-2. After checking the code out, Go to the my-app directory
-3. Copy the .env.example to a file ending in .env : current values should be suitable in all cases.
 
+1. After checking the code out, Go to the my-app directory
+2. Make sure your code is up to date, if it's not, run `git pull`
+3. Copy the .env.example to .env: current values should be suitable in all cases.
 4. Run `npm i` to download all dependencies
 5. Run `npm run build` to build the static app: it will generate a dist directory with the static files.
 6. Copy the content of dist to your server root. For example, if you use apache2 on Linux, that would be /var/www/html and the command to run would be
@@ -22,7 +22,7 @@ sudo cp -R dist/* /var/www/html
 
 ## Back-end
 
-1. Check the code out, go to the api directory and copy .env.example to a file ending in .env 
+1. Check the code out, go to the api directory and copy .env.example to .env
 2. Install postgres
 3. Create a user for the app matching the credential in your .env file.
 4. Create a database matching the db name specified in the .env database, assign to the db user the required privileges (must be done using postgres commands)
