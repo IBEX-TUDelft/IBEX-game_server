@@ -16,12 +16,12 @@
                         :header="getHeader(index)"
                         header-tag="header"
 
-                        :bg-variant="(player.role != 1 && index + 1 === player.number) ? 'primary' : 'light'"
-                        :text-variant="(player.role != 1 && index + 1 === player.number) ? 'white' : 'black'"
+                        :bg-variant="(player!= null && player.role != 1 && index + 1 === player.number) ? 'primary' : 'light'"
+                        :text-variant="(player!= null && player.role != 1 && index + 1 === player.number) ? 'white' : 'black'"
                     >
                         <div class="row p-0" v-for="condition in game.conditions" :key="condition.id">
                             <div class="col" v-if="game.winningCondition == null || game.winningCondition === condition.id">
-                                <div class="row" v-if="player.role === 1 && (game.phase === 3 || game.phase === 8)
+                                <div class="row" v-if="player!= null && player.role === 1 && (game.phase === 3 || game.phase === 8)
                                         && game.declarations[index] != null && player.hasToSpeculate">
                                     <div class="col-1 p-0">
                                         <b-form-checkbox :value="(index + 1) + '.' + condition.id" />
@@ -78,6 +78,7 @@ export default {
                 declarations[index].d == null ||
                 declarations[index].d[condition.id] == null
             ) {
+                console.log(`Declaration ${index} of condition ${condition != null ? condition.id : '?'} is empty`);
                 return '-';
             }
 

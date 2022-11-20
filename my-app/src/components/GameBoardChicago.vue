@@ -12,7 +12,7 @@
                         <b-navbar-brand>
                             <Transition name="slide-fade">
                                 <div v-if="showIntructions">
-                                    {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
+                                    {{ player == null || player.tag == null ? 'New Player' : player.tag }}: {{ player.instructions }}
                                 </div>
                             </Transition>
                         </b-navbar-brand>
@@ -40,6 +40,7 @@
             <div class="d-flex flex-column col-6">
 
                 <HarbergerMatrix
+                    ref="neighborhood"
                     :condition="game.conditions[game.winningCondition]"
                     :project="conditionToString(game.winningCondition)"
                     :game="game"
@@ -404,6 +405,11 @@
 
                 const player = this.game.players.find(p => p.number === declaration.number);
 
+                if (player == null) {
+                    console.log(`Could not find player number ${declaration.number}`);
+                    return '-';
+                }
+
                 return player.tag;
             },
             async doneSpeculating() {
@@ -518,6 +524,8 @@
                     } else {
                         self.game.declarations[self.player.number - 1].d = myDeclarations;
                     }
+
+                    self.$refs['neighborhood'].$forceUpdate();
                 }
 
                 this.modals.errorList.show = true;
@@ -1281,6 +1289,12 @@
                 }
 
                 self.updateSummary();
+
+                var phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
+                    [null, 'speculator', 'developer', 'owner'][self.player.role != null ? self.player.role : 1]
+                ];
+
+                self.player.instructions = phaseInstructions;
 
                 try {
                     self.openWebSocket();

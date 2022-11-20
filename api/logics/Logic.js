@@ -9,63 +9,8 @@ import fs from 'fs';
 
 export default class {
 
-    series = [    
-        [
-            {
-                "developer": 366,
-                "owner": [471, 399, 480, 409, 353]
-            }, {
-                "developer": 1052,
-                "owner": [327, 254, 224, 264, 284]
-            }
-        ],
-        [
-            {
-                "developer": 369,
-                "owner": [465, 382, 429, 374, 357]
-            }, {
-                "developer": 1277,
-                "owner": [291, 299, 300, 335, 329]
-            }
-        ],
-        [
-            {
-                "developer": 389,
-                "owner": [500, 457, 440, 493, 382]
-            }, {
-                "developer": 1219,
-                "owner": [338, 245, 348, 328, 230]
-            }
-        ],
-        [
-            {
-                "developer": 340,
-                "owner": [392, 405, 486, 449, 368]
-            }, {
-                "developer": 1041,
-                "owner": [265, 277, 311, 206, 342]
-            }
-        ],
-        [
-            {
-                "developer": 385,
-                "owner": [466, 443, 448, 363, 447]
-            }, {
-                "developer": 1050,
-                "owner": [251, 337, 221, 325, 275]
-            }
-        ],
-        [
-            {
-                "developer": 374,
-                "owner": [402, 356, 411, 444, 389]
-            }, {
-                "developer": 1096,
-                "owner": [236, 268, 232, 300, 348]
-            }
-        ]
-    ];
-
+    valueSeries = null;
+    signalSeries = null;
     over = false;
     data;
     phases;
@@ -84,6 +29,9 @@ export default class {
         if (!['Harberger', 'Futarchy', 'Voting'].includes(type)) {
             throw new Error(`The game type must be Harberger, Futarchy or Voting. It was ${type}`);
         }
+
+        this.valueSeries = JSON.parse(fs.readFileSync('./resources/values.json'));
+        this.signalSeries = JSON.parse(fs.readFileSync('./resources/signals.json'));
 
         this.data = data;
         this.phases = phases;
@@ -327,22 +275,33 @@ export default class {
         this.refreshWallet();
         
         let ownerCounter = 0;
+        let speculatorCounter = 0;
 
         this.data.players.forEach(p => {
-            if (p.role === 2) {
-                p.property.v[0] = this.series[number][0].developer * 1000;
-                p.property.v[1] = this.series[number][1].developer * 1000;
-            } else if (p.role === 3) {
-                console.log(p.property.v);
+            if (p.role === 1) {
+                p.S[0] = this.signalSeries[number][0].speculator[speculatorCounter];
+                p.S[1] = this.signalSeries[number][1].speculator[speculatorCounter];
 
-                p.property.v[0] = this.series[number][0].owner[ownerCounter] * 1000;
-                p.property.v[1] = this.series[number][1].owner[ownerCounter] * 1000;
+                speculatorCounter ++;
+            } if (p.role === 2) {
+                p.property.v[0] = parseInt(this.valueSeries[number][0].developer) * 1000;
+                p.property.v[1] = parseInt(this.valueSeries[number][1].developer) * 1000;
+
+                p.S[0] = this.signalSeries[number][0].developer;
+                p.S[1] = this.signalSeries[number][1].developer;
+            } else if (p.role === 3) {
+                p.property.v[0] = parseInt(this.valueSeries[number][0].owner[ownerCounter]) * 1000;
+                p.property.v[1] = parseInt(this.valueSeries[number][1].owner[ownerCounter]) * 1000;
+
+                p.S[0] = this.signalSeries[number][0].owner[ownerCounter];
+                p.S[1] = this.signalSeries[number][1].owner[ownerCounter];
 
                 ownerCounter ++;
             }
         });
 
-        if (this.data.type != 'Voting') {
+        //TODO don't override if the signals should come from the config file, enable this section otherwise
+        /*if (this.data.type != 'Voting') {
             let V = [];
 
             for (let j = 0; j < 2; j++) {
@@ -370,7 +329,7 @@ export default class {
 
                 console.log(`${player.name} S = ${player.S}`);
             }
-        }
+        }*/
 
         if (number > this.data.parameters.round_count ) {
             console.log('The game is over');
