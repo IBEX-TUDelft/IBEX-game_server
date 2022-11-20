@@ -43,18 +43,19 @@ export default class Phase {
     }
 
     async onEnter() {
-        const self = this;
+        /*const self = this;
 
         if (this.game.dictionary != null) {
             const phaseNumber = this.game.currentRound.phase;
 
             const phaseInstructions = this.game.dictionary.instructions.phases[phaseNumber];
 
-            this.instructions.push(
+            //Override the defaults
+            this.instructions = [
                 phaseInstructions.speculator == null ? '-' : phaseInstructions.speculator,
-                phaseInstructions.developer,
-                phaseInstructions.owner
-            );
+                phaseInstructions.developer == null ? '-' : phaseInstructions.developer,
+                phaseInstructions.owner == null ? '-' : phaseInstructions.owner
+            ];
         }
 
         if (this.instructions.length > 0) {
@@ -74,7 +75,7 @@ export default class Phase {
             }
         }
 
-        console.log(`Entering phase ${this.game.currentRound.phase}`);
+        console.log(`Entering phase ${this.game.currentRound.phase}`);*/
     }
 
     async onExit() {

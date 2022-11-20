@@ -25,7 +25,7 @@
                     <b-tab v-for="index in indexes" :key="index">
 
                         <template #title>
-                            Round {{ index + 1 }}
+                            Round {{ index }}
                         </template>
 
                         <div class="mt-1 mx-5 mp-1">
@@ -493,7 +493,7 @@
                 console.log(ownerNumbers);
 
                 self.rounds.forEach(round => {
-                    const roundIdx = round.round - 1;
+                    const roundIdx = round.round;
 
                     const winningCondition = self.winningCondition[roundIdx];
 

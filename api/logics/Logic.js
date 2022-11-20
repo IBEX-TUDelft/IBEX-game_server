@@ -314,7 +314,7 @@ export default class {
     }
 
     async beginRound () {
-        let number = 1;
+        let number = 0;
 
         if (this.data.currentRound != null) {
             this.addSummaries();
@@ -330,13 +330,13 @@ export default class {
 
         this.data.players.forEach(p => {
             if (p.role === 2) {
-                p.property.v[0] = this.series[number - 1][0].developer * 1000;
-                p.property.v[1] = this.series[number - 1][1].developer * 1000;
+                p.property.v[0] = this.series[number][0].developer * 1000;
+                p.property.v[1] = this.series[number][1].developer * 1000;
             } else if (p.role === 3) {
                 console.log(p.property.v);
 
-                p.property.v[0] = this.series[number - 1][0].owner[ownerCounter] * 1000;
-                p.property.v[1] = this.series[number - 1][1].owner[ownerCounter] * 1000;
+                p.property.v[0] = this.series[number][0].owner[ownerCounter] * 1000;
+                p.property.v[1] = this.series[number][1].owner[ownerCounter] * 1000;
 
                 ownerCounter ++;
             }
@@ -460,9 +460,7 @@ export default class {
     getSummaries(number) {
         const playerData = this.data.players.find(p => p.number === number);
 
-        console.log(playerData.summaries);
-
-        return playerData.summaries == null ? [] : playerData.summaries;
+        return playerData.summaries == null ? [] : playerData.summaries.filter(s => s.round != 0).reverse();
     }
 
     addSummaries() {

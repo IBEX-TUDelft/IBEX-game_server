@@ -214,7 +214,7 @@
                 ]);                
 
                 self.rounds.forEach(round => {
-                    const roundNr = round.round - 1;
+                    const roundNr = round.round;
                     const winningCondition = self.getWinningCondition(round.round);
                     
                     const conditionTotals = [];
@@ -299,7 +299,7 @@
                 return obj;
             },
             getCompensationRequest(roundNumber, number, condition) {
-                const compensationRequests = this.compensationRequests[roundNumber - 1].find(acd => acd.number === number);
+                const compensationRequests = this.compensationRequests[roundNumber].find(acd => acd.number === number);
 
                 if (compensationRequests == null || compensationRequests.compensationRequests == null) {
                     return null;
@@ -308,14 +308,14 @@
                 return compensationRequests.compensationRequests[condition];
             },
             getCompensationOffered(roundNumber, condition) {
-                if (this.compensationOffers[roundNumber - 1][condition] == null) {
+                if (this.compensationOffers[roundNumber][condition] == null) {
                     return null;
                 }
 
-                return this.formatUs(this.compensationOffers[roundNumber - 1][condition]);
+                return this.formatUs(this.compensationOffers[roundNumber][condition]);
             },
             getCompensationAccepted(roundNumber, number, condition) {
-                const playerCompensationDecisions = this.compensationDecisions[roundNumber - 1].find(acd => acd.number === number);
+                const playerCompensationDecisions = this.compensationDecisions[roundNumber].find(acd => acd.number === number);
 
                 if (playerCompensationDecisions == null || playerCompensationDecisions.compensationDecisions == null) {
                     return null;
@@ -324,7 +324,7 @@
                 return playerCompensationDecisions.compensationDecisions.includes(condition) ? 'Yes' : 'No';
             },
             getCompensationReceived(roundNumber, role) {
-                const jackpot = this.compensationOffers[roundNumber - 1][this.winningCondition[roundNumber - 1]];
+                const jackpot = this.compensationOffers[roundNumber][this.winningCondition[roundNumber]];
 
                 console.log('jackpot: ' + jackpot);
 
@@ -339,8 +339,8 @@
                 }
             },
             getTotalProfit(roundNumber, player) {
-                const compensationOffers = this.compensationOffers[roundNumber - 1];
-                const winningCondition = this.winningCondition[roundNumber - 1];
+                const compensationOffers = this.compensationOffers[roundNumber];
+                const winningCondition = this.winningCondition[roundNumber];
                 
                 const jackpot = compensationOffers[winningCondition];
 
@@ -355,40 +355,40 @@
             getPlayerValues(playerNumber, roundNumber) {
                 if (
                     this.playerValues == null ||
-                    this.playerValues[roundNumber - 1] == null
+                    this.playerValues[roundNumber] == null
                 ) {
                     console.log(`WITH ROUND ${roundNumber} PLAYER ${playerNumber}`);
                     return null;
                 }
 
-                return this.playerValues[roundNumber - 1].find(p => p.number === playerNumber).values;
+                return this.playerValues[roundNumber].find(p => p.number === playerNumber).values;
             },
             getStandingCounter(roundNumber, condition) {
                 if (
                     this.standings == null ||
-                    this.standings[roundNumber - 1] == null ||
-                    this.standings[roundNumber - 1][condition] == null
+                    this.standings[roundNumber] == null ||
+                    this.standings[roundNumber][condition] == null
                 ) {
                     console.log(`WITH ROUND ${roundNumber} CONDITION ${condition}`);
                     return null;
                 }
 
-                return this.standings[roundNumber - 1][condition].counter;
+                return this.standings[roundNumber][condition].counter;
             },
             getStandingValue(roundNumber, condition) {
                 if (
                     this.standings == null ||
-                    this.standings[roundNumber - 1] == null ||
-                    this.standings[roundNumber - 1][condition] == null
+                    this.standings[roundNumber] == null ||
+                    this.standings[roundNumber][condition] == null
                 ) {
                     console.log(`WITH ROUND ${roundNumber} CONDITION ${condition}`);
                     return null;
                 }
 
-                return this.standings[roundNumber - 1][condition].value;
+                return this.standings[roundNumber][condition].value;
             },
             getWinningCondition(roundNumber) {
-                return this.winningCondition[roundNumber - 1];
+                return this.winningCondition[roundNumber];
             },
             formatUs(num) {
                 if (num == null || typeof num != 'number') {

@@ -13,10 +13,6 @@ import End from './phases/6.js';
 export default class Voting extends Logic {
     constructor(data) {
         super(data, [WaitToStartPhase, Introduction, Chat, Request, Offer, Chat, Vote, End], 'Voting');
-
-        const rawDictionary = fs.readFileSync('./resources/voting.json');
-
-        data.dictionary = JSON.parse(rawDictionary);
     }
 
     getRecoveryData(number) {

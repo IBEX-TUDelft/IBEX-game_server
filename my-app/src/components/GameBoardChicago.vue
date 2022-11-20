@@ -10,7 +10,11 @@
                 <b-navbar class="mb-0" id="navbar" toggleable="md" type="dark" variant="info" >
                     <b-navbar-nav>
                         <b-navbar-brand>
-                            {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
+                            <Transition name="slide-fade">
+                                <div v-if="showIntructions">
+                                    {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
+                                </div>
+                            </Transition>
                         </b-navbar-brand>
                     </b-navbar-nav>
                     <b-navbar-nav class="ml-auto">
@@ -178,6 +182,7 @@
     export default {
         data() {
             return {
+                showIntructions: true,
                 updateSpeculationTable: 0,
                 firstConnection: true,
                 connection: null,
@@ -211,7 +216,7 @@
                 game: {
                     over: false,
                     winningCondition: null,
-                    round: 1,
+                    round: 0,
                     phase: 0,
                     ruleset: "",
                     properties: [],
@@ -701,12 +706,6 @@
                                 self.player.number = ev.data.number;
                                 self.game.ruleset = ev.data.ruleset;
                                 break;
-                            case 'phase-instructions':
-                                self.player.instructions = ev.data.instructions;
-
-                                self.acknowledge(`Phase Instructions`, ev.data.instructions);
-
-                                break;
                             case "assign-role":
                                 self.game.boundaries = ev.data.boundaries;
                                 self.game.conditions = ev.data.conditions;
@@ -732,6 +731,18 @@
                             case "phase-transition":
                                 self.game.round = ev.data.round;
                                 self.game.phase = ev.data.phase;
+
+                                var phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
+                                    [null, 'speculator', 'developer', 'owner'][self.player.role]
+                                ];
+
+                                self.showIntructions = false;
+
+                                setTimeout(() => {
+                                    self.player.instructions = phaseInstructions;
+
+                                    self.showIntructions = true;
+                                }, 1000);
 
                                 if (self.game.phase === 1) {
                                     self.game.declarations = [null, null, null];
@@ -945,12 +956,23 @@
                                 var summaryIdx = self.player.summaries.findIndex(s => s.round = ev.data.round);
 
                                 if (summaryIdx != -1) {
-                                    console.log(`Removing the result row of round ${ev.data.round} with the consolidated one from the server`);
-                                    self.player.summaries[summaryIdx] = ev.data;
+                                    if (ev.data.round === 0) {
+                                        console.log('Removing the initial round');
+                                        self.player.summaries.shift();
+                                    } else {
+                                        console.log(`Removing the result row of round ${ev.data.round} with the consolidated one from the server`);
+                                        self.player.summaries[summaryIdx] = ev.data;
+                                    }
                                 } else {
-                                    console.log(`Adding the result row of round ${ev.data.round} from the server`);
-                                    self.player.summaries.unshift(ev.data);
+                                    if (ev.data.round != 0) {
+                                        console.log(`Adding the result row of round ${ev.data.round} from the server`);
+                                        self.player.summaries.unshift(ev.data);
+                                    } else {
+                                        console.log('Removing the initial round');
+                                        self.player.summaries.shift();
+                                    }
                                 }
+
                                 break;
                             case 'game-over':
                                 self.game.over = true;
@@ -1169,7 +1191,7 @@
                 }
 
                 return obj;
-            }, getSummary() { //TODO
+            }, getSummary() {
                 const summary = {};
                 
                 summary.round = this.game.round;
@@ -1260,9 +1282,6 @@
 
                 self.updateSummary();
 
-                console.log('REFS');
-                console.log(self.$refs);
-
                 try {
                     self.openWebSocket();
                 } catch (err) {
@@ -1272,3 +1291,18 @@
         }
     }
 </script>
+<style>
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(50px);
+  opacity: 0;
+}
+</style>

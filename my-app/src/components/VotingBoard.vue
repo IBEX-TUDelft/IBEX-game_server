@@ -8,7 +8,11 @@
                 <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
                     <b-navbar-nav>
                         <b-navbar-brand>
-                            {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
+                            <Transition name="slide-fade">
+                                <div v-if="showIntructions">
+                                    {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
+                                </div>
+                            </Transition>
                         </b-navbar-brand>
                     </b-navbar-nav>
                     <b-navbar-nav class="ml-auto">
@@ -260,8 +264,8 @@
                             <th scope="col">Total</th>
                         </thead>
                         <tbody>
-                            <tr v-for="summary in getSummaries().reverse()" :key="summary.round" :style="summary.round === game.round && !game.over ? 'background-color: yellow;' : ''">
-                                <td>{{ summary.round }}</td>
+                            <tr v-for="summary in player.summaries" :key="summary.round" :style="summary.round === game.round && !game.over ? 'background-color: yellow;' : ''">
+                                <td>{{ summary.round != 0 ? summary.round : 'practice' }}</td>
                                 <td>{{ summary.condition == null ? 'To be Determined' : game.conditions[summary.condition].name }}</td>
                                 <td>{{ summary.value == null ? '' : formatUs(summary.value) }}</td>
                                 <td>{{ summary.compensation == null ? '' : formatUs(summary.compensation) }}</td>
@@ -288,6 +292,7 @@ import FormatService from '../services/FormatService';
 export default {
     data() {
         return {
+            showIntructions: true,
             connection: null,
             dictionary: {},
             format: 'en-US',
@@ -303,7 +308,7 @@ export default {
             },
             game: {
                 winningCondition: null,
-                round: 1,
+                round: 0,
                 phase: 0,
                 ruleset: "Voting",
                 conditions: [],
@@ -372,6 +377,18 @@ export default {
                             self.game.round = ev.data.round;
                             self.game.phase = ev.data.phase;
 
+                            var phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
+                                [null, 'speculator', 'developer', 'owner'][self.player.role]
+                            ];
+
+                            self.showIntructions = false;
+
+                            setTimeout(() => {
+                                self.player.instructions = phaseInstructions;
+
+                                self.showIntructions = true;
+                            }, 1000);
+
                             if (ev.data.phase === 0) {
                                 console.log('A NEW ROUND HAS BEGUN');
                                 
@@ -388,8 +405,11 @@ export default {
 
                                 self.forms.messageRecipients = [];
                                 self.forms.outgoingChatMessage = '';
-                                self.forms.selectedCondition = 0;
+                                self.forms.selectedCondition = null;
                             }
+
+                            self.updateSummary();
+
                             break;
                         case "set-timer":
                             self.timer.end = ev.data.end;
@@ -403,12 +423,6 @@ export default {
                             self.timer.end = null;
 
                             self.timer.on = false;
-
-                            break;
-                        case 'phase-instructions':
-                            self.player.instructions = ev.data.instructions;
-
-                            self.acknowledge(`Phase Instructions`, ev.data.instructions);
 
                             break;
                         case 'assign-role':
@@ -519,7 +533,26 @@ export default {
 
                             break;
                         case 'round-summary':
-                            self.player.summaries.push(ev.data);
+                            var summaryIdx = self.player.summaries.findIndex(s => s.round = ev.data.round);
+
+                            if (summaryIdx != -1) {
+                                if (ev.data.round === 0) {
+                                    console.log('Removing the initial round');
+                                    self.player.summaries.shift();
+                                } else {
+                                    console.log(`Removing the result row of round ${ev.data.round} with the consolidated one from the server`);
+                                    self.player.summaries[summaryIdx] = ev.data;
+                                }
+                            } else {
+                                if (ev.data.round != 0) {
+                                    console.log(`Adding the result row of round ${ev.data.round} from the server`);
+                                    self.player.summaries.unshift(ev.data);
+                                } else {
+                                    console.log('Removing the initial round');
+                                    self.player.summaries.shift();
+                                }
+                            }
+                            
                             break;
                         case 'game-over':
                             self.game.over = true;
@@ -898,12 +931,18 @@ export default {
             }
 
             return summary;
-        }, getSummaries() {
-            if (this.game.over === true) {
-                return this.player.summaries;
+        }, updateSummary() {
+            const summaryIdx = this.player.summaries.findIndex(s => s.round === this.game.round);
+
+            if (summaryIdx == -1) {
+                console.log(`Adding a new summary of round ${this.game.round}`);
+                this.player.summaries.unshift(this.getSummary());
+            } else {
+                console.log(`Updating the summary of round ${this.game.round} (element ${summaryIdx})`);
+                this.player.summaries[summaryIdx] = this.getSummary();
             }
 
-            return [...this.player.summaries, this.getSummary()];
+            this.$forceUpdate();
         }, getRequestMedian() {
             const items = this.game.players.filter(p => p.role === 3)
                 .filter(p => p.property != null && p.property.lastOffer != null)
@@ -947,6 +986,8 @@ export default {
             this.recover(response.gameData);
         }
 
+        this.updateSummary();
+
         this.openWebSocket();
 
         this.dictionary = dictionary;
@@ -959,3 +1000,18 @@ export default {
     }
 }
 </script>
+<style>
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+</style>

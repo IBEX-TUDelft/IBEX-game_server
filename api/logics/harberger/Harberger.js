@@ -17,10 +17,6 @@ export default class Harberger extends Logic {
     constructor(data) {
         super(data, [WaitToStartPhase, Phase1, Phase2, Phase3, Phase4,
             Phase5, Phase6, Phase7, Phase8, ShowResults], 'Harberger');
-
-        const rawDictionary = fs.readFileSync('./resources/harberger.json');
-
-        data.dictionary = JSON.parse(rawDictionary);
     }
 
     getRecoveryData(number) {

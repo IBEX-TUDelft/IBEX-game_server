@@ -36,7 +36,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="summary in summaries" :key="summary.round" :style="summary.round === $parent.game.round && !$parent.game.over ? 'background-color: yellow;' : ''">
-                            <td>{{ summary.round }}</td>
+                            <td>{{ summary.round === 0 ? 'practice' : summary.round }}</td>
                             <td v-if="$parent.player.role != 1" >{{ formatForPrinting(summary.value) }}</td>
                             <td v-if="$parent.player.role != 1">{{ formatForPrinting(summary.firstDeclaration) }}</td>
                             <td v-if="$parent.player.role != 1">{{ formatForPrinting(summary.firstTaxes, true) }}</td>
