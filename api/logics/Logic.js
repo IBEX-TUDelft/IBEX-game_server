@@ -279,22 +279,22 @@ export default class {
 
         this.data.players.forEach(p => {
             if (p.role === 1) {
-                p.S[0] = this.signalSeries[number][0].speculator[speculatorCounter];
-                p.S[1] = this.signalSeries[number][1].speculator[speculatorCounter];
+                p.S[0] = parseInt(this.signalSeries[number][0].speculator[speculatorCounter]);
+                p.S[1] = parseInt(this.signalSeries[number][1].speculator[speculatorCounter]);
 
                 speculatorCounter ++;
             } if (p.role === 2) {
                 p.property.v[0] = parseInt(this.valueSeries[number][0].developer) * 1000;
                 p.property.v[1] = parseInt(this.valueSeries[number][1].developer) * 1000;
 
-                p.S[0] = this.signalSeries[number][0].developer;
-                p.S[1] = this.signalSeries[number][1].developer;
+                p.S[0] = parseInt(this.signalSeries[number][0].developer);
+                p.S[1] = parseInt(this.signalSeries[number][1].developer);
             } else if (p.role === 3) {
                 p.property.v[0] = parseInt(this.valueSeries[number][0].owner[ownerCounter]) * 1000;
                 p.property.v[1] = parseInt(this.valueSeries[number][1].owner[ownerCounter]) * 1000;
 
-                p.S[0] = this.signalSeries[number][0].owner[ownerCounter];
-                p.S[1] = this.signalSeries[number][1].owner[ownerCounter];
+                p.S[0] = parseInt(this.signalSeries[number][0].owner[ownerCounter]);
+                p.S[1] = parseInt(this.signalSeries[number][1].owner[ownerCounter]);
 
                 ownerCounter ++;
             }

@@ -5,7 +5,6 @@
     </div>
 
     <div class="d-flex flex-row mt-1 p-0">
-        <div class="col-4">Median Price: {{ getMedianPrice() }}</div>
         <div class="col-4">Public Signal: {{ formatUs(game.publicSignal[condition]) }}</div>
         <div class="col-4">Private Signal: {{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</div>
     </div>
@@ -97,6 +96,10 @@
         </div>
 
         <div class="d-flex flex-column col-2 ">
+
+            <b-row class="justify-content-center">
+                Median Price: {{ getMedianPrice() }}
+            </b-row>
 
             <b-row class="justify-content-center">
                 <b>Contracts</b>
