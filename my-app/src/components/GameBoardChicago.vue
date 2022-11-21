@@ -12,7 +12,7 @@
                         <b-navbar-brand>
                             <Transition name="slide-fade">
                                 <div v-if="showIntructions">
-                                    {{ player == null || player.tag == null ? 'New Player' : player.tag }}: {{ player.instructions }}
+                                    {{ player == null || player.tag == null || player.tag === '' ? 'New Player' : player.tag }}: {{ player.instructions }}
                                 </div>
                             </Transition>
                         </b-navbar-brand>
@@ -99,7 +99,7 @@
                                 <td>{{ condition.name }}</td>
                                 <td class="text-right">{{ formatUs(player.property.v[condition.id]) }}</td>
                                 <td>
-                                    <b-form-input @keydown="isAllowed" @input="player.declaration[condition.id] = reformat(player.declaration[condition.id])" v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
+                                    <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat" v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
                                     <div v-else>
                                         <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
                                             <div class="text-right" v-if="player.declaration != null && player.declaration[condition.id] != null">

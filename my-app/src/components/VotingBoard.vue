@@ -10,7 +10,7 @@
                         <b-navbar-brand>
                             <Transition name="slide-fade">
                                 <div v-if="showIntructions">
-                                    {{ game.phase === 0 && game.round === 1 ? 'New Player' : player.tag }}: {{ player.instructions }}
+                                    {{ player == null || player.tag == null || player.tag === '' ? 'New Player' : player.tag }}: {{ player.instructions }}
                                 </div>
                             </Transition>
                         </b-navbar-brand>
@@ -59,7 +59,7 @@
                                         <td>{{ condition.name }}</td>
                                         <td>{{ formatUs(player.property.v[condition.id]) }} {{ condition.id === 0 ? '' : '(' + formatUs(player.property.v[condition.id] - player.property.v[0]) + ')' }}</td>
                                         <td v-if="game.phase >= 4">
-                                            <b-form-input @keydown="isAllowed" @input="game.compensationOffers[condition.id] = reformat(game.compensationOffers[condition.id])"  v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat" v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
                                             <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                         </td>
                                         <td v-if="game.phase === 4 || game.phase === 5 || game.phase === 6">
@@ -83,7 +83,7 @@
                                         <td>{{ condition.name }}</td>
                                         <td>{{ formatUs(player.property.v[condition.id]) }} {{ condition.id === 0 ? '' : '(' + formatUs(player.property.v[condition.id] - player.property.v[0]) + ')' }}</td>
                                         <td v-if="game.phase >= 3">
-                                            <b-form-input @keydown="isAllowed" @input="player.compensationRequests[condition.id] = reformat(player.compensationRequests[condition.id])" v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat"  v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
                                             <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
                                         </td>
                                         <td v-if="game.phase >= 5">
@@ -963,6 +963,11 @@ export default {
                 return items[half].r;
             
             return (items[half - 1].r + items[half].r) / 2.0;
+        }, test(e, scope) {
+            console.log('EVENT')
+            console.log(e);
+            console.log(scope)
+            console.log('END EVtT')
         }
     },
     async mounted () {
@@ -986,10 +991,6 @@ export default {
             this.recover(response.gameData);
         }
 
-        this.updateSummary();
-
-        this.openWebSocket();
-
         this.dictionary = dictionary;
 
         if (dictionary.parameters.format != null) {
@@ -997,6 +998,20 @@ export default {
         }
 
         this.formatService = new FormatService(this.format);
+
+        this.updateSummary();
+
+        var phaseInstructions = this.dictionary.instructions.phases[this.game.phase][
+            [null, 'speculator', 'developer', 'owner'][this.player.role != null ? this.player.role : 1]
+        ];
+
+        this.player.instructions = phaseInstructions;
+
+        try {
+            this.openWebSocket();
+        } catch (err) {
+            console.log(err);
+        }
     }
 }
 </script>

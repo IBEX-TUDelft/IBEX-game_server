@@ -9,8 +9,8 @@
             "developer": "Wait for all players to be ready."
         }, {
             "number": 1,
-            "owner": "All the players are ready, the game will start shortly.",
-            "developer": "All the players are ready, the game will start shortly."
+            "owner": "All the players are ready, the round will start shortly.",
+            "developer": "All the players are ready, the round will start shortly."
         }, {
             "number": 2,
             "owner": "Deliberation phase.",

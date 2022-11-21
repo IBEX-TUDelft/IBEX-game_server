@@ -22,7 +22,7 @@
 
                 <div class="col-4">
                     <div class="row-12">
-                        <b-form-input @keydown="isAllowed" @input="ask_price = reformat(ask_price)" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
+                        <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
                     </div>
                 </div>
 
@@ -89,20 +89,16 @@
                 </div>
 
                 <div class="d-flex flex-column col-4">
-                    <b-form-input @keydown="isAllowed" @input="bid_price = reformat(bid_price)" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
+                    <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
                 </div>
             </div>
 
         </div>
 
         <div class="d-flex flex-column col-2 ">
-
+            
             <b-row class="justify-content-center">
-                Median Price: {{ getMedianPrice() }}
-            </b-row>
-
-            <b-row class="justify-content-center">
-                <b>Contracts</b>
+                <b>Contracts (Median Price: {{ getMedianPrice() }})</b>
             </b-row>
 
             <b-row style="display: flex; height: 281px; overflow: scroll;">

@@ -33,7 +33,7 @@ export default class FormatService {
     reformat(string) {
         const num = this.parse(string);
 
-        if (num == null) {
+        if (num == null || isNaN(num)) {
             return null
         }
 

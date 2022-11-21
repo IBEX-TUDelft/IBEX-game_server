@@ -41,9 +41,6 @@ export default class Voting extends Logic {
 
         let messages = null;
 
-        console.log('RESULTS');
-        console.log(self.data.results);
-
         if (self.data.currentRound.phase === 2 || self.data.currentRound.phase === 5) {
             messages = self.data.currentPhase.results.chatLog.map(m => {
                 return {
@@ -170,7 +167,7 @@ export default class Voting extends Logic {
 
             if (playerData.role === 2) {
                 summary.compensation = - this.data.compensationOffers[this.data.winningCondition] * ( this.data.players.length - 1);
-                summary.profit = summary.value - summary.compensation * ( this.data.players.length - 1);
+                summary.profit = summary.value + summary.compensation;
             } else {
                 summary.compensation = this.data.compensationOffers[this.data.winningCondition];
                 summary.profit = summary.value + summary.compensation;
