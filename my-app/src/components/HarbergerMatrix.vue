@@ -120,7 +120,7 @@ export default {
                 return '';
             }
             
-            return ` (Last snipe: ${player.snipe})`;
+            return ` (${this.$parent.resolvePlaceHolder('last-speculation')}: ${player.snipe})`;
         }
     }
 }

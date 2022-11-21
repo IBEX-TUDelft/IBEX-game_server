@@ -752,17 +752,34 @@
                         } else if (player.role === 2 || player.role === 3) {
                             firstSnipeResult = self.firstSnipeResults[roundIdx].filter(sr => sr.target.number === player.number && sr.profit != null)
                                 .map(sr => sr.profit).reduce((a, b) => a - b, 0);
-                            firstTaxes = self.firstDeclarations[roundIdx].find(d => d.player === player.number).taxes[self.winningCondition];
+                            firstTaxes = self.firstDeclarations[roundIdx].find(d => d.player === player.number).taxes[winningCondition];
                             secondSnipeResult = self.secondSnipeResults[roundIdx].filter(sr => sr.target.number === player.number && sr.profit != null)
                                 .map(sr => sr.profit).reduce((a, b) => a - b, 0);
-                            secondTaxes = self.secondDeclarations[roundIdx].find(d => d.player === player.number).taxes[self.winningCondition];
+                            secondTaxes = self.secondDeclarations[roundIdx].find(d => d.player === player.number).taxes[winningCondition];
                         }
 
                         xlsRow.push(firstSnipeResult);
-                        xlsRow.push(firstTaxes);
+
+                        if (player.role === 1) {
+                            xlsRow.push(null);
+                        } else {
+                            xlsRow.push(
+                                self.firstDeclarations[roundIdx].find(fd => fd.player === player.number).declaration[winningCondition]
+                                - firstTaxes
+                            );
+                        }
+
                         xlsRow.push(tradingResult);
                         xlsRow.push(secondSnipeResult);
-                        xlsRow.push(secondTaxes);
+
+                        if (player.role === 1) {
+                            xlsRow.push(null);
+                        } else {
+                            xlsRow.push(
+                                self.secondDeclarations[roundIdx].find(fd => fd.player === player.number).declaration[winningCondition]
+                                - secondTaxes
+                            );
+                        }
 
                         xls.push(xlsRow);
                     });

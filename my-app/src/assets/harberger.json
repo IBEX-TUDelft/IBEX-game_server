@@ -82,6 +82,7 @@
         "order-refused": "Order Refused",
         "acknowledge-button": "Ok",
         "confirm-button": "Confirm",
-        "cancel-button": "Cancel"
+        "cancel-button": "Cancel",
+        "last-speculation": "Last Speculation"
     }
 }
