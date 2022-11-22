@@ -22,7 +22,7 @@
         <div>
             <b-card no-body>
                 <b-tabs card v-model="roundIndex">
-                    <b-tab v-for="round in rounds" :key="round.round">
+                    <b-tab v-for="round in rounds.filter(r => r.round > 0)" :key="round.round">
 
                         <template #title>
                             Round {{ round.round }}
@@ -213,7 +213,7 @@
                     'Project Realized', 'Optimal_Outcome'
                 ]);                
 
-                self.rounds.forEach(round => {
+                self.rounds.filter(r => r.round > 0).forEach(round => {
                     const roundNr = round.round;
                     const winningCondition = self.getWinningCondition(round.round);
                     
@@ -424,6 +424,7 @@
 
                 rounds.forEach(r => {
                     if (r.phase[phase] == null) {
+                        result.push(null);
                         return
                     }
 

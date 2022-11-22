@@ -408,7 +408,9 @@ export default {
                                 self.forms.selectedCondition = null;
                             }
 
-                            self.updateSummary();
+                            if (self.game.phase > 0) {
+                                self.updateSummary();
+                            }
 
                             break;
                         case "set-timer":
@@ -999,7 +1001,9 @@ export default {
 
         this.formatService = new FormatService(this.format);
 
-        this.updateSummary();
+        if (this.game.phase > 0) {
+            this.updateSummary();
+        }
 
         var phaseInstructions = this.dictionary.instructions.phases[this.game.phase][
             [null, 'speculator', 'developer', 'owner'][this.player.role != null ? this.player.role : 1]

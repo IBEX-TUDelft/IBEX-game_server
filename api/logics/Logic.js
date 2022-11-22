@@ -182,6 +182,13 @@ export default class {
 
         this.data.startTime = new Date().toLocaleString('nl', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})
 
+        if (this.data.parameters.practice_round === false) {
+            this.data.results.push({
+                "round": 0,
+                "phase": []
+            });
+        }
+
         await this.beginRound();
     }
 
@@ -262,7 +269,7 @@ export default class {
     }
 
     async beginRound () {
-        let number = 0;
+        let number;
 
         if (this.data.currentRound != null) {
             this.addSummaries();
@@ -270,6 +277,12 @@ export default class {
             number = this.data.currentRound.number + 1;
 
             this.data.rounds.push(this.data.currentRound);
+        } else {
+            if (this.data.parameters.practice_round === false) {
+                number = 1;
+            } else {
+                number = 0;
+            }
         }
 
         this.refreshWallet();
@@ -306,8 +319,8 @@ export default class {
             }
         });
 
-        //TODO don't override if the signals should come from the config file, enable this section otherwise
-        /*if (this.data.type != 'Voting') {
+        //The pregenerated private signals are overridden with dynamically computed ones, that take in account the amount of players in game
+        if (this.data.type != 'Voting' && this.data.parameters.generate_signals === true) {
             let V = [];
 
             for (let j = 0; j < 2; j++) {
@@ -335,7 +348,7 @@ export default class {
 
                 console.log(`${player.name} S = ${player.S}`);
             }
-        }*/
+        }
 
         if (number > this.data.parameters.round_count ) {
             console.log('The game is over');

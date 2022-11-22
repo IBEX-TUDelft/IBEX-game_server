@@ -800,7 +800,9 @@
                                     }
                                 }
 
-                                self.updateSummary();
+                                if (self.game.phase > 0) {
+                                    self.updateSummary();
+                                }
 
                                 break;
                             case "set-timer":
@@ -1288,7 +1290,9 @@
                     });
                 }
 
-                self.updateSummary();
+                if (self.game.phase > 0) {
+                    self.updateSummary();
+                }
 
                 var phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
                     [null, 'speculator', 'developer', 'owner'][self.player.role != null ? self.player.role : 1]

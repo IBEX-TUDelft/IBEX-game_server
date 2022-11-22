@@ -68,6 +68,15 @@ export default {
                                 return errMessage;                                
                             }
                             break;
+                        case 'boolean':
+                            try {
+                                gameData.parameters[gp.key] = 'true' === gp.value;
+                            } catch (e) {
+                                const errMessage = `Game ${gameId}'s parameter ${gp.key} value (${gp.value}) cannot be parsed as boolean (type: boolean)`;
+                                console.error(errMessage);
+                                return errMessage;                                
+                            }
+                            break;
                         default:
                             const errMessage = `Game ${gameId}'s parameter ${gp.key} (value: ${gp.value}) has an unrecognized type: ${gp.value}. Should be string|number`;
                             console.error(errMessage);

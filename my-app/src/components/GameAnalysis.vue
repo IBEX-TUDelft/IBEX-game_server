@@ -905,6 +905,7 @@
 
                 rounds.forEach(r => {
                     if (r.phase[phase] == null) {
+                        result.push(null);
                         return
                     }
 
@@ -935,7 +936,7 @@
                 this.firstSnipeResults = extractProperty(this.rounds, 6, 'snipeOutcomes');
             }
 
-            this.indexes = this.rounds.map((e, i) => i);
+            this.indexes = this.rounds.filter(r => r.round > 0).map(r => r.round);
 
             window.vue = this;
         }

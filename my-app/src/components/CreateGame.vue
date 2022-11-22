@@ -36,6 +36,9 @@
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="round_count" name="round_count" id="round_count" aria-describedby="emailHelp" placeholder="6" />
                 </div>
+                    <b-form-checkbox type="checkbox" true-false="false" false-true="true" v-model="practice_round" name="practice_round" id="practice_round">
+                        Add an Extra Practice Round
+                    </b-form-checkbox>
             </div>
 
             <div v-if="game_type != 'voting'" class="row">
@@ -70,16 +73,24 @@
             
             <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
+                    Signals:
+                </div>
+                <div class="form-group col-md-2">
                     <label htmlFor="exampleInputEmail1">Signal (Low)</label>
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-1">
                     <input type="number" class="form-control" v-model="signal_low" name="signal_low" id="signal_low" aria-describedby="emailHelp" step="0.1" />
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-2">
                     <label htmlFor="exampleInputEmail1">Signal (High)</label>
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-1">
                     <input type="number" class="form-control" v-model="signal_high" name="signal_high" id="signal_high" aria-describedby="emailHelp" step="0.1" />
+                </div>
+                <div class="form-group col-md-3">
+                    <b-form-checkbox type="checkbox" true-false="false" false-true="true" v-model="generate_signals" name="generate_signals" id="generate_signals">
+                        Generate Signals Dynamically
+                    </b-form-checkbox>
                 </div>
             </div>
 
@@ -293,6 +304,8 @@ export default {
             tax_rate_final: 25,
             signal_low: 0.95,
             signal_high: 1.05,
+            generate_signals: false,
+            practice_round: true,
             cash_for_snipers: 250000
         }
     },
@@ -326,7 +339,8 @@ export default {
                 },
                 signal: {
                     low: this.signal_low,
-                    high: this.signal_high
+                    high: this.signal_high,
+                    generate: this.generate_signals
                 },
                 speculators: {
                     count: this.speculators_count,
@@ -381,6 +395,7 @@ export default {
                 },
                 round_count: this.round_count,
                 game_type: this.game_type,
+                practice: this.practice_round,
                 minutes_for_trading: this.minutes_for_trading,
                 minutes_for_sniping: this.minutes_for_sniping
             }

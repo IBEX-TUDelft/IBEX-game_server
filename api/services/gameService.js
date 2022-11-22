@@ -15,12 +15,14 @@ export default {
         const parameters = [
             {key: "game_type", type: "string", value: gameParameters.game_type},
             {key: "round_count", type: "number", value: gameParameters.round_count},
+            {key: "practice_round", type: "boolean", value: gameParameters.practice},
             {key: "minutes_for_trading", type: "number", value: gameParameters.minutes_for_trading},
             {key: "minutes_for_sniping", type: "number", value: gameParameters.minutes_for_sniping},
             {key: "tax_rate_initial", type: "number", value: gameParameters.tax_rate.initial},
             {key: "tax_rate_final", type: "number", value: gameParameters.tax_rate.final},
             {key: "signal_low", type: "float", value: gameParameters.signal.low},
             {key: "signal_high", type: "float", value: gameParameters.signal.high},
+            {key: "generate_signals", type: "boolean", value: gameParameters.signal.generate},
 
             {key: "speculators_count", type: "number", value: gameParameters.speculators.count},
             {key: "speculator_balance", type: "number", value: gameParameters.speculators.balance},
