@@ -5,9 +5,17 @@
     </div>
 
     <div class="d-flex flex-row mt-1 p-0">
-        <div class="col-4">Public Signal: {{ formatUs(game.publicSignal[condition]) }}</div>
-        <div class="col-4">Private Signal: {{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</div>
+        <div class="col-4" v-b-tooltip.hover id="public-signal-id">Public Signal: {{ formatUs(game.publicSignal[condition]) }}</div>
+        <div class="col-4" v-b-tooltip.hover id="private-signal-id">Private Signal: {{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</div>
     </div>
+
+    <b-tooltip target="public-signal-id" triggers="hover" placement="bottomleft">
+        {{ resolvePlaceHolder('public-signal-tooltip') }}
+    </b-tooltip>
+
+    <b-tooltip target="private-signal-id" triggers="hover" placement="bottomleft">
+        {{ resolvePlaceHolder('private-signal-tooltip') }}
+    </b-tooltip>
 
     <div class="d-flex flex-row mt-1 p-0">
 
@@ -353,6 +361,9 @@ export default {
         },
         extractDataFromObject(def, object, ...tags) {
             return this.$parent.extractDataFromObject(def, object, ...tags);
+        },
+        resolvePlaceHolder(placeHolder) {
+            return this.$parent.resolvePlaceHolder(placeHolder);
         }
     },
     async mounted() {

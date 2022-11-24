@@ -55,6 +55,9 @@ export default {
         },
         extractDataFromObject(def, object, ...tags) {
             return this.$parent.extractDataFromObject(def, object, ...tags);
+        },
+        resolvePlaceHolder(placeHolder) {
+            return this.$parent.resolvePlaceHolder(placeHolder);
         }
     },
     components: {

@@ -38,6 +38,7 @@
         }]
     }, "placeHolders": {
         "ready-button": "Click When You Are Ready",
+        "waiting-for-others": "Waiting for all players to click ready ...",
         "conditions-plot-values-title": "Conditions and Plot Values",
         "plot-matrix": "Your Neighborhood (Your Property Highlighted in Blue)",
         "message-problem-title" : "Check Your Messages",

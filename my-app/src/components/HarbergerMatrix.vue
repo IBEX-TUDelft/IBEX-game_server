@@ -2,7 +2,7 @@
 
     <div class="flex-row">
         
-        <div class="text-center mb-1"><b>Declarations</b></div>
+        <div class="text-center mb-1"><b>{{ resolvePlaceHolder('property-matrix-header') }}</b></div>
 
         <b-form-checkbox-group
             :id="'checked-plots'"
@@ -121,6 +121,9 @@ export default {
             }
             
             return ` (${this.$parent.resolvePlaceHolder('last-speculation')}: ${this.formatUs(player.snipe)})`;
+        },
+        resolvePlaceHolder(placeHolder) {
+            return this.$parent.resolvePlaceHolder(placeHolder);
         }
     }
 }

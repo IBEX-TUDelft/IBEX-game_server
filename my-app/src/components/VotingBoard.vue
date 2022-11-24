@@ -28,8 +28,8 @@
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase === 0">
             <b-col class="d-flex align-items-center justify-content-center flex-column">
                 <b-row class="">
-                    <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
-                    <div v-else>Waiting all players to join ...</div>
+                    <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">{{ resolvePlaceHolder('ready-button') }}</b-button>
+                    <div v-else>{{ resolvePlaceHolder('waiting-for-others') }}</div>
                 </b-row>
             </b-col>
         </b-row>

@@ -30,8 +30,8 @@
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase === 0">
             <b-col class="d-flex align-items-center justify-content-center flex-column">
                 <b-row class="">
-                    <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">I am Ready</b-button>
-                    <div v-else>Waiting all players to join ...</div>
+                    <b-button v-if="player.ready === false" size="lg" @click="signalReady" variant="primary">{{ resolvePlaceHolder('ready-button') }}</b-button>
+                    <div v-else>{{ resolvePlaceHolder('waiting-for-others') }}</div>
                 </b-row>
             </b-col>
         </b-row>
@@ -52,19 +52,19 @@
 
                 <div class="row justify-content-center" v-if="player.role == 1 && (game.phase === 3 || game.phase === 8) && player.hasToSpeculate">
                     <div class="col-6 text-center">
-                        <button type="button" @click='doneSpeculating()' class="btn btn-primary">Submit</button>
+                        <button type="button" @click='doneSpeculating()' class="btn btn-primary">{{ resolvePlaceHolder('speculator-submit-button') }}</button>
                     </div>
                 </div>
 
                 <b-row class="no-gutters" v-if="game.boundaries != null">
 
                     <div v-for="role in ['owner', 'developer']" :key="role" class="col-6 p-1">
-                        <div class="text-center mb-1"><b>Value Ranges ({{ role }})</b></div>
+                        <div class="text-center mb-1"><b>{{ resolvePlaceHolder(`value-ranges-${role}-header`) }}</b></div>
                         <table class="table table-bordered" style="table-layout: fixed;">
                             <thead class="thead-dark">
-                                <th scope="col">Condition</th>
-                                <th scope="col">Minimum</th>
-                                <th scope="col">Maximum</th>
+                                <th scope="col">{{ resolvePlaceHolder('value-ranges-condition') }}</th>
+                                <th scope="col">{{ resolvePlaceHolder('value-ranges-minimum') }}</th>
+                                <th scope="col">{{ resolvePlaceHolder('value-ranges-maximum') }}</th>
                             </thead>
                             <tbody>
                                 <tr v-for="condition in game.conditions" :key="condition.id"
@@ -84,15 +84,15 @@
             <div class="col-6">
                 <!-- Actions -->
                 <b-row class="d-flex flex-row no-gutters p-1" v-if="player.role > 1">
-                    <div class="text-center mb-1"><b>My Value Information</b></div>
+                    <div class="text-center mb-1"><b>{{ resolvePlaceHolder('my-value-info-header') }}</b></div>
                     <table class="table table-bordered">
                         <thead class="thead-dark">
-                            <th scope="col">Condition</th>
-                            <th scope="col">Value</th>
-                            <th scope="col">Declaration</th>
-                            <th scope="col">Tax Bill ({{formatUs(game.taxRate)}}%)</th>
-                            <th scope="col">Profit</th>
-                            <th scope="col">Sniper Prob.</th>
+                            <th scope="col">{{ resolvePlaceHolder('my-value-info-condition') }}</th>
+                            <th scope="col">{{ resolvePlaceHolder('my-value-info-value') }}</th>
+                            <th scope="col">{{ resolvePlaceHolder('my-value-info-declaration') }}</th>
+                            <th scope="col">{{ resolvePlaceHolder('my-value-info-tax') + ' (' + formatUs(game.taxRate) + '%)' }}</th>
+                            <th scope="col">{{ resolvePlaceHolder('my-value-info-profit') }}</th>
+                            <th scope="col">{{ resolvePlaceHolder('my-value-info-sniping') }}</th>
                         </thead>
                         <tbody>
                             <tr v-for="condition in game.conditions.filter(c => game.winningCondition == null || game.winningCondition === c.id)" :key="condition.id">
@@ -476,35 +476,25 @@
 
                     myDeclarations[i] = v;
 
-                    let low = null, high = null;
+                    const condition = this.game.conditions[i];
 
-                    if (i === 0) {
-                        low = this.player.boundaries.noProject.low;
-                        high = this.player.boundaries.noProject.high;
-                    } else if (i === 1) {
-                        low = this.player.boundaries.projectA.low;
-                        high = this.player.boundaries.projectA.high;
-                    } else if (i === 2) {
-                        low = this.player.boundaries.projectB.low;
-                        high = this.player.boundaries.projectB.high;
-                    }
+                    const low = this.player.boundaries[condition.key].low;
+                    const high = this.player.boundaries[condition.key].high;
 
                     if (v < low) {
-                        myWarnings.push(`Your declaration under condition ${this.conditionToString(i)} is less than the known minimum value (${low}), speculators will certainly target you`);
+                        myWarnings.push(this.resolvePlaceHolder(`${condition.key}-declaration-low-warning`));
                     }
 
                     if (v > high) {
-                        myWarnings.push(`Your declaration under condition ${this.conditionToString(i)} is greater than the known maximum value (${high}), this is certainly not optimal`);
+                        myWarnings.push(this.resolvePlaceHolder(`${condition.key}-declaration-high-warning`));
                     }
                 }
 
                 if (myWarnings.length > 0) {
-                    this.modals.errorList.description = 'There are some caveats with your declaration. Do you want to submit it anyway?'
-                    + 'It will not be possible to change it at a later time.';
+                    this.modals.errorList.description = this.resolvePlaceHolder('declaration-warning-description');
                     this.modals.errorList.warnings = myWarnings;
                 } else {
-                    this.modals.errorList.description = 'Do you want to proceed and submit your declaration?'
-                    + 'It will not be possible to change it at a later time.';
+                    this.modals.errorList.description = this.resolvePlaceHolder('declaration-submit-description');
                     this.modals.errorList.warnings = [];
                 }
 
