@@ -387,7 +387,7 @@ export default {
                                 self.player.instructions = phaseInstructions;
 
                                 self.showIntructions = true;
-                            }, 1000);
+                            }, 2000);
 
                             if (ev.data.phase === 0) {
                                 console.log('A NEW ROUND HAS BEGUN');
@@ -1006,7 +1006,7 @@ export default {
         }
 
         var phaseInstructions = this.dictionary.instructions.phases[this.game.phase][
-            [null, 'speculator', 'developer', 'owner'][this.player.role != null ? this.player.role : 1]
+            [null, 'speculator', 'developer', 'owner'][this.player.role != null ? this.player.role : 3]
         ];
 
         this.player.instructions = phaseInstructions;
@@ -1025,12 +1025,12 @@ export default {
 }
 
 .slide-fade-leave-active {
-  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+  transition: all 2.0s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
 .slide-fade-enter-from,
 .slide-fade-leave-to {
-  transform: translateX(20px);
+  transform: translateX(100px);
   opacity: 0;
 }
 </style>

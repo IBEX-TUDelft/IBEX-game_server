@@ -7,6 +7,9 @@
     <div class="d-flex flex-row mt-1 p-0">
         <div class="col-4" v-b-tooltip.hover id="public-signal-id">Public Signal: {{ formatUs(game.publicSignal[condition]) }}</div>
         <div class="col-4" v-b-tooltip.hover id="private-signal-id">Private Signal: {{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</div>
+        <div class="col-4" v-if="player.role != 1">
+            Your Property's Value:  {{ formatUs(player.property.v[condition]) }}
+        </div>
     </div>
 
     <b-tooltip target="public-signal-id" triggers="hover" placement="bottomleft">
@@ -364,6 +367,9 @@ export default {
         },
         resolvePlaceHolder(placeHolder) {
             return this.$parent.resolvePlaceHolder(placeHolder);
+        },
+        getRootContext() {
+            return this.$parent.getRootContext();
         }
     },
     async mounted() {

@@ -37,16 +37,16 @@
                     <tbody>
                         <tr v-for="summary in summaries" :key="summary.round" :style="summary.round === $parent.game.round && !$parent.game.over ? 'background-color: yellow;' : ''">
                             <td>{{ summary.round === 0 ? 'practice' : summary.round }}</td>
-                            <td v-if="$parent.player.role != 1" >{{ formatForPrinting(summary.value) }}</td>
-                            <td v-if="$parent.player.role != 1">{{ formatForPrinting(summary.firstDeclaration) }}</td>
-                            <td v-if="$parent.player.role != 1">{{ formatForPrinting(summary.firstTaxes, true) }}</td>
-                            <td v-if="$parent.player.role != 1">{{ formatForPrinting(summary.secondDeclaration) }}</td>
-                            <td v-if="$parent.player.role != 1">{{ formatForPrinting(summary.secondTaxes, true) }}</td>
-                            <td>{{ formatForPrinting(summary.firstRepurchase) }}</td>
-                            <td>{{ formatForPrinting(summary.secondRepurchase) }}</td>
-                            <td>{{ formatForPrinting(getCash(summary)) }}</td>
-                            <td>{{ formatForPrinting(getSharesPayoff(summary)) }}</td>
-                            <td>{{ getTotalEarnings(summary) }}</td>
+                            <td class="text-right" v-if="$parent.player.role != 1" >{{ formatForPrinting(summary.value) }}</td>
+                            <td class="text-right" v-if="$parent.player.role != 1">{{ formatForPrinting(summary.firstDeclaration) }}</td>
+                            <td class="text-right" v-if="$parent.player.role != 1">{{ formatForPrinting(summary.firstTaxes, true) }}</td>
+                            <td class="text-right" v-if="$parent.player.role != 1">{{ formatForPrinting(summary.secondDeclaration) }}</td>
+                            <td class="text-right" v-if="$parent.player.role != 1">{{ formatForPrinting(summary.secondTaxes, true) }}</td>
+                            <td class="text-right">{{ formatForPrinting(summary.firstRepurchase) }}</td>
+                            <td class="text-right">{{ formatForPrinting(summary.secondRepurchase) }}</td>
+                            <td class="text-right">{{ formatForPrinting(getCash(summary)) }}</td>
+                            <td class="text-right">{{ formatForPrinting(getSharesPayoff(summary)) }}</td>
+                            <td class="text-right">{{ getTotalEarnings(summary) }}</td>
                         </tr>
                     </tbody>
                 </table>

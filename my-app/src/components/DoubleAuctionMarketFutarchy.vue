@@ -58,6 +58,9 @@ export default {
         },
         resolvePlaceHolder(placeHolder) {
             return this.$parent.resolvePlaceHolder(placeHolder);
+        },
+        getRootContext() {
+            return this.$parent.getRootContext();
         }
     },
     components: {

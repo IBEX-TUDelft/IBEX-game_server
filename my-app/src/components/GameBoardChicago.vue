@@ -573,6 +573,9 @@
 
                 this.game.players.forEach(p => p.snipe = null);
             },
+            getRootContext() {
+                return this;
+            },
             recover(gameData) {
                 const self = this;
 
@@ -740,7 +743,7 @@
                                     self.player.instructions = phaseInstructions;
 
                                     self.showIntructions = true;
-                                }, 1000);
+                                }, 2000);
 
                                 if (self.game.phase === 1) {
                                     self.game.declarations = [null, null, null];
@@ -1305,7 +1308,7 @@
 }
 
 .slide-fade-leave-active {
-  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+  transition: all 2.0s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
 .slide-fade-enter-from,
