@@ -307,17 +307,6 @@ class Phase6 extends JoinablePhase {
 
         self.wss.broadcastInfo(self.game.id, 'Reconciliation in progress ...');
 
-        /*self.game.players.forEach(player => {
-            const summary = player.summaries[self.game.currentRound.number - 1];
-
-            summary.value = player.property == null ? 0 : player.property.v[winningCondition]
-            summary.firstDeclaration = summary.initialDeclarations[winningCondition];
-            summary.firstTaxes = summary.initialTaxes[winningCondition];
-
-            delete summary.initialDeclarations;
-            delete summary.initialTaxes;
-        });*/
-
         self.game.properties.forEach(p => {
             try {
                 console.log('Creating land profit bill');
@@ -356,19 +345,10 @@ class Phase6 extends JoinablePhase {
                     landProfit.speculator = biddingSpeculators;
                     landProfit.snipeProfit = speculationProfit;
 
-                    /*const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
-
-                    ownerSummary.firstRepurchase = (ownerSummary.firstRepurchase == null) ?
-                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.firstRepurchase;*/
-
                     for (let i = 0; i < self.game.players.length; i++) {
                         const speculator = self.game.players[i];
 
-                        if (
-                            !p.speculators[0].includes(speculator.number) &&
-                            !p.speculators[1].includes(speculator.number) &&
-                            !p.speculators[2].includes(speculator.number)
-                        ) {
+                        if (!p.speculators[winningCondition].includes(speculator.number)) {
                             continue;
                         }
 
@@ -404,11 +384,6 @@ class Phase6 extends JoinablePhase {
                             },
                             "profit": speculationProfit
                         });
-
-                        /*const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
-
-                        speculatorSummary.firstRepurchase = (speculatorSummary.firstRepurchase == null) ?
-                            speculationProfit : speculationProfit + speculatorSummary.firstRepurchase;*/
 
                         speculator.profit.push({
                             "phase": 4,
