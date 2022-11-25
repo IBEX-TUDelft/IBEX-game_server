@@ -492,7 +492,7 @@
                 console.log("Owner numbers: ");
                 console.log(ownerNumbers);
 
-                self.rounds.forEach(round => {
+                self.rounds.filter(r => r.round > 0).forEach(round => {
                     const roundIdx = round.round;
 
                     const winningCondition = self.winningCondition[roundIdx];
