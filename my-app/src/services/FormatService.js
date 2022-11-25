@@ -45,6 +45,7 @@ export default class FormatService {
             return number;
         }
 
-        return (Math.round(number * 100) / 100).toLocaleString(this.locale);
+        //return (Math.round(number * 100) / 100).toLocaleString(this.locale);
+        return Math.round(number).toLocaleString(this.locale);
     }
 }

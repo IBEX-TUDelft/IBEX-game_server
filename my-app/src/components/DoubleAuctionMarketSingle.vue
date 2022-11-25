@@ -5,10 +5,10 @@
     </div>
 
     <div class="d-flex flex-row mt-1 p-0">
-        <div class="col-4" v-b-tooltip.hover id="public-signal-id">Public Signal: {{ formatUs(game.publicSignal[condition]) }}</div>
-        <div class="col-4" v-b-tooltip.hover id="private-signal-id">Private Signal: {{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</div>
+        <div class="col-4" v-b-tooltip.hover id="public-signal-id">Public Signal: <b>{{ formatUs(game.publicSignal[condition]) }}</b></div>
+        <div class="col-4" v-b-tooltip.hover id="private-signal-id">Private Signal: <b>{{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</b></div>
         <div class="col-4" v-if="player.role != 1">
-            Your Property's Value:  {{ formatUs(player.property.v[condition]) }}
+            Your Property's Value:  <b>{{ formatUs(player.property.v[condition]) }}</b>
         </div>
     </div>
 
@@ -109,7 +109,11 @@
         <div class="d-flex flex-column col-2 ">
             
             <b-row class="justify-content-center">
-                <b>Contracts (Median Price: {{ getMedianPrice() }})</b>
+                <b>Contracts</b>
+            </b-row>
+
+            <b-row class="justify-content-center">
+                Median: <b>{{ getMedianPrice() }}</b>
             </b-row>
 
             <b-row style="display: flex; height: 281px; overflow: scroll;">
