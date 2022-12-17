@@ -17,6 +17,59 @@ export default class Futarchy extends Logic {
             Phase5, Phase6, Phase7, Phase8, ShowResults], 'Futarchy');
     }
 
+    getExpectation(playerNumber, round) {
+        return this.data.results.find(r => r.round === round)
+            .phase[2].expectations.find(e => e.condition === this.data.winningCondition)
+            .players.find(p => p.number === playerNumber).profit;
+    }
+
+    getProfit(playerNumber, round) {
+        const playerData = this.data.players.find(p => p.number === playerNumber);
+
+        const summary = playerData.summaries.find(s => s.round === round);
+
+        if (summary == null) {
+            console.warn(`Could not find summary of round ${round} for player ${playerNumber}`);
+            return;
+        }
+
+        let total = 0;
+
+        if (summary.value != null) {
+            total += summary.value;
+        }
+
+        if (summary.firstTaxes != null) {
+            total -= summary.firstTaxes;
+        }
+
+        if (summary.secondTaxes != null) {
+            total -= summary.secondTaxes;
+        }
+
+        if (summary.firstRepurchase != null) {
+            total += summary.firstRepurchase;
+        }
+
+        if (summary.secondRepurchase != null) {
+            total += summary.secondRepurchase;
+        }
+
+        if (summary.market != null && summary.market.balance != null) {
+            total += summary.market.balance;
+        }
+
+        if (
+            summary.market != null &&
+            summary.market.shares != null &&
+            summary.market.price != null
+        ) {
+            total += summary.market.shares * summary.market.price;
+        }
+
+        return total;
+    }
+
     getRecoveryData(number) {
         const self = this;
 

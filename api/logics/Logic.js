@@ -269,6 +269,8 @@ export default class {
     }
 
     async beginRound () {
+        const self = this;
+
         let number;
 
         if (this.data.currentRound != null) {
@@ -352,6 +354,39 @@ export default class {
 
         if (number > this.data.parameters.round_count ) {
             console.log('The game is over');
+
+            const chosenRound = Math.floor(Math.random() * this.data.parameters.round_count) + 1;
+
+            const rewards = [];
+
+            const baseReward = 20;
+
+            this.data.players.forEach(p => {
+                const profit = self.getProfit(p.number, chosenRound);
+                const expectation = self.getExpectation(p.number, chosenRound);
+
+                const reward = {
+                    "number": p.number,
+                    "round": chosenRound,
+                    "reward": Math.round(baseReward * profit / expectation)
+                };
+
+                const err = self.wss.sendEvent(
+                    self.data.id,
+                    p.number,
+                    "reward",
+                    reward
+                );
+    
+                if (err != null) {
+                    console.error(err);
+                }
+
+                rewards.push(reward);
+            });
+
+            this.data.rewards = rewards;
+
             this.wss.broadcastEvent(this.data.id, "game-over", {});
             this.over = true;
             clearInterval(this.phaseCheckingInterval);
@@ -430,6 +465,15 @@ export default class {
         };
     }
 
+    //Always overwritten
+    getProfit(playerNumber, round) {
+        throw new Error('Method getProfit must always be overwritten');
+    }
+
+    getExpectation(playerNumber, round) {
+        throw new Error('Method getExpectation must always be overwritten');
+    }
+
     getSummary(number) {
         return {
         };
@@ -466,7 +510,7 @@ export default class {
 
             if (err != null) {
                 console.error(err);
-            }    
+            }
         })
     }
 }

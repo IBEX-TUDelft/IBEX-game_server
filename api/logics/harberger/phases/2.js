@@ -4,7 +4,8 @@ import JoinablePhase from '../../JoinablePhase.js';
 class Phase2 extends JoinablePhase {
 
     results = {
-        declarations: []
+        declarations: [],
+        expectations: null
     };
 
     constructor(game, wss) {
@@ -59,7 +60,49 @@ class Phase2 extends JoinablePhase {
             p.d = null;
         });
 
-        console.log(this.game.players);
+        this.results.expectations = [];
+
+        const self = this;
+
+        this.game.conditions.forEach((condition) => {
+            const players = [];
+
+            let sum = 0;
+
+            self.game.players.forEach(p => {
+                if (p.role === 1) {
+                    return;
+                }
+
+                sum += p.property.v[condition.id];
+            });
+
+            const expectedShareValue = sum * self.game.parameters.tax_rate_final / 10000;
+
+            this.game.players.forEach(player => {
+                let profit = 0;
+    
+                if (player.role != 1) {
+                    profit += player.property.v[condition.id];
+                }
+    
+                profit += player.shares * expectedShareValue;
+
+                players.push({
+                    "number": player.number,
+                    "profit": profit
+                });
+            });
+
+            this.results.expectations.push({
+                "condition": condition.id,
+                "expectedShareValue": expectedShareValue,
+                "players": players
+            })
+        });
+
+        console.log('Expected result: ');
+        console.log(this.results.expectations);
     }
 
     testComplete () {

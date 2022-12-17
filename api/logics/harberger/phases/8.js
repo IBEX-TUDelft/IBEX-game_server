@@ -192,11 +192,6 @@ class Phase8 extends JoinablePhase {
                     landProfit.speculator = biddingSpeculators;
                     landProfit.snipeProfit = speculationProfit;
 
-                    /*const ownerSummary = owner.summaries[self.game.currentRound.number - 1];
-
-                    ownerSummary.secondRepurchase = (ownerSummary.secondRepurchase == null) ?
-                        -landProfit.snipeProfit : -landProfit.snipeProfit + ownerSummary.secondRepurchase;*/
-                    
                     for (let i = 0; i < biddingSpeculators.length; i++) {
                         const speculatorNumber = biddingSpeculators[i];
                         
@@ -223,11 +218,6 @@ class Phase8 extends JoinablePhase {
                             "snipes": [winningCondition === 0, winningCondition === 1, winningCondition === 2],
                             "executed": true
                         });
-
-                        /*const speculatorSummary = speculator.summaries[self.game.currentRound.number - 1];
-
-                        speculatorSummary.secondRepurchase = (speculatorSummary.secondRepurchase == null) ?
-                            speculationProfit : speculationProfit + speculatorSummary.secondRepurchase;*/
 
                         self.results.snipeOutcomes.push( {
                             "player": {
@@ -320,7 +310,6 @@ class Phase8 extends JoinablePhase {
 
         console.log(`Total taxes: ${taxPot}`);
 
-        //const totalShares = this.game.players.reduce((acc, p2) => acc + p2.shares, 0);
         const totalShares = 100;
 
         console.log(`Total shares: ${totalShares}`);
@@ -345,11 +334,6 @@ class Phase8 extends JoinablePhase {
                 "number": player.number,
                 "cashForSniping": player.cashForSniping
             });
-
-            /*const summary = player.summaries[self.game.currentRound.number - 1];
-
-            summary.cash = player.wallet[winningCondition].balance;
-            summary.sharesPayoff = taxPot * player.wallet[winningCondition].shares / totalShares;*/
 
             if (player.profit == null) {
                 player.profit = [];
@@ -393,13 +377,6 @@ class Phase8 extends JoinablePhase {
                 "profit",
                 taxProfitBill
             );
-
-            /*self.wss.sendEvent(
-                self.game.id,
-                player.number,
-                "round-summary",
-                summary
-            );*/
         });
 
         this.game.players.forEach(player => {

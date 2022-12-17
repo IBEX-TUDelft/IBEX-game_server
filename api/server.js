@@ -37,7 +37,7 @@ app.get('/api/v1/auth/check', async (req, res) => {
     return res.status(401).json({
       data: {},
       status: true,
-      message: err
+      message: e.message
     });
   }
 });

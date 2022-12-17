@@ -149,6 +149,9 @@
 
         <Summaries ref="summaries" :summaries="player.summaries"/>
         
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.reward != null">
+            <p>Your reward is <b>{{ formatUs(game.reward.reward) }}</b>$</p>
+        </b-row>
     </div></b-col>
 </template>
 <script>
@@ -987,6 +990,9 @@
                                     "shares": self.player.wallet[self.game.winningCondition].shares
                                 };
                                 
+                                break;
+                            case 'reward':
+                                self.game.reward = ev.data;
                                 break;
                             default:
                                 console.error(`Type ${ev.eventType} was not understood`);
