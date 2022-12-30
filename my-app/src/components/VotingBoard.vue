@@ -86,8 +86,8 @@
                                             <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat"  v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
                                             <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
                                         </td>
-                                        <td v-if="game.phase >= 5">
-                                            <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
+                                        <td v-if="game.phase >= 5" :style="game.phase === 5 ? 'background-color: yellow;' : ''">
+                                            <div  v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                         </td>
                                         <td v-if="game.phase === 3 || game.phase === 4">
                                             {{ formatUs(player.property.v[condition.id] + parseFormatted(player.compensationRequests[condition.id], 0)) }}
@@ -276,6 +276,10 @@
                     </table>
                 </b-row>
             </b-col>
+        </b-row>
+
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.reward != null">
+            <p>Your reward is <b>{{ formatUs(game.reward.reward) }}</b>$</p>
         </b-row>
     </div></b-col>
 </template>
@@ -514,25 +518,17 @@ export default {
                             self.player.property.lastOffer = ev.data.compensationOffers;
                             self.game.compensationOffers = ev.data.compensationOffers;
 
+                            if (self.player.role === 3) {
+                                if (self.player.property.v[0] > self.player.property.v[1] + self.game.compensationOffers[1]) {
+                                    self.acknowledge('compensation-insufficient-owner-title', 'compensation-insufficient-owner-description');
+                                }
+                            }
                             break;
                         case 'final-profit':
                             self.player.result = ev.data;
 
                             break;
                         case 'round-end':
-                            /*self.game.compensationOffers = [];
-                            self.game.messages = [];
-
-                            self.player.compensationRequests = [];
-                            self.player.compensationRequestReceived = false;
-                            self.player.compensationOfferReceived = false;
-                            self.player.compensationDecisions = [];
-                            self.player.compensationDecisionReceived = false;
-
-                            self.forms.messageRecipients = [];
-                            self.forms.outgoingChatMessage = "";
-                            self.forms.selectedCondition = 0;*/
-
                             break;
                         case 'round-summary':
                             var summaryIdx = self.player.summaries.findIndex(s => s.round = ev.data.round);
@@ -558,6 +554,9 @@ export default {
                             break;
                         case 'game-over':
                             self.game.over = true;
+                            break;
+                        case 'reward':
+                            self.game.reward = ev.data;
                             break;
                         default:
                             console.error(`Type ${ev.eventType} was not understood`);
@@ -743,7 +742,27 @@ export default {
         async submitCompensationOffers() {
             const self = this;
 
-            const confirm = await this.confirm('submit-offer-title', 'submit-offer-description');
+            let confirm;
+
+            let likelyVotes = 0;
+
+            const compensations = self.game.compensationOffers.map(c => new LocalizedNumberParser(self.format).parse(c));
+
+            this.game.players.forEach(p => {
+                if (p.role != 3) {
+                    return;
+                }
+
+                if (compensations[1] >= p.property.lastOffer[1]) {
+                    likelyVotes++;
+                }
+            });
+
+            if (likelyVotes >= (this.game.players.length - 1) / 2) {
+                confirm = await this.confirm('submit-offer-title', 'submit-offer-description');
+            } else {
+                confirm = await this.confirm('compensation-insufficient-dev-title', 'compensation-insufficient-dev-description');
+            }
 
             if (!confirm) {
                 return
@@ -752,7 +771,7 @@ export default {
             this.sendMessage({
                 "gameId": self.game.id,
                 "type": "compensation-offer",
-                "compensationOffers": self.game.compensationOffers.map(c => new LocalizedNumberParser(self.format).parse(c))
+                "compensationOffers": compensations
             });
         },
         findPlayerByNumber(number) {

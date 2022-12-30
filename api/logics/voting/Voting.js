@@ -15,6 +15,18 @@ export default class Voting extends Logic {
         super(data, [WaitToStartPhase, Introduction, Chat, Request, Offer, Chat, Vote, End], 'Voting');
     }
 
+    getExpectation(playerNumber, round) {
+        return this.data.results.find(r => r.round === round)
+            .phase[1].players.find(p => p.number === playerNumber)
+            .values[this.data.winningCondition];
+    }
+
+    getProfit(playerNumber, round) {
+        return this.data.results.find(r => r.round === round)
+            .phase[1].players.find(p => p.number === playerNumber)
+            .values[this.data.winningCondition];
+    }
+
     getRecoveryData(number) {
         const self = this;
 
