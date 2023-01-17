@@ -18,7 +18,7 @@
                         <th v-else></th>
                         <th v-if="$parent.player.role != 1" colspan="4" scope="colgroup">Tax Payments</th>
                         <th colspan="2" scope="colgroup">Repurchase Gains/Losses</th>
-                        <th colspan="2" scope="colgroup">Financial Market Earnings</th>
+                        <th colspan="4" scope="colgroup">Financial Market Earnings</th>
                         <th></th>
                     </thead>
                     <thead class="thead-dark">
@@ -31,6 +31,8 @@
                         <th>Repurchase (1)</th>
                         <th>Repurchase (2)</th>
                         <th>Trading Cash</th>
+                        <th>Shares</th>
+                        <th>Share Price</th>
                         <th>Shares Payoff</th>
                         <th>Total Earnings</th>
                     </thead>
@@ -45,6 +47,8 @@
                             <td class="text-right">{{ formatForPrinting(summary.firstRepurchase) }}</td>
                             <td class="text-right">{{ formatForPrinting(summary.secondRepurchase) }}</td>
                             <td class="text-right">{{ formatForPrinting(getCash(summary)) }}</td>
+                            <td class="text-right">{{ formatForPrinting(getShares(summary)) }}</td>
+                            <td class="text-right">{{ formatForPrinting(getSharePrice(summary)) }}</td>
                             <td class="text-right">{{ formatForPrinting(getSharesPayoff(summary)) }}</td>
                             <td class="text-right">{{ getTotalEarnings(summary) }}</td>
                         </tr>
@@ -105,6 +109,10 @@ export default {
             return 0;
         }, getCash(summary) {
             return summary.market == null ? null : summary.market.balance;
+        }, getShares(summary) {
+            return summary.market == null ? null : summary.market.shares;
+        }, getSharePrice(summary) {
+            return summary.market == null ? null : summary.market.price;
         }, getSharesPayoff(summary) {
             if (
                 summary.market == null ||

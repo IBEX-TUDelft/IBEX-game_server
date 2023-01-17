@@ -112,7 +112,8 @@
                 conditions: null,
                 players: null,
                 roundIndex: 0,
-                rounds: null
+                rounds: null,
+                rewards: null
             };
         },
         components: {
@@ -210,7 +211,7 @@
                 xls.push([
                     'session', 'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
                     '', 'Compensation_Req', 'Compensation_Offer', 'Compens_Delta', 'Vote', 'Num_Votes_for project', 'Total Value',
-                    'Project Realized', 'Optimal_Outcome'
+                    'Project Realized', 'Optimal_Outcome', 'Reward'
                 ]);                
 
                 self.rounds.filter(r => r.round > 0).forEach(round => {
@@ -269,7 +270,8 @@
 
                         xls.push([self.startTime,player.number,round.round, player.tag, player.role, self.ruleset, values[0], values[1],
                         '',compensationReq, compensationOffer, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
-                        self.getStandingCounter(round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No'
+                        self.getStandingCounter(round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No',
+                        self.rewards.find(r => r.number === player.number).reward
                         ]);
                     });
                 });
@@ -439,6 +441,7 @@
             this.players = response.data.data.players;
             this.rounds = response.data.data.results;
             this.startTime = response.data.data.startTime;
+            this.rewards = response.data.data.rewards;
             
             this.playerValues = extractProperty(this.rounds, 1, 'players');
             this.compensationRequests = extractProperty(this.rounds, 3, 'compensationRequests');

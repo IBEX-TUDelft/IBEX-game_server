@@ -148,6 +148,7 @@ export default {
             };
 
             data.conditions = game.data.conditions;
+            data.rewards = game.data.rewards;
 
             data.players = game.data.players.map(p => {
                 return {

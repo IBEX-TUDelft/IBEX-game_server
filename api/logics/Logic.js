@@ -363,16 +363,32 @@ export default class {
 
             const rewards = [];
 
-            const baseReward = 20;
+            const baseReward = 5;
 
             this.data.players.forEach(p => {
+                let factor;
+
+                switch(p.role) {
+                    case 1:
+                        factor = 10000;
+                        break;
+                    case 2:
+                        factor = 60000;
+                        break;
+                    case 3:
+                        factor = 20000;
+                        break;
+                    default:
+                        throw new Error(`Player ${p.number} role not clear: ${p.role}`);
+                }
+
                 const profit = self.getProfit(p.number, chosenRound);
-                const expectation = self.getExpectation(p.number, chosenRound);
+                //const expectation = self.getExpectation(p.number, chosenRound);
 
                 const reward = {
                     "number": p.number,
                     "round": chosenRound,
-                    "reward": Math.round(baseReward * profit / expectation)
+                    "reward": Math.round(baseReward + profit / factor)
                 };
 
                 const err = self.wss.sendEvent(
