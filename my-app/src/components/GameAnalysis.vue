@@ -721,8 +721,8 @@
                         self.conditions.forEach((c) => {
                             const myActions = self.log[roundIdx][c.id]; //.filter(l => l.actor.number === player.number);
 
-                            xlsRow.push(myActions.filter(a => a.action === 'added Sell' && a.actor.number === player.number).length);
                             xlsRow.push(myActions.filter(a => a.action === 'added Buy' && a.actor.number === player.number).length);
+                            xlsRow.push(myActions.filter(a => a.action === 'added Sell' && a.actor.number === player.number).length);
                             xlsRow.push(myActions.filter(a => a.buyer != null && a.buyer.number === player.number).length);
                             xlsRow.push(myActions.filter(a => a.seller != null && a.seller.number === player.number).length);
                             xlsRow.push(self.wallets[roundIdx].find(w => w.number === player.number).wallet[c.id].balance);

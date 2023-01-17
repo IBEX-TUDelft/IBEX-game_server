@@ -30,8 +30,12 @@ export default class {
             throw new Error(`The game type must be Harberger, Futarchy or Voting. It was ${type}`);
         }
 
-        this.valueSeries = JSON.parse(fs.readFileSync('./resources/values.json'));
-        this.signalSeries = JSON.parse(fs.readFileSync('./resources/signals.json'));
+        const sessions = JSON.parse(fs.readFileSync('./resources/sessions.json'));
+
+        const session = sessions.find(s => s.id === data.parameters.session_number);
+
+        this.valueSeries = session.rounds.map(r => r.values);
+        this.signalSeries = session.rounds.map(r => r.signals);
 
         this.data = data;
         this.phases = phases;

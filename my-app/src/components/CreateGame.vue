@@ -71,6 +71,18 @@
                 </div>
             </div>
             
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Session Number</label>
+                </div>
+                <div class="form-group col-md-3">
+                    <select 
+                        class="form-control" v-model="session_number" name="session_number" id="session_number" aria-describedby="emailHelp" >
+                        <option v-for="session in sessions" :key="session.id" :value="session.id">{{session.id}}</option>
+                    </select>
+                </div>
+            </div>
+
             <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
                     Signals:
@@ -257,6 +269,8 @@ import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-
 
 import Header from './Header.vue'
 
+import sessions from '../assets/sessions.json';
+
 export default {
     name: 'CreateGame',
     data() {
@@ -307,7 +321,9 @@ export default {
             signal_high: 1.05,
             generate_signals: false,
             practice_round: true,
-            cash_for_snipers: 250000
+            cash_for_snipers: 250000,
+            session_number: 1,
+            sessions: null
         }
     },
     components: {
@@ -398,7 +414,8 @@ export default {
                 game_type: this.game_type,
                 practice: this.practice_round,
                 minutes_for_trading: this.minutes_for_trading,
-                minutes_for_sniping: this.minutes_for_sniping
+                minutes_for_sniping: this.minutes_for_sniping,
+                session_number: this.session_number
             }
 
             createGame(payload).then((response) => {
@@ -411,6 +428,9 @@ export default {
             this.lastName = "";
             this.email = "";
         }
-  }
+    },
+    mounted () {
+        this.sessions = sessions;
+    }
 }
 </script>

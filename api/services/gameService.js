@@ -14,6 +14,7 @@ export default {
         //2 Create the parameters
         const parameters = [
             {key: "game_type", type: "string", value: gameParameters.game_type},
+            {key: "session_number", type: "number", value: gameParameters.session_number},
             {key: "round_count", type: "number", value: gameParameters.round_count},
             {key: "practice_round", type: "boolean", value: gameParameters.practice},
             {key: "minutes_for_trading", type: "number", value: gameParameters.minutes_for_trading},

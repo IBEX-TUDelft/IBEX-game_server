@@ -30,7 +30,8 @@
     "pg": "^8.8.0",
     "random-id": "^1.0.4",
     "unique-names-generator": "^4.7.1",
-    "ws": "^8.10.0"
+    "ws": "^8.10.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "del": "^7.0.0",
