@@ -99,7 +99,7 @@
                                 <td>{{ condition.name }}</td>
                                 <td class="text-right">{{ formatUs(player.property.v[condition.id]) }}</td>
                                 <td>
-                                    <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat" v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
+                                    <b-form-input @keydown="isAllowed" @keyup="onChange" v-if="[2,7].includes(game.phase) && (game.winningCondition == null || game.winningCondition == condition.id) && player.hasToDeclare" class="form-control" v-model="player.declaration[condition.id]" name="player_declaration_0" id="player_declaration_0" aria-describedby="emailHelp" />
                                     <div v-else>
                                         <div v-if="(game.winningCondition == null || game.winningCondition === condition.id) && player.declaration != null">
                                             <div class="text-right" v-if="player.declaration != null && player.declaration[condition.id] != null">
@@ -1063,14 +1063,45 @@
 
                 return result;
             }, isAllowed(e) {
-                if (![8,9,37,38,39,40,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,105,104,105,188,190].includes(e.which)) {
+                if (![8,9,37,38,39,40,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
                     console.log(`Sorry ${e.which}`)
                     e.preventDefault();
                     return false;
                 }
 
                 return true;
-            },reformat(stringValue) {
+            }, onChange(e) {
+                if (!this.isAllowed(e)) {
+                    return false;
+                }
+
+                const valueToCaret = e.target.value.substring(0, e.target.selectionStart);
+                const relativePositionOfKey = valueToCaret.split(e.key).length - 1;
+                
+                console.log(e.which);
+
+                e.target.value = this.reformat(e.target.value);
+
+                if (e.which != 8) {
+                    let caret = 0;
+                    let repetitionOfKeys = 0;
+
+                    while (repetitionOfKeys < relativePositionOfKey) {
+                        if (e.target.value.charAt(caret) === e.key) {
+                            repetitionOfKeys++;
+                        }
+
+                        if (caret === e.target.value.length) {
+                            break;
+                        }
+
+                        caret ++;
+                    }
+
+                    e.target.selectionStart = caret;
+                    e.target.selectionEnd = caret;
+                }
+            }, reformat(stringValue) {
                 if (stringValue == null || stringValue.trim() === '') {
                     return stringValue;
                 }

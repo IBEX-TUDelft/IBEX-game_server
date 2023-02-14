@@ -59,7 +59,7 @@
                                         <td>{{ condition.name }}</td>
                                         <td>{{ formatUs(player.property.v[condition.id]) }} {{ condition.id === 0 ? '' : '(' + formatUs(player.property.v[condition.id] - player.property.v[0]) + ')' }}</td>
                                         <td v-if="game.phase >= 4">
-                                            <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat" v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <b-form-input @keydown="isAllowed" @keyup="onChange" v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
                                             <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                         </td>
                                         <td v-if="game.phase === 4 || game.phase === 5 || game.phase === 6">
@@ -83,7 +83,7 @@
                                         <td>{{ condition.name }}</td>
                                         <td>{{ formatUs(player.property.v[condition.id]) }} {{ condition.id === 0 ? '' : '(' + formatUs(player.property.v[condition.id] - player.property.v[0]) + ')' }}</td>
                                         <td v-if="game.phase >= 3">
-                                            <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat"  v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <b-form-input @keydown="isAllowed" @keyup="onChange" v-if="condition.id != 0 && player.compensationRequestReceived === false && game.phase === 3" class="form-control" v-model="player.compensationRequests[condition.id]" :name="'player_compensation_' + condition.id" :id="'player_compensation_' + condition.id" aria-describedby="emailHelp" />
                                             <div v-if="condition.id != 0 && (player.compensationRequestReceived != false || game.phase !== 3)" >{{ formatUs(player.compensationRequests[condition.id]) }}</div>
                                         </td>
                                         <td v-if="game.phase >= 5" :style="game.phase === 5 ? 'background-color: yellow;' : ''">
@@ -250,7 +250,7 @@
         <b-row class="flex-row no-gutters no-gutters pb-1 px-2">
             <b-col class="d-flex flex-column">
                 <b-row class="d-flex flex-row no-gutters mb-1">
-                    <div class="col-12 text-center"><b>Results (Current round in yellow)</b></div>
+                    <div class="col-12 text-center"><b>Results ({{game.over ? 'Reward round in yellow' : 'Current round in yellow'}})</b></div>
                 </b-row>
 
                 <b-row class="d-flex flex-row no-gutters">
@@ -264,7 +264,7 @@
                             <th scope="col">Total</th>
                         </thead>
                         <tbody>
-                            <tr v-for="summary in player.summaries" :key="summary.round" :style="summary.round === game.round && !game.over ? 'background-color: yellow;' : ''">
+                            <tr v-for="summary in player.summaries" :key="summary.round" :style="((summary.round === game.round) && !game.over) || ((game.reward != null) && game.reward.round === summary.round) ? 'background-color: yellow;' : ''">
                                 <td>{{ summary.round != 0 ? summary.round : 'practice' }}</td>
                                 <td>{{ summary.condition == null ? 'To be Determined' : game.conditions[summary.condition].name }}</td>
                                 <td>{{ summary.value == null ? '' : formatUs(summary.value) }}</td>
@@ -931,13 +931,44 @@ export default {
 
             return obj;
         }, isAllowed(e) {
-            if (![8,9,37,38,39,40,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,105,104,105,188,190].includes(e.which)) {
+            if (![8,9,37,38,39,40,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
                 console.log(`Sorry ${e.which}`)
                 e.preventDefault();
                 return false;
             }
 
             return true;
+        }, onChange(e) {
+            if (!this.isAllowed(e)) {
+                return false;
+            }
+
+            const valueToCaret = e.target.value.substring(0, e.target.selectionStart);
+            const relativePositionOfKey = valueToCaret.split(e.key).length - 1;
+            
+            console.log(e.which);
+
+            e.target.value = this.reformat(e.target.value);
+
+            if (e.which != 8) {
+                let caret = 0;
+                let repetitionOfKeys = 0;
+
+                while (repetitionOfKeys < relativePositionOfKey) {
+                    if (e.target.value.charAt(caret) === e.key) {
+                        repetitionOfKeys++;
+                    }
+
+                    if (caret === e.target.value.length) {
+                        break;
+                    }
+
+                    caret ++;
+                }
+
+                e.target.selectionStart = caret;
+                e.target.selectionEnd = caret;
+            }
         }, getSummary() {
             const summary = {};
             

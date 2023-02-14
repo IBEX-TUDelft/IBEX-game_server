@@ -50,6 +50,9 @@ export default {
         isAllowed(e) {
             return this.$parent.isAllowed(e);
         },
+        onChange(e) {
+            return this.$parent.onChange(e);
+        },
         parseFormatted(numericalString, def) {
             return this.$parent.parseFormatted(numericalString, def);
         },

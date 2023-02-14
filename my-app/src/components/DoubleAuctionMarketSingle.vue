@@ -33,7 +33,7 @@
 
                 <div class="col-4">
                     <div class="row-12">
-                        <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
+                        <b-form-input @keydown="isAllowed" @keyup="onChange" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
                     </div>
                 </div>
 
@@ -100,7 +100,7 @@
                 </div>
 
                 <div class="d-flex flex-column col-4">
-                    <b-form-input @keydown="isAllowed" @mouseleave="$event.target.blur()" lazy-formatter :formatter="reformat" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
+                    <b-form-input @keydown="isAllowed" @keyup="onChange" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
                 </div>
             </div>
 
@@ -362,6 +362,9 @@ export default {
         },
         isAllowed(e) {
             return this.$parent.isAllowed(e);
+        },
+        onChange(e) {
+            return this.$parent.onChange(e);
         },
         parseFormatted(numericalString, def) {
             return this.$parent.parseFormatted(numericalString, def);
