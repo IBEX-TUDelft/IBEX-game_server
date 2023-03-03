@@ -67,9 +67,9 @@ app.post('/api/v1/auth/login', async (req, res) => {
   }
 
   const record = {
-    "id": 1,
-    "username": "admin",
-    "role": 0
+    "id": user.id,
+    "username": user.username,
+    "role": user.role
   };
 
   const token = Utils.generateJWT(record);
