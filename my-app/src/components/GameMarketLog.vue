@@ -22,7 +22,7 @@
                     <b-tab v-for="i in indexes" :key="i">
 
                         <template #title>
-                            Round {{ i + 1 }}
+                            Round {{ i }}
                         </template>
 
                         <div class="mx-5 mp-1">
@@ -212,7 +212,7 @@
 
                     /* convert state to workbook */
                     const ws = XLSX.utils.aoa_to_sheet(xls);
-                    XLSX.utils.book_append_sheet(wb, ws, `Round ${index + 1}`);
+                    XLSX.utils.book_append_sheet(wb, ws, `Round ${index}`);
                 });
 
                 /* generate file and send to client */

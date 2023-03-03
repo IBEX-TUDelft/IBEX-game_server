@@ -113,7 +113,7 @@
             </b-row>
 
             <b-row class="justify-content-center">
-                Median: <b>{{ getMedianPrice() }}</b>
+                Median: {{ getMedianPrice() }}
             </b-row>
 
             <b-row style="display: flex; height: 281px; overflow: scroll;">

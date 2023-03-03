@@ -138,6 +138,10 @@ export default class Harberger extends Logic {
 
         player.summaries = this.getSummaries(number);
         
+        if (self.over === true) {
+            game.reward = self.data.rewards.find(r => r.number === number);
+        }
+
         const data = {
             "game": game,
             "player": player,

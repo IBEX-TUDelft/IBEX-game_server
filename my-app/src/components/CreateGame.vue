@@ -34,7 +34,7 @@
                     <label htmlFor="exampleInputEmail1">Number of Rounds</label>
                 </div>
                 <div class="form-group col-md-3">
-                    <input type="number" class="form-control" v-model="round_count" name="round_count" id="round_count" aria-describedby="emailHelp" placeholder="6" />
+                    <input @input="proposeNewName" type="number" class="form-control" v-model="round_count" name="round_count" id="round_count" aria-describedby="emailHelp" placeholder="6" />
                 </div>
                     <b-form-checkbox type="checkbox" true-false="false" false-true="true" v-model="practice_round" name="practice_round" id="practice_round">
                         Add an Extra Practice Round
@@ -77,7 +77,9 @@
                 </div>
                 <div class="form-group col-md-3">
                     <select 
-                        class="form-control" v-model="session_number" name="session_number" id="session_number" aria-describedby="emailHelp" >
+                        class="form-control" v-model="session_number" name="session_number" id="session_number" aria-describedby="emailHelp"
+                        @change="proposeNewName"
+                    >
                         <option v-for="session in sessions" :key="session.id" :value="session.id">{{session.id}}</option>
                     </select>
                 </div>
@@ -265,7 +267,6 @@
 
 <script>
 import { createGame } from '../services/GameService'
-import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
 
 import Header from './Header.vue'
 
@@ -278,11 +279,7 @@ export default {
             state: {
 
             },
-            title: uniqueNamesGenerator({
-                dictionaries: [colors, adjectives, animals],
-                separator: " ",
-                style: "capital"
-            }),
+            title: '',
             speculators_count: 6,
             speculator_balance: 18000,
             speculator_shares: 5,
@@ -330,14 +327,38 @@ export default {
         Header
     },
     methods: {
+        generateName() {
+            const date = new Date();
+            const month = date.toLocaleString('default', { month: 'long' });
+            const day = date.getDate();
+
+            let suffix = 'th';
+
+            if (day <= 3 || day >= 21){
+                switch (day % 10) {
+                    case 1: 
+                        suffix = 'st';
+                        break;
+                    case 2:
+                        suffix = 'nd';
+                        break;
+                    case 3:
+                        suffix = 'rd';
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return `${localStorage.username} ${month}, ${day}${suffix} ${date.getHours()}:${date.getMinutes()} [${this.game_type}]`
+                + ` [${this.round_count} rds] [ds ${this.session_number}]`;
+        },
         proposeNewName() {
-            this.title = uniqueNamesGenerator({
-                dictionaries: [colors, adjectives, animals],
-                separator: " ",
-                style: "capital"
-            });
+            this.title = this.generateName();
         },
         onChangeGameType(event) {
+            this.proposeNewName();
+
             if (this.game_type === 'voting') {
                 this.state.previousSpeculatorCount = this.speculators_count;
                 this.speculators_count = 0;
@@ -431,6 +452,8 @@ export default {
     },
     mounted () {
         this.sessions = sessions;
+
+        this.title = this.generateName();
     }
 }
 </script>

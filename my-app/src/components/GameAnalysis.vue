@@ -224,6 +224,7 @@
                 gameId: null,
                 startTime: null,
                 ruleset: null,
+                dataset: null,
                 firstDeclarations: [],
                 signals: null,
                 winningCondition: null,
@@ -456,7 +457,7 @@
                 const xls = [];
 
                 xls.push([
-                    'session', 'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
+                    'session', 'dataset', 'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
                     'Declaration1_noProject', 'Declaration1_projectA', 'Taxes1_noProject', 'Taxes1_projectA', 'ProjectOutcome', '',
                     'Signal_PublicNP', 'sig_pubP', 'SigPrivateNP', 'SigPrivateP', '',
                     'snipe1_TNP_owner1', 'snipe1_TNP_owner2', 'snipe1_TNP_owner3', 'snipe1_TNP_owner4', 'snipe1_TNP_owner5', 'snipe1_TNP_dev', '',
@@ -493,13 +494,14 @@
                 console.log("Owner numbers: ");
                 console.log(ownerNumbers);
 
-                self.rounds.filter(r => r.round > 0).forEach(round => {
+                self.rounds.forEach(round => {
+                    try {
                     const roundIdx = round.round;
 
                     const winningCondition = self.winningCondition[roundIdx];
 
                     self.players.forEach(player => {
-                        const xlsRow = [self.startTime,player.number,round.round, player.tag, player.role, self.ruleset];
+                        const xlsRow = [self.startTime,self.dataset,player.number,round.round, player.tag, player.role, self.ruleset];
 
                         self.conditions.forEach((c) => { //Values
                             const declaration = self.firstDeclarations[roundIdx].find(d => d.player === player.number);
@@ -546,7 +548,11 @@
                                 return;
                             }
 
-                            xlsRow.push(publicSignals[c.id]);
+                            if (c.id === winningCondition || self.ruleset === 'futarchy') {
+                                xlsRow.push(publicSignals[c.id]);
+                            } else {
+                                xlsRow.push(null);
+                            }
                         });
 
                         self.conditions.forEach((c) => { //Private signals
@@ -796,7 +802,9 @@
 
                         xls.push(xlsRow);
                     });
-
+                    } catch(e) {
+                        console.log(`Could not load the round: ${e.message}`);
+                    }
                 });
 
                 const ws = XLSX.utils.aoa_to_sheet(xls);
@@ -907,6 +915,7 @@
                 }
             });
 
+            this.dataset = response.data.data.dataset;
             this.rounds = response.data.data.results;
             this.ruleset = response.data.data.ruleset;
             this.players = response.data.data.players;
