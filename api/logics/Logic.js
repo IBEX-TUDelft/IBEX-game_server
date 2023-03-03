@@ -363,7 +363,7 @@ export default class {
 
             const rewards = [];
 
-            const baseReward = 5;
+            const baseReward = 0;//5;
 
             this.data.players.forEach(p => {
                 let factor;
@@ -388,7 +388,9 @@ export default class {
                 const reward = {
                     "number": p.number,
                     "round": chosenRound,
-                    "reward": Math.round(baseReward + profit / factor)
+                    "reward": Math.round(baseReward + profit / factor),
+                    "points": profit,
+                    "exchange": 1 / factor
                 };
 
                 const err = self.wss.sendEvent(

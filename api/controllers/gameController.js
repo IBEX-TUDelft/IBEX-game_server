@@ -149,6 +149,7 @@ export default {
 
             data.conditions = game.data.conditions;
             data.rewards = game.data.rewards;
+            data.dataset = game.data.parameters.session_number;
 
             data.players = game.data.players.map(p => {
                 return {

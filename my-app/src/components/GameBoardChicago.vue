@@ -1021,7 +1021,7 @@
                     self.openWebSocket();
                 }
             },
-            resolvePlaceHolder(placeholder) {
+            resolvePlaceHolder(placeholder, ...parameters) {
                 if (this.dictionary == null) {
                     console.warn('No dictionary available');
                     return placeholder;
@@ -1037,7 +1037,15 @@
                     return placeholder;
                 }
 
-                return this.dictionary.placeHolders[placeholder];
+                let line = this.dictionary.placeHolders[placeholder];
+
+                if (parameters != null) {
+                    parameters.forEach((p, i) => {
+                        line = line.replace('${' + i + '}', p);
+                    })
+                }
+
+                return line;
             },
             acknowledge(titlePlaceholder, descriptionPlaceholder) {
                 this.modals.acknowledge.title = this.resolvePlaceHolder(titlePlaceholder);
@@ -1063,7 +1071,7 @@
 
                 return result;
             }, isAllowed(e) {
-                if (![8,9,37,38,39,40,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
+                if (![8,9,37,38,39,40,46,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
                     console.log(`Sorry ${e.which}`)
                     e.preventDefault();
                     return false;
@@ -1075,32 +1083,54 @@
                     return false;
                 }
 
-                const valueToCaret = e.target.value.substring(0, e.target.selectionStart);
-                const relativePositionOfKey = valueToCaret.split(e.key).length - 1;
-                
-                console.log(e.which);
+                if (e.target.value == null || e.target.value.trim() == '') {
+                    return;
+                }
 
+                if ([37, 39].includes(e.which)) {
+                    return;
+                }
+
+                const valueToCaret = e.target.value.substring(0, e.target.selectionStart);
+
+                if (valueToCaret == null || valueToCaret.trim() == '') {
+                    e.target.selectionStart = 0;
+                    e.target.selectionEnd = 0;
+
+                    return;
+                }
+
+                let key = e.key;
+
+                if ([8, 46].includes(e.which)) {
+                    key = valueToCaret[valueToCaret.length - 1];
+
+                    if (key === '.') {
+                        key = valueToCaret[valueToCaret.length - 2];
+                    }
+                }
+
+                const relativePositionOfKey = valueToCaret.split(key).length - 1;
+                
                 e.target.value = this.reformat(e.target.value);
 
-                if (e.which != 8) {
-                    let caret = 0;
-                    let repetitionOfKeys = 0;
+                let caret = 0;
+                let repetitionOfKeys = 0;
 
-                    while (repetitionOfKeys < relativePositionOfKey) {
-                        if (e.target.value.charAt(caret) === e.key) {
-                            repetitionOfKeys++;
-                        }
-
-                        if (caret === e.target.value.length) {
-                            break;
-                        }
-
-                        caret ++;
+                while (repetitionOfKeys < relativePositionOfKey) {
+                    if (e.target.value.charAt(caret) === key) {
+                        repetitionOfKeys++;
                     }
 
-                    e.target.selectionStart = caret;
-                    e.target.selectionEnd = caret;
+                    if (caret === e.target.value.length) {
+                        break;
+                    }
+
+                    caret ++;
                 }
+
+                e.target.selectionStart = caret;
+                e.target.selectionEnd = caret;
             }, reformat(stringValue) {
                 if (stringValue == null || stringValue.trim() === '') {
                     return stringValue;

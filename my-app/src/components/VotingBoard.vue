@@ -258,18 +258,19 @@
                         <thead class="thead-dark">
                             <th scope="col">Round</th>
                             <th scope="col">Winning Condition</th>
+                            <th scope="col">Votes for Project</th>
                             <th scope="col">Value</th>
                             <th scope="col">Compensations</th>
-                            <th scope="col">Votes For</th>
+                            
                             <th scope="col">Total</th>
                         </thead>
                         <tbody>
                             <tr v-for="summary in player.summaries" :key="summary.round" :style="((summary.round === game.round) && !game.over) || ((game.reward != null) && game.reward.round === summary.round) ? 'background-color: yellow;' : ''">
                                 <td>{{ summary.round != 0 ? summary.round : 'practice' }}</td>
                                 <td>{{ summary.condition == null ? 'To be Determined' : game.conditions[summary.condition].name }}</td>
+                                <td>{{ getTally(summary.round) }}</td>
                                 <td>{{ summary.value == null ? '' : formatUs(summary.value) }}</td>
                                 <td>{{ summary.compensation == null ? '' : formatUs(summary.compensation) }}</td>
-                                <td>{{ summary.tally }}</td>
                                 <td>{{ summary.profit == null ? '' : formatUs(summary.profit)}}</td>
                             </tr>
                         </tbody>
@@ -279,7 +280,13 @@
         </b-row>
 
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.reward != null">
-            <p>Your reward is <b>{{ formatUs(game.reward.reward) }}</b>$</p>
+            <p>{{ resolvePlaceHolder(
+                'reward-earned',
+                game.reward.round,
+                formatUs(game.reward.points),
+                game.reward.exchange.toFixed(6),
+                game.reward.reward
+            )}}</p>
         </b-row>
     </div></b-col>
 </template>
@@ -518,11 +525,11 @@ export default {
                             self.player.property.lastOffer = ev.data.compensationOffers;
                             self.game.compensationOffers = ev.data.compensationOffers;
 
-                            if (self.player.role === 3) {
+                            /*if (self.player.role === 3) {
                                 if (self.player.property.v[0] > self.player.property.v[1] + self.game.compensationOffers[1]) {
                                     self.acknowledge('compensation-insufficient-owner-title', 'compensation-insufficient-owner-description');
                                 }
-                            }
+                            }*/
                             break;
                         case 'final-profit':
                             self.player.result = ev.data;
@@ -844,7 +851,7 @@ export default {
 
             this.game.messageBoxes.sort((a,b) => b.last - a.last);
         },
-        resolvePlaceHolder(placeholder) {
+        resolvePlaceHolder(placeholder, ...parameters) {
             if (this.dictionary == null) {
                 console.warn('No dictionary available');
                 return placeholder;
@@ -860,7 +867,16 @@ export default {
                 return placeholder;
             }
 
-            return this.dictionary.placeHolders[placeholder];
+
+            let line = this.dictionary.placeHolders[placeholder];
+
+            if (parameters != null) {
+                parameters.forEach((p, i) => {
+                    line = line.replace('${' + i + '}', p);
+                })
+            }
+
+            return line;
         },
         acknowledge(titlePlaceholder, descriptionPlaceholder) {
             this.modals.acknowledge.title = this.resolvePlaceHolder(titlePlaceholder);
@@ -931,7 +947,7 @@ export default {
 
             return obj;
         }, isAllowed(e) {
-            if (![8,9,37,38,39,40,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
+            if (![8,9,37,38,39,40,46,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
                 console.log(`Sorry ${e.which}`)
                 e.preventDefault();
                 return false;
@@ -943,32 +959,54 @@ export default {
                 return false;
             }
 
-            const valueToCaret = e.target.value.substring(0, e.target.selectionStart);
-            const relativePositionOfKey = valueToCaret.split(e.key).length - 1;
-            
-            console.log(e.which);
+            if (e.target.value == null || e.target.value.trim() == '') {
+                return;
+            }
 
+            if ([37, 39].includes(e.which)) {
+                return;
+            }
+
+            const valueToCaret = e.target.value.substring(0, e.target.selectionStart);
+
+            if (valueToCaret == null || valueToCaret.trim() == '') {
+                e.target.selectionStart = 0;
+                e.target.selectionEnd = 0;
+
+                return;
+            }
+
+            let key = e.key;
+
+            if ([8, 46].includes(e.which)) {
+                key = valueToCaret[valueToCaret.length - 1];
+
+                if (key === '.') {
+                    key = valueToCaret[valueToCaret.length - 2];
+                }
+            }
+
+            const relativePositionOfKey = valueToCaret.split(key).length - 1;
+            
             e.target.value = this.reformat(e.target.value);
 
-            if (e.which != 8) {
-                let caret = 0;
-                let repetitionOfKeys = 0;
+            let caret = 0;
+            let repetitionOfKeys = 0;
 
-                while (repetitionOfKeys < relativePositionOfKey) {
-                    if (e.target.value.charAt(caret) === e.key) {
-                        repetitionOfKeys++;
-                    }
-
-                    if (caret === e.target.value.length) {
-                        break;
-                    }
-
-                    caret ++;
+            while (repetitionOfKeys < relativePositionOfKey) {
+                if (e.target.value.charAt(caret) === key) {
+                    repetitionOfKeys++;
                 }
 
-                e.target.selectionStart = caret;
-                e.target.selectionEnd = caret;
+                if (caret === e.target.value.length) {
+                    break;
+                }
+
+                caret ++;
             }
+
+            e.target.selectionStart = caret;
+            e.target.selectionEnd = caret;
         }, getSummary() {
             const summary = {};
             
@@ -1020,6 +1058,26 @@ export default {
             console.log(e);
             console.log(scope)
             console.log('END EVtT')
+        }, getTally(round) {
+            if (this.player.summaries == null) {
+                return '';
+            }
+
+            const summary = this.player.summaries.find(s => s.round === round);
+
+            if (summary == null) {
+                return '';
+            }
+
+            if (summary.condition == null || summary.tally == null) {
+                return '';
+            }
+
+            if (summary.condition === 1) {
+                return summary.tally;
+            } else {
+                return this.game.players.length - 1 - summary.tally;
+            }
         }
     },
     async mounted () {

@@ -103,6 +103,7 @@
             return {
                 gameId: null,
                 ruleset: null,
+                dataset: null,
                 compensationRequests: null,
                 compensationOffers: null,
                 compensationDecisions: null,
@@ -209,71 +210,75 @@
 
 
                 xls.push([
-                    'session', 'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
+                    'session', 'dataset' ,'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
                     '', 'Compensation_Req', 'Compensation_Offer', 'Compens_Delta', 'Vote', 'Num_Votes_for project', 'Total Value',
                     'Project Realized', 'Optimal_Outcome', 'Reward'
                 ]);                
 
-                self.rounds.filter(r => r.round > 0).forEach(round => {
-                    const roundNr = round.round;
-                    const winningCondition = self.getWinningCondition(round.round);
-                    
-                    const conditionTotals = [];
+                self.rounds.forEach(round => {
+                    try {
+                        const roundNr = round.round;
+                        const winningCondition = self.getWinningCondition(round.round);
+                        
+                        const conditionTotals = [];
 
-                    self.players.forEach(player => {
-                        self.conditions.forEach((c, i) => {
-                            if (conditionTotals[i] == null) {
-                                conditionTotals[i] = 0;
+                        self.players.forEach(player => {
+                            self.conditions.forEach((c, i) => {
+                                if (conditionTotals[i] == null) {
+                                    conditionTotals[i] = 0;
+                                }
+
+                                const values = self.getPlayerValues(player.number, round.round);
+
+                                console.log(values[i]);
+
+                                conditionTotals[i] += values[i];
+                            });
+                        });
+
+                        let max = 0;
+                        let bestConditions = [];
+
+                        conditionTotals.forEach((ct, i) => {
+                            if (ct < max) {
+                                return;
+                            } else if (ct === max) {
+                                bestConditions.push(i);
+                            } else {
+                                bestConditions = [i];
+                                max = ct;
+                            }
+                        })
+
+                        console.log('Condition totals: ');
+                        console.log(conditionTotals);
+                        console.log('Best conditions: ');
+                        console.log(bestConditions);
+                        console.log('Value: ' + max);
+
+                        self.players.forEach(player => {
+                            const values = self.getPlayerValues(player.number, round.round);
+                            const compensationReq = self.extractDataFromObject(self.compensationRequests[roundNr].find(cr => cr.number === player.number), 'compensationRequests', 1);
+                            const compensationOffer = player.role != 2 ? self.compensationOffers[roundNr][1] : '';
+                            const compensationDelta = player.role != 2 ? compensationOffer - compensationReq : '';
+
+                            let total = values[winningCondition];
+
+                            if (player.role === 2) {
+                                total -= self.players.filter(p => p.role === 3).length * self.compensationOffers[roundNr][winningCondition];
+                            } else {
+                                total += self.compensationOffers[roundNr][winningCondition];
                             }
 
-                            const values = self.getPlayerValues(player.number, round.round);
-
-                            console.log(values[i]);
-
-                            conditionTotals[i] += values[i];
+                            xls.push([self.startTime,self.dataset,player.number,round.round, player.tag, player.role, self.ruleset, values[0], values[1],
+                            '',compensationReq, compensationOffer, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
+                            self.getStandingCounter(round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No',
+                            self.rewards.find(r => r.number === player.number).reward
+                            ]);
                         });
-                    });
-
-                    let max = 0;
-                    let bestConditions = [];
-
-                    conditionTotals.forEach((ct, i) => {
-                        if (ct < max) {
-                            return;
-                        } else if (ct === max) {
-                            bestConditions.push(i);
-                        } else {
-                            bestConditions = [i];
-                            max = ct;
-                        }
-                    })
-
-                    console.log('Condition totals: ');
-                    console.log(conditionTotals);
-                    console.log('Best conditions: ');
-                    console.log(bestConditions);
-                    console.log('Value: ' + max);
-
-                    self.players.forEach(player => {
-                        const values = self.getPlayerValues(player.number, round.round);
-                        const compensationReq = self.extractDataFromObject(self.compensationRequests[roundNr].find(cr => cr.number === player.number), 'compensationRequests', 1);
-                        const compensationOffer = player.role != 2 ? self.compensationOffers[roundNr][1] : '';
-                        const compensationDelta = player.role != 2 ? compensationOffer - compensationReq : '';
-
-                        let total = values[winningCondition];
-
-                        if (player.role === 2) {
-                            total -= self.players.filter(p => p.role === 3).length * self.compensationOffers[roundNr][winningCondition];
-                        } else {
-                            total += self.compensationOffers[roundNr][winningCondition];
-                        }
-
-                        xls.push([self.startTime,player.number,round.round, player.tag, player.role, self.ruleset, values[0], values[1],
-                        '',compensationReq, compensationOffer, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
-                        self.getStandingCounter(round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No',
-                        self.rewards.find(r => r.number === player.number).reward
-                        ]);
-                    });
+                    } catch (e) {
+                        console.log(`Couldn't process round: ${e.message}`);
+                    }
                 });
 
                 const ws = XLSX.utils.aoa_to_sheet(xls);
@@ -437,6 +442,7 @@
             }
 
             this.ruleset = response.data.data.ruleset;
+            this.dataset = response.data.data.dataset;
             this.conditions = response.data.data.conditions;
             this.players = response.data.data.players;
             this.rounds = response.data.data.results;

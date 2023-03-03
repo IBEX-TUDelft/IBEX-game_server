@@ -22,9 +22,20 @@ export default class Voting extends Logic {
     }
 
     getProfit(playerNumber, round) {
-        return this.data.results.find(r => r.round === round)
-            .phase[1].players.find(p => p.number === playerNumber)
+        const result = this.data.results.find(r => r.round === round);
+
+        const player = this.data.players.find(p => p.number === playerNumber);
+
+        const value = result.phase[1].players.find(p => p.number === playerNumber)
             .values[this.data.winningCondition];
+
+        let compensation = result.phase[4].compensationOffers[this.data.winningCondition];
+
+        if (player.role === 2) {
+            compensation = - compensation * (result.phase[1].players.length - 1);
+        }
+
+        return value + compensation;
     }
 
     getRecoveryData(number) {
@@ -48,7 +59,7 @@ export default class Voting extends Logic {
             "conditions": self.data.conditions,
             "players": players,
             "compensationOffers": [],
-            "over": self.over
+            "over": self.over,
         }
 
         let messages = null;
@@ -152,6 +163,10 @@ export default class Voting extends Logic {
 
         if (self.data.currentPhase.timer.set === true) {
             timer = self.data.currentPhase.timer.visibleTimeout
+        }
+
+        if (self.over === true) {
+            game.reward = self.data.rewards.find(r => r.number === number);
         }
 
         player.summaries = this.getSummaries(number);

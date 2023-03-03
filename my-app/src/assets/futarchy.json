@@ -85,6 +85,7 @@
         "cancel-button": "Cancel",
         "last-speculation": "Last Speculation",
         "public-signal-tooltip": "This value represents 1% of the true sum of values of all properties plus or minus an error term. This is an estimate of the payout per share if everyone declares their true value after the market phase.",
-        "private-signal-tooltip": "This value represents 1% of the sum of initial declarations for all properties.  This is the payout per share if everyone declares the same amount after the market phase as they declared before the market phase."
+        "private-signal-tooltip": "This value represents 1% of the sum of initial declarations for all properties.  This is the payout per share if everyone declares the same amount after the market phase as they declared before the market phase.",
+        "reward-earned": "Round ${0} has been selected for payment. You earned ${1} points in that round. The exchange rate is ${2}. You have earned € ${3}"
     }
 }
