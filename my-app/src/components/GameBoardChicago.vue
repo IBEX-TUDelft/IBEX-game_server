@@ -333,9 +333,11 @@
                     high = this.player.boundaries.projectB.high;
                 }
 
-                const snipingProbability = (high - this.parseFormatted(this.player.declaration[condition],0)) * 100 / (high - low);
+                const snipingProbability = (this.parseFormatted(this.player.declaration[condition],0) - low) * 100 / (high - low);
 
-                return Math.max(Math.min(snipingProbability, 100), 0).toFixed(2);
+                const bounded = Math.round(Math.max(Math.min(snipingProbability, 100), 0) * 100) / 100;
+                
+                return this.formatUs(bounded);
             },
             getSniperProbability(playerIndex, condition){
                 console.log(`Searching for player of declaration ${playerIndex} under condition ${condition}`);
@@ -387,9 +389,11 @@
 
                 const value = declaration.d[condition];
 
-                const snipingProbability = (high - value) * 100 / (high - low);
+                const snipingProbability = (value - low) * 100 / (high - low);
 
-                return Math.max(Math.min(snipingProbability, 100), 0).toFixed(2);
+                const bounded = Math.round(Math.max(Math.min(snipingProbability, 100), 0) * 100) / 100;
+                
+                return this.formatUs(bounded);
             },
             getDeclarationPlayer(i) {
                 const declaration = this.game.declarations[i];
@@ -476,14 +480,14 @@
 
                     console.log(v);
 
+                    const condition = this.game.conditions[i];
+
                     if (isNaN(v) || v == null) {
-                        myWarnings.push(`Your declaration under condition ${this.conditionToString(i)} is empty: it might result in a massive loss`);
+                        myWarnings.push(this.resolvePlaceHolder('declaration-empty', condition.name));
                         continue;
                     }
 
                     myDeclarations[i] = v;
-
-                    const condition = this.game.conditions[i];
 
                     const low = this.player.boundaries[condition.key].low;
                     const high = this.player.boundaries[condition.key].high;
@@ -831,6 +835,14 @@
                             case 'declaration-received':
                                 self.player.hasToDeclare = false;
                                 console.log('Confirmation received');
+                                break;
+                            case 'declaration-above-max':
+                                self.acknowledge('Mind You Declaration',
+                                    self.resolvePlaceHolder('declaration-above-max',
+                                        ev.data.condition,
+                                        self.formatUs(ev.data.maximum)
+                                    )
+                                );
                                 break;
                             case 'speculation-received':
                                 self.player.hasToSpeculate = false;

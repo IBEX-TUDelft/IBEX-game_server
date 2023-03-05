@@ -5,18 +5,18 @@
     </div>
 
     <div class="d-flex flex-row mt-1 p-0">
-        <div class="col-4" >Public Signal: <b>{{ formatUs(game.publicSignal[condition]) }}</b> <b-icon v-b-tooltip.hover id="public-signal-id" icon="question-circle-fill" variant="primary"></b-icon></div>
-        <div class="col-4" >Private Signal: <b>{{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</b> <b-icon v-b-tooltip.hover id="private-signal-id" icon="question-circle-fill" variant="primary"></b-icon></div>
+        <div class="col-4" >Public Signal: <b>{{ formatUs(game.publicSignal[condition]) }}</b> <b-icon v-b-tooltip.hover :id="'public-signal-id' + condition" icon="question-circle-fill" variant="primary"></b-icon></div>
+        <div class="col-4" >Private Signal: <b>{{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</b> <b-icon v-b-tooltip.hover :id="'private-signal-id' + condition" icon="question-circle-fill" variant="primary"></b-icon></div>
         <div class="col-4" v-if="player.role != 1">
             Your Property's Value:  <b>{{ formatUs(player.property.v[condition]) }}</b>
         </div>
     </div>
 
-    <b-tooltip target="public-signal-id" triggers="hover" placement="bottomleft">
+    <b-tooltip :target="'public-signal-id' + condition" triggers="hover" placement="bottomleft">
         {{ resolvePlaceHolder('public-signal-tooltip', conditionName) }}
     </b-tooltip>
 
-    <b-tooltip target="private-signal-id" triggers="hover" placement="bottomleft">
+    <b-tooltip :target="'private-signal-id' + condition" triggers="hover" placement="bottomleft">
         {{ resolvePlaceHolder('private-signal-tooltip', conditionName) }}
     </b-tooltip>
 
@@ -24,16 +24,16 @@
 
     <div class="d-flex flex-row mt-1 p-0">
 
-        <div class="d-flex flex-column col-10 p-0">
+        <div class="d-flex flex-column col-8 p-0">
             <div class="d-flex flex-row p-0">
 
-                <div class="col-4">
+                <div class="col-6">
                     <div class="row-12">
                         <button type="button" class="btn btn-primary btn-block" @click='postOrder("ask", false)'>Ask</button>
                     </div>
                 </div>
 
-                <div class="col-4">
+                <div class="col-6">
                     <div class="row-12">
                         <b-form-input @keydown="isAllowed" @keyup="onChange" class="form-control" v-model="ask_price" name="ask_price" id="ask_price" aria-describedby="emailHelp" />
                     </div>
@@ -42,7 +42,7 @@
             </div>
 
             <div class="d-flex flex-row mt-1 p-0">
-                <div class="d-flex flex-column col-4">
+                <div class="d-flex flex-column col-6">
                     <div v-if="player.wallet != null && player.wallet[condition] != null" class="d-flex flex-row mb-auto mt-2">
                         Shares: {{ player.wallet[condition].shares }}
                     </div>
@@ -52,26 +52,21 @@
                     </div>
                 </div>
 
-                <div class="d-flex flex-col col-4" style="height: 200px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
+                <div class="d-flex flex-col col-6" style="height: 200px; display: flex; flex-direction: column-reverse; border: 1px solid; overflow: scroll;">
                     <table class="table table-bordered text-center" style="margin-top: auto; margin-bottom: 0px;">
                         <tr v-for="ask in asks" :key="ask.id">
-                            <td class="p-1">{{ formatUs(ask.price) }}{{ask.sender == player.number ? '*' : ''}}</td>
+                            <td class="p-1">
+                                {{ formatUs(ask.price) }}
+                                <b-icon v-if="ask.sender === player.number" @click="removeAsk(ask.id)" icon="x-circle-fill" variant="danger"></b-icon>
+                            </td>
                         </tr>
                     </table>
-                </div>
-
-                <div class="d-flex flex-column col-4">
-                    <div class="d-flex flex-row mb-auto">
-                    </div>
-                    <div class="d-flex flex-row">
-                        <button type="button" class="btn btn-primary btn-block" @click='removeLastAsk()'>Remove Ask</button>
-                    </div>
                 </div>
             </div>
 
             <div class="d-flex flex-row mt-1 p-0">
 
-                <div class="d-flex flex-column col-4">
+                <div class="d-flex flex-column col-6">
                     <div class="d-flex flex-row">
                         <button type="button" class="btn btn-primary btn-block" @click='postOrder("ask", true)'>Sell @ -></button>
                     </div>
@@ -81,44 +76,42 @@
                     </div>
                 </div>
 
-                <div class="d-flex flex-col col-4" style="height: 200px; display: flex; border: 1px solid; overflow: scroll;">
+                <div class="d-flex flex-col col-6" style="height: 200px; display: flex; border: 1px solid; overflow: scroll;">
                     <table class="table table-bordered text-center" style="margin-bottom: auto;">
                         <tr v-for="bid in bids" :key="bid.id">
-                            <td class="p-1">{{ formatUs(bid.price) }}{{bid.sender == player.number ? '*' : ''}}</td>
+                            <td class="p-1">
+                                {{ formatUs(bid.price) }}
+                                <b-icon v-if="bid.sender === player.number" @click="removeBid(bid.id)" icon="x-circle-fill" variant="danger"></b-icon>
+                            </td>
                         </tr>
                     </table>
                 </div>
-
-                <div class="d-flex flex-column col-4">
-                    <button type="button" class="btn btn-primary btn-block" @click='removeLastBid()'>Remove Bid</button>
-                </div>
-
             </div>
 
             <div class="d-flex flex-row mt-1 p-0">
 
-                <div class="d-flex flex-column col-4">
+                <div class="d-flex flex-column col-6">
                     <button type="button" class="btn btn-primary btn-block" @click='postOrder("bid", false)'>Bid</button>
                 </div>
 
-                <div class="d-flex flex-column col-4">
+                <div class="d-flex flex-column col-6">
                     <b-form-input @keydown="isAllowed" @keyup="onChange" class="form-control" v-model="bid_price" name="bid_price" id="bid_price" aria-describedby="emailHelp" />
                 </div>
             </div>
 
         </div>
 
-        <div class="d-flex flex-column col-2 ">
+        <div class="d-flex flex-column col-4 ">
             
             <b-row class="justify-content-center">
                 <b>Contracts</b>
             </b-row>
 
             <b-row class="justify-content-center">
-                <div>Median: <b>{{ getMedianPrice() }}</b> <b-icon v-b-tooltip.hover id="median-tooltip-id" icon="question-circle-fill" variant="primary"></b-icon></div>
+                <div>Median: <b>{{ getMedianPrice() }}</b> <b-icon v-b-tooltip.hover :id="'median-tooltip-id' + condition" icon="question-circle-fill" variant="primary"></b-icon></div>
             </b-row>
 
-            <b-tooltip target="median-tooltip-id" triggers="hover" placement="bottomleft">
+            <b-tooltip :target="'median-tooltip-id' + condition" triggers="hover" placement="bottomleft">
                 {{ resolvePlaceHolder('median-tooltip', conditionName) }}
             </b-tooltip>
 
@@ -159,33 +152,39 @@ export default {
         completeMarketPhase() {
             this.sendMessage("complete-market-phase", {});
         },
-        removeLastAsk() {
+        removeBid(id) {
             const self = this;
 
-            const last = this.asks.filter(a => a.sender == self.$props.player.number).reduce((p,n) => p.id >= n.id ? p : n);
+            const bid = this.bids.find(b => b.id === id);
 
-            if (last != null) {
-                this.sendMessage("cancel-order", {
-                    "order": {
-                        "id": last.id,
-                        "condition": self.$props.condition
-                    }
-                });
+            if (bid == null) {
+                console.log(`Bid with id ${id} not found`);
+                return;
             }
+
+            this.sendMessage("cancel-order", {
+                "order": {
+                    "id": bid.id,
+                    "condition": self.$props.condition
+                }
+            });
         },
-        removeLastBid() {
+        removeAsk(id) {
             const self = this;
 
-            const last = this.bids.filter(b => b.sender == self.$props.player.number).reduce((p,n) => p.id >= n.id ? p : n);
+            const ask = this.asks.find(a => a.id === id);
 
-            if (last != null) {
-                this.sendMessage("cancel-order", {
-                    "order": {
-                        "id": last.id,
-                        "condition": self.$props.condition
-                    }
-                });
+            if (ask == null) {
+                console.log(`Ask with id ${id} not found`);
+                return;
             }
+
+            this.sendMessage("cancel-order", {
+                "order": {
+                    "id": ask.id,
+                    "condition": self.$props.condition
+                }
+            });
         },
         removeOrder(id) {
             this.sendMessage("cancel-order", {

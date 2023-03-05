@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex flex-row">
-        <div class="d-flex flex-column col-6" v-for="condition in $parent.game.conditions" :key="condition.id" :style="'border: 5px solid ' + (isLeading(condition) ? 'yellow' : 'white') + ';'" >
+        <div class="d-flex flex-column col-6" v-for="condition in $parent.game.conditions" :key="condition.id" :style="'border: 5px solid ' + (condition.id === leading ? 'yellow' : 'white') + ';'" >
             <DoubleAuctionMarketSingle
                 :ref="'doubleAuctionMarket' + condition.id"
                 :condition="condition.id"
@@ -24,7 +24,8 @@ export default {
         return {
             fields: ['name', 'price'],
             activity: [],
-            markets: []
+            markets: [],
+            leading: 0
         }
     },
     methods: {
@@ -70,11 +71,14 @@ export default {
         DoubleAuctionMarketSingle
     },
     mounted () {
+        const self = this;
+
         for (let i = 0; i < this.$parent.game.conditions.length; i++) {
             this.activity[i] = false;
 
             this.markets[i] = {
                 "name": this.$parent.game.conditions[i].name,
+                "condition": this.$parent.game.conditions[i].id,
                 "price": 0
             }
         }
@@ -92,7 +96,9 @@ export default {
 
             market.price = median;
 
-            this.markets.sort((a, b) => b.price - a.price);
+            self.markets.sort((a, b) => b.price - a.price);
+
+            self.leading = self.markets[0].condition;
 
             console.log(this.markets);
         });

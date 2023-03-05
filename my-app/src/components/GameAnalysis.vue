@@ -548,7 +548,7 @@
                                 return;
                             }
 
-                            if (c.id === winningCondition || self.ruleset === 'futarchy') {
+                            if (c.id === winningCondition || self.ruleset === 'Futarchy') {
                                 xlsRow.push(publicSignals[c.id]);
                             } else {
                                 xlsRow.push(null);

@@ -23,6 +23,31 @@ class Phase7 extends JoinablePhase {
                     return;
                 }
                 
+                const roles = [null, 'speculator', 'developer', 'owner'];
+
+                for (let i = 0; i < game.conditions.length; i++) {
+                    const condition = game.conditions[i];
+                    const d = message.declaration[i];
+
+                    const max = game.parameters[`${roles[player.role]}_${condition.parameter}_high`] * 2;
+
+                    console.log(`Checking ${d} against ${roles[player.role]}_${condition.parameter}_high * 2 (${max})`);
+
+                    if (d > max) {
+                        wss.sendEvent(
+                            game.id,
+                            player.number,
+                            "declaration-above-max",
+                            {
+                                "condition": condition.name,
+                                "maximum": max
+                            }
+                        );
+
+                        return;
+                    }
+                }
+
                 player.property.d = message.declaration;
 
                 phase.results.declarations.push({
