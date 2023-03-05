@@ -125,22 +125,17 @@ export default class Futarchy extends Logic {
                     return;
                 }
 
+                const firstDeclaration = this.data.results.find(r => r.round === this.data.currentRound.number)
+                    .phase[2].declarations.find(d => d.player === p.number).declaration;
+
                 declarationData.push({
                     "id": p.property.id,
                     "name": p.property.name,
                     "owner": p.name,
                     "role": p.role,
                     "number": p.number,
-                    "d": p.property.d
+                    "d": firstDeclaration
                 });
-
-                if (declarationData.d == null) {
-                    if (player.secondDeclaration != null) {
-                        declarationData.d = player.secondDeclaration;    
-                    } else {
-                        declarationData.d = player.firstDeclaration;
-                    }
-                }
             });
 
             game.declarations = declarationData;
@@ -256,6 +251,10 @@ export default class Futarchy extends Logic {
 
             summary.market.balance = playerWallet.balance;
             summary.market.shares = playerWallet.shares;
+
+            if (playerData.role != 1 && playerData.property.d != null) {
+                summary.secondDeclaration = playerData.property.d[this.data.winningCondition];
+            }
         }
 
         if (this.data.currentRound.phase > 7) {

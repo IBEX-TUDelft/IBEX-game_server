@@ -58,6 +58,7 @@
         "ready-button": "I am Ready",
         "waiting-for-others": "Waiting for all players to click ready ...",
         "property-matrix-header": "Declarations",
+        "property-matrix-header-7": "Previous Declarations",
         "value-ranges-owner-header": "Value Range (Owners)",
         "value-ranges-developer-header": "Value Range (Developer)",
         "value-ranges-condition": "Condition",
@@ -72,9 +73,9 @@
         "my-value-info-sniping": "Percentile in the value range",
         "declaration-warning-description": "Something seems odd with your declaration. Do you want to submit it anyway? It will not be possible to change it at a later time.",
         "declaration-submit-description": "Do you want to proceed and submit your declaration? It will not be possible to change it at a later time.",
-        "noProject-declaration-low-warning": "Your declaration under condition No Project is empty. Do you want to submit it anyway? It will not be possible to change it at a later time.",
+        "noProject-declaration-low-warning": "Your declaration under condition No Project is lower than the known minimum. Do you want to submit it anyway? It will not be possible to change it at a later time.",
         "noProject-declaration-high-warning": "Your declaration under condition No Project is greater than the known maximum value. Do you want to submit it anyway? It will not be possible to change it at a later time.",
-        "projectA-declaration-low-warning": "Your declaration under condition Project A is empty. Do you want to submit it anyway? It will not be possible to change it at a later time.",
+        "projectA-declaration-low-warning": "Your declaration under condition Project A is lower than the known minimum. Do you want to submit it anyway? It will not be possible to change it at a later time.",
         "projectA-declaration-high-warning": "Your declaration under condition Project A is greater than the known maximum value. Do you want to submit it anyway? It will not be possible to change it at a later time.",
         "speculator-submit-button": "Submit",
         "speculator-submit-title": "Do you confirm your choices?",
@@ -84,8 +85,15 @@
         "confirm-button": "Confirm",
         "cancel-button": "Cancel",
         "last-speculation": "Last Speculation",
-        "public-signal-tooltip": "This value represents 1% of the true sum of values of all properties plus or minus an error term. This is an estimate of the payout per share if everyone declares their true value after the market phase.",
-        "private-signal-tooltip": "This value represents 1% of the sum of initial declarations for all properties.  This is the payout per share if everyone declares the same amount after the market phase as they declared before the market phase.",
-        "reward-earned": "Round ${0} has been selected for payment. You earned ${1} points in that round. The exchange rate is ${2}. You have earned € ${3}"
+        "private-signal-tooltip": "This value represents 1% of the true sum of values of all properties under condition ${0} plus or minus an error term. This is an estimate of the payout per share if everyone declares their true value after the market phase.",
+        "public-signal-tooltip": "This value represents 1% of the sum of initial declarations under condition ${0} for all properties.  This is the payout per share if everyone declares the same amount after the market phase as they declared before the market phase.",
+        "median-tooltip": "This is the median value of the 7 most recent transactions under condition ${0}",
+        "reward-earned": "Round <b>${0}</b> has been selected for payment. You earned <b>${1}</b> points in that round. The exchange rate is <b>${2}</b>. You have earned € <b>${3}</b>",
+        "could-not-find-bids": "No bids from other players are available. Your own are not considered for trade: they are marked with a star",
+        "could-not-find-asks": "No bids from other players are available. Your own are not considered for trade: they are marked with a star",
+        "order-price-missing": "You did not specify the price of your offer",
+        "order-price-negative": "Order prices must be non negative. Your price: ${0}",
+        "no-shares-available": "You have already committed all your shares ${0} in other asks. You can cancel them if you want to publish new ones",
+        "no-balance-available": "You have already committed much of your balance (${0}) in other bids, The remainder (${1}) is not enough to bid ${2}. You may cancel previous bids to free some of your balance."
     }
 }

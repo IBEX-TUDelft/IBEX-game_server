@@ -2,7 +2,7 @@
 
     <div class="flex-row">
         
-        <div class="text-center mb-1"><b>{{ resolvePlaceHolder('property-matrix-header') }}</b></div>
+        <div class="text-center mb-1"><b>{{ getTitle() }}</b></div>
 
         <b-form-checkbox-group
             :id="'checked-plots'"
@@ -59,6 +59,13 @@ export default {
         formatUs(num) {
             return this.$parent.formatUs(num);
         },
+        getTitle() {
+            if (this.$props.game.phase === 7) {
+                return this.resolvePlaceHolder('property-matrix-header-7');
+            } else {
+                return this.resolvePlaceHolder('property-matrix-header');
+            }
+        },
         getGameDeclaration(index, condition) {
             const declarations = this.$props.game.declarations;
 
@@ -85,7 +92,8 @@ export default {
             return this.formatUs(declarations[index].d[condition.id])
         },
         getHeader(index) {
-            return `${this.$props.getDeclarationPlayer(index)}${this.getSnipeFormatted(index)}`;
+            //return `${this.$props.getDeclarationPlayer(index)}${this.getSnipeFormatted(index)}`;
+            return `${this.$props.getDeclarationPlayer(index)}`;
         },
         getSnipeFormatted(index) {
             if (this.$props.player.role != 1) {

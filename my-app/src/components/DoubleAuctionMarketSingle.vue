@@ -5,20 +5,22 @@
     </div>
 
     <div class="d-flex flex-row mt-1 p-0">
-        <div class="col-4" v-b-tooltip.hover id="public-signal-id">Public Signal: <b>{{ formatUs(game.publicSignal[condition]) }}</b></div>
-        <div class="col-4" v-b-tooltip.hover id="private-signal-id">Private Signal: <b>{{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</b></div>
+        <div class="col-4" >Public Signal: <b>{{ formatUs(game.publicSignal[condition]) }}</b> <b-icon v-b-tooltip.hover id="public-signal-id" icon="question-circle-fill" variant="primary"></b-icon></div>
+        <div class="col-4" >Private Signal: <b>{{ player.signals == null ? 'n/a' : formatUs(player.signals[condition]) }}</b> <b-icon v-b-tooltip.hover id="private-signal-id" icon="question-circle-fill" variant="primary"></b-icon></div>
         <div class="col-4" v-if="player.role != 1">
             Your Property's Value:  <b>{{ formatUs(player.property.v[condition]) }}</b>
         </div>
     </div>
 
     <b-tooltip target="public-signal-id" triggers="hover" placement="bottomleft">
-        {{ resolvePlaceHolder('public-signal-tooltip') }}
+        {{ resolvePlaceHolder('public-signal-tooltip', conditionName) }}
     </b-tooltip>
 
     <b-tooltip target="private-signal-id" triggers="hover" placement="bottomleft">
-        {{ resolvePlaceHolder('private-signal-tooltip') }}
+        {{ resolvePlaceHolder('private-signal-tooltip', conditionName) }}
     </b-tooltip>
+
+
 
     <div class="d-flex flex-row mt-1 p-0">
 
@@ -113,8 +115,12 @@
             </b-row>
 
             <b-row class="justify-content-center">
-                Median: {{ getMedianPrice() }}
+                <div>Median: <b>{{ getMedianPrice() }}</b> <b-icon v-b-tooltip.hover id="median-tooltip-id" icon="question-circle-fill" variant="primary"></b-icon></div>
             </b-row>
+
+            <b-tooltip target="median-tooltip-id" triggers="hover" placement="bottomleft">
+                {{ resolvePlaceHolder('median-tooltip', conditionName) }}
+            </b-tooltip>
 
             <b-row style="display: flex; height: 281px; overflow: scroll;">
                 <table class="table table-bordered mb-auto" style="table-layout: fixed;">
@@ -372,8 +378,8 @@ export default {
         extractDataFromObject(def, object, ...tags) {
             return this.$parent.extractDataFromObject(def, object, ...tags);
         },
-        resolvePlaceHolder(placeHolder) {
-            return this.$parent.resolvePlaceHolder(placeHolder);
+        resolvePlaceHolder(placeHolder, ...parameters) {
+            return this.$parent.resolvePlaceHolder(placeHolder, ...parameters);
         },
         getRootContext() {
             return this.$parent.getRootContext();

@@ -959,7 +959,11 @@
                 this.firstSnipeResults = extractProperty(this.rounds, 6, 'snipeOutcomes');
             }
 
-            this.indexes = this.rounds.filter(r => r.round > 0).map(r => r.round);
+            if (this.winningCondition[0] != null) {
+                this.indexes = this.rounds.map(r => r.round);    
+            } else {
+                this.indexes = this.rounds.filter(r => r.round > 0).map(r => r.round);
+            }
 
             window.vue = this;
         }

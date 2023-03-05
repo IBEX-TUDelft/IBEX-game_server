@@ -383,14 +383,13 @@ export default class {
                 }
 
                 const profit = self.getProfit(p.number, chosenRound);
-                //const expectation = self.getExpectation(p.number, chosenRound);
 
                 const reward = {
                     "number": p.number,
                     "round": chosenRound,
                     "reward": Math.round(baseReward + profit / factor),
                     "points": profit,
-                    "exchange": 1 / factor
+                    "exchange": Math.round(1000000 / factor) / 1000000
                 };
 
                 const err = self.wss.sendEvent(

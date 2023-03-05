@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import App from './App.vue'
-import { BootstrapVue } from 'bootstrap-vue'
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
 import router from './router'
 import axios from "axios";
 
 Vue.config.productionTip = false
 
 Vue.use(BootstrapVue);
+Vue.use(BootstrapVueIcons);
 
 const base = axios.create({
   baseURL: process.env.VUE_APP_API,

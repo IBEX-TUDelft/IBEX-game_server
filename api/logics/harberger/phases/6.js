@@ -44,7 +44,8 @@ class Phase6 extends JoinablePhase {
                         player.number,
                         'order-refused',
                         {
-                            "message": `Order price was not filled.`
+                            "message": `Order price was not filled.`,
+                            "placeholder": "order-price-missing"
                         }
                     );
                     return; //Cannot ask or bid negative numbers
@@ -60,7 +61,9 @@ class Phase6 extends JoinablePhase {
                         player.number,
                         'order-refused',
                         {
-                            "message": `Order prices must be non negative. Your price: ${order.price}`
+                            "message": `Order prices must be non negative. Your price: ${order.price}`,
+                            "placeholder": "order-price-negative",
+                            "parameters": [order.price]
                         }
                     );
                     return; //Cannot ask or bid negative numbers
@@ -76,7 +79,9 @@ class Phase6 extends JoinablePhase {
                             'order-refused',
                             {
                                 "message": `You have already committed all your shares ${player.wallet[condition].shares} in other asks.
-                                 You can cancel them if you want to publish new ones`
+                                 You can cancel them if you want to publish new ones`,
+                                "placeholder": "no-shares-available",
+                                "parameters": [player.wallet[condition].shares]
                             }
                         );
                         return; //Cannot have more asks than shares
@@ -96,7 +101,9 @@ class Phase6 extends JoinablePhase {
                             {
                                 "message": `You have already committed much of your balance (${committedSumForCondition}) in other bids,
                                  The remainder ${remainder} is not enough to bid ${order.price}. 
-                                 You may cancel previous bids to free some of your balance.`
+                                 You may cancel previous bids to free some of your balance.`,
+                                "placeholder": "no-balance-available",
+                                "parameters": [committedSumForCondition, remainder, order.price]
                             }
                         );
 
@@ -146,28 +153,52 @@ class Phase6 extends JoinablePhase {
                     );
                 }
 
-                if (result.quantity > 0 && !order.now) {
-                    const nextId = phase.nextOrderId[condition];
-                    phase.nextOrderId[condition] ++;
+                if (result.quantity > 0) {
+                    if (!order.now) {
+                        const nextId = phase.nextOrderId[condition];
+                        phase.nextOrderId[condition] ++;
 
-                    const newOrder = {
-                        "id": nextId,
-                        "sender": player.number,
-                        "price": order.price,
-                        "quantity": result.quantity,
-                        "type": order.type,
-                        "condition": condition
-                    };
+                        const newOrder = {
+                            "id": nextId,
+                            "sender": player.number,
+                            "price": order.price,
+                            "quantity": result.quantity,
+                            "type": order.type,
+                            "condition": condition
+                        };
 
-                    phase.orders[condition].push(newOrder);
+                        phase.orders[condition].push(newOrder);
 
-                    wss.broadcastEvent (
-                        game.id,
-                        "add-order",
-                        {
-                            "order": newOrder
+                        wss.broadcastEvent (
+                            game.id,
+                            "add-order",
+                            {
+                                "order": newOrder
+                            }
+                        );
+                    } else {
+                        if (order.type === 'ask') {
+                            wss.sendEvent(
+                                game.id,
+                                player.number,
+                                'order-refused',
+                                {
+                                    "message": `Could not fulfill your order: ${result.message}`,
+                                    "placeholder": "could-not-find-bids"
+                                }
+                            );
+                        } else if (order.type === 'bid') {
+                            wss.sendEvent(
+                                game.id,
+                                player.number,
+                                'order-refused',
+                                {
+                                    "message": `Could not fulfill your order: ${result.message}`,
+                                    "placeholder": "could-not-find-asks"
+                                }
+                            );
                         }
-                    );
+                    }
                 }
             }
         }, {

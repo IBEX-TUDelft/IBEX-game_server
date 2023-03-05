@@ -59,8 +59,8 @@ export default {
         extractDataFromObject(def, object, ...tags) {
             return this.$parent.extractDataFromObject(def, object, ...tags);
         },
-        resolvePlaceHolder(placeHolder) {
-            return this.$parent.resolvePlaceHolder(placeHolder);
+        resolvePlaceHolder(placeHolder, ...parameters) {
+            return this.$parent.resolvePlaceHolder(placeHolder, ...parameters);
         },
         getRootContext() {
             return this.$parent.getRootContext();

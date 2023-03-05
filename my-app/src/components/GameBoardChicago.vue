@@ -150,13 +150,13 @@
         <Summaries ref="summaries" :summaries="player.summaries"/>
         
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.reward != null">
-            <p>{{ resolvePlaceHolder(
+            <p v-html="resolvePlaceHolder(
                 'reward-earned',
                 game.reward.round,
                 formatUs(game.reward.points),
-                game.reward.exchange.toFixed(6),
+                game.reward.exchange,
                 game.reward.reward
-            )}}</p>
+            )"/>
         </b-row>
     </div></b-col>
 </template>
@@ -467,8 +467,6 @@
 
                 const myWarnings = [];
 
-                console.log('My declarations:' + myDeclarations);
-
                 for (let i = 0; i < self.game.conditions.length; i++) {
                     if (self.game.winningCondition != null && self.game.winningCondition != i) {
                         continue;
@@ -514,17 +512,17 @@
                         "declaration": myDeclarations
                     });
 
-                    console.log(self.game.declarations);
+                    /*if (self.game.phase != 7) {
+                        if (self.game.declarations[self.player.number - 1] == null) {
+                            self.game.declarations[self.player.number - 1] = {
+                                "d": myDeclarations
+                            };
+                        } else {
+                            self.game.declarations[self.player.number - 1].d = myDeclarations;
+                        }
 
-                    if (self.game.declarations[self.player.number - 1] == null) {
-                        self.game.declarations[self.player.number - 1] = {
-                            "d": myDeclarations
-                        };
-                    } else {
-                        self.game.declarations[self.player.number - 1].d = myDeclarations;
-                    }
-
-                    self.$refs['neighborhood'].$forceUpdate();
+                        self.$refs['neighborhood'].$forceUpdate();
+                    }*/
                 }
 
                 this.modals.errorList.show = true;
@@ -620,6 +618,9 @@
                 for (const prop in gameData.game) {
                     self.game[prop] = gameData.game[prop];
                 }
+
+                console.log('GAME')
+                console.log(self.game);
 
                 if (self.game.boundaries != null) {
                     if (self.player.role == 2) {
@@ -962,7 +963,17 @@
                                 self.game.winningCondition = ev.data.winningCondition;
                                 break;
                             case 'order-refused':
-                                self.acknowledge('order-refused', ev.data.message);
+                                var orderRefusedMessage = ev.data.message;
+
+                                if (ev.data.placeholder != null) {
+                                    if (ev.data.parameters == null) {
+                                        orderRefusedMessage = self.resolvePlaceHolder(ev.data.placeholder);
+                                    } else {
+                                        orderRefusedMessage = self.resolvePlaceHolder(ev.data.placeholder, ...ev.data.parameters);
+                                    }
+                                }
+
+                                self.acknowledge('order-refused', orderRefusedMessage );
                                 break;
                             case 'round-summary':
                                 var summaryIdx = self.player.summaries.findIndex(s => s.round = ev.data.round);
@@ -1077,7 +1088,7 @@
 
                 return result;
             }, isAllowed(e) {
-                if (![8,9,37,38,39,40,46,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
+                if (![8,9,35,36,37,38,39,40,46,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
                     console.log(`Sorry ${e.which}`)
                     e.preventDefault();
                     return false;
@@ -1093,7 +1104,7 @@
                     return;
                 }
 
-                if ([37, 39].includes(e.which)) {
+                if ([35,36,37,39].includes(e.which)) {
                     return;
                 }
 

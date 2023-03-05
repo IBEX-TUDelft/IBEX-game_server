@@ -62,6 +62,6 @@
         "compensation-insufficient-owner-description": "The compensation offered is nto enough to offset your loss of profit in case the project is developed",
         "compensation-insufficient-dev-title" : "Warning",
         "compensation-insufficient-dev-description": "The compensation you are offering is probably not sufficient to win at least half of the owners' support to develop your project. Do you want to proceed anyway?",
-        "reward-earned": "Round ${0} has been selected for payment. You earned ${1} points in that round. The exchange rate is ${2}. You have earned € ${3}"
+        "reward-earned": "Round <b>${0}</b> has been selected for payment. You earned <b>${1}</b> points in that round. The exchange rate is <b>${2}</b>. You have earned € <b>${3}</b>"
     }
 }

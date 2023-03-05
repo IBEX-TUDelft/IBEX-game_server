@@ -947,7 +947,7 @@ export default {
 
             return obj;
         }, isAllowed(e) {
-            if (![8,9,37,38,39,40,46,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
+            if (![8,9,35,36,37,38,39,40,46,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105,110,188,190].includes(e.which)) {
                 console.log(`Sorry ${e.which}`)
                 e.preventDefault();
                 return false;
@@ -963,7 +963,7 @@ export default {
                 return;
             }
 
-            if ([37, 39].includes(e.which)) {
+            if ([35,36,37,39].includes(e.which)) {
                 return;
             }
 
