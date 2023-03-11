@@ -280,13 +280,13 @@
         </b-row>
 
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.reward != null">
-            <p>{{ resolvePlaceHolder(
+            <p v-html="resolvePlaceHolder(
                 'reward-earned',
                 game.reward.round,
                 formatUs(game.reward.points),
-                game.reward.exchange.toFixed(6),
+                game.reward.exchange,
                 game.reward.reward
-            )}}</p>
+            )"/>
         </b-row>
     </div></b-col>
 </template>

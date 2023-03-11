@@ -60,7 +60,8 @@ export default {
             const data = {
                 "found": false,
                 "canJoin": true,
-                "gameData": null
+                "gameData": null,
+                "ruleset": game.data.type
             }
 
             let message;

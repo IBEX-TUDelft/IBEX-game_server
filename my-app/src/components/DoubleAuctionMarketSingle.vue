@@ -24,7 +24,7 @@
 
     <div class="d-flex flex-row mt-1 p-0">
 
-        <div class="d-flex flex-column col-8 p-0">
+        <div class="d-flex flex-column col-8">
             <div class="d-flex flex-row p-0">
 
                 <div class="col-6">
@@ -101,7 +101,7 @@
 
         </div>
 
-        <div class="d-flex flex-column col-4 ">
+        <div class="d-flex flex-column col-4">
             
             <b-row class="justify-content-center">
                 <b>Contracts</b>

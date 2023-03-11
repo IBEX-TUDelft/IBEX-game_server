@@ -168,7 +168,8 @@
     import Confirm from './modals/Confirm.vue';
     import Acknowledge from './modals/Acknowledge.vue';
     import Summaries from './Summaries.vue';
-    import dictionary from '../assets/harberger.json';
+    import harbergerDictionary from '../assets/harberger.json';
+    import futarchyDictionary from '../assets/futarchy.json';
     import { LocalizedNumberParser } from 'localized-number-parser';
     import { getGameStatus } from '../services/GameService'
     import EventService from '../services/EventService';
@@ -1166,89 +1167,6 @@
                 }
 
                 return this.formatService.reformat(stringValue);
-            }, formatInput(e) {
-                if (e == null) {
-                    return;
-                }
-
-                console.log('You typed ' + e.which);
-
-                if (![8,9,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,105,104,105,188,190].includes(e.which)) {
-                    console.log(`Sorry ${e.which}`)
-                    e.preventDefault();
-                    return false;
-                }
-
-                let format = this.format;
-
-                if (Number.isNaN(new LocalizedNumberParser(format).parse(e.target.value))) {
-                    return true;
-                }
-
-                const currentValueString = e.target.value;
-                let currentValue = null;
-
-                try {
-                    currentValue = new LocalizedNumberParser(format).parse(currentValueString);
-
-                    if (currentValue != null) {
-                        console.log(`Current value string: ${currentValueString}, parsed into ${currentValue} (${typeof currentValue}). Format: ${format}`);
-                    } else {
-                        console.log(`Current value string: ${currentValueString} can't be parsed into a ${format} value because the parser return a null value`);
-                    }
-                } catch (err) {
-                    console.err(`Current value string: ${currentValueString} can't be parsed into a ${format} value because of an exception`, err);
-                }
-
-                let newValue;
-
-                switch(e.which) {
-                    case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57:
-
-                        if (!e.target.value.endsWith('.') && !e.target.value.endsWith(',')) {
-                            e.target.value = this.formatUs(parseFloat(currentValue.toString() + (e.which - 48).toString())).slice(0, -1);
-                        }
-
-                        return true;
-                    case 96: case 97: case 98: case 99: case 100: case 101: case 102: case 103: case 104: case 105:
-
-                        if (!e.target.value.endsWith('.') && !e.target.value.endsWith(',')) {
-                            e.target.value = this.formatUs(parseFloat(currentValue.toString() + (e.which - 96).toString())).slice(0, -1);
-                        }
-
-                        return true;
-                    case 9: /*Tab*/
-                        return true;
-                    case 188: /*Comma*/ case 190: /*Dot*/
-                        var character = e.which === 188 ? ',' : '.';
-
-                        try {
-                            newValue = new LocalizedNumberParser(format).parse(currentValueString + character);
-
-                            if (Number.isNaN(newValue)) {
-                                throw new Error('The parser returned a non value');
-                            }
-
-                            return true;
-                        } catch (err) {
-                            e.preventDefault();
-                            console.error(`Can't add ${character} to ${e.target.value}`, err);
-                            return false;
-                        }
-                    case 8: //Backspace
-                        if (currentValueString == null || currentValueString.trim() === '' || currentValueString.slice(0, -1).trim() === '') {
-                            return true;
-                        }
-
-                        e.target.value =
-                            this.formatUs(new LocalizedNumberParser(format).parse(currentValueString.slice(0, -1))) +
-                            e.target.value.charAt(e.target.value.length - 1);
-
-                        return true;
-                    default:
-                        e.preventDefault();
-                        return false;
-                }
             }, parseFormatted(numericalString, def) {
                 console.log(`Parsing ${numericalString} (${typeof numericalString}), `)
 
@@ -1334,50 +1252,65 @@
                 this.$refs['summaries'].$forceUpdate();
             }
         },
-        mounted () {
+        async mounted () {
             const self = this;
 
             this.game.id = parseInt(this.$route.params.id);
             this.player.recovery = this.$route.params.recovery;
             window.vue = this;
 
-            this.dictionary = dictionary;
+            let attempts = 0;
+            let response = null;
 
-            if (dictionary.parameters.format != null) {
-                this.format = dictionary.parameters.format;
+            while (attempts < 3) {
+                response = await getGameStatus(this.$route.params.id, this.$route.params.recovery);
+
+                if (response != null) {
+                    break;
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+
+                attempts ++;
             }
 
-            this.formatService = new FormatService(this.format);
+            console.log('Status: ');
+            console.log(response);
 
-            console.log(`${process.env.VUE_APP_API}`);
+            if (response.canJoin != true) {
+                console.log('The game is full');
+                return;
+            }
 
-            getGameStatus(this.$route.params.id, this.$route.params.recovery).then(async (response) => {
-                console.log('Status: ');
-                console.log(response);
+            const dictionary = response.ruleset === 'Futarchy' ? futarchyDictionary : harbergerDictionary;
 
-                if (response.canJoin != true) {
-                    console.log('The game is full');
-                    return;
-                }
+            console.log(response.ruleset + ' Dictionary: ' + (response.ruleset === 'Futarchy' ? 'F' : 'H'));
 
-                if (response.gameData != null) {
-                    self.game.phase = response.gameData.game.phase;
-                    self.game.ruleset = response.gameData.game.ruleset;
+            self.dictionary = dictionary;
 
-                    console.log('AWAITING TO RECOVER THE DATA');
+            if (dictionary.parameters.format != null) {
+                self.format = dictionary.parameters.format;
+            }
 
-                    await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load
+            self.formatService = new FormatService(self.format);
 
-                    self.recover(response.gameData);
+            if (response.gameData != null) {
+                self.game.phase = response.gameData.game.phase;
+                self.game.ruleset = response.gameData.game.ruleset;
 
-                    console.log('DATA RECOVERED');
+                console.log('AWAITING TO RECOVER THE DATA');
 
-                    await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load
+                await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load
 
-                    EventService.on('component-ready', () => {
-                        EventService.emit('data-recovered', response.gameData);
-                    });
-                }
+                self.recover(response.gameData);
+
+                console.log('DATA RECOVERED');
+
+                await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load
+
+                EventService.on('component-ready', () => {
+                    EventService.emit('data-recovered', response.gameData);
+                });
 
                 if (self.game.phase > 0) {
                     self.updateSummary();
@@ -1388,13 +1321,14 @@
                 ];
 
                 self.player.instructions = phaseInstructions;
+            }
 
-                try {
-                    self.openWebSocket();
-                } catch (err) {
-                    console.log(err);
-                }
-            });
+            try {
+                self.openWebSocket();
+            } catch (err) {
+                console.log(err);
+            }
+
         }
     }
 </script>
