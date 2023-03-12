@@ -30,6 +30,8 @@ export default {
             {key: "speculator_shares", type: "number", value: gameParameters.speculators.shares},
             {key: "max_lot_purchases", type: "number", value: gameParameters.speculators.max_lot_purchases},
             {key: "cash_for_snipers", type: "number", value: gameParameters.speculators.cash_for_snipers},
+            {key: "speculators_base_points", type: "number", value: gameParameters.speculators.base_points},
+            {key: "speculators_reward_scale_factor", type: "number", value: gameParameters.speculators.reward_scale_factor},
 
             {key: "developers_count", type: "number", value: gameParameters.developers.count},
             {key: "developer_balance", type: "number", value: gameParameters.developers.balance},
@@ -43,6 +45,8 @@ export default {
             {key: "developer_project_b_low", type: "number", value: gameParameters.developers.profit.project_b.low},
             {key: "developer_project_b_fixed", type: "number", value: gameParameters.developers.profit.project_b.fixed},
             {key: "developer_project_b_high", type: "number", value: gameParameters.developers.profit.project_b.high},
+            {key: "developers_base_points", type: "number", value: gameParameters.developers.base_points},
+            {key: "developers_reward_scale_factor", type: "number", value: gameParameters.developers.reward_scale_factor},
 
             {key: "owners_count", type: "number", value: gameParameters.owners.count},
             {key: "owner_balance", type: "number", value: gameParameters.owners.balance},
@@ -55,9 +59,11 @@ export default {
             {key: "owner_project_a_high", type: "number", value: gameParameters.owners.profit.project_a.high},
             {key: "owner_project_b_low", type: "number", value: gameParameters.owners.profit.project_b.low},
             {key: "owner_project_b_fixed", type: "number", value: gameParameters.owners.profit.project_b.fixed},
-            {key: "owner_project_b_high", type: "number", value: gameParameters.owners.profit.project_b.high}
+            {key: "owner_project_b_high", type: "number", value: gameParameters.owners.profit.project_b.high},
+            {key: "owners_base_points", type: "number", value: gameParameters.owners.base_points},
+            {key: "owners_reward_scale_factor", type: "number", value: gameParameters.owners.reward_scale_factor},
 
-
+            {key: "seconds_for_deliberation", type: "number", value: gameParameters.seconds_for_deliberation}
         ];
 
         for (let i = 0; i < parameters.length; i++) {

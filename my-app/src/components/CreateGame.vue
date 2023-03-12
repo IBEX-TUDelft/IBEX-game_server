@@ -41,6 +41,15 @@
                     </b-form-checkbox>
             </div>
 
+            <div v-if="game_type === 'voting'" class="row">
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Seconds for Deliberation</label>
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="seconds_for_deliberation" name="seconds_for_deliberation" id="seconds_for_deliberation" aria-describedby="emailHelp" placeholder="10" />
+                </div>
+            </div>
+
             <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Minutes for Trading</label>
@@ -106,7 +115,63 @@
                 <div class="form-group col-md-1" v-if="generate_signals === true">
                     <input type="number" class="form-control" v-model="signal_high" name="signal_high" id="signal_high" aria-describedby="emailHelp" step="0.1" />
                 </div>
+            </div>
 
+            <div class="row">
+                <div class="col-md-12 mt-3 mb-3">
+                    <h3>Scores and Rewards</h3>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1"></label>
+                </div>
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Speculators</label>
+                </div>
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Owners</label>
+                </div>
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Developers</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Base Points</label>
+                </div>
+                <div v-if="game_type != 'voting'" class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="speculators_base_points" name="speculators_base_points" id="speculators_base_points" aria-describedby="emailHelp" placeholder="6" />
+                </div>
+                <div v-else class="form-group col-md-3">
+
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="owners_base_points" name="owners_base_points" id="owners_base_points" aria-describedby="emailHelp" placeholder="1" />
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="developers_base_points" name="developers_base_points" id="developers_base_points" aria-describedby="emailHelp" placeholder="5" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Reward Scale Factor</label>
+                </div>
+                <div v-if="game_type != 'voting'" class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="speculators_reward_scale_factor" name="speculators_reward_scale_factor" id="speculators_reward_scale_factor" aria-describedby="emailHelp" placeholder="6" />
+                </div>
+                <div v-else class="form-group col-md-3">
+
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="owners_reward_scale_factor" name="owners_reward_scale_factor" id="owners_reward_scale_factor" aria-describedby="emailHelp" placeholder="1" />
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="developers_reward_scale_factor" name="developers_reward_scale_factor" id="developers_reward_scale_factor" aria-describedby="emailHelp" placeholder="5" />
+                </div>
             </div>
 
             <div class="row">
@@ -204,6 +269,21 @@
 
             <div class="row">
                 <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1"></label>
+                </div>
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Speculators</label>
+                </div>
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Owners</label>
+                </div>
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Developers</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Status Quo Value (Low)</label>
                 </div>
                 <div class="form-group col-md-3">
@@ -272,6 +352,42 @@ import Header from './Header.vue'
 
 import sessions from '../assets/sessions.json';
 
+const defaultBasePoints = {
+    "voting": {
+        "speculator": 50000,
+        "developer": 0,
+        "owner": 10000
+    },
+    "harberger": {
+        "speculator": 55000,
+        "developer": 5000,
+        "owner": 15000
+    },
+    "futarchy": {
+        "speculator": 60000,
+        "developer": 10000,
+        "owner": 20000
+    },
+}
+
+const defaultRewardScaleFactor = {
+    "voting": {
+        "speculator": 10000,
+        "developer": 60000,
+        "owner": 20000
+    },
+    "harberger": {
+        "speculator": 11000,
+        "developer": 65000,
+        "owner": 22000
+    },
+    "futarchy": {
+        "speculator": 12000,
+        "developer": 68000,
+        "owner": 27000
+    },
+}
+
 export default {
     name: 'CreateGame',
     data() {
@@ -320,7 +436,14 @@ export default {
             practice_round: true,
             cash_for_snipers: 250000,
             session_number: 1,
-            sessions: null
+            sessions: null,
+            seconds_for_deliberation: 30,
+            speculators_base_points: defaultBasePoints.harberger.speculator,
+            owners_base_points: defaultBasePoints.harberger.owner,
+            developers_base_points: defaultBasePoints.harberger.developer,
+            speculators_reward_scale_factor: defaultRewardScaleFactor.harberger.speculator,
+            owners_reward_scale_factor: defaultRewardScaleFactor.harberger.owner,
+            developers_reward_scale_factor: defaultRewardScaleFactor.harberger.developer,
         }
     },
     components: {
@@ -367,6 +490,13 @@ export default {
             }
 
             this.state.previousGameType = event.target.value;
+
+            this.speculators_base_points = defaultBasePoints[this.game_type].speculator;
+            this.owners_base_points = defaultBasePoints[this.game_type].owner;
+            this.developers_base_points = defaultBasePoints[this.game_type].developer;
+            this.speculators_reward_scale_factor = defaultRewardScaleFactor[this.game_type].speculator;
+            this.owners_reward_scale_factor = defaultRewardScaleFactor[this.game_type].owner;
+            this.developers_reward_scale_factor = defaultRewardScaleFactor[this.game_type].developer;
         },
         createGame() {
             const payload = {
@@ -385,12 +515,16 @@ export default {
                     balance: this.speculator_balance,
                     shares: this.speculator_shares,
                     max_lot_purchases: this.max_lot_purchases,
-                    cash_for_snipers: this.cash_for_snipers
+                    cash_for_snipers: this.cash_for_snipers,
+                    base_points: this.speculators_base_points,
+                    reward_scale_factor: this.speculators_reward_scale_factor
                 },
                 developers: {
                     count: this.developers_count,
                     balance: this.developer_balance,
                     shares: this.developer_shares,
+                    base_points: this.developers_base_points,
+                    reward_scale_factor: this.developers_reward_scale_factor,
                     profit: {
                         no_project: {
                             low: this.no_project_dev_low,
@@ -413,6 +547,8 @@ export default {
                     count: this.owners_count,
                     balance: this.owner_balance,
                     shares: this.owner_shares,
+                    base_points: this.owners_base_points,
+                    reward_scale_factor: this.owners_reward_scale_factor,
                     profit: {
                         no_project: {
                             low: this.no_project_owner_low,
@@ -436,7 +572,8 @@ export default {
                 practice: this.practice_round,
                 minutes_for_trading: this.minutes_for_trading,
                 minutes_for_sniping: this.minutes_for_sniping,
-                session_number: this.session_number
+                session_number: this.session_number,
+                seconds_for_deliberation: this.seconds_for_deliberation
             }
 
             createGame(payload).then((response) => {

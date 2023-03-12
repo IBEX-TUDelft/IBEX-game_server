@@ -472,7 +472,8 @@
                     'snipe2_TO_owner1_result', 'snipe2_TO_owner2_result', 'snipe2_TO_owner3_result', 'snipe2_TO_owner4_result', 'snipe2_TO_owner5_result', 'snipe2_TO_dev_result', '',
                     'Num_Bids_NP', 'Num_Asks_NP', 'Num_Buys_NP', 'Num_Sells_NP', 'Ending_Cash_NP', 'Ending_Shares_NP', '',
                     'Num_Bids_P', 'Num_Asks_P', 'Num_Buys_P', 'Num_Sells_P', 'Ending_Cash_P', 'Ending_Shares_P', '',
-                    'snipe1_end_result', 'Property Value_min_Tax1', 'Trading_Result', 'snipe2_end_results', 'Property Value_min_Tax2', 'Total Earnings', 'Reward'
+                    'snipe1_end_result', 'Property Value_min_Tax1', 'Trading_Result', 'snipe2_end_results', 'Property Value_min_Tax2', 'Total Earnings',
+                    'base_points', 'points', 'final_score', 'factor', 'exchange_rate', 'reward'
                 ]);                
 
                 const ownerNumbers = [null, null, null, null, null, null];
@@ -798,7 +799,15 @@
                         }
 
                         xlsRow.push(total);
-                        xlsRow.push(self.rewards.find(r => r.number === player.number).reward);
+
+                        const playerReward = self.rewards.find(r => r.number === player.number);
+
+                        xlsRow.push(playerReward.basePoints);
+                        xlsRow.push(playerReward.profit);
+                        xlsRow.push(playerReward.points);
+                        xlsRow.push(playerReward.factor);
+                        xlsRow.push(playerReward.exchange);
+                        xlsRow.push(playerReward.reward);
 
                         xls.push(xlsRow);
                     });

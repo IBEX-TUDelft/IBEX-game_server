@@ -76,7 +76,8 @@ class Chat extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
         
-        const visibleTimeout = parseInt(process.env.VOTING_CHAT_FIXED_DURATION);
+        //const visibleTimeout = parseInt(process.env.VOTING_CHAT_FIXED_DURATION);
+        const visibleTimeout = this.game.parameters.seconds_for_deliberation;
         const totalTimeout = (visibleTimeout + Math.floor(Math.random() * parseInt(process.env.VOTING_CHAT_MAX_EXTRA_TIME))) * 1000;
 
         console.log(`Timer: ${process.env.VOTING_CHAT_FIXED_DURATION}s visible, ${process.env.VOTING_CHAT_MAX_EXTRA_TIME}s extra. Total: ${totalTimeout}ms`);

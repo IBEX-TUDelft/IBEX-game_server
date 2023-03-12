@@ -363,20 +363,22 @@ export default class {
 
             const rewards = [];
 
-            const baseReward = 0;//5;
-
             this.data.players.forEach(p => {
                 let factor;
+                let basePoints;
 
                 switch(p.role) {
                     case 1:
-                        factor = 10000;
+                        factor = this.data.parameters.speculators_reward_scale_factor;
+                        basePoints = this.data.parameters.speculators_base_points;
                         break;
                     case 2:
-                        factor = 60000;
+                        factor = this.data.parameters.developers_reward_scale_factor;
+                        basePoints = this.data.parameters.developers_base_points;
                         break;
                     case 3:
-                        factor = 20000;
+                        factor = this.data.parameters.owners_reward_scale_factor;
+                        basePoints = this.data.parameters.owners_base_points;
                         break;
                     default:
                         throw new Error(`Player ${p.number} role not clear: ${p.role}`);
@@ -384,11 +386,16 @@ export default class {
 
                 const profit = self.getProfit(p.number, chosenRound);
 
+                const points = basePoints + profit;
+
                 const reward = {
                     "number": p.number,
                     "round": chosenRound,
-                    "reward": Math.round(baseReward + profit / factor),
-                    "points": profit,
+                    "reward": Math.round(points / factor),
+                    "basePoints": basePoints,
+                    "profit": profit,
+                    "points": points,
+                    "factor": factor,
                     "exchange": Math.round(1000000 / factor) / 1000000
                 };
 
