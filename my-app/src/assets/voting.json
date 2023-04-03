@@ -5,36 +5,36 @@
     "instructions": {
         "phases": [{
             "number": 0,
-            "owner": "Wait for all players to be ready.",
-            "developer": "Wait for all players to be ready."
+            "owner": "Please wait for all players to be ready.",
+            "developer": "Please wait for all players to be ready."
         }, {
             "number": 1,
             "owner": "All the players are ready, the round will start shortly.",
             "developer": "All the players are ready, the round will start shortly."
         }, {
             "number": 2,
-            "owner": "Deliberation phase.",
-            "developer": "Deliberation phase."
+            "owner": "You can use chat box to communicate with other players.",
+            "developer": "You can use chat box to communicate with other players."
         }, {
             "number": 3,
-            "owner": "Submit a compensation request, remember to click on the submit button. Wait for all to submit.",
-            "developer": "Wait for all owners to submit their requests."
+            "owner": "Submit a compensation request to the developer. Remember to click the Submit button.",
+            "developer": "Wait for property owners to submit their compensation requests."
         }, {
             "number": 4,
-            "owner": "Wait for the developer to submit a compensation offer.",
-            "developer": "Submit your compensation offer (click the submit button)."
+            "owner": "Please wait for the developer to submit a compensation offer.",
+            "developer": "Submit your compensation offers. Remember to click the Submit button."
         }, {
             "number": 5,
-            "owner": "Deliberation phase.",
-            "developer": "Deliberation phase."
+            "owner": "You can use the chat box to communicate with other players.",
+            "developer": "You can use the chat box to communicate with other players."
         }, {
             "number": 6,
-            "owner": "Submit your final vote, remember to click on the submit button. Wait for all to submit.",
-            "developer": "Wait for all owners to submit their vote."
+            "owner": "Vote for Project or No Project. Remember to click on the Submit button. ",
+            "developer": "Wait for owners to submit their votes."
         }, {
             "number": 7,
-            "owner": "Here you can see the results of this round.",
-            "developer": "Here you can see the results of this round."
+            "owner": "Review results of this round.",
+            "developer": "Review results of this round."
         }]
     }, "placeHolders": {
         "ready-button": "Click When You Are Ready",
@@ -53,7 +53,7 @@
         "submit-decision-button": "Vote",
         "submit-decision-title": "Submit Your Vote",
         "submit-decision-description": "Are you sure? Once you have submitted, you cannot change it later",
-        "choose-offer-title": "Submit your final vote",
+        "choose-offer-title": "Please submit your final vote.",
         "choose-offer-button": "Vote",
         "acknowledge-button": "Ok",
         "confirm-button": "Confirm",

@@ -5,9 +5,9 @@
     "instructions": {
         "phases": [{
             "number": 0,
-            "speculator": "Wait for all players to be ready.",
-            "owner": "Wait for all players to be ready.",
-            "developer": "Wait for all players to be ready."
+            "speculator": "Please wait for all players to be ready.",
+            "owner": "Please wait for all players to be ready.",
+            "developer": "Please wait for all players to be ready."
         }, {
             "number": 1,
             "speculator": "All the players are ready, the round will start shortly.",
@@ -15,14 +15,14 @@
             "developer": "All the players are ready, the round will start shortly."
         }, {
             "number": 2,
-            "speculator": "Wait for all property owners to make their declarations.",
-            "owner": "Fill the declaration with a value under all conditions. You can use the real value as a reference.",
-            "developer": "Fill the declaration with a value under all conditions. You can use the real value as a reference."
+            "speculator": "Please wait for all property owners to make their declarations.",
+            "owner": "Provide a declared value under all conditions. You can use the real value as a reference.",
+            "developer": "Provide a declared value under all conditions. You can use the real value as a reference."
         }, {
             "number": 3,
             "speculator": "Analyse all declared values in all treatments and choose which properties to buy at the declared price.",
-            "owner": "Wait for the speculators to make their decisions.",
-            "developer": "Wait for the speculators to make their decisions."
+            "owner": "Please wait for the speculators to make their decisions.",
+            "developer": "Please wait for the speculators to make their decisions."
         }, {
             "number": 4,
             "speculator": "Reconciliation in progress, please wait ...",
@@ -35,24 +35,24 @@
             "developer": "Saving the results, please wait ..."
         }, {
             "number": 6,
-            "speculator": "Here you can trade shares. Shares represent a percentage of the final taxes on the winning project.",
-            "owner": "Here you can trade shares. Shares represent a percentage of the final taxes on the winning project.",
-            "developer": "Here you can trade shares. Shares represent a percentage of the final taxes on the winning project."
+            "speculator": "Each share pays its owner 1% of taxes collected.",
+            "owner": "Each share pays its owner 1% of taxes collected.",
+            "developer": "Each share pays its owner 1% of taxes collected."
         }, {
             "number": 7,
-            "speculator": "Wait for all property owners to make their declarations.",
-            "owner": "Fill the declaration with a value under all conditions. You can use the real value as a reference.",
-            "developer": "Fill the declaration with a value under all conditions. You can use the real value as a reference."
+            "speculator": "Please wait for all property owners to make their declarations.",
+            "owner": "Declare a value for the selected condition.",
+            "developer": "Declare a value for the selected condition."
         }, {
             "number": 8,
-            "speculator": "Analyse all declared values in all treatments and choose which properties to buy at the declared price.",
+            "speculator": "Review the property owners’ declarations. Select the property(ies), if any, you wish to buy and re-sell at the declared price.",
             "owner": "Wait for the speculators to make their decisions.",
             "developer": "Wait for the speculators to make their decisions."
         }, {
             "number": 9,
-            "speculator": "Here you can see the results of this round.",
-            "owner": "Here you can see the results of this round.",
-            "developer": "Here you can see the results of this round."
+            "speculator": "Results of this round.",
+            "owner": "Results of this round.",
+            "developer": "Results of this round."
         }]
     }, "placeHolders": {
         "ready-button": "I am Ready",
@@ -61,7 +61,7 @@
         "property-matrix-header-7": "Previous Declarations",
         "value-ranges-owner-header": "Value Range (Owners)",
         "value-ranges-developer-header": "Value Range (Developer)",
-        "value-ranges-condition": "Condition",
+        "value-ranges-condition": "Project Choice",
         "value-ranges-minimum": "Minimum",
         "value-ranges-maximum": "Maximum",
         "my-value-info-header": "My Value Information",
@@ -70,7 +70,7 @@
         "my-value-info-declaration": "Declaration",
         "my-value-info-tax": "Tax Bill",
         "my-value-info-profit": "Profit",
-        "my-value-info-sniping": "Percentile in the value range",
+        "my-value-info-sniping": "Value percentile",
         "declaration-empty": "Your declaration under condition ${0} is empty",
         "declaration-above-max": "Your declaration under condition ${0} is above the limit (${1})",
         "declaration-warning-description": "Something seems odd with your declaration. Do you want to submit it anyway? It will not be possible to change it at a later time.",
