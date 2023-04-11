@@ -514,18 +514,6 @@
                         "type": "declare",
                         "declaration": myDeclarations
                     });
-
-                    /*if (self.game.phase != 7) {
-                        if (self.game.declarations[self.player.number - 1] == null) {
-                            self.game.declarations[self.player.number - 1] = {
-                                "d": myDeclarations
-                            };
-                        } else {
-                            self.game.declarations[self.player.number - 1].d = myDeclarations;
-                        }
-
-                        self.$refs['neighborhood'].$forceUpdate();
-                    }*/
                 }
 
                 this.modals.errorList.show = true;
