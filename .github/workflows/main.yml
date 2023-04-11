@@ -1,7 +1,5 @@
-name: "Test Action"
-on:
-  push:
-    branches: [main]
+name: remote ssh command
+on: [push]
 
 jobs:
   deploy:
@@ -15,4 +13,3 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.SSH_PORT }}
           script: paste.sh
-    
