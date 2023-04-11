@@ -136,3 +136,5 @@ server {
 }
 
 ```
+
+Try whenever possible to use automated action (see workflows)
