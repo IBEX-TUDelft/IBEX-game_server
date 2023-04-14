@@ -28,6 +28,6 @@ jobs:
       - uses: sibiraj-s/action-eslint@v2
         with:
           eslint-args: '--ignore-path=.gitignore --quiet'
-          extensions: 'js'
+          extensions: 'ts,tsx'
           annotations: true
           prettier: true
