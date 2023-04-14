@@ -2,7 +2,8 @@ name: remote ssh command
 on:
   push:
     branches:
-      - main
+      - master
+      - develop
 
 
 jobs:
