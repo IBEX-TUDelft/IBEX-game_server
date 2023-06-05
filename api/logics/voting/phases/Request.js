@@ -8,7 +8,7 @@ class Phase3 extends JoinablePhase {
 
     complete = false;
 
-    constructor (game, wss) {
+    constructor (game, wss, number) {
         super (game, wss, [{
             "type": "compensation-request",
             "role": null,
@@ -36,7 +36,7 @@ class Phase3 extends JoinablePhase {
             '-',
             'Wait for all owners to submit their requests',
             'Submit a compensation request, remember to click on the submit button. Wait for all to submit.'
-        ]);
+        ], number);
     }
 
     async onEnter () {
@@ -60,6 +60,12 @@ class Phase3 extends JoinablePhase {
     async onExit() {
         await super.onExit();
 
+        this.game.players.forEach(p => {
+            if (p.role === 3 && p.compensationRequests == null) {
+                p.compensationRequests = [0, 0];
+            }
+        });
+
         const err = this.wss.broadcastEvent(
             this.game.id,
             "reset-timer",
@@ -73,7 +79,7 @@ class Phase3 extends JoinablePhase {
 }
 
 export default {
-    create(game, wss) {
-        return new Phase3(game, wss);
+    create(game, wss, number) {
+        return new Phase3(game, wss, number);
     }
 }

@@ -214,5 +214,32 @@ export default {
 
             Controller.handleSuccess(res, data, 'Data available');
         });
+
+        Controller.addPostRoute(app, '/api/v1/games/survey', false, async (req, res) => {
+            console.log(req.body);
+
+            try {
+                const id = gameService.saveSurvey(req.body);
+
+                Controller.handleSuccess(res, { id }, 'Survery received');
+            } catch(e) {
+                Controller.handleGenericError(res, e, 500);
+            }
+        });
+
+        Controller.addGetRoute(app, '/api/v1/games/surveys', true, async (req, res) => {
+            const gameId = parseInt(req.query.game_id);
+
+            //const game = gameManager.games.find(g => g.data.id  == gameId);
+
+            const records = await gameService.findSurveys(gameId);
+
+            const data = {
+                //"ruleset": game.data.type,
+                records
+            }
+
+            Controller.handleSuccess(res, data, 'Data available');
+        });
     }
 };

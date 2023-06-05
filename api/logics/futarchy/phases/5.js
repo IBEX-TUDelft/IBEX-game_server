@@ -7,17 +7,19 @@ class Phase5 extends JoinablePhase {
         signals: []
     };
 
-    constructor(game, wss) {
+    constructor(game, wss, number) {
         super(game, wss,[{
             "type": "complete-current-phase",
             "role": null,
             "action": function(ws, message, player, caller) {
                 caller.complete = true;
             }
-        }], []);
+        }], [], number);
     }
 
     async onEnter () {
+        super.onEnter();
+        
         console.log('PHASE 5');
 
         const self = this;
@@ -42,7 +44,7 @@ class Phase5 extends JoinablePhase {
             privateSignals: self.game.players.map(p => { return [...p.S] })
         };
         
-        this.setTimer(5 * 1000, 5 * 1000);
+        //this.setTimer(5 * 1000, 5 * 1000);
     }
 
     getData() {
@@ -60,7 +62,7 @@ class Phase5 extends JoinablePhase {
 }
 
 export default {
-    create(game, wss) {
-        return new Phase5(game, wss);
+    create(game, wss, number) {
+        return new Phase5(game, wss, number);
     }
 }

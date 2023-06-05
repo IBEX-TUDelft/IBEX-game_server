@@ -48,6 +48,78 @@ export default {
             );
         });
     },
+    saveSurvey: async function (content) {
+        if (content == null) {
+            throw new Error('No content');
+        }
+
+        if (content.number == null) {
+            throw new Error('No player number');
+        }
+
+        if (content.gameId == null) {
+            throw new Error('No game ID');
+        }
+
+        console.log('GOING TO FIND');
+
+        console.log(`SELECT count(*) FROM game_surveys
+        WHERE player_number = ${parseInt(content.number)}
+        AND game_id = ${parseInt(content.gameId)};`);
+
+        const found = await new Promise((resolve, reject) => {
+            this.pool.query(`SELECT count(*) as total FROM game_surveys
+                WHERE player_number = ${parseInt(content.number)}
+                AND game_id = ${parseInt(content.gameId)};`,
+                (err, res) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res.rows[0].total);
+                    }
+                }
+            );
+        });
+
+        console.log(found);
+
+        if (found > 0) {
+            return Promise.resolve(-1);
+        }
+
+        const query = `INSERT INTO game_surveys (
+            player_number,
+            game_id,
+            content
+        ) VALUES (
+            ${parseInt(content.number)},
+            ${parseInt(content.gameId)},
+            '${JSON.stringify(content)}'
+        ) RETURNING id;`;
+
+        console.log(query);
+
+        return await new Promise((resolve, reject) => {
+            this.pool.query(
+                query,
+                (err, res) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res.rows[0].id);
+                    }
+                }
+            );
+        });
+    },
+    findSurveys: async function(gameId) {
+        const result = await Database.execute(`SELECT gs.content
+            FROM game_surveys gs WHERE gs.game_id = ${gameId} ORDER BY gs.player_number ASC;`);
+
+        console.log(result);
+
+        return result;
+    },
     list: async function(parameters) {
         return await Database.execute(`SELECT g.id, g.title, g.created_at, g.updated_at, g.ended_at 
             FROM games g ORDER BY id DESC LIMIT 50;`);

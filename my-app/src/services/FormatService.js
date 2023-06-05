@@ -22,15 +22,33 @@ export default class FormatService {
             return null;
         }
 
-        const numericString = localizedString
-            .trim()
-            .replace(this._group, '')
-            .replace(this._decimal, '.')
-            .replace(this._numeral, this._index);
-        return numericString ? Number(numericString) : NaN;
+        if (typeof localizedString === 'number') {
+            return localizedString;
+        }
+
+        if (typeof localizedString != 'string') {
+            localizedString = localizedString.toString();
+        }
+
+        try {
+            const numericString = localizedString
+                .trim()
+                .replace(this._group, '')
+                .replace(this._decimal, '.')
+                .replace(this._numeral, this._index);
+
+            return numericString ? Number(numericString) : NaN;
+        } catch (err) {
+            console.error(`Could not turn ${typeof localizedString} "${localizedString}" into a numeric string`, err);
+            return NaN;
+        }
     }
 
     reformat(string) {
+        if (typeof string != 'string') {
+            string = string.toString();
+        }
+
         const num = this.parse(string);
 
         if (num == null || isNaN(num)) {

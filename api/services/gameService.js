@@ -63,7 +63,18 @@ export default {
             {key: "owners_base_points", type: "number", value: gameParameters.owners.base_points},
             {key: "owners_reward_scale_factor", type: "number", value: gameParameters.owners.reward_scale_factor},
 
-            {key: "seconds_for_deliberation", type: "number", value: gameParameters.seconds_for_deliberation}
+            {key: "seconds_for_deliberation", type: "number", value: gameParameters.seconds_for_deliberation},
+
+            {key: "timer_phase_0", type: "number", value: gameParameters.timers.phase_0},
+            {key: "timer_phase_1", type: "number", value: gameParameters.timers.phase_1},
+            {key: "timer_phase_2", type: "number", value: gameParameters.timers.phase_2},
+            {key: "timer_phase_3", type: "number", value: gameParameters.timers.phase_3},
+            {key: "timer_phase_4", type: "number", value: gameParameters.timers.phase_4},
+            {key: "timer_phase_5", type: "number", value: gameParameters.timers.phase_5},
+            {key: "timer_phase_6", type: "number", value: gameParameters.timers.phase_6},
+            {key: "timer_phase_7", type: "number", value: gameParameters.timers.phase_7},
+            {key: "timer_phase_8", type: "number", value: gameParameters.timers.phase_8},
+            {key: "timer_phase_9", type: "number", value: gameParameters.timers.phase_9}
         ];
 
         for (let i = 0; i < parameters.length; i++) {
@@ -218,5 +229,16 @@ export default {
         }
 
         return null;
+    },
+    saveSurvey: async function(survey) {
+        return await gameRepository.saveSurvey(survey);
+    },
+    findSurveys: async function(gameId) {
+        const rows = await gameRepository
+            .findSurveys(gameId);
+        
+        console.log(rows);
+
+        return rows.map(s => JSON.parse(s.content));
     }
 }

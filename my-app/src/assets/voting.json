@@ -5,34 +5,42 @@
     "instructions": {
         "phases": [{
             "number": 0,
+            "tag": "Introduction",
             "owner": "Please wait for all players to be ready.",
             "developer": "Please wait for all players to be ready."
         }, {
             "number": 1,
+            "tag": "Presentation",
             "owner": "All the players are ready, the round will start shortly.",
             "developer": "All the players are ready, the round will start shortly."
         }, {
             "number": 2,
+            "tag": "Deliberation",
             "owner": "You can use chat box to communicate with other players.",
             "developer": "You can use chat box to communicate with other players."
         }, {
             "number": 3,
+            "tag": "Request",
             "owner": "Submit a compensation request to the developer. Remember to click the Submit button.",
             "developer": "Wait for property owners to submit their compensation requests."
         }, {
             "number": 4,
+            "tag": "Offer",
             "owner": "Please wait for the developer to submit a compensation offer.",
             "developer": "Submit your compensation offers. Remember to click the Submit button."
         }, {
             "number": 5,
+            "tag": "Deliberation",
             "owner": "You can use the chat box to communicate with other players.",
             "developer": "You can use the chat box to communicate with other players."
         }, {
             "number": 6,
+            "tag": "Voting",
             "owner": "Vote for Project or No Project. Remember to click on the Submit button. ",
             "developer": "Wait for owners to submit their votes."
         }, {
             "number": 7,
+            "tag": "Results",
             "owner": "Review results of this round.",
             "developer": "Review results of this round."
         }]
@@ -62,6 +70,11 @@
         "compensation-insufficient-owner-description": "The compensation offered is nto enough to offset your loss of profit in case the project is developed",
         "compensation-insufficient-dev-title" : "Warning",
         "compensation-insufficient-dev-description": "The compensation you are offering is probably not sufficient to win at least half of the owners' support to develop your project. Do you want to proceed anyway?",
-        "reward-earned": "Round <b>${0}</b> has been selected for payment. You earned <b>${1}</b> points in that round. The exchange rate is <b>${2}</b>. You have earned € <b>${3}</b>"
+        "reward-earned": "Round <b>${0}</b> has been selected for payment. You earned <b>${1}</b> points in that round. The exchange rate is <b>${2}</b>. You have earned € <b>${3}</b>",
+        "preparing-next-phase": "Moving to phase ${0} ...",
+        "present-survey": "Before you go, please answer some questions:",
+        "phase-transition-filler": "Moving to ${0} phase"
+    }, "styles": {
+        "size-of-transition-filler": 36
     }
 }

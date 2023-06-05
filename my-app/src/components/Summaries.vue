@@ -32,7 +32,7 @@
                         <th>Repurchase (2)</th>
                         <th>Trading Cash</th>
                         <th>Shares</th>
-                        <th>Share Price</th>
+                        <th>Dividend</th>
                         <th>Shares Payoff</th>
                         <th>Total Earnings</th>
                     </thead>

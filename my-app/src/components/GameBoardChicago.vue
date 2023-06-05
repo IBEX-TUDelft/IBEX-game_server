@@ -18,7 +18,7 @@
                     <b-navbar-nav class="ml-auto">
                         <b-nav-item active v-if="timer.on === true" style="width: 150px; text-align: center;">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
                         <b-nav-item active v-if="!game.over" style="width: 100px; text-align: center;">Round: {{ game.round }}</b-nav-item>
-                        <b-nav-item active v-if="!game.over" style="width: 100px; text-align: center;">Phase: {{ game.phase }}</b-nav-item>
+                        <b-nav-item active v-if="!game.over" style="width: 200px; text-align: center;">Phase: {{ game.phaseTag }}</b-nav-item>
                         <b-nav-item active v-if="game.over" style="width: 100px; text-align: center;">Game Over</b-nav-item>
                     </b-navbar-nav>
                 </b-navbar>
@@ -34,7 +34,15 @@
             </b-col>
         </b-row>
 
-        <b-row class="d-flex flex-row no-gutters" v-if="![0,6,9].includes(game.phase)">
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase != 0 && transitioning">
+            <b-col class="d-flex align-items-center justify-content-center flex-column">
+                <b-row>
+                    <div :style="`font-size: ${dictionary.styles['size-of-transition-filler']}px;`">{{ resolvePlaceHolder('phase-transition-filler', game.phaseTag) }}</div>
+                </b-row>
+            </b-col>
+        </b-row>
+
+        <b-row class="d-flex flex-row no-gutters" v-if="![0,6,9].includes(game.phase)  && !transitioning">
             <div class="d-flex flex-column col-6">
 
                 <HarbergerMatrix
@@ -135,7 +143,7 @@
             </div>
         </b-row>
 
-        <DoubleAuctionMarketSingle ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Harberger'"
+        <DoubleAuctionMarketSingle ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Harberger' && !transitioning"
             :condition="game.winningCondition"
             :conditionName="conditionToString(game.winningCondition)"
             :connection="connection"
@@ -143,7 +151,7 @@
             :player="player"
             :pushMessage="pushMessage"
         />
-        <DoubleAuctionMarketFutarchy ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Futarchy'"/>
+        <DoubleAuctionMarketFutarchy ref="doubleAuctionMarket" v-if="game.phase === 6 && game.ruleset === 'Futarchy' && !transitioning"/>
 
         <Summaries ref="summaries" :summaries="player.summaries"/>
         
@@ -156,6 +164,8 @@
                 game.reward.reward
             )"/>
         </b-row>
+
+        <Survey v-if="game.over" />
     </div></b-col>
 </template>
 <script>
@@ -168,10 +178,10 @@
     import Summaries from './Summaries.vue';
     import harbergerDictionary from '../assets/harberger.json';
     import futarchyDictionary from '../assets/futarchy.json';
-    import { LocalizedNumberParser } from 'localized-number-parser';
     import { getGameStatus } from '../services/GameService'
     import EventService from '../services/EventService';
     import FormatService from '../services/FormatService';
+    import Survey from './Survey.vue';
 
     const styleMap = {
         "success": "alert-success",
@@ -191,6 +201,8 @@
     export default {
         data() {
             return {
+                transitioning: false,
+                transitionTimeoutId: null,
                 showIntructions: true,
                 updateSpeculationTable: 0,
                 firstConnection: true,
@@ -227,6 +239,7 @@
                     winningCondition: null,
                     round: 0,
                     phase: 0,
+                    phaseTag: "Introduction",
                     ruleset: "",
                     properties: [],
                     declarations: [],
@@ -270,7 +283,8 @@
             ErrorList,
             Confirm,
             Acknowledge,
-            Summaries
+            Summaries,
+            Survey
         },
         name: 'GameBoard',
         methods: {
@@ -734,6 +748,8 @@
                                 self.game.round = ev.data.round;
                                 self.game.phase = ev.data.phase;
 
+                                self.game.phaseTag = self.dictionary.instructions.phases[self.game.phase]?.tag;
+
                                 var phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
                                     [null, 'speculator', 'developer', 'owner'][self.player.role]
                                 ];
@@ -746,6 +762,12 @@
                                     self.showIntructions = true;
                                 }, 2000);
 
+                                if ([4,5].includes(ev.data.phase)) {
+                                    break;
+                                }
+
+                                self.startTransition();
+                                
                                 if (self.game.phase === 1) {
                                     self.game.declarations = [null, null, null];
                                     self.player.declaration = [null, null, null];
@@ -839,7 +861,10 @@
                                 self.game.declarations = ev.data.declarations;
                                 self.game.winningCondition = ev.data.winningCondition;
 
-                                console.log(self.game.declarations);
+                                if (self.player.role != 1) {
+                                    var myOwn = self.game.declarations.find(d => d.number === self.player.number);
+                                    self.player.declaration = myOwn.d.map(n => self.formatService.format(n));
+                                }
 
                                 break;
                             case 'first-snipes':
@@ -1037,6 +1062,17 @@
                     self.openWebSocket();
                 }
             },
+            startTransition() {
+                if (this.transitionTimeoutId != null) {
+                    clearTimeout(this.transitionTimeoutId);
+                }
+
+                this.transitioning = true;
+
+                setTimeout(() => {
+                    this.transitioning = false;
+                }, 3000);
+            },
             resolvePlaceHolder(placeholder, ...parameters) {
                 if (this.dictionary == null) {
                     console.warn('No dictionary available');
@@ -1160,7 +1196,7 @@
                     return def;
                 }
 
-                const result = new LocalizedNumberParser(this.format).parse(numericalString);
+                const result = this.formatService.parse(numericalString);
 
                 if (Number.isNaN(result)) {
                     console.error(`Could not parse ${numericalString} (${typeof numericalString}) into a number according to format ${this.format}`);
@@ -1284,6 +1320,8 @@
                 self.game.phase = response.gameData.game.phase;
                 self.game.ruleset = response.gameData.game.ruleset;
 
+                self.game.phaseTag = self.dictionary.instructions.phases[self.game.phase]?.tag;
+                
                 console.log('AWAITING TO RECOVER THE DATA');
 
                 await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load

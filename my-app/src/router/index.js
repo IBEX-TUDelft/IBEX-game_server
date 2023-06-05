@@ -11,6 +11,8 @@ import GameAnalysis from '../components/GameAnalysis';
 import GameAnalysisVoting from '../components/GameAnalysisVoting';
 import GameMarketLog from '../components/GameMarketLog';
 import GameChatLog from '../components/GameChatLog';
+import GameSurveys from '../components/GameSurveys';
+
 
 Vue.use(VueRouter)
 
@@ -78,6 +80,11 @@ const routes = [
     path: '/analyse-voting/:id',
     name: 'Game Analysis Voting',
     component: GameAnalysisVoting
+  },
+  {
+    path: '/surveys/:id',
+    name: 'Game Surveys',
+    component: GameSurveys
   }
 ]
 

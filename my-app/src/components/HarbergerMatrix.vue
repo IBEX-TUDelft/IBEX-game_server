@@ -41,6 +41,14 @@
                                         {{ getGameDeclaration(index, condition) }}
                                     </div>
                                 </div>
+                                <div class="row p-0" v-if="game.phase === 7 && player.role === 1">
+                                    <div class="col-8">
+                                        {{ resolvePlaceHolder('last-speculation') }}
+                                    </div>
+                                    <div class="col-4 text-right">
+                                        {{ getLastSnipe(index) }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -95,8 +103,51 @@ export default {
             //return `${this.$props.getDeclarationPlayer(index)}${this.getSnipeFormatted(index)}`;
             return `${this.$props.getDeclarationPlayer(index)}`;
         },
+        getLastSnipe(index) {
+            if (this.$props.player.role != 1) {
+                return '';
+            }
+
+            if (this.$parent.game.phase != 7) {
+                return '';
+            }
+
+            let tag = 'n/a';
+
+            switch(index) {
+                case 0:
+                    tag = 'Owner 1';
+                    break;
+                case 1:
+                    tag = 'Developer';
+                    break;
+                default:
+                    tag = `Owner ${index}`;
+            }
+
+            const player = this.$parent.game.players.find(p => p.tag === tag);
+
+            if (player == null) {
+                console.log(`Player ${index + 1} not found.`);
+                return 'n/a';
+            }
+
+            if (player.role === 1) {
+                return 'n/a';
+            }
+
+            if (player.snipe == null) {
+                return 'n/a';
+            }
+            
+            return this.formatUs(player.snipe);
+        },
         getSnipeFormatted(index) {
             if (this.$props.player.role != 1) {
+                return '';
+            }
+
+            if (this.$parent.game.phase != 7) {
                 return '';
             }
 

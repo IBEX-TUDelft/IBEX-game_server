@@ -16,7 +16,7 @@
                     <b-navbar-nav>
                         <b-nav-item active v-if="timer.on === true" style="width: 150px; text-align: center;">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
                         <b-nav-item active v-if="!game.over" style="width: 100px; text-align: center;">Round: {{ game.round }}</b-nav-item>
-                        <b-nav-item active v-if="!game.over" style="width: 100px; text-align: center;">Phase: {{ game.phase }}</b-nav-item>
+                        <b-nav-item active v-if="!game.over" style="width: 300px; text-align: left;">Phase: {{ game.phaseTag }}</b-nav-item>
                         <b-nav-item active v-if="game.over" style="width: 100px; text-align: center;">Game Over</b-nav-item>
                     </b-navbar-nav>
                 </b-navbar>
@@ -32,7 +32,15 @@
             </b-col>
         </b-row>
 
-        <b-row v-if="game.phase < 7" class="flex-row no-gutters">
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase != 0 && transitioning">
+            <b-col class="d-flex align-items-center justify-content-center flex-column">
+                <b-row>
+                    <div :style="`font-size: ${dictionary.styles['size-of-transition-filler']}px;`">{{ resolvePlaceHolder('phase-transition-filler', game.phaseTag) }}</div>
+                </b-row>
+            </b-col>
+        </b-row>
+
+        <b-row v-if="game.phase < 7 && !transitioning" class="flex-row no-gutters">
 
             <div class="d-flex flex-column col-8" v-if="game.phase >= 1">
                 <b-row v-if="game.phase >= 2" class="no-gutters py-1 px-2">
@@ -57,7 +65,7 @@
                                         <td>{{ condition.name }}</td>
                                         <td>{{ formatUs(player.property.v[condition.id]) }} {{ condition.id === 0 ? '' : '(' + formatUs(player.property.v[condition.id] - player.property.v[0]) + ')' }}</td>
                                         <td v-if="game.phase >= 4">
-                                            <b-form-input @keydown="isAllowed" @keyup="onChange" v-if="condition.id != 0 && player.compensationOfferReceived != true" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
+                                            <b-form-input @keydown="isAllowed" @keyup="onChange" v-if="condition.id != 0 && player.compensationOfferReceived != true && game.phase === 4" class="form-control" v-model="game.compensationOffers[condition.id]" :name="'condition_compensation_' + condition.id" :id="'condition_compensation_' + condition.id" aria-describedby="emailHelp" />
                                             <div v-if="game.phase >= 5">{{ formatUs(game.compensationOffers[condition.id]) }}</div>
                                         </td>
                                         <td v-if="game.phase === 4 || game.phase === 5 || game.phase === 6">
@@ -277,15 +285,17 @@
             </b-col>
         </b-row>
 
-        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.reward != null">
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.reward != null && !transitioning">
             <p v-html="resolvePlaceHolder(
                 'reward-earned',
                 game.reward.round,
                 formatUs(game.reward.points),
                 game.reward.exchange,
-                game.reward.reward
+                game.reward.reward.toFixed(2)
             )"/>
         </b-row>
+
+        <Survey v-if="game.over" />
     </div></b-col>
 </template>
 
@@ -297,10 +307,13 @@ import { getGameStatus } from '../services/GameService'
 import dictionary from '../assets/voting.json';
 import { LocalizedNumberParser } from 'localized-number-parser';
 import FormatService from '../services/FormatService';
+import Survey from './Survey.vue';
 
 export default {
     data() {
         return {
+            transitioning: false,
+            transitionTimeoutId: null,
             showIntructions: true,
             connection: null,
             dictionary: {},
@@ -319,6 +332,7 @@ export default {
                 winningCondition: null,
                 round: 0,
                 phase: 0,
+                phaseTag: 'Introduction',
                 ruleset: "Voting",
                 conditions: [],
                 players: [],
@@ -362,7 +376,8 @@ export default {
     components: {
         DeveloperCard,
         Confirm,
-        Acknowledge
+        Acknowledge,
+        Survey
     },
     methods: {
         openWebSocket() {
@@ -385,6 +400,9 @@ export default {
                         case "phase-transition":
                             self.game.round = ev.data.round;
                             self.game.phase = ev.data.phase;
+                            self.game.phaseTag = self.dictionary.instructions.phases[self.game.phase]?.tag;
+
+                            self.startTransition();
 
                             var phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
                                 [null, 'speculator', 'developer', 'owner'][self.player.role]
@@ -634,6 +652,17 @@ export default {
 
             self.forms.outgoingChatMessage = '';
         },
+        startTransition() {
+            if (this.transitionTimeoutId != null) {
+                clearTimeout(this.transitionTimeoutId);
+            }
+
+            this.transitioning = true;
+
+            setTimeout(() => {
+                this.transitioning = false;
+            }, 3000);
+        },
         updateTimer() {
             const self = this;
 
@@ -681,6 +710,7 @@ export default {
             }
 
             self.game = gameData.game;
+
             self.game.messageBoxes = [];
 
             if (self.game.messages != null) {
@@ -1100,6 +1130,8 @@ export default {
         }
 
         this.dictionary = dictionary;
+
+        this.game.phaseTag = this.dictionary.instructions.phases[this.game.phase]?.tag;
 
         if (dictionary.parameters.format != null) {
             this.format = dictionary.parameters.format;

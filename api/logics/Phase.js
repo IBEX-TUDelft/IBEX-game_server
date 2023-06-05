@@ -7,6 +7,7 @@ export default class Phase {
     game = null;
     wss = null;
     instructions = [];
+    complete = false;
 
     phasePlayers = [];
 
@@ -79,6 +80,10 @@ export default class Phase {
     }
 
     async onExit() {
+        if (this.timeoutId != null) {
+            clearTimeout(this.timeoutId);
+        }
+
         if (this.timer.set === true) {
             const err = this.wss.broadcastEvent(
                 this.game.id,
@@ -152,7 +157,8 @@ export default class Phase {
 
         this.timer.set = true;
 
-        setTimeout(() => {
+        this.timeoutId = setTimeout(() => {
+            console.log(`PHASE ${self.number} TIMEOUT`);
             self.complete = true;
         }, realTimeout );
 

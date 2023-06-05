@@ -16,7 +16,7 @@ class Phase6 extends JoinablePhase {
         finalPrices: []
     }
 
-    constructor(game, wss) {
+    constructor(game, wss, number) {
         super (game, wss, [{
             "type": "post-order",
             "role": null,
@@ -255,7 +255,7 @@ class Phase6 extends JoinablePhase {
             }
         }], [
             'Trade shares, they represent a percentage of the final taxes on the winning project'
-        ]);
+        ], number);
     }
 
     async onExit () {
@@ -286,7 +286,7 @@ class Phase6 extends JoinablePhase {
 
         console.log(`Allowing ${self.game.parameters.minutes_for_trading} minutes for trading`);
 
-        this.setTimer(60 * 1000 * self.game.parameters.minutes_for_trading, 60 * 1000 * self.game.parameters.minutes_for_trading);
+        //this.setTimer(60 * 1000 * self.game.parameters.minutes_for_trading, 60 * 1000 * self.game.parameters.minutes_for_trading);
     }
 
     testComplete () {
@@ -753,7 +753,7 @@ class Phase6 extends JoinablePhase {
 }
 
 export default {
-    create(game, wss) {
-        return new Phase6(game, wss);
+    create(game, wss, number) {
+        return new Phase6(game, wss, number);
     }
 }

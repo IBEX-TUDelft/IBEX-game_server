@@ -10,7 +10,7 @@ class Phase4 extends JoinablePhase {
         compensationOffers: []
     };
 
-    constructor (game, wss) {
+    constructor (game, wss, number) {
         super (game, wss, [{
             "type": "compensation-offer",
             "role": 2,
@@ -37,7 +37,7 @@ class Phase4 extends JoinablePhase {
             '-',
             'Submit your compensation offers (click the submit button)',
             'Wait for the developer to submit a compensation offer'
-        ]);
+        ], number);
     }
 
     async onEnter () {
@@ -84,12 +84,18 @@ class Phase4 extends JoinablePhase {
         const self = this;
 
         this.game.players.filter(p => p.role === 3).forEach(p => {
+            let compensationOffers = self.results.compensationOffers;
+
+            if (compensationOffers == null || compensationOffers.length === 0) {
+                compensationOffers = [0 ,0];
+            }
+
             const err = self.wss.sendEvent(
                 self.game.id,
                 p.number,
                 "compensation-offer-made",
                 {
-                    "compensationOffers": self.results.compensationOffers
+                    "compensationOffers": compensationOffers
                 }
             );
 
@@ -97,11 +103,16 @@ class Phase4 extends JoinablePhase {
                 console.error(err);
             }
         });
+
+        if (this.results.compensationOffers == null) {
+            this.results.compensationOffers = [];
+            this.game.compensationOffers = [];
+        }
     }
 }
 
 export default {
-    create(game, wss) {
-        return new Phase4(game, wss);
+    create(game, wss, number) {
+        return new Phase4(game, wss, number);
     }
 }
