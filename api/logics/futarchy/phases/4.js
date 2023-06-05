@@ -8,14 +8,14 @@ class Phase4 extends JoinablePhase {
         snipeOutcomes: []
     };
 
-    constructor(game, wss) {
-        super(game, wss, [], []);
+    constructor(game, wss, number) {
+        super(game, wss, [], [], number);
     }
 
     async onEnter () {
         await super.onEnter();
 
-        this.setTimer(5 * 1000, 5 * 1000);
+        //this.setTimer(5 * 1000, 5 * 1000);
     }
 
     getData() {
@@ -28,7 +28,7 @@ class Phase4 extends JoinablePhase {
 }
 
 export default {
-    create(game, wss) {
-        return new Phase4(game, wss);
+    create(game, wss, number) {
+        return new Phase4(game, wss, number);
     }
 }

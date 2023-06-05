@@ -114,7 +114,8 @@
                 players: null,
                 roundIndex: 0,
                 rounds: null,
-                rewards: null
+                rewards: null,
+                surveys: []
             };
         },
         components: {
@@ -208,11 +209,11 @@
 
                 const xls = [];
 
-
                 xls.push([
                     'session', 'dataset' ,'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
-                    '', 'Compensation_Req', 'Compensation_Offer', 'Compens_Delta', 'Vote', 'Num_Votes_for project', 'Total Value',
-                    'Project Realized', 'Optimal_Outcome', 'Base Points', 'Points', 'Final Score', 'Factor', 'Exchange Rate', 'Reward'
+                    '', 'Compensation_Req', 'Request_Submitted','Compensation_Offer', 'Offer_Submitted', 'Compens_Delta', 'Vote', 'Num_Votes_for project', 'Total Value',
+                    'Project Realized', 'Optimal_Outcome', 'Base Points', 'Points', 'Final Score', 'Factor', 'Exchange Rate', 'Reward',
+                    'Age', 'Gender', 'Year_of_Study', 'Faculty', 'Risk_Choice'
                 ]);                
 
                 self.rounds.forEach(round => {
@@ -260,22 +261,40 @@
                             const values = self.getPlayerValues(player.number, round.round);
                             const compensationReq = self.extractDataFromObject(self.compensationRequests[roundNr].find(cr => cr.number === player.number), 'compensationRequests', 1);
                             const compensationOffer = player.role != 2 ? self.compensationOffers[roundNr][1] : '';
-                            const compensationDelta = player.role != 2 ? compensationOffer - compensationReq : '';
+                            const compensationOfferNumber = isNaN(parseInt(compensationOffer)) ? 0 : parseInt(compensationOffer);
+                            const requestSubmitted = player.role != 2 ? (isNaN(parseInt(compensationReq)) ? 'No' : 'Yes') : '';
+                            const compensationReqNumber = isNaN(parseInt(compensationReq)) ? 0 : parseInt(compensationReq);
+                            const compensationDelta = player.role != 2 ? (compensationOfferNumber - compensationReqNumber) : '';
+                            const offerSubmitted = player.role === 2 ? (isNaN(parseInt(compensationOffer)) ? 'No' : 'Yes') : '';
 
                             let total = values[winningCondition];
 
+                            let compensationOfferWinningCondition = 0;
+
+                            if (
+                                    self.compensationOffers != null &&
+                                    self.compensationOffers[roundNr] != null &&
+                                    self.compensationOffers[roundNr][winningCondition] != null &&
+                                    !isNaN(parseInt(self.compensationOffers[roundNr][winningCondition]))
+                            ) {
+                                compensationOfferWinningCondition = parseInt(self.compensationOffers[roundNr][winningCondition]);
+                            }
+
                             if (player.role === 2) {
-                                total -= self.players.filter(p => p.role === 3).length * self.compensationOffers[roundNr][winningCondition];
+                                total -= self.players.filter(p => p.role === 3).length * compensationOfferWinningCondition;
                             } else {
-                                total += self.compensationOffers[roundNr][winningCondition];
+                                total += compensationOfferWinningCondition;
                             }
 
                             const playerReward = self.rewards.find(r => r.number === player.number);
 
+                            const survey = self.surveys.find(s => s.number === player.number);
+
                             xls.push([self.startTime,self.dataset,player.number,round.round, player.tag, player.role, self.ruleset, values[0], values[1],
-                            '',compensationReq, compensationOffer, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
+                            '',compensationReq, requestSubmitted, compensationOffer, offerSubmitted, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
                             self.getStandingCounter(round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No',
-                            playerReward.basePoints, playerReward.profit, playerReward.points, playerReward.factor, playerReward.exchange, playerReward.reward
+                            playerReward.basePoints, playerReward.profit, playerReward.points, playerReward.factor, playerReward.exchange, playerReward.reward,
+                            survey?.age, survey?.gender, survey?.yearOfStudy, survey?.faculty, survey?.risk
                             ]);
                         });
                     } catch (e) {
@@ -324,10 +343,16 @@
                 return this.formatUs(this.compensationOffers[roundNumber][condition]);
             },
             getCompensationAccepted(roundNumber, number, condition) {
+                const player = this.players.find(p => p.number === number);
+
+                if (player == null || player.role != 3) {
+                    return '';
+                }
+
                 const playerCompensationDecisions = this.compensationDecisions[roundNumber].find(acd => acd.number === number);
 
                 if (playerCompensationDecisions == null || playerCompensationDecisions.compensationDecisions == null) {
-                    return null;
+                    return 'Abs';
                 }
 
                 return playerCompensationDecisions.compensationDecisions.includes(condition) ? 'Yes' : 'No';
@@ -427,6 +452,16 @@
                     game_id: self.gameId
                 }
             });
+
+            const surveyResponse = await this.$http.get("/games/surveys", {
+                params: {
+                    token,
+                    game_id: self.gameId
+                }
+            });
+
+            this.ruleset = surveyResponse.data.data.ruleset;
+            this.surveys = surveyResponse.data.data.records;
 
             function extractProperty (rounds, phase, property) {
                 const result = [];

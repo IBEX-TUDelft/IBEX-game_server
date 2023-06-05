@@ -4,10 +4,10 @@ class Phase1 extends JoinablePhase {
 
     complete = false;
 
-    constructor (game, wss) {
+    constructor (game, wss, number) {
         super (game, wss, [], [
             'All players joined, the game will start shortly'
-        ]);
+        ], number);
     }
 
     async onEnter () {
@@ -61,9 +61,7 @@ class Phase1 extends JoinablePhase {
             {
                 "players": players
             }
-        );
-        
-        this.setTimer(15 * 1000, 15 * 1000); //Timer of 15 seconds requested by Sander
+        );        
     }
 
     getData() {
@@ -76,7 +74,7 @@ class Phase1 extends JoinablePhase {
 }
 
 export default {
-    create(game, wss) {
-        return new Phase1(game, wss);
+    create(game, wss, number) {
+        return new Phase1(game, wss, number);
     }
 }

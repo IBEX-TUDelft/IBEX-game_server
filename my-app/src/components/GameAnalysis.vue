@@ -239,7 +239,8 @@
                 finalPrices: [],
                 wallets: [],
                 cashForSniping: [],
-                rewards: null
+                rewards: null,
+                surveys: null
             };
         },
         components: {
@@ -458,7 +459,7 @@
 
                 xls.push([
                     'session', 'dataset', 'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
-                    'Declaration1_noProject', 'Declaration1_projectA', 'Taxes1_noProject', 'Taxes1_projectA', 'ProjectOutcome', '',
+                    'Declaration1_noProject', 'Declaration1_projectA', 'Taxes1_noProject', 'Taxes1_projectA', 'Declaration1_acted', 'ProjectOutcome', '',
                     'Signal_PublicNP', 'sig_pubP', 'SigPrivateNP', 'SigPrivateP', '',
                     'snipe1_TNP_owner1', 'snipe1_TNP_owner2', 'snipe1_TNP_owner3', 'snipe1_TNP_owner4', 'snipe1_TNP_owner5', 'snipe1_TNP_dev', '',
                     'snipe1_TP_owner1', 'snipe1_TP_owner2', 'snipe1_TP_owner3', 'snipe1_TP_owner4', 'snipe1_TP_owner5', 'snipe1_TP_dev', '',
@@ -466,14 +467,15 @@
                     'Dec1_Owner1_P', 'Dec1_Owner2_P', 'Dec1_Owner3_P', 'Dec1_Owner4_P', 'Dec1_Owner5_P', 'Dec1_Dev_P', '',
                     'snipe1_TNP_owner1_result', 'snipe1_TNP_owner2_result', 'snipe1_TNP_owner3_result', 'snipe1_TNP_owner4_result', 'snipe1_TNP_owner5_result', 'snipe1_TNP_dev_result', '',
                     'snipe1_TP_owner1_result', 'snipe1_TP_owner2_result', 'snipe1_TP_owner3_result', 'snipe1_TP_owner4_result', 'snipe1_TP_owner5_result', 'snipe1_TP_dev_result', '',
-                    'Declaration2_Outcome',	'Taxes2_Outcome', '',
+                    'Declaration2_Outcome',	'Taxes2_Outcome', 'Declaration2_acted', '',
                     'snipe2_TO_owner1', 'snipe2_TO_owner2',	'snipe2_TO_owner3', 'snipe2_TO_owner4', 'snipe2_TO_owner5', 'snipe2_TO_dev', '',
                     'Dec2_Owner1_O', 'Dec2_Owner2_O', 'Dec2_Owner3_O', 'Dec2_Owner4_O', 'Dec2_Owner5_O', 'Dec2_Dev_O', '',
                     'snipe2_TO_owner1_result', 'snipe2_TO_owner2_result', 'snipe2_TO_owner3_result', 'snipe2_TO_owner4_result', 'snipe2_TO_owner5_result', 'snipe2_TO_dev_result', '',
                     'Num_Bids_NP', 'Num_Asks_NP', 'Num_Buys_NP', 'Num_Sells_NP', 'Ending_Cash_NP', 'Ending_Shares_NP', '',
                     'Num_Bids_P', 'Num_Asks_P', 'Num_Buys_P', 'Num_Sells_P', 'Ending_Cash_P', 'Ending_Shares_P', '',
                     'snipe1_end_result', 'Property Value_min_Tax1', 'Trading_Result', 'snipe2_end_results', 'Property Value_min_Tax2', 'Total Earnings',
-                    'base_points', 'points', 'final_score', 'factor', 'exchange_rate', 'reward'
+                    'base_points', 'points', 'final_score', 'factor', 'exchange_rate', 'reward',
+                    'Age', 'Gender', 'Year_of_Study', 'Faculty', 'Risk_Choice'
                 ]);                
 
                 const ownerNumbers = [null, null, null, null, null, null];
@@ -504,38 +506,40 @@
                     self.players.forEach(player => {
                         const xlsRow = [self.startTime,self.dataset,player.number,round.round, player.tag, player.role, self.ruleset];
 
+                        const firstDeclaration = self.firstDeclarations[roundIdx].find(d => d.player === player.number);
+                        
                         self.conditions.forEach((c) => { //Values
-                            const declaration = self.firstDeclarations[roundIdx].find(d => d.player === player.number);
-
-                            if (declaration == null) {
+                            if (firstDeclaration == null) {
                                 xlsRow.push(null);
                                 return;
                             }
 
-                            xlsRow.push(declaration.value[c.id]);
+                            xlsRow.push(firstDeclaration.value[c.id]);
                         });
 
                         self.conditions.forEach((c) => { //First declarations
-                            const declaration = self.firstDeclarations[roundIdx].find(d => d.player === player.number);
-
-                            if (declaration == null) {
+                            if (firstDeclaration == null) {
                                 xlsRow.push(null);
                                 return;
                             }
 
-                            xlsRow.push(declaration.declaration[c.id]);
+                            xlsRow.push(firstDeclaration.declaration[c.id]);
                         });
 
                         self.conditions.forEach((c) => { //Taxes
-                            const declaration = self.firstDeclarations[roundIdx].find(d => d.player === player.number);
-
-                            if (declaration == null) {
+                            if (firstDeclaration == null) {
                                 xlsRow.push(null);
                                 return;
                             }
 
-                            xlsRow.push(declaration.taxes[c.id]);
+                            xlsRow.push(firstDeclaration.taxes[c.id]);
                         });
+
+                        if (firstDeclaration != null) {
+                            xlsRow.push(firstDeclaration.declared === true ? 'Yes' : 'No'); //Pressed 'Declare' button
+                        } else {
+                            xlsRow.push(null);
+                        }
 
                         xlsRow.push(self.conditions[winningCondition].key); //outcome
 
@@ -650,10 +654,11 @@
                         const secondDeclaration = self.secondDeclarations[roundIdx].find(d => d.player === player.number);
 
                         if (secondDeclaration == null) {
-                            xlsRow.push(null, null);
+                            xlsRow.push(null, null, null);
                         } else {
                             xlsRow.push(secondDeclaration.declaration[winningCondition]);
                             xlsRow.push(secondDeclaration.taxes[winningCondition]);
+                            xlsRow.push(firstDeclaration.declared === true ? 'Yes' : 'No'); //Pressed 'Declare' buttons
                         }//End pf Second Declarations and Taxes
 
                         xlsRow.push(null);
@@ -809,6 +814,10 @@
                         xlsRow.push(playerReward.exchange);
                         xlsRow.push(playerReward.reward);
 
+                        const survey = self.surveys.find(s => s.number === player.number);
+
+                        xlsRow.push(survey?.age, survey?.gender, survey?.yearOfStudy, survey?.faculty, survey?.risk);
+                        
                         xls.push(xlsRow);
                     });
                     } catch(e) {
@@ -923,6 +932,15 @@
                     game_id: self.gameId
                 }
             });
+
+            const surveyResponse = await this.$http.get("/games/surveys", {
+                params: {
+                    token,
+                    game_id: self.gameId
+                }
+            });
+
+            this.surveys = surveyResponse.data.data.records;
 
             this.dataset = response.data.data.dataset;
             this.rounds = response.data.data.results;

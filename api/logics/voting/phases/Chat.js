@@ -3,15 +3,13 @@ import WS from '../../../helpers/websocket.js';
 
 class Chat extends JoinablePhase {
 
-    complete = false;
-
     messageCounter = 0;
 
     results = {
         chatLog: []
     };
 
-    constructor (game, wss) {
+    constructor (game, wss, number) {
         super (game, wss, [{
             "type": "chat-with-players",
             "role": null,
@@ -70,7 +68,7 @@ class Chat extends JoinablePhase {
             }
         }], [
             'Click on a plot to chat with its owner'
-        ]);
+        ], number);
     }
 
     async onEnter () {
@@ -80,9 +78,9 @@ class Chat extends JoinablePhase {
         const visibleTimeout = this.game.parameters.seconds_for_deliberation;
         const totalTimeout = (visibleTimeout + Math.floor(Math.random() * parseInt(process.env.VOTING_CHAT_MAX_EXTRA_TIME))) * 1000;
 
-        console.log(`Timer: ${process.env.VOTING_CHAT_FIXED_DURATION}s visible, ${process.env.VOTING_CHAT_MAX_EXTRA_TIME}s extra. Total: ${totalTimeout}ms`);
+        //console.log(`Timer: ${process.env.VOTING_CHAT_FIXED_DURATION}s visible, ${process.env.VOTING_CHAT_MAX_EXTRA_TIME}s extra. Total: ${totalTimeout}ms`);
 
-        this.setTimer(visibleTimeout * 1000, totalTimeout);
+        //this.setTimer(visibleTimeout * 1000, totalTimeout);
     }
 
     getData() {
@@ -96,7 +94,7 @@ class Chat extends JoinablePhase {
 }
 
 export default {
-    create(game, wss) {
-        return new Chat(game, wss);
+    create(game, wss, number) {
+        return new Chat(game, wss, number);
     }
 }

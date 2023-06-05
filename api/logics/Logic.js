@@ -176,7 +176,7 @@ export default class {
 
         const transition = await this.data.currentPhase.onMessage(ws, message);
 
-        if (transition) {
+        if (this.data.currentPhase.complete === true || transition) {
             await this.nextPhase();
         }
     }
@@ -232,7 +232,7 @@ export default class {
 
         const Phase = this.phases[this.data.currentRound.phase];
 
-        this.data.currentPhase = Phase.create(this.data, this.wss);
+        this.data.currentPhase = Phase.create(this.data, this.wss, this.data.currentRound.phase);
         
         await this.data.currentPhase.onEnter();
 
@@ -262,7 +262,7 @@ export default class {
         this.phaseCheckingInterval = setInterval(async () => {
             const transition = await self.data.currentPhase.testComplete();
 
-            if (transition) {
+            if (self.data.currentPhase.complete === true || transition) {
                 try {
                     await self.nextPhase();
                 } catch(e) {
@@ -391,7 +391,7 @@ export default class {
                 const reward = {
                     "number": p.number,
                     "round": chosenRound,
-                    "reward": Math.round(points / factor),
+                    "reward": Math.round(points * 100 / factor) / 100,
                     "basePoints": basePoints,
                     "profit": profit,
                     "points": points,
@@ -444,7 +444,7 @@ export default class {
 
         console.log('Data saved');
 
-        this.data.currentPhase = this.phases[0].create(this.data, this.wss);
+        this.data.currentPhase = this.phases[0].create(this.data, this.wss, 0);
 
         console.log('Phase created');
 

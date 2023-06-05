@@ -29,7 +29,13 @@ export default class Voting extends Logic {
         const value = result.phase[1].players.find(p => p.number === playerNumber)
             .values[this.data.winningCondition];
 
-        let compensation = result.phase[4].compensationOffers[this.data.winningCondition];
+        let compensationOffers = result.phase[4].compensationOffers;
+
+        if (compensationOffers == null || compensationOffers.length === 0) {
+            compensationOffers = [0,0];
+        }
+
+        let compensation = compensationOffers[this.data.winningCondition];
 
         if (player.role === 2) {
             compensation = - compensation * (result.phase[1].players.length - 1);
@@ -146,7 +152,13 @@ export default class Voting extends Logic {
         }
 
         if (self.data.winningCondition != null) {
-            const compensation = self.data.compensationOffers[self.data.winningCondition];
+            let compensationOffers = self.data.compensationOffers;
+
+            if (compensationOffers == null || compensationOffers.length === 0) {
+                compensationOffers = [0,0];
+            }
+
+            const compensation = compensationOffers[self.data.winningCondition];
 
             player.result = {
                 "condition": self.data.winningCondition,
@@ -192,11 +204,17 @@ export default class Voting extends Logic {
             summary.value = playerData.property.v[this.data.winningCondition];
             summary.tally = this.data.currentPhase.results.standings[this.data.winningCondition].counter;
 
+            let compensationOffers = this.data.compensationOffers;
+
+            if (compensationOffers == null || compensationOffers.length === 0) {
+                compensationOffers = [0, 0];
+            }
+
             if (playerData.role === 2) {
-                summary.compensation = - this.data.compensationOffers[this.data.winningCondition] * ( this.data.players.length - 1);
+                summary.compensation = - compensationOffers[this.data.winningCondition] * ( this.data.players.length - 1);
                 summary.profit = summary.value + summary.compensation;
             } else {
-                summary.compensation = this.data.compensationOffers[this.data.winningCondition];
+                summary.compensation = compensationOffers[this.data.winningCondition];
                 summary.profit = summary.value + summary.compensation;
             }
         }

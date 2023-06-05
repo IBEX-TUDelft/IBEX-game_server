@@ -8,7 +8,7 @@ class Phase2 extends JoinablePhase {
         expectations: null
     };
 
-    constructor(game, wss) {
+    constructor(game, wss, number) {
         super (game, wss, [{
             "type": "declare",
             "role": [2,3],
@@ -57,7 +57,8 @@ class Phase2 extends JoinablePhase {
                     "role": player.role,
                     "value": [...player.property.v],
                     "declaration": message.declaration,
-                    "taxes": message.declaration.map(d => d * game.parameters.tax_rate_initial / 100)
+                    "taxes": message.declaration.map(d => d * game.parameters.tax_rate_initial / 100),
+                    "declared": true
                 });
 
                 wss.broadcastInfo(game.id, `Player ${player.name} submitted a declaration of values.`, null);
@@ -73,7 +74,7 @@ class Phase2 extends JoinablePhase {
             'Wait for all property owners to send their declarations',
             'Fill the declaration with a value under all conditions. Use the real value as a reference',
             'Fill the declaration with a value under all conditions. Use the real value as a reference'
-        ]);
+        ], number);
     }
 
     async onEnter () {
@@ -134,6 +135,43 @@ class Phase2 extends JoinablePhase {
         return this.game.properties.find(p => p.d == null) == null; //true when all properties have a declaration
     }
 
+    async onExit () {
+        await super.onExit();
+
+        const self = this;
+
+        this.game.players.forEach(player => {
+            const property = player.property;
+
+            if (property == null || (property.d != null && property.d.length > 0)) {
+                return;
+            }
+
+            property.d = [0, 0];
+
+            const roles = [null, 'speculator', 'developer', 'owner'];
+
+            for (let i = 0; i < self.game.conditions.length; i++) {
+                const condition = self.game.conditions[i];
+
+                const high = self.game.parameters[`${roles[player.role]}_${condition.parameter}_high`];
+                const low = self.game.parameters[`${roles[player.role]}_${condition.parameter}_low`];
+
+                //property.d[i] = low + Math.round((high - low) * Math.random());
+                property.d[i] = low;
+            }
+
+            self.results.declarations.push({
+                "player": player.number,
+                "role": player.role,
+                "value": [...player.property.v],
+                "declaration": property.d,
+                "declared": false,
+                "taxes": property.d.map(d => d * self.game.parameters.tax_rate_initial / 100)
+            });
+        });
+    }
+
     getData() {
         return this.game.properties.map(p => {
             return {
@@ -146,7 +184,7 @@ class Phase2 extends JoinablePhase {
 }
 
 export default {
-    create(game, wss) {
-        return new Phase2 (game, wss);
+    create(game, wss, number) {
+        return new Phase2 (game, wss, number);
     }
 }

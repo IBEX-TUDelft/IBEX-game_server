@@ -5,51 +5,61 @@
     "instructions": {
         "phases": [{
             "number": 0,
+            "tag": "Introduction",
             "speculator": "Please wait for all players to be ready.",
             "owner": "Please wait for all players to be ready.",
             "developer": "Please wait for all players to be ready."
         }, {
             "number": 1,
+            "tag": "Presentation",
             "speculator": "All the players are ready, the round will start shortly.",
             "owner": "All the players are ready, the round will start shortly.",
             "developer": "All the players are ready, the round will start shortly."
         }, {
             "number": 2,
+            "tag": "Declaration",
             "speculator": "Please wait for all property owners to make their declarations.",
             "owner": "Provide a declared value under all conditions. You can use the real value as a reference.",
             "developer": "Provide a declared value under all conditions. You can use the real value as a reference."
         }, {
             "number": 3,
+            "tag": "Speculation",
             "speculator": "Analyse all declared values in all treatments and choose which properties to buy at the declared price.",
             "owner": "Please wait for the speculators to make their decisions.",
             "developer": "Please wait for the speculators to make their decisions."
         }, {
             "number": 4,
+            "tag": "Reconciliation",
             "speculator": "Reconciliation in progress, please wait ...",
             "owner": "Reconciliation in progress, please wait ...",
             "developer": "Reconciliation in progress, please wait ..."
         }, {
             "number": 5,
+            "tag": "Transition",
             "speculator": "Saving the results, please wait ...",
             "owner": "Saving the results, please wait ...",
             "developer": "Saving the results, please wait ..."
         }, {
             "number": 6,
+            "tag": "Market",
             "speculator": "Each share in the selected condition pays its owner 1% of taxes collected. The market with the highest median price (of last 7 trades) is selected.",
             "owner": "Each share in the selected condition pays its owner 1% of taxes collected. The market with the highest median price (of last 7 trades) is selected.",
             "developer": "Each share in the selected condition pays its owner 1% of taxes collected. The market with the highest median price (of last 7 trades) is selected."
         }, {
             "number": 7,
+            "tag": "Declaration",
             "speculator": "Please wait for all property owners to make their declarations.",
             "owner": "Declare a value for the selected condition.",
             "developer": "Declare a value for the selected condition."
         }, {
             "number": 8,
-            "speculator": "Review the property owners’ declarations. Select the property(ies), if any, you wish to buy and re-sell at the declared price.",
+            "tag": "Speculation",
+            "speculator": "Review the property owners' declarations. Select the property(ies), if any, you wish to buy and re-sell at the declared price.",
             "owner": "Wait for the speculators to make their decisions.",
             "developer": "Wait for the speculators to make their decisions."
         }, {
             "number": 9,
+            "tag": "Results",
             "speculator": "Results of this round.",
             "owner": "Results of this round.",
             "developer": "Results of this round."
@@ -96,6 +106,11 @@
         "order-price-missing": "You did not specify the price of your offer",
         "order-price-negative": "Order prices must be non negative. Your price: ${0}",
         "no-shares-available": "You have already committed all your shares ${0} in other asks. You can cancel them if you want to publish new ones",
-        "no-balance-available": "You have already committed much of your balance (${0}) in other bids, The remainder (${1}) is not enough to bid ${2}. You may cancel previous bids to free some of your balance."
+        "no-balance-available": "You have already committed much of your balance (${0}) in other bids, The remainder (${1}) is not enough to bid ${2}. You may cancel previous bids to free some of your balance.",
+        "preparing-next-phase": "Moving to phase ${0} ...",
+        "present-survey": "Before you go, please answer some questions:",
+        "phase-transition-filler": "Moving to ${0} phase"
+    }, "styles": {
+        "size-of-transition-filler": 36
     }
 }

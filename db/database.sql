@@ -69,3 +69,16 @@ CREATE TABLE IF NOT EXISTS game_players (
     shares BIGINT NOT NULL DEFAULT 0,
     player_role SMALLINT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS setting_templates (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(64) NOT NULL,
+    content TEXT
+);
+
+CREATE TABLE IF NOT EXISTS game_surveys (
+    id SERIAL PRIMARY KEY,
+    player_number SMALLINT NOT NULL,
+    game_id BIGINT NOT NULL,
+    content TEXT
+);

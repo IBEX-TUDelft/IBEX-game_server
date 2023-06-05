@@ -22,14 +22,17 @@
                     <td>{{ item.currentRound.phase }}</td>
                     <td>
                         <div class="row">
-                            <div class="btn-toolbar col-md-4">
+                            <div class="btn-toolbar col-md-3">
                                 <button type="button" @click='joinGame(item.id)' class="btn btn-primary">Join</button>
                             </div>
-                            <div class="btn-toolbar col-md-4">
+                            <div class="btn-toolbar col-md-3">
                                 <button type="button" @click='analyseGame(item.id, item.type)' class="btn btn-primary">Analyse</button>
                             </div>
-                            <div class="btn-toolbar col-md-4">
+                            <div class="btn-toolbar col-md-3">
                                 <button type="button" @click='interationLog(item.id, item.type)' class="btn btn-primary">{{ item.type === 'voting' ? 'Chat' : 'Market'}} Log</button>
+                            </div>
+                            <div class="btn-toolbar col-md-3">
+                                <button type="button" @click='surveys(item.id)' class="btn btn-primary">Surveys</button>
                             </div>
                         </div>
                     </td>
@@ -118,6 +121,15 @@ export default {
 
             try {
                 const routeData = this.$router.resolve({path: `/${subPath}/${id}`});
+                console.log('HRef:' + routeData.href);
+                window.open(routeData.href, '_blank');
+            } catch (e) {
+                console.log(e);
+            }
+        },
+        surveys: async function(id) {
+            try {
+                const routeData = this.$router.resolve({path: `/surveys/${id}`});
                 console.log('HRef:' + routeData.href);
                 window.open(routeData.href, '_blank');
             } catch (e) {

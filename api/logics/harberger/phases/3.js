@@ -7,7 +7,7 @@ class Phase3 extends JoinablePhase {
         winningCondition: null
     };
 
-    constructor(game, wss) {
+    constructor(game, wss, number) {
         super (game, wss, [{
             "type": "done-speculating",
             "role": [1],
@@ -62,7 +62,7 @@ class Phase3 extends JoinablePhase {
             'Analyse all declarations and choose which ones to target, under all conditions',
             'Wait for the speculators to make their decisions',
             'Wait for the speculators to make their decisions'
-        ]);
+        ], number);
     }
 
     async onEnter () {
@@ -164,7 +164,7 @@ class Phase3 extends JoinablePhase {
         }
 
 
-        this.setTimer(self.game.parameters.minutes_for_sniping * 60 * 1000, self.game.parameters.minutes_for_sniping * 60 * 1000);
+        //this.setTimer(self.game.parameters.minutes_for_sniping * 60 * 1000, self.game.parameters.minutes_for_sniping * 60 * 1000);
     }
 
     getData() {
@@ -178,12 +178,12 @@ class Phase3 extends JoinablePhase {
     }
 
     testComplete () {
-        return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0 || this.complete === true;
+        return this.game.players.filter(p => p.role === 1).filter(p => !p.doneSpeculating).length == 0;
     }
 }
 
 export default {
-    create(game, wss) {
-        return new Phase3(game, wss);
+    create(game, wss, number) {
+        return new Phase3(game, wss, number);
     }
 }

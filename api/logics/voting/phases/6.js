@@ -7,10 +7,8 @@ class End extends JoinablePhase {
         winningCondition: null
     };
 
-    complete = false;
-
-    constructor (game, wss) {
-        super (game, wss, [], ['The results of this round are available']);
+    constructor (game, wss, number) {
+        super (game, wss, [], ['The results of this round are available'], number);
     }
 
     async onEnter () {
@@ -20,9 +18,29 @@ class End extends JoinablePhase {
 
         const self = this;
 
-        const quorum = Math.ceil(self.game.players.filter(p => p.role === 3).length / 2);
+        let validVotes = 0;
+
+        self.game.players.filter(p => p.role === 3).forEach(player => {
+            if (player.compensationDecisions != null && player.compensationDecisions.length > 0) {
+                validVotes ++;
+            }
+        });
+
+        const quorum = Math.ceil(validVotes / 2);
+
+        console.log(`Valid votes: ${validVotes}, Quorum: ${quorum}`);
 
         const developer = self.game.players.find(p => p.role === 2);
+
+        console.log('COMPENSATION OFFERS');
+        console.log(self.game.compensationOffers);
+        
+        let compensationOffers = self.game.compensationOffers;
+
+
+        if (compensationOffers == null || compensationOffers.length === 0) {
+            compensationOffers = [0, 0];
+        }
 
         self.game.conditions.forEach(c => {
             self.results.standings.push({
@@ -30,11 +48,12 @@ class End extends JoinablePhase {
                 "id": c.id,
                 "winner": false,
                 "value": developer.property.v[c.id],
-                "compensation": self.game.compensationOffers[c.id]
+                "compensation": compensationOffers[c.id]
             });
 
-            self.game.players.forEach(player => {
-                if (player.role === 3 && player.compensationDecisions.includes(c.id)) {
+            self.game.players.filter(p => p.role === 3 && p.compensationDecisions != null && p.compensationDecisions.length > 0)
+            .forEach(player => {
+                if (player.compensationDecisions.includes(c.id)) {
                     self.results.standings[c.id].counter ++;
                 }
             })
@@ -78,8 +97,6 @@ class End extends JoinablePhase {
                 console.error(err);
             }
         });
-
-        this.setTimer(30 * 1000, 30 * 1000);
     }
 
     testComplete () {
@@ -108,7 +125,7 @@ class End extends JoinablePhase {
 }
 
 export default {
-    create(game, wss) {
-        return new End(game, wss);
+    create(game, wss, number) {
+        return new End(game, wss, number);
     }
 }

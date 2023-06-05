@@ -42,3 +42,45 @@ export async function getGameStatus(id, recovery) {
 
   return response.data.data;
 }
+
+export async function saveTemplate(template) {
+  const response = await http.post("/templates/push", template);
+
+  return response.data.data;
+}
+
+export async function loadTemplateList(type) {
+  const response = await http.get("/templates/list", {
+    params: {
+        "type": type
+    }
+  });
+
+  return response.data.data;
+}
+
+export async function loadTemplate(id) {
+  const response = await http.get("/templates/load", {
+    params: {
+        "id": id
+    }
+  });
+
+  return response.data.data;
+}
+
+export async function sendSurvey(data) {
+  const response = await http.post("/games/survey", data);
+
+  return response.data.data;
+}
+
+export async function findSurveys(gameId) {
+  const response = await http.get("/games/surveys", {
+    params: {
+        "id": gameId
+    }
+  });
+
+  return response.data.data;
+}

@@ -7,7 +7,7 @@ class Phase3 extends JoinablePhase {
         winningCondition: null
     };
 
-    constructor(game, wss) {
+    constructor(game, wss, number) {
         super (game, wss, [{
             "type": "done-speculating",
             "role": [1],
@@ -67,7 +67,7 @@ class Phase3 extends JoinablePhase {
             'Analyse all declarations under all conditions. Choose which, if any, properties you want to buy at the declared value.',
             'Wait for the speculators to make their decisions.',
             'Wait for the speculators to make their decisions.'
-        ]);
+        ], number);
     }
 
     async onEnter () {
@@ -160,7 +160,7 @@ class Phase3 extends JoinablePhase {
             console.log(err);
         }
 
-        this.setTimer(self.game.parameters.minutes_for_sniping * 60 * 1000, self.game.parameters.minutes_for_sniping * 60 * 1000);
+        //this.setTimer(self.game.parameters.minutes_for_sniping * 60 * 1000, self.game.parameters.minutes_for_sniping * 60 * 1000);
     }
 
     getData() {
@@ -179,7 +179,7 @@ class Phase3 extends JoinablePhase {
 }
 
 export default {
-    create(game, wss) {
-        return new Phase3(game, wss);
+    create(game, wss, number) {
+        return new Phase3(game, wss, number);
     }
 }

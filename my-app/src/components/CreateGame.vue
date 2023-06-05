@@ -41,7 +41,7 @@
                     </b-form-checkbox>
             </div>
 
-            <div v-if="game_type === 'voting'" class="row">
+            <!--div v-if="game_type === 'voting'" class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Seconds for Deliberation</label>
                 </div>
@@ -63,7 +63,7 @@
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="minutes_for_sniping" name="minutes_for_sniping" id="minutes_for_sniping" aria-describedby="emailHelp" placeholder="2" />
                 </div>
-            </div>
+            </div-->
 
             <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
@@ -114,6 +114,86 @@
                 </div>
                 <div class="form-group col-md-1" v-if="generate_signals === true">
                     <input type="number" class="form-control" v-model="signal_high" name="signal_high" id="signal_high" aria-describedby="emailHelp" step="0.1" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 mt-3 mb-3">
+                    <h3>Timers of Phases</h3>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#0</label>
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_0" name="timer_phase_0" id="timer_phase_0" aria-describedby="emailHelp" />
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#1</label>
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_1" name="timer_phase_1" id="timer_phase_1" aria-describedby="emailHelp" />
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#2</label>
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_2" name="timer_phase_2" id="timer_phase_2" aria-describedby="emailHelp" />
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#3</label>
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_3" name="timer_phase_3" id="timer_phase_3" aria-describedby="emailHelp" />
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#4</label>
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_4" name="timer_phase_4" id="timer_phase_4" aria-describedby="emailHelp" />
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#5</label>
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_5" name="timer_phase_5" id="timer_phase_5" aria-describedby="emailHelp" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#6</label>
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_6" name="timer_phase_6" id="timer_phase_6" aria-describedby="emailHelp" />
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#7</label>
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_7" name="timer_phase_7" id="timer_phase_7" aria-describedby="emailHelp" />
+                </div>
+
+                <div v-if="game_type != 'voting'" class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#8</label>
+                </div>
+                <div v-if="game_type != 'voting'" class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_8" name="timer_phase_8" id="timer_phase_8" aria-describedby="emailHelp" />
+                </div>
+
+                <div v-if="game_type != 'voting'" class="form-group col-md-1">
+                    <label htmlFor="exampleInputEmail1">#9</label>
+                </div>
+                <div v-if="game_type != 'voting'" class="form-group col-md-1">
+                    <input type="number" class="form-control" v-model="timer_phase_9" name="timer_phase_9" id="timer_phase_9" aria-describedby="emailHelp" />
                 </div>
             </div>
 
@@ -444,6 +524,16 @@ export default {
             speculators_reward_scale_factor: defaultRewardScaleFactor.harberger.speculator,
             owners_reward_scale_factor: defaultRewardScaleFactor.harberger.owner,
             developers_reward_scale_factor: defaultRewardScaleFactor.harberger.developer,
+            timer_phase_0: null,
+            timer_phase_1: 12,
+            timer_phase_2: 120,
+            timer_phase_3: 120,
+            timer_phase_4: 3,
+            timer_phase_5: 3,
+            timer_phase_6: 600,
+            timer_phase_7: 120,
+            timer_phase_8: 120,
+            timer_phase_9: 30
         }
     },
     components: {
@@ -497,6 +587,15 @@ export default {
             this.speculators_reward_scale_factor = defaultRewardScaleFactor[this.game_type].speculator;
             this.owners_reward_scale_factor = defaultRewardScaleFactor[this.game_type].owner;
             this.developers_reward_scale_factor = defaultRewardScaleFactor[this.game_type].developer;
+
+            this.timer_phase_0 = null;
+            this.timer_phase_1 = 13;
+            this.timer_phase_2 = 120;
+            this.timer_phase_3 = 120;
+            this.timer_phase_4 = 120;
+            this.timer_phase_5 = 120;
+            this.timer_phase_6 = 120;
+            this.timer_phase_7 = 30;
         },
         createGame() {
             const payload = {
@@ -566,6 +665,18 @@ export default {
                             high: this.project_b_owner_high
                         }
                     }
+                },
+                timers: {
+                    phase_0: this.timer_phase_0,
+                    phase_1: this.timer_phase_1,
+                    phase_2: this.timer_phase_2,
+                    phase_3: this.timer_phase_3,
+                    phase_4: this.timer_phase_4,
+                    phase_5: this.timer_phase_5,
+                    phase_6: this.timer_phase_6,
+                    phase_7: this.timer_phase_7,
+                    phase_8: this.timer_phase_8,
+                    phase_9: this.timer_phase_9
                 },
                 round_count: this.round_count,
                 game_type: this.game_type,

@@ -2,7 +2,7 @@ import JoinablePhase from "../JoinablePhase.js";
 
 class WaitToStartPhase extends JoinablePhase {
 
-    constructor (game, wss) {
+    constructor (game, wss, number) {
         super (game, wss, [{
             "type": "player-is-ready",
             "role": null,
@@ -20,7 +20,7 @@ class WaitToStartPhase extends JoinablePhase {
                     console.error(err);
                 }
             }
-        }]);
+        }], 0);
     }
 
     testComplete () {
@@ -42,6 +42,6 @@ class WaitToStartPhase extends JoinablePhase {
 
 export default {
     create(game, wss) {
-        return new WaitToStartPhase(game, wss);
+        return new WaitToStartPhase(game, wss, 0);
     }
 }

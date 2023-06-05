@@ -8,7 +8,7 @@ class Vote extends JoinablePhase {
         compensationDecisions: []
     };
 
-    constructor (game, wss) {
+    constructor (game, wss, number) {
         super (game, wss, [{
             "type": "compensation-decision",
             "role": null,
@@ -36,7 +36,7 @@ class Vote extends JoinablePhase {
             '-',
             'Wait for all owners to submit their decisions on your offer',
             'Submit your final decision, remember to click on the submit button. Wait for all to submit.'
-        ]);
+        ], number);
     }
 
     async onEnter () {
@@ -56,10 +56,20 @@ class Vote extends JoinablePhase {
     testComplete () {
         return this.game.players.find(p => p.role === 3 && p.compensationDecisions == null) == null;
     }
+
+    async onExit() {
+        await super.onExit();
+
+        this.game.players.forEach(p => {
+            if (p.role === 3 && p.compensationDecisions == null) {
+                p.compensationDecisions = [];
+            }
+        });
+    }
 }
 
 export default {
-    create(game, wss) {
-        return new Vote(game, wss);
+    create(game, wss, number) {
+        return new Vote(game, wss, number);
     }
 }
