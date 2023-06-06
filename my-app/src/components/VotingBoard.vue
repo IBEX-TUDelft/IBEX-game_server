@@ -16,7 +16,7 @@
                     <b-navbar-nav>
                         <b-nav-item active v-if="timer.on === true" style="width: 150px; text-align: center;">Time left: {{ timer.minutes }}:{{ timer.seconds }}</b-nav-item>
                         <b-nav-item active v-if="!game.over" style="width: 100px; text-align: center;">Round: {{ game.round }}</b-nav-item>
-                        <b-nav-item active v-if="!game.over" style="width: 300px; text-align: left;">Phase: {{ game.phaseTag }}</b-nav-item>
+                        <b-nav-item active v-if="!game.over" style="width: 200px; text-align: left;">Phase: {{ game.phaseTag }}</b-nav-item>
                         <b-nav-item active v-if="game.over" style="width: 100px; text-align: center;">Game Over</b-nav-item>
                     </b-navbar-nav>
                 </b-navbar>

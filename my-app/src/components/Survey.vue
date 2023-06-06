@@ -7,7 +7,7 @@
                     <h3>{{ $parent.resolvePlaceHolder('present-survey') }}</h3>
                 </b-row>
 
-                <b-row class="no-gutters justify-content-center flex-grow-1">
+                <b-row class="no-gutters justify-content-center flex-grow-1" align-v="center">
                     <div class="form-group col-md-3">
                         <label htmlFor="exampleInputEmail1">Age</label>
                     </div>
@@ -16,7 +16,7 @@
                     </div>
                 </b-row>
 
-                <b-row class="no-gutters justify-content-center flex-grow-1">
+                <b-row class="no-gutters justify-content-center flex-grow-1" align-v="center">
                     <div class="form-group col-md-3">
                         <label htmlFor="exampleInputEmail1">Gender</label>
                     </div>
@@ -29,7 +29,7 @@
                     </div>
                 </b-row>
                 
-                <b-row class="no-gutters justify-content-center flex-grow-1">
+                <b-row class="no-gutters justify-content-center flex-grow-1" align-v="center">
                     <div class="form-group col-md-3">
                         <label htmlFor="exampleInputEmail1">Year of study</label>
                     </div>
@@ -46,7 +46,7 @@
                     </div>
                 </b-row>
 
-                <b-row class="no-gutters justify-content-center flex-grow-1">
+                <b-row class="no-gutters justify-content-center flex-grow-1" align-v="center">
                     <div class="form-group col-md-3">
                         <label htmlFor="exampleInputEmail1">Faculty</label>
                     </div>
@@ -66,34 +66,39 @@
                     </div>
                 </b-row>
 
-                <b-row class="no-gutters justify-content-center flex-grow-1">
+                <b-row class="no-gutters flex-grow-1" align-v="center">
+                    <b-col class="form-group col-md-3"></b-col>
+
                     <b-col class="form-group col-md-3">
                         <label htmlFor="exampleInputEmail1">Rate how much risk you are generally willing to take</label>
                     </b-col>
-                    <b-col class="form-group col-md-3">
-                        <b-row class="form-group col-12">
-                            <b-form-radio
-                                v-model="risk"
-                                name="0"
-                                value="0"
-                            >0 - Not willing to take any risk</b-form-radio>
-                        </b-row>
 
-                        <b-row class="form-group col-12" v-for="i in [1,2,3,4,5,6,7,8,9]" :key="i">
-                            <b-form-radio
+                    <b-col class="form-group col-md-6">
+                        <b-form-group v-slot="{ ariaDescribedby }">
+                            <b-form-radio-group
+                                id="radio-group-2"
                                 v-model="risk"
-                                :name="i.toString()"
-                                :value="i"
-                            >{{ i }}</b-form-radio>
-                        </b-row>
+                                :aria-describedby="ariaDescribedby"
+                                name="radio-sub-component"
+                                buttons
+                                button-variant="outline-dark"
+                            >
+                                <b-form-radio
+                                    name="risk_0"
+                                    value="0"
+                                >0 - Not willing to take any risk</b-form-radio>
 
-                        <b-row class="form-group col-12">
-                            <b-form-radio
-                                v-model="risk"
-                                name="10"
-                                value="10"
-                            >10 - Very willing to take risk</b-form-radio>
-                        </b-row>
+                                <b-form-radio v-for="i in [1,2,3,4,5,6,7,8,9]" :key="i"
+                                    :name="'risk_' + i"
+                                    :value="i"
+                                >{{ i }}</b-form-radio>
+
+                                <b-form-radio
+                                    name="risk_10"
+                                    value="10"
+                                >10 - Very willing to take risk</b-form-radio>
+                            </b-form-radio-group>
+                        </b-form-group>
                     </b-col>
                 </b-row>
 

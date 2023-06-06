@@ -2,6 +2,17 @@
     "parameters": {
         "format": "nl"
     },
+    "defaultBasePoints": {
+        "speculator": 60000,
+        "developer": 10000,
+        "owner": 20000
+    },
+    "defaultRewardScaleFactor": {
+        "speculator": 12000,
+        "developer": 68000,
+        "owner": 27000
+    },
+    "timers": [null, 12, 120, 120, 3, 3, 600, 120, 120, 30],
     "instructions": {
         "phases": [{
             "number": 0,

@@ -123,79 +123,22 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#0</label>
-                </div>
-                <div class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_0" name="timer_phase_0" id="timer_phase_0" aria-describedby="emailHelp" />
-                </div>
-
-                <div class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#1</label>
-                </div>
-                <div class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_1" name="timer_phase_1" id="timer_phase_1" aria-describedby="emailHelp" />
-                </div>
-
-                <div class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#2</label>
-                </div>
-                <div class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_2" name="timer_phase_2" id="timer_phase_2" aria-describedby="emailHelp" />
-                </div>
-
-                <div class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#3</label>
-                </div>
-                <div class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_3" name="timer_phase_3" id="timer_phase_3" aria-describedby="emailHelp" />
-                </div>
-
-                <div class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#4</label>
-                </div>
-                <div class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_4" name="timer_phase_4" id="timer_phase_4" aria-describedby="emailHelp" />
-                </div>
-
-                <div class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#5</label>
-                </div>
-                <div class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_5" name="timer_phase_5" id="timer_phase_5" aria-describedby="emailHelp" />
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#6</label>
-                </div>
-                <div class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_6" name="timer_phase_6" id="timer_phase_6" aria-describedby="emailHelp" />
-                </div>
-
-                <div class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#7</label>
-                </div>
-                <div class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_7" name="timer_phase_7" id="timer_phase_7" aria-describedby="emailHelp" />
-                </div>
-
-                <div v-if="game_type != 'voting'" class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#8</label>
-                </div>
-                <div v-if="game_type != 'voting'" class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_8" name="timer_phase_8" id="timer_phase_8" aria-describedby="emailHelp" />
-                </div>
-
-                <div v-if="game_type != 'voting'" class="form-group col-md-1">
-                    <label htmlFor="exampleInputEmail1">#9</label>
-                </div>
-                <div v-if="game_type != 'voting'" class="form-group col-md-1">
-                    <input type="number" class="form-control" v-model="timer_phase_9" name="timer_phase_9" id="timer_phase_9" aria-describedby="emailHelp" />
-                </div>
-            </div>
+            <b-row>
+                <b-col v-if="configurations[game_type].phaseTags != null">
+                    <b-row class="row mb-3" v-for="i in Math.ceil(configurations[game_type].phaseTags.length / 3 + 1)" :key="i">
+                        <b-col v-for="j in [0, 1, 2]" class="col-4" :key="3 * (i - 1) + j">
+                            <b-row>
+                                <b-col class="col-6" v-if="configurations[game_type].phaseTags.length > 3 * (i - 1) + j">
+                                    <label htmlFor="exampleInputEmail1">{{  configurations[game_type].phaseTags[3 * (i - 1) + j] }} ({{ 3 * (i - 1) + j }})</label>
+                                </b-col>
+                                <b-col class="col-6" v-if="configurations[game_type].phaseTags.length > 3 * (i - 1) + j">
+                                    <input type="number" class="form-control" v-model="phase_timers[3 * (i - 1) + j]" :name="`timer_phase_${3 * (i - 1) + j}`" :id="`timer_phase_${3 * (i - 1) + j}`" aria-describedby="emailHelp" />
+                                </b-col>
+                            </b-row>
+                        </b-col>
+                    </b-row>
+                </b-col>
+            </b-row>
 
             <div class="row">
                 <div class="col-md-12 mt-3 mb-3">
@@ -432,41 +375,9 @@ import Header from './Header.vue'
 
 import sessions from '../assets/sessions.json';
 
-const defaultBasePoints = {
-    "voting": {
-        "speculator": 50000,
-        "developer": 0,
-        "owner": 10000
-    },
-    "harberger": {
-        "speculator": 55000,
-        "developer": 5000,
-        "owner": 15000
-    },
-    "futarchy": {
-        "speculator": 60000,
-        "developer": 10000,
-        "owner": 20000
-    },
-}
-
-const defaultRewardScaleFactor = {
-    "voting": {
-        "speculator": 10000,
-        "developer": 60000,
-        "owner": 20000
-    },
-    "harberger": {
-        "speculator": 11000,
-        "developer": 65000,
-        "owner": 22000
-    },
-    "futarchy": {
-        "speculator": 12000,
-        "developer": 68000,
-        "owner": 27000
-    },
-}
+import harbergerDictionary from '../assets/harberger.json';
+import futarchyDictionary from '../assets/futarchy.json';
+import votingDictionary from '../assets/voting.json';
 
 export default {
     name: 'CreateGame',
@@ -518,22 +429,23 @@ export default {
             session_number: 1,
             sessions: null,
             seconds_for_deliberation: 30,
-            speculators_base_points: defaultBasePoints.harberger.speculator,
-            owners_base_points: defaultBasePoints.harberger.owner,
-            developers_base_points: defaultBasePoints.harberger.developer,
-            speculators_reward_scale_factor: defaultRewardScaleFactor.harberger.speculator,
-            owners_reward_scale_factor: defaultRewardScaleFactor.harberger.owner,
-            developers_reward_scale_factor: defaultRewardScaleFactor.harberger.developer,
-            timer_phase_0: null,
-            timer_phase_1: 12,
-            timer_phase_2: 120,
-            timer_phase_3: 120,
-            timer_phase_4: 3,
-            timer_phase_5: 3,
-            timer_phase_6: 600,
-            timer_phase_7: 120,
-            timer_phase_8: 120,
-            timer_phase_9: 30
+            speculators_base_points: null,
+            owners_base_points: null,
+            developers_base_points: null,
+            speculators_reward_scale_factor: null,
+            owners_reward_scale_factor: null,
+            developers_reward_scale_factor: null,
+            phase_timers: [null, 12, 120, 120, 3, 3, 600, 120, 120, 30],
+            dictionary: {
+                futarchy: futarchyDictionary,
+                harberger: harbergerDictionary,
+                voting: votingDictionary
+            },
+            configurations: {
+                futarchy: {},
+                harberger: {},
+                voting: {}
+            }
         }
     },
     components: {
@@ -581,21 +493,14 @@ export default {
 
             this.state.previousGameType = event.target.value;
 
-            this.speculators_base_points = defaultBasePoints[this.game_type].speculator;
-            this.owners_base_points = defaultBasePoints[this.game_type].owner;
-            this.developers_base_points = defaultBasePoints[this.game_type].developer;
-            this.speculators_reward_scale_factor = defaultRewardScaleFactor[this.game_type].speculator;
-            this.owners_reward_scale_factor = defaultRewardScaleFactor[this.game_type].owner;
-            this.developers_reward_scale_factor = defaultRewardScaleFactor[this.game_type].developer;
+            this.speculators_base_points = this.configurations[this.game_type].defaultBasePoints.speculator;
+            this.owners_base_points = this.configurations[this.game_type].defaultBasePoints.owner;
+            this.developers_base_points = this.configurations[this.game_type].defaultBasePoints.developer;
+            this.speculators_reward_scale_factor = this.configurations[this.game_type].defaultRewardScaleFactor.speculator;
+            this.owners_reward_scale_factor = this.configurations[this.game_type].defaultRewardScaleFactor.owner;
+            this.developers_reward_scale_factor = this.configurations[this.game_type].defaultRewardScaleFactor.developer;
 
-            this.timer_phase_0 = null;
-            this.timer_phase_1 = 13;
-            this.timer_phase_2 = 120;
-            this.timer_phase_3 = 120;
-            this.timer_phase_4 = 120;
-            this.timer_phase_5 = 120;
-            this.timer_phase_6 = 120;
-            this.timer_phase_7 = 30;
+            this.phase_timers = [...this.configurations[this.game_type].timers];
         },
         createGame() {
             const payload = {
@@ -667,16 +572,16 @@ export default {
                     }
                 },
                 timers: {
-                    phase_0: this.timer_phase_0,
-                    phase_1: this.timer_phase_1,
-                    phase_2: this.timer_phase_2,
-                    phase_3: this.timer_phase_3,
-                    phase_4: this.timer_phase_4,
-                    phase_5: this.timer_phase_5,
-                    phase_6: this.timer_phase_6,
-                    phase_7: this.timer_phase_7,
-                    phase_8: this.timer_phase_8,
-                    phase_9: this.timer_phase_9
+                    phase_0: this.phase_timers[0],
+                    phase_1: this.phase_timers[1],
+                    phase_2: this.phase_timers[2],
+                    phase_3: this.phase_timers[3],
+                    phase_4: this.phase_timers[4],
+                    phase_5: this.phase_timers[5],
+                    phase_6: this.phase_timers[6],
+                    phase_7: this.phase_timers[7],
+                    phase_8: this.phase_timers[8],
+                    phase_9: this.phase_timers[9]
                 },
                 round_count: this.round_count,
                 game_type: this.game_type,
@@ -698,10 +603,35 @@ export default {
             this.email = "";
         }
     },
-    mounted () {
+    async mounted () {
+        const self = this;
+
         this.sessions = sessions;
 
         this.title = this.generateName();
+
+        for (let mode of ['voting', 'harberger', 'futarchy']) {
+            const dictionary = self.dictionary[mode];
+
+            self.configurations[mode].timers = dictionary.timers;
+            self.configurations[mode].defaultBasePoints = dictionary.defaultBasePoints;
+            self.configurations[mode].defaultRewardScaleFactor = dictionary.defaultRewardScaleFactor;
+
+            self.configurations[mode].phaseTags = [];
+            
+            dictionary.instructions.phases.forEach(phase => {
+                self.configurations[mode].phaseTags.push(phase.tag);
+            });
+        }
+
+        self.speculators_base_points =  self.configurations[self.game_type].defaultBasePoints.speculator,
+        self.owners_base_points = self.configurations[self.game_type].defaultBasePoints.owner,
+        self.developers_base_points = self.configurations[self.game_type].defaultBasePoints.developer,
+        self.speculators_reward_scale_factor = self.configurations[self.game_type].defaultRewardScaleFactor.speculator,
+        self.owners_reward_scale_factor = self.configurations[self.game_type].defaultRewardScaleFactor.owner,
+        self.developers_reward_scale_factor = self.configurations[self.game_type].defaultRewardScaleFactor.developer,
+
+        window.vue = this;
     }
 }
 </script>

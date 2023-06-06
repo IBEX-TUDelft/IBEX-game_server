@@ -26,7 +26,7 @@ class End extends JoinablePhase {
             }
         });
 
-        const quorum = Math.ceil(validVotes / 2);
+        const quorum = Math.floor(validVotes / 2);
 
         console.log(`Valid votes: ${validVotes}, Quorum: ${quorum}`);
 
