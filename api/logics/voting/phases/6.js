@@ -66,11 +66,12 @@ class End extends JoinablePhase {
         } else if (standings.length === 1 || standings[0].counter > standings[1].counter) {
             standings[0].winner = true;
         } else {
-            const maximum = standings[0].counter;
+            /*const maximum = standings[0].counter;
 
             standings = standings.filter(s => s.counter === maximum).sort((f,s) => s.value - f.value);
 
-            standings[0].winner = true;
+            standings[0].winner = true;*/
+            self.results.standings[1].winner = true; //in case of a draw, the projects goes through
         }
 
         const winner = self.results.standings.find(r => r.winner === true);
