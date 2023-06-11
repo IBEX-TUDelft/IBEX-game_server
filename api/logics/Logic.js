@@ -43,13 +43,32 @@ export default class {
         this.data.properties = [];
     }
 
+    alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase();
+
+    generatePaymentToken() {
+        return this.alphabet[Math.floor(Math.random() * this.alphabet.length)] +
+            this.alphabet[Math.floor(Math.random() * this.alphabet.length)];
+    }
+
     async init () {
         const self = this;
 
         const rawProjects = fs.readFileSync('./resources/projects.json');
         this.data.conditions = JSON.parse(rawProjects);
 
+        const paymentTokens = [];
+
         self.data.players.forEach(player => {
+            let paymentToken = self.generatePaymentToken();
+            
+            while (paymentTokens.includes(paymentToken)) {
+                paymentToken = self.generatePaymentToken();
+            }
+
+            paymentTokens.push(paymentToken);
+
+            player.paymentToken = paymentToken;
+
             player.summaries = [];
 
             switch (player.role) {
@@ -396,7 +415,8 @@ export default class {
                     "profit": profit,
                     "points": points,
                     "factor": factor,
-                    "exchange": Math.round(1000000 / factor) / 1000000
+                    "exchange": Math.round(1000000 / factor) / 1000000,
+                    "paymentToken": p.paymentToken
                 };
 
                 const err = self.wss.sendEvent(

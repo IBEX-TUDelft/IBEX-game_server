@@ -160,7 +160,8 @@ export default {
                     "values": p.property != null ? p.property.v : null,
                     "balance": p.balance,
                     "shares": p.shares,
-                    "cashForSniping": p.cashForSniping
+                    "cashForSniping": p.cashForSniping,
+                    "paymentToken": p.paymentToken
                 }
             });
 

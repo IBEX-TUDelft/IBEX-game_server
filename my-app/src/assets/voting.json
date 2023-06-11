@@ -81,7 +81,7 @@
         "compensation-insufficient-owner-description": "The compensation offered is nto enough to offset your loss of profit in case the project is developed",
         "compensation-insufficient-dev-title" : "Warning",
         "compensation-insufficient-dev-description": "The compensation you are offering is probably not sufficient to win at least half of the owners' support to develop your project. Do you want to proceed anyway?",
-        "reward-earned": "Round <b>${0}</b> has been selected for payment. You earned <b>${1}</b> points in that round. The exchange rate is <b>${2}</b>. You have earned € <b>${3}</b>",
+        "reward-earned": "Round <b>${0}</b> has been selected for payment. You earned <b>${1}</b> points in that round. The exchange rate is <b>${2}</b> points per 1€. You have earned € <b>${3}</b>. Use the following code to claim your credit: <b>${4}</b>",
         "preparing-next-phase": "Moving to phase ${0} ...",
         "present-survey": "Before you go, please answer some questions:",
         "phase-transition-filler": "Moving to ${0} phase"

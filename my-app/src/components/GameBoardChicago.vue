@@ -160,8 +160,9 @@
                 'reward-earned',
                 game.reward.round,
                 formatUs(game.reward.points),
-                game.reward.exchange,
-                game.reward.reward
+                game.reward.factor,
+                game.reward.reward.toFixed(2),
+                player.paymentToken
             )"/>
         </b-row>
 
@@ -1034,6 +1035,7 @@
                                 break;
                             case 'reward':
                                 self.game.reward = ev.data;
+                                self.player.paymentToken = ev.data.paymentToken;
                                 break;
                             default:
                                 console.error(`Type ${ev.eventType} was not understood`);
