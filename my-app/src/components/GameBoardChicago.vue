@@ -158,11 +158,13 @@
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.reward != null">
             <p v-html="resolvePlaceHolder(
                 'reward-earned',
-                game.reward.round,
-                formatUs(game.reward.points),
-                game.reward.factor,
-                game.reward.reward.toFixed(2),
-                player.paymentToken
+                game.reward.round, //0
+                formatUs(game.reward.profit), //1
+                formatUs(game.reward.factor), //2
+                formatUs(game.reward.gameFee.toFixed(2)), //3
+                formatUs(game.reward.showupFee.toFixed(2)), //4
+                formatUs(game.reward.reward.toFixed(2)), //5
+                game.reward.paymentToken //6
             )"/>
         </b-row>
 
@@ -1095,7 +1097,7 @@
 
                 if (parameters != null) {
                     parameters.forEach((p, i) => {
-                        line = line.replace('${' + i + '}', p);
+                        line = line.replaceAll('${' + i + '}', p);
                     })
                 }
 
@@ -1263,6 +1265,10 @@
                 
                 return summary;
             }, updateSummary() {
+                if (this.game.over === true) {
+                    return;
+                }
+
                 const summaryIdx = this.player.summaries.findIndex(s => s.round === this.game.round);
 
                 if (summaryIdx == -1) {

@@ -412,6 +412,8 @@ export default class {
                     "round": chosenRound,
                     "reward": Math.round(points * 100 / factor) / 100,
                     "basePoints": basePoints,
+                    "showupFee": Math.round(basePoints * 100 / factor) / 100,
+                    "gameFee": Math.round(profit * 100 / factor) / 100,
                     "profit": profit,
                     "points": points,
                     "factor": factor,
