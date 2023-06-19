@@ -14,7 +14,7 @@ function numberToCell(row, column) {
 }
 
 (() => {
-    const workbook = XLSX.readFile('resources/Distributions_23Jan13-ValuesOnly.xlsm');
+    const workbook = XLSX.readFile('resources/Distributions_new_analysisSR-speculators15-06.xlsx');
 
     let session = 0;
     let round = 0;
@@ -57,11 +57,12 @@ function numberToCell(row, column) {
 
         for (let i = 1; i <= 4; i++) {
             for (let j = 6; j <= 17; j++) {
-                const cellId = numberToCell(session * 36 + round * 6 + i, j);
+                const cellId = numberToCell(session * 36 + round * 9 + i, j);
 
-                const cell = workbook.Sheets['Signals Latest '][cellId];
+                const cell = workbook.Sheets['signals'][cellId];
 
                 if (j < 12 && (cell == null || cell.v == null || typeof cell.v != 'number')) {
+                    console.log(cellId)
                     complete = true;
                     break;
                 }
@@ -130,10 +131,11 @@ function numberToCell(row, column) {
         }
     }
 
+    console.log(sessions);
     console.log(sessions[0].rounds);
 
     console.log(`Draws: ${draws}`);
 
     let data = JSON.stringify(sessions);
-    fs.writeFileSync('resources/sessions.json', data);
+    fs.writeFileSync('resources/sessions_2.json', data);
 }) ();
