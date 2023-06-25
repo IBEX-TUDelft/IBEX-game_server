@@ -41,30 +41,6 @@
                     </b-form-checkbox>
             </div>
 
-            <!--div v-if="game_type === 'voting'" class="row">
-                <div class="form-group col-md-3">
-                    <label htmlFor="exampleInputEmail1">Seconds for Deliberation</label>
-                </div>
-                <div class="form-group col-md-3">
-                    <input type="number" class="form-control" v-model="seconds_for_deliberation" name="seconds_for_deliberation" id="seconds_for_deliberation" aria-describedby="emailHelp" placeholder="10" />
-                </div>
-            </div>
-
-            <div v-if="game_type != 'voting'" class="row">
-                <div class="form-group col-md-3">
-                    <label htmlFor="exampleInputEmail1">Minutes for Trading</label>
-                </div>
-                <div class="form-group col-md-3">
-                    <input type="number" class="form-control" v-model="minutes_for_trading" name="minutes_for_trading" id="minutes_for_trading" aria-describedby="emailHelp" placeholder="10" />
-                </div>
-                <div class="form-group col-md-3">
-                    <label htmlFor="exampleInputEmail1">Minutes for Sniping</label>
-                </div>
-                <div class="form-group col-md-3">
-                    <input type="number" class="form-control" v-model="minutes_for_sniping" name="minutes_for_sniping" id="minutes_for_sniping" aria-describedby="emailHelp" placeholder="2" />
-                </div>
-            </div-->
-
             <div v-if="game_type != 'voting'" class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Initial Tax Rate</label>
@@ -194,6 +170,15 @@
                 </div>
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="developers_reward_scale_factor" name="developers_reward_scale_factor" id="developers_reward_scale_factor" aria-describedby="emailHelp" placeholder="5" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Show-up Fee (€)</label>
+                </div>
+                <div class="form-group col-md-9">
+                    <input type="number" class="form-control" v-model="show_up_fee" name="show_up_fee" id="show_up_fee" aria-describedby="emailHelp" placeholder="5" />
                 </div>
             </div>
 
@@ -445,7 +430,8 @@ export default {
                 futarchy: {},
                 harberger: {},
                 voting: {}
-            }
+            },
+            show_up_fee: 5
         }
     },
     components: {
@@ -589,7 +575,8 @@ export default {
                 minutes_for_trading: this.minutes_for_trading,
                 minutes_for_sniping: this.minutes_for_sniping,
                 session_number: this.session_number,
-                seconds_for_deliberation: this.seconds_for_deliberation
+                seconds_for_deliberation: this.seconds_for_deliberation,
+                show_up_fee: this.show_up_fee
             }
 
             createGame(payload).then((response) => {

@@ -380,6 +380,8 @@ export default class {
 
             const chosenRound = Math.floor(Math.random() * this.data.parameters.round_count) + 1;
 
+            const showupFee = this.data.parameters.show_up_fee;
+
             const rewards = [];
 
             this.data.players.forEach(p => {
@@ -410,10 +412,10 @@ export default class {
                 const reward = {
                     "number": p.number,
                     "round": chosenRound,
-                    "reward": Math.round(points * 100 / factor) / 100,
+                    "reward": Math.round(points * 100 / factor) / 100 + showupFee,
                     "basePoints": basePoints,
-                    "showupFee": Math.round(basePoints * 100 / factor) / 100,
-                    "gameFee": Math.round(profit * 100 / factor) / 100,
+                    "showupFee": showupFee,
+                    "gameFee": Math.round(points * 100 / factor) / 100,
                     "profit": profit,
                     "points": points,
                     "factor": factor,

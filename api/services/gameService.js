@@ -74,7 +74,9 @@ export default {
             {key: "timer_phase_6", type: "number", value: gameParameters.timers.phase_6},
             {key: "timer_phase_7", type: "number", value: gameParameters.timers.phase_7},
             {key: "timer_phase_8", type: "number", value: gameParameters.timers.phase_8},
-            {key: "timer_phase_9", type: "number", value: gameParameters.timers.phase_9}
+            {key: "timer_phase_9", type: "number", value: gameParameters.timers.phase_9},
+
+            {key: "show_up_fee", type: "number", value: gameParameters.show_up_fee}
         ];
 
         for (let i = 0; i < parameters.length; i++) {

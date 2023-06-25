@@ -289,7 +289,7 @@
             <p v-html="resolvePlaceHolder(
                 'reward-earned',
                 game.reward.round, //0
-                formatUs(game.reward.profit), //1
+                formatUs(game.reward.points), //1
                 formatUs(game.reward.factor), //2
                 formatUs(game.reward.gameFee.toFixed(2)), //3
                 formatUs(game.reward.showupFee.toFixed(2)), //4
