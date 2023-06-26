@@ -12,6 +12,28 @@
         "developer": 65000,
         "owner": 22000
     },
+    "defaultBoundaries": {
+        "owner": {
+            "noproject": {
+                "low": 350000,
+                "high": 600000
+            },
+            "project": {
+                "low": 150000,
+                "high": 350000
+            }
+        },
+        "developer": {
+            "noproject": {
+                "low": 200000,
+                "high": 500000
+            },
+            "project": {
+                "low": 500000,
+                "high": 2750000
+            }
+        }
+    },
     "timers": [null, 12, 120, 120, 3, 3, 600, 120, 120, 30],
     "instructions": {
         "phases": [{

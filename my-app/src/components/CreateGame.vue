@@ -487,6 +487,15 @@ export default {
             this.developers_reward_scale_factor = this.configurations[this.game_type].defaultRewardScaleFactor.developer;
 
             this.phase_timers = [...this.configurations[this.game_type].timers];
+
+            this.no_project_dev_low = this.configurations[this.game_type].defaultBoundaries.developer.noproject.low;
+            this.no_project_dev_high = this.configurations[this.game_type].defaultBoundaries.developer.noproject.high;
+            this.no_project_owner_low = this.configurations[this.game_type].defaultBoundaries.owner.noproject.low;
+            this.no_project_owner_high = this.configurations[this.game_type].defaultBoundaries.owner.noproject.high;
+            this.project_a_dev_low = this.configurations[this.game_type].defaultBoundaries.developer.project.low;
+            this.project_a_dev_high = this.configurations[this.game_type].defaultBoundaries.developer.project.high;
+            this.project_a_owner_low = this.configurations[this.game_type].defaultBoundaries.owner.project.low;
+            this.project_a_owner_high = this.configurations[this.game_type].defaultBoundaries.owner.project.high;
         },
         createGame() {
             const payload = {
@@ -603,6 +612,7 @@ export default {
             self.configurations[mode].timers = dictionary.timers;
             self.configurations[mode].defaultBasePoints = dictionary.defaultBasePoints;
             self.configurations[mode].defaultRewardScaleFactor = dictionary.defaultRewardScaleFactor;
+            self.configurations[mode].defaultBoundaries = dictionary.defaultBoundaries;
 
             self.configurations[mode].phaseTags = [];
             
@@ -617,6 +627,17 @@ export default {
         self.speculators_reward_scale_factor = self.configurations[self.game_type].defaultRewardScaleFactor.speculator,
         self.owners_reward_scale_factor = self.configurations[self.game_type].defaultRewardScaleFactor.owner,
         self.developers_reward_scale_factor = self.configurations[self.game_type].defaultRewardScaleFactor.developer,
+
+        self.phase_timers = [...self.configurations[self.game_type].timers];
+
+        self.no_project_dev_low = self.configurations[self.game_type].defaultBoundaries.developer.noproject.low;
+        self.no_project_dev_high = self.configurations[self.game_type].defaultBoundaries.developer.noproject.high;
+        self.no_project_owner_low = self.configurations[self.game_type].defaultBoundaries.owner.noproject.low;
+        self.no_project_owner_high = self.configurations[self.game_type].defaultBoundaries.owner.noproject.high;
+        self.project_a_dev_low = self.configurations[self.game_type].defaultBoundaries.developer.project.low;
+        self.project_a_dev_high = self.configurations[self.game_type].defaultBoundaries.developer.project.high;
+        self.project_a_owner_low = self.configurations[self.game_type].defaultBoundaries.owner.project.low;
+        self.project_a_owner_high = self.configurations[self.game_type].defaultBoundaries.owner.project.high;
 
         window.vue = this;
     }

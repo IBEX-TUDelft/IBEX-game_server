@@ -3,16 +3,38 @@
         "format": "nl"
     },
     "defaultBasePoints": {
-        "speculator": 50000,
-        "developer": 0,
-        "owner": 10000
+        "speculator": 0,
+        "developer": 500000,
+        "owner": 0
     },
     "defaultRewardScaleFactor": {
-        "speculator": 10000,
-        "developer": 60000,
+        "speculator": 1,
+        "developer": 50000,
         "owner": 20000
     },
-    "timers": [null, 13, 120, 120, 120, 120, 120, 30],
+    "defaultBoundaries": {
+        "owner": {
+            "noproject": {
+                "low": 350000,
+                "high": 600000
+            },
+            "project": {
+                "low": 150000,
+                "high": 350000
+            }
+        },
+        "developer": {
+            "noproject": {
+                "low": 200000,
+                "high": 500000
+            },
+            "project": {
+                "low": 500000,
+                "high": 2750000
+            }
+        }
+    },
+    "timers": [null, 15, 180, 120, 120, 120, 60, 15],
     "instructions": {
         "phases": [{
             "number": 0,
