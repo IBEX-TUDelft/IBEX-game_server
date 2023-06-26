@@ -164,7 +164,9 @@
                 formatUs(game.reward.gameFee.toFixed(2)), //3
                 formatUs(game.reward.showupFee.toFixed(2)), //4
                 formatUs(game.reward.reward.toFixed(2)), //5
-                game.reward.paymentToken //6
+                game.reward.paymentToken, //6,
+                formatUs(game.reward.basePoints), //7
+                formatUs(game.reward.profit), //8
             )"/>
         </b-row>
 

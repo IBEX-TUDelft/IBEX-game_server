@@ -294,7 +294,9 @@
                 formatUs(game.reward.gameFee.toFixed(2)), //3
                 formatUs(game.reward.showupFee.toFixed(2)), //4
                 formatUs(game.reward.reward.toFixed(2)), //5
-                game.reward.paymentToken //6
+                game.reward.paymentToken, //6,
+                formatUs(game.reward.basePoints), //7
+                formatUs(game.reward.profit), //8
             )"/>
         </b-row>
 
@@ -783,25 +785,9 @@ export default {
 
             let confirm;
 
-            //let likelyVotes = 0;
-
             const compensations = self.game.compensationOffers.map(c => new LocalizedNumberParser(self.format).parse(c));
 
-            /*this.game.players.forEach(p => {
-                if (p.role != 3) {
-                    return;
-                }
-
-                if (compensations[1] >= p.property.lastOffer[1]) {
-                    likelyVotes++;
-                }
-            });*/
-
-            //if (likelyVotes >= (this.game.players.length - 1) / 2) {
-                confirm = await this.confirm('submit-offer-title', 'submit-offer-description');
-            /*} else {
-                confirm = await this.confirm('compensation-insufficient-dev-title', 'compensation-insufficient-dev-description');
-            }*/
+            confirm = await this.confirm('submit-offer-title', 'submit-offer-description');
 
             if (!confirm) {
                 return
