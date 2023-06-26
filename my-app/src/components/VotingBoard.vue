@@ -783,11 +783,11 @@ export default {
 
             let confirm;
 
-            let likelyVotes = 0;
+            //let likelyVotes = 0;
 
             const compensations = self.game.compensationOffers.map(c => new LocalizedNumberParser(self.format).parse(c));
 
-            this.game.players.forEach(p => {
+            /*this.game.players.forEach(p => {
                 if (p.role != 3) {
                     return;
                 }
@@ -795,13 +795,13 @@ export default {
                 if (compensations[1] >= p.property.lastOffer[1]) {
                     likelyVotes++;
                 }
-            });
+            });*/
 
-            if (likelyVotes >= (this.game.players.length - 1) / 2) {
+            //if (likelyVotes >= (this.game.players.length - 1) / 2) {
                 confirm = await this.confirm('submit-offer-title', 'submit-offer-description');
-            } else {
+            /*} else {
                 confirm = await this.confirm('compensation-insufficient-dev-title', 'compensation-insufficient-dev-description');
-            }
+            }*/
 
             if (!confirm) {
                 return
