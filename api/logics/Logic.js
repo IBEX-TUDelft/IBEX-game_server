@@ -312,69 +312,6 @@ export default class {
 
         this.refreshWallet();
         
-        let ownerCounter = 0;
-        let speculatorCounter = 0;
-
-        this.data.players.forEach(p => {
-            if (p.role === 1) {
-                if (this.data.type != 'Voting') {
-                    p.S[0] = parseInt(this.signalSeries[number][0].speculator[speculatorCounter]);
-                    p.S[1] = parseInt(this.signalSeries[number][1].speculator[speculatorCounter]);
-                }
-
-                speculatorCounter ++;
-            } if (p.role === 2) {
-                p.property.v[0] = parseInt(this.valueSeries[number][0].developer) * 1000;
-                p.property.v[1] = parseInt(this.valueSeries[number][1].developer) * 1000;
-
-                if (this.data.type != 'Voting') {
-                    p.S[0] = parseInt(this.signalSeries[number][0].developer);
-                    p.S[1] = parseInt(this.signalSeries[number][1].developer);
-                }
-            } else if (p.role === 3) {
-                p.property.v[0] = parseInt(this.valueSeries[number][0].owner[ownerCounter]) * 1000;
-                p.property.v[1] = parseInt(this.valueSeries[number][1].owner[ownerCounter]) * 1000;
-
-                if (this.data.type != 'Voting') {
-                    p.S[0] = parseInt(this.signalSeries[number][0].owner[ownerCounter]);
-                    p.S[1] = parseInt(this.signalSeries[number][1].owner[ownerCounter]);
-                }
-
-                ownerCounter ++;
-            }
-        });
-
-        //The pregenerated private signals are overridden with dynamically computed ones, that take in account the amount of players in game
-        if (this.data.type != 'Voting' && this.data.parameters.generate_signals === true) {
-            let V = [];
-
-            for (let j = 0; j < 2; j++) {
-                V[j] = 0;
-
-                this.data.properties.forEach(p => {
-                    V[j] += p.v[j];
-                });
-            }
-
-            for (let i = 0; i < this.data.players.length; i++) {
-                const player = this.data.players[i];
-
-                for (let j = 0; j < 2; j++) {
-                    const delta = (this.data.parameters.signal_high - this.data.parameters.signal_low) * Math.random();
-
-                    const coefficient = this.data.parameters.signal_low + delta;
-
-                    console.log(`delta1 = ${delta}, coefficient1 = ${coefficient}`);
-
-                    const normalizedTaxRate = this.data.parameters.tax_rate_final / 100;
-
-                    player.S[j] = Math.round(V[j] * coefficient * normalizedTaxRate / 100);
-                }
-
-                console.log(`${player.name} S = ${player.S}`);
-            }
-        }
-
         if (number > this.data.parameters.round_count ) {
             console.log('The game is over');
 
@@ -444,6 +381,69 @@ export default class {
             clearInterval(this.phaseCheckingInterval);
             
             return;
+        }
+        
+        let ownerCounter = 0;
+        let speculatorCounter = 0;
+
+        this.data.players.forEach(p => {
+            if (p.role === 1) {
+                if (this.data.type != 'Voting') {
+                    p.S[0] = parseInt(this.signalSeries[number][0].speculator[speculatorCounter]);
+                    p.S[1] = parseInt(this.signalSeries[number][1].speculator[speculatorCounter]);
+                }
+
+                speculatorCounter ++;
+            } if (p.role === 2) {
+                p.property.v[0] = parseInt(this.valueSeries[number][0].developer) * 1000;
+                p.property.v[1] = parseInt(this.valueSeries[number][1].developer) * 1000;
+
+                if (this.data.type != 'Voting') {
+                    p.S[0] = parseInt(this.signalSeries[number][0].developer);
+                    p.S[1] = parseInt(this.signalSeries[number][1].developer);
+                }
+            } else if (p.role === 3) {
+                p.property.v[0] = parseInt(this.valueSeries[number][0].owner[ownerCounter]) * 1000;
+                p.property.v[1] = parseInt(this.valueSeries[number][1].owner[ownerCounter]) * 1000;
+
+                if (this.data.type != 'Voting') {
+                    p.S[0] = parseInt(this.signalSeries[number][0].owner[ownerCounter]);
+                    p.S[1] = parseInt(this.signalSeries[number][1].owner[ownerCounter]);
+                }
+
+                ownerCounter ++;
+            }
+        });
+
+        //The pregenerated private signals are overridden with dynamically computed ones, that take in account the amount of players in game
+        if (this.data.type != 'Voting' && this.data.parameters.generate_signals === true) {
+            let V = [];
+
+            for (let j = 0; j < 2; j++) {
+                V[j] = 0;
+
+                this.data.properties.forEach(p => {
+                    V[j] += p.v[j];
+                });
+            }
+
+            for (let i = 0; i < this.data.players.length; i++) {
+                const player = this.data.players[i];
+
+                for (let j = 0; j < 2; j++) {
+                    const delta = (this.data.parameters.signal_high - this.data.parameters.signal_low) * Math.random();
+
+                    const coefficient = this.data.parameters.signal_low + delta;
+
+                    console.log(`delta1 = ${delta}, coefficient1 = ${coefficient}`);
+
+                    const normalizedTaxRate = this.data.parameters.tax_rate_final / 100;
+
+                    player.S[j] = Math.round(V[j] * coefficient * normalizedTaxRate / 100);
+                }
+
+                console.log(`${player.name} S = ${player.S}`);
+            }
         }
 
         this.data.results.push({
