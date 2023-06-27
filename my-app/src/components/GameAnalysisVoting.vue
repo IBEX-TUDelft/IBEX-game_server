@@ -265,7 +265,7 @@
                             const requestSubmitted = player.role != 2 ? (isNaN(parseInt(compensationReq)) ? 'No' : 'Yes') : '';
                             const compensationReqNumber = isNaN(parseInt(compensationReq)) ? 0 : parseInt(compensationReq);
                             const compensationDelta = player.role != 2 ? (compensationOfferNumber - compensationReqNumber) : '';
-                            const offerSubmitted = player.role === 2 ? (isNaN(parseInt(compensationOffer)) ? 'No' : 'Yes') : '';
+                            const offerSubmitted = player.role === 2 ? (!isNaN(parseInt(compensationOffer)) ? 'No' : 'Yes') : '';
 
                             let total = values[winningCondition];
 
