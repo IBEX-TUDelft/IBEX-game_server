@@ -286,14 +286,18 @@
                                 total += compensationOfferWinningCondition;
                             }
 
-                            const playerReward = self.rewards.find(r => r.number === player.number);
+                            let playerReward;
+
+                            if (self.rewards != null) {
+                                playerReward = self.rewards.find(r => r.number === player.number);
+                            }
 
                             const survey = self.surveys.find(s => s.number === player.number);
 
                             xls.push([self.startTime,self.dataset,player.number,round.round, player.tag, player.role, self.ruleset, values[0], values[1],
                             '',compensationReq, requestSubmitted, compensationOffer, offerSubmitted, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
                             self.getStandingCounter(round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No',
-                            playerReward.basePoints, playerReward.profit, playerReward.points, playerReward.factor, playerReward.exchange, playerReward.reward, player.paymentToken,
+                            playerReward?.basePoints, playerReward?.profit, playerReward?.points, playerReward?.factor, playerReward?.exchange, playerReward?.reward, player.paymentToken,
                             survey?.age, survey?.gender, survey?.yearOfStudy, survey?.faculty, survey?.risk
                             ]);
                         });
