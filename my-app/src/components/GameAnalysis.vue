@@ -85,7 +85,7 @@
                                     <tbody>
                                         <tr v-for="c in conditions" :key="c.id" :style="c.id === winningCondition[index] ? 'background-color: yellow;' : ''">
                                             <td>{{ c.name }}</td>
-                                            <td>{{ signals != null ? formatUs(signals[index].publicSignal[c.id]) : '-' }}</td>
+                                            <td>{{ getPublicSignal(index, c.id) }}</td>
                                             <td>{{ getPrivateSignal(index, 0, c.id) }}</td>
                                             <td>{{ getPrivateSignal(index, 1, c.id) }}</td>
                                             <td>{{ getPrivateSignal(index, 2, c.id) }}</td>
@@ -882,6 +882,20 @@
                 }
 
                 return this.formatUs(this.signals[index].privateSignals[i][condition]);
+            },
+            getPublicSignal(index, condition) {
+                if (
+                    index == null
+                    || condition == null
+                    || this.signals == null
+                    || this.signals[index] == null
+                    || this.signals[index].publicSignal == null
+                    || this.signals[index].publicSignal[condition.id] == null
+                ) {
+                    return '-';
+                }
+
+                return this.formatUs(this.signals[index].publicSignal[condition.id]);
             },
             getYesOrNo(bool) {
                 if (bool == null) {
