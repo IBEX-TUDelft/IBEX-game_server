@@ -142,31 +142,11 @@ export default {
         Controller.addGetRoute(app, '/api/v1/games/data', false, async (req, res) => {
             const gameId = parseInt(req.query.game_id);
 
-            const game = gameManager.games.find(g => g.data.id  == gameId);
+            const data = await gameService.findGameData(gameId);
 
-            const data = {
-                "ruleset": game.data.type
-            };
-
-            data.conditions = game.data.conditions;
-            data.rewards = game.data.rewards;
-            data.dataset = game.data.parameters.session_number;
-
-            data.players = game.data.players.map(p => {
-                return {
-                    "number": p.number,
-                    "tag": p.tag,
-                    "role": p.role,
-                    "values": p.property != null ? p.property.v : null,
-                    "balance": p.balance,
-                    "shares": p.shares,
-                    "cashForSniping": p.cashForSniping,
-                    "paymentToken": p.paymentToken
-                }
-            });
-
-            data.results = game.data.results;
-            data.startTime = game.data.startTime;
+            if (data != null) {
+                data.ruleset = data.type;
+            }
 
             Controller.handleSuccess(res, data, 'Data available');
         });

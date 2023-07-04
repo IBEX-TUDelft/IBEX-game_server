@@ -173,5 +173,24 @@ export default {
         });
 
         data.currentPhase = currentPhase;
+    },
+    findGameData: async function(gameId) {
+        return await new Promise((resolve, reject) => {
+            this.pool.query(
+                `SELECT game_data FROM games WHERE id = ${gameId};`,
+                (err, res) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        if (res.rows == null || res.rows.length === 0) {
+                            resolve(null);
+                        } else if (res.rows.length === 1) {
+                            resolve(res.rows[0].game_data);
+                        } else {
+                            console.error(`${res.rows.length} games found with id ${gameId}. RED ALERT: check the database.`);
+                        }
+                    }
+            });
+        }); 
     }
 }

@@ -242,5 +242,16 @@ export default {
         console.log(rows);
 
         return rows.map(s => JSON.parse(s.content));
+    },
+    findGameData: async function (gameId) {
+        try {
+            const data = await gameRepository.findGameData(gameId);
+
+            return JSON.parse(data);
+        } catch(e) {
+            return {
+                "error": `While looking for ${gameId} data: ${e.message}`
+            };
+        }
     }
 }
