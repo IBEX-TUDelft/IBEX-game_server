@@ -121,7 +121,7 @@ export default {
         return result;
     },
     list: async function(parameters) {
-        return await Database.execute(`SELECT g.id, g.title, g.created_at, g.updated_at, g.ended_at 
+        return await Database.execute(`SELECT g.id, g.title, g.created_at, g.updated_at, g.ended_at, game_data  
             FROM games g ORDER BY id DESC LIMIT 50;`);
     },
     findOne: async function(gameId) {

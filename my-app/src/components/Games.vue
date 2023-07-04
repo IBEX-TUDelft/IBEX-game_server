@@ -19,11 +19,22 @@
                     <td>{{ item.phase_number }}</td>
                     <td>{{ item.ended_at }}</td>
                     <td>
-                        <div class="btn-toolbar pull-right col-md-12">
-                            <!--button type="button" @click='detailGame()' class="btn btn-primary mr-1">Details</button-->
-                            <button v-if="item.round_number == null || item.round_number == 0" type="button" @click="startGame(item.id)" class="btn btn-success mr-1">Start</button>
-                            <!--button v-if="item.round_number != null && item.ended_at != null" type="button" @click='endGame()' class="btn btn-warning mr-1">Force End</button-->
-                            <button type="button" @click='deleteGame(item.id)' class="btn btn-danger">Delete</button>
+                        <div class="btn-toolbar pull-right row-12">
+                            <div class="mr-2">
+                                <button v-if="item.round_number == null || item.round_number == 0" type="button" @click="startGame(item.id)" class="btn btn-success mr-1">Start</button>
+                            </div>
+                            <div class="mr-2">
+                                <button type="button" @click='deleteGame(item.id)' class="btn btn-danger">Delete</button>
+                            </div>
+                            <div class="mr-2">
+                                <button type="button" @click='analyseGame(item.id, item.type)' class="btn btn-primary">Analyse</button>
+                            </div>
+                            <div class="mr-2">
+                                <button type="button" @click='interationLog(item.id, item.type)' class="btn btn-primary">{{ item.type.toString().toLowerCase() === 'voting' ? 'Chat' : 'Market'}} Log</button>
+                            </div>
+                            <div class="">
+                                <button type="button" @click='surveys(item.id)' class="btn btn-primary">Surveys</button>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -78,6 +89,46 @@
                     console.log('Game ' + id + ' deleted.');
 
                     //this.$router.go();
+                } catch (e) {
+                    console.log(e);
+                }
+            },
+            analyseGame: async function (id, type) {
+                let subPath = 'analyse';
+
+                console.log('TYPE ' + type)
+                if (type?.toString().toLowerCase() === 'voting') {
+                    subPath = 'analyse-voting';
+                }
+
+                try {
+                    const routeData = this.$router.resolve({path: `/${subPath}/${id}`});
+                    console.log('HRef:' + routeData.href);
+                    window.open(routeData.href, '_blank');
+                } catch (e) {
+                    console.log(e);
+                }
+            },
+            interationLog: async function (id, type) {
+                let subPath = 'market';
+
+                if (type?.toString().toLowerCase() === 'voting') {
+                    subPath = 'chat';
+                }
+
+                try {
+                    const routeData = this.$router.resolve({path: `/${subPath}/${id}`});
+                    console.log('HRef:' + routeData.href);
+                    window.open(routeData.href, '_blank');
+                } catch (e) {
+                    console.log(e);
+                }
+            },
+            surveys: async function(id) {
+                try {
+                    const routeData = this.$router.resolve({path: `/surveys/${id}`});
+                    console.log('HRef:' + routeData.href);
+                    window.open(routeData.href, '_blank');
                 } catch (e) {
                     console.log(e);
                 }

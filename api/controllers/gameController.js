@@ -30,6 +30,10 @@ export default {
             }});
 
             records.forEach(r => {
+                const data = JSON.parse(r.game_data);
+
+                r.type = data.type;
+
                 const game = gs.find(g => g.id === r.id);
 
                 if (game == null) {
