@@ -315,7 +315,13 @@
                     xls.push(header);
 
                     self.conditions.forEach(c => {
-                        const row = [c.name, self.signals[i].publicSignal[c.id]];
+                        let row = [c.name];
+
+                        if (self.signals != null && self.signals[i] != null && self.signals[i].publicSignal != null && self.signals[i].publicSignal[c.id] != null) {
+                            row.push(self.signals[i].publicSignal[c.id]);
+                        } else {
+                            row.push('-');
+                        }
 
                         for (let j = 0; j < 12; j++) {
                             row.push(self.getPrivateSignal(i, j, c.id))
