@@ -811,14 +811,18 @@
 
                         xlsRow.push(total);
 
-                        const playerReward = self.rewards.find(r => r.number === player.number);
+                        if (self.rewards != null) {
+                            const playerReward = self.rewards.find(r => r.number === player.number);
 
-                        xlsRow.push(playerReward.basePoints);
-                        xlsRow.push(playerReward.profit);
-                        xlsRow.push(playerReward.points);
-                        xlsRow.push(playerReward.factor);
-                        xlsRow.push(playerReward.exchange);
-                        xlsRow.push(playerReward.reward);
+                            xlsRow.push(playerReward.basePoints);
+                            xlsRow.push(playerReward.profit);
+                            xlsRow.push(playerReward.points);
+                            xlsRow.push(playerReward.factor);
+                            xlsRow.push(playerReward.exchange);
+                            xlsRow.push(playerReward.reward);
+                        } else {
+                            xlsRow.push('', '', '', '', '', '');
+                        }
 
                         xlsRow.push(player.paymentToken);
 
