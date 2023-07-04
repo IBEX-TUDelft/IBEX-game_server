@@ -380,6 +380,8 @@ export default class {
             this.over = true;
             clearInterval(this.phaseCheckingInterval);
             
+            await GameRepository.saveData(data.id, this.data);
+
             return;
         }
         
