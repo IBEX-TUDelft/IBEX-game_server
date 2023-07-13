@@ -3,6 +3,7 @@ import games from '../repositories/gameRepository.js';
 import Controller from '../helpers/controller.js';
 import WssManagement from '../services/wssGameService.js';
 import GameManagement from '../services/gameManager.js';
+import gameRepository from '../repositories/gameRepository.js';
 
 export default {
     apply (app) {
@@ -18,7 +19,7 @@ export default {
             Controller.handleSuccess(res, { id : gameId }, 'Game created');
         });
 
-        Controller.addGetRoute(app, '/api/v1/games/list', true, async (req, res) => {
+        async function listGames() {
             const records = await games.list();
 
             const gs = gameManager.games.map(g => g.data).map(d => { return {
@@ -29,21 +30,34 @@ export default {
                 "currentRound": d.currentRound
             }});
 
-            records.forEach(r => {
-                const data = JSON.parse(r.game_data);
+            for (let i = 0; i < records.length; i++) {
+                const r = records[i];
 
-                r.type = data.type;
+                if (r === null) {
+                    console.error('Null record in database');
+                    continue;
+                }
+
+                r.type = await gameRepository.getGameType(r.id);
+
+                console.log(r.type);
 
                 const game = gs.find(g => g.id === r.id);
 
                 if (game == null) {
-                    return;
+                    continue;
                 }
                 
                 if (game.currentRound != null) {
                     r.round_number = game.currentRound;
                 }
-            });
+            }
+
+            return records;
+        }
+
+        Controller.addGetRoute(app, '/api/v1/games/list', true, async (req, res) => {
+            const records = await listGames();
 
             Controller.handleSuccess(res, records, 'Data found');
         });
@@ -105,7 +119,7 @@ export default {
 
             await gameManager.deleteGame(gameId);
 
-            const records = await games.list();
+            const records = await listGames();
 
             console.log(records);
 

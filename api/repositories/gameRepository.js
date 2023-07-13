@@ -192,5 +192,25 @@ export default {
                     }
             });
         }); 
+    },
+    getGameType: async function(gameId) {
+        return await new Promise((resolve, reject) => {
+            this.pool.query(
+                `select parameter_value from game_parameters where parameter_key = 'game_type' and game_id = ${gameId};`,
+                (err, res) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        if (res.rows == null || res.rows.length === 0) {
+                            resolve(null);
+                        } else if (res.rows.length === 1) {
+                            resolve(res.rows[0].parameter_value);
+                        } else {
+                            console.error(`${res.rows.length} games found with id ${gameId}. RED ALERT: check the database.`);
+                        }
+                    }
+            });
+        });
+        
     }
 }
