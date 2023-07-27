@@ -181,7 +181,7 @@ class Phase8 extends JoinablePhase {
                 console.log('Current land profit');
                 console.log(landProfit);
 
-                if (p.speculators != null && p.speculators[winningCondition].length > 0) {
+                if (p.speculators != null && p.speculators[winningCondition] != null && p.speculators[winningCondition].length > 0) {
                     console.log('There are speculators');
 
                     const biddingSpeculators = p.speculators[winningCondition];

@@ -14,9 +14,9 @@ import ShowResults from '../common/ShowResults.js';
 import Logic from "../Logic.js";
 
 export default class Harberger extends Logic {
-    constructor(data) {
+    constructor(data, record) {
         super(data, [WaitToStartPhase, Phase1, Phase2, Phase3, Phase4,
-            Phase5, Phase6, Phase7, Phase8, ShowResults], 'Harberger');
+            Phase5, Phase6, Phase7, Phase8, ShowResults], 'Harberger', record);
     }
 
     getRecoveryData(number) {

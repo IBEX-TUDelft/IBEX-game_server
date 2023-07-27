@@ -12,9 +12,9 @@ import ShowResults from '../common/ShowResults.js';
 import Logic from "../Logic.js";
 
 export default class Futarchy extends Logic {
-    constructor(data) {
+    constructor(data, record) {
         super(data, [WaitToStartPhase, Phase1, Phase2, Phase3, Phase4,
-            Phase5, Phase6, Phase7, Phase8, ShowResults], 'Futarchy');
+            Phase5, Phase6, Phase7, Phase8, ShowResults], 'Futarchy', record);
     }
 
     getExpectation(playerNumber, round) {

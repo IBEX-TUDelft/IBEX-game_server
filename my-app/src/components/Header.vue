@@ -1,22 +1,34 @@
 <template>
-  <div>
-    <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
-      <b-navbar-brand href="#" @click="dashboard">
-          Back Home
+  <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
+    <b-nav>
+      <b-nav-item>
+        <b-button style="width: 125px" v-if="$route.path != '/dashboard'" variant="primary" @click="dashboard">Home</b-button>
+        <b-nav-text style="width: 125px; text-align: center;" v-else>Home</b-nav-text>
+      </b-nav-item>
+    </b-nav>
+    <div class="container justify-content-center">
+      <b-navbar-brand>
+        {{ $route.name }}
       </b-navbar-brand>
-      <div class="container justify-content-center">
-        <b-navbar-brand>
-            {{ $route.name }}
-        </b-navbar-brand>
-      </div>
-      <b-navbar-nav class="ml-auto">
-        <b-nav-text>{{ username }} | </b-nav-text>
-        <b-nav-item @click="newGame" active>New Game | </b-nav-item>
-        <b-nav-item @click="lobby" active>Game Lobby | </b-nav-item>
-        <b-nav-item @click="logUserOut" active>Logout</b-nav-item>
-      </b-navbar-nav>
-    </b-navbar>
-  </div>
+    </div>
+    <b-nav style="flex-wrap: nowrap;" class="justify-content-center">
+      <b-nav-item>
+        <b-button style="width: 125px" v-if="$route.path != '/simulation'" variant="primary" @click="simulation">Simulation</b-button>
+        <b-nav-text style="width: 125px; text-align: center;" v-else>Simulation</b-nav-text>
+      </b-nav-item>
+      <b-nav-item>
+        <b-button style="width: 125px" v-if="$route.path != '/newgame'" variant="primary" @click="newGame">New Game</b-button>
+        <b-nav-text style="width: 125px; text-align: center;" v-else>New Game</b-nav-text>
+      </b-nav-item>
+      <b-nav-item>
+        <b-button style="width: 125px" v-if="$route.path != '/lobby'" variant="primary" @click="lobby">Game Lobby</b-button>
+        <b-nav-text style="width: 125px; text-align: center;" v-else>Game Lobby</b-nav-text>
+      </b-nav-item>
+      <b-nav-item>
+        <b-button style="width: 125px" variant="danger" @click="logUserOut">Logout {{ username }}</b-button>
+      </b-nav-item>
+    </b-nav>
+  </b-navbar>
 </template>
 
 <script>
@@ -54,7 +66,10 @@ export default {
     },
     dashboard() {
       this.$router.push("/dashboard");
-    }
+    },
+    simulation() {
+      this.$router.push("/simulation");
+    },
   },
   created() {
     this.getUserDetails();

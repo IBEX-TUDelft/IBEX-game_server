@@ -298,7 +298,7 @@ class Phase6 extends JoinablePhase {
         // 1 Determine the winning condition based on the final market price
         this.game.quotations = [0, 0, 0];
 
-        let winningCondition = 0; //If no trades are made, the status quo wins
+        let winningCondition = 1; //If no trades are made, the first project wins
         let winningQuotation = 0;
 
         for (let condition = 0; condition < self.game.conditions.length; condition++) {

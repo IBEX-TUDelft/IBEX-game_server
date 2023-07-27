@@ -27,8 +27,6 @@ class Phase3 extends JoinablePhase {
 
                 const winningConditionSnipes = message.snipe[game.winningCondition];
 
-                console.log('Winning condition snipes: ' + winningConditionSnipes.length);
-
                 if (winningConditionSnipes != null && winningConditionSnipes.length > 0) {
                     winningConditionSnipes.forEach(id => {
                         const lot = game.properties.find(p => p.id === id);
@@ -92,11 +90,11 @@ class Phase3 extends JoinablePhase {
 
         // 2. determine the winning condition
 
-        let winningCondition = null;
-        let winningSum = 0;
+        let winningCondition = 0;
+        let winningSum = self.game.D[0];
 
-        for(let j = 0; j < self.game.conditions.length; j++) {
-            if (self.game.D[j] > winningSum) {
+        for(let j = 1; j < self.game.conditions.length; j++) {
+            if (self.game.D[j] > winningSum || (winningCondition === 0 && self.game.D[j] === winningSum)) {
                 winningSum = self.game.D[j];
                 winningCondition = j;
             }
