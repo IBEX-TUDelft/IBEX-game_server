@@ -6,6 +6,8 @@ import GameService from "../services/gameService.js";
 import Utils from '../helpers/utils.js';
 import WS from '../helpers/websocket.js';
 import fs from 'fs';
+import { AppEvents, GameOver, PhaseBegins, PhaseComplete, PhaseTimeout } from '../helpers/AppEvents.js';
+import { GameRecorder } from '../helpers/GameRecorder.js';
 
 export default class {
 
@@ -16,8 +18,9 @@ export default class {
     phases;
     wss = null;
     phaseCheckingInterval = null;
+    recorder;
 
-    constructor (data, phases, type) {
+    constructor (data, phases, type, record) {
         if (data == null) {
             throw new Error('Game data is null');
         }
@@ -41,6 +44,10 @@ export default class {
         this.phases = phases;
         this.data.type = type;
         this.data.properties = [];
+
+        if (record === true) {
+            this.recorder = new GameRecorder(this.data.id);
+        }
     }
 
     alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase();
@@ -194,13 +201,9 @@ export default class {
         }
 
         const transition = await this.data.currentPhase.onMessage(ws, message);
-
-        if (this.data.currentPhase.complete === true || transition) {
-            await this.nextPhase();
-        }
     }
 
-    async start (wss) {
+    async start (wss, record) {
         this.wss = wss;
 
         this.data.startTime = new Date().toLocaleString('nl', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})
@@ -211,6 +214,30 @@ export default class {
                 "phase": []
             });
         }
+
+        AppEvents.get(this.data.id).addListener(PhaseTimeout, (data) => {
+            console.log(`Event ${PhaseTimeout} received with args:`);
+            console.log(data);
+
+            if (data != null && data.phase != null && data.phase != this.data.currentRound.phase) {
+                console.log(`In phase ${this.data.currentRound.phase}, gotten a ${PhaseTimeout} event from a different phase: ${data.phase}`)
+                return;
+            }
+
+            this.nextPhase();
+        });
+
+        AppEvents.get(this.data.id).addListener(PhaseComplete, async (data) => {
+            console.log(`Event ${PhaseComplete} received with args:`);
+            console.log(data);
+
+            if (data != null && data.number != null && data.number != this.data.currentRound.phase) {
+                console.log(`In phase ${this.data.currentRound.phase}, gotten a ${PhaseComplete} event from a different phase: ${data.number}`)
+                return;
+            }
+
+            await this.nextPhase();
+        });
 
         await this.beginRound();
     }
@@ -276,19 +303,10 @@ export default class {
             console.error(err);
         }
 
-        const self = this;
-
-        this.phaseCheckingInterval = setInterval(async () => {
-            const transition = await self.data.currentPhase.testComplete();
-
-            if (self.data.currentPhase.complete === true || transition) {
-                try {
-                    await self.nextPhase();
-                } catch(e) {
-                    console.error(`Could not transition to phase ${self.data.currentRound.phase}`, e);
-                }
-            }
-        }, 5000);
+        AppEvents.get(this.data.id).emit(PhaseBegins, {
+           "phase": this.data.currentRound.phase,
+           "round": this.data.currentRound.number
+        });
     }
 
     async beginRound () {
@@ -377,6 +395,8 @@ export default class {
             this.data.rewards = rewards;
 
             this.wss.broadcastEvent(this.data.id, "game-over", {});
+            AppEvents.get(this.data.id).emit(GameOver);
+
             this.over = true;
             clearInterval(this.phaseCheckingInterval);
             

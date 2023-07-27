@@ -1,5 +1,6 @@
 import JoinHandler from "./JoinHandler.js";
 import Phase from "./Phase.js";
+import { AppEvents } from '../helpers/AppEvents.js';
 
 export default class JoinablePhase extends Phase {
     number;
@@ -14,8 +15,6 @@ export default class JoinablePhase extends Phase {
 
     async onEnter () {
         super.onEnter();
-
-        console.log(this.game.parameters);
         
         const timer = this.game.parameters[`timer_phase_${this.number}`];
 
@@ -23,6 +22,10 @@ export default class JoinablePhase extends Phase {
 
         if (timer != null && typeof timer === 'number' && timer > 0) {
             this.setTimer(timer * 1000, timer * 1000);
+            AppEvents.get(this.game.id).phaseTimeout(timer * 1000, {
+                "phase": this.number,
+                "round": this.game.currentRound.number
+            });
         }
     }
 }

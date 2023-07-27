@@ -12,7 +12,7 @@ import GameAnalysisVoting from '../components/GameAnalysisVoting';
 import GameMarketLog from '../components/GameMarketLog';
 import GameChatLog from '../components/GameChatLog';
 import GameSurveys from '../components/GameSurveys';
-
+import SimulationList from '../components/SimulationList';
 
 Vue.use(VueRouter)
 
@@ -34,6 +34,14 @@ const routes = [
     path: '/newgame',
     name: 'Create a Game',
     component: CreateGame,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/simulation',
+    name: 'Game Simulation Datasets',
+    component: SimulationList,
     meta: {
       requiresAuth: true
     }

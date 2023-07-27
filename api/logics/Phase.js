@@ -1,5 +1,6 @@
 import WS from '../helpers/websocket.js';
 import Utils from '../helpers/utils.js';
+import { AppEvents, PhaseComplete, PlayerMessage } from '../helpers/AppEvents.js';
 
 export default class Phase {
     number;
@@ -44,46 +45,9 @@ export default class Phase {
     }
 
     async onEnter() {
-        /*const self = this;
-
-        if (this.game.dictionary != null) {
-            const phaseNumber = this.game.currentRound.phase;
-
-            const phaseInstructions = this.game.dictionary.instructions.phases[phaseNumber];
-
-            //Override the defaults
-            this.instructions = [
-                phaseInstructions.speculator == null ? '-' : phaseInstructions.speculator,
-                phaseInstructions.developer == null ? '-' : phaseInstructions.developer,
-                phaseInstructions.owner == null ? '-' : phaseInstructions.owner
-            ];
-        }
-
-        if (this.instructions.length > 0) {
-            for (let i = 0; i < 3; i++) {
-                const err = this.wss.broadcastEvent (
-                    self.game.id,
-                    "phase-instructions",
-                    {
-                        "instructions": this.instructions[i]
-                    },
-                    i + 1 //role
-                );
-
-                if (err != null) {
-                    console.error(err);
-                }
-            }
-        }
-
-        console.log(`Entering phase ${this.game.currentRound.phase}`);*/
     }
 
     async onExit() {
-        if (this.timeoutId != null) {
-            clearTimeout(this.timeoutId);
-        }
-
         if (this.timer.set === true) {
             const err = this.wss.broadcastEvent(
                 this.game.id,
@@ -97,8 +61,18 @@ export default class Phase {
         }
     }
 
-    async testComplete() {
+    async updateAndTest() {
+        const complete = await this.testComplete();
 
+        if (complete) {
+            AppEvents.get(this.game.id).emit(PhaseComplete, {
+                "phase": this.game.currentRound.phase,
+                "round": this.game.currentRound.round
+            });
+        }
+    }
+
+    async testComplete() {
     }
 
     getData () {
@@ -115,6 +89,17 @@ export default class Phase {
 
     async onMessage(ws, message) {
         console.log(this.handlers);
+
+        let player = this.getPlayer(ws, message);
+
+        AppEvents.get(this.game.id).emit(PlayerMessage, {
+            "content": message,
+            "number": player?.number,
+            "tag": player?.tag,
+            "phase": this.game.currentRound.phase,
+            "round": this.game.currentRound.number,
+            "type": "message"
+        });
 
         const handler = this.handlers.find(m => m.type === message.type);
 
@@ -139,8 +124,6 @@ export default class Phase {
             }
         }
 
-        let player = this.getPlayer(ws, message);
-
         if (player == null && handler.requiresAuthentication != false) {
             const errMessage = `Handler ${handler.type} requires authentication. Player ${ws.player == null ? 'unknown' : ws.player.number} not found in game ${message.gameId}`;
             console.error(errMessage);
@@ -149,18 +132,15 @@ export default class Phase {
 
         await handler.action(ws, message, player, this);
 
-        return await this.testComplete();
+        this.updateAndTest();
+
+        return false;
     }
 
     setTimer(visibleTimeout, realTimeout) {
         const self = this;
 
         this.timer.set = true;
-
-        this.timeoutId = setTimeout(() => {
-            console.log(`PHASE ${self.number} TIMEOUT`);
-            self.complete = true;
-        }, realTimeout );
 
         this.timer.visibleTimeout = Date.now() + visibleTimeout;
         this.timer.realTimeout = Date.now() + realTimeout;

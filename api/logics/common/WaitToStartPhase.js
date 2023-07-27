@@ -9,6 +9,8 @@ class WaitToStartPhase extends JoinablePhase {
             "action": function(ws, message, player, caller) {
                 player.ready = true;
 
+                console.log('REALLY HERE');
+                
                 let err = wss.sendEvent(
                     game.id,
                     player.number,
@@ -20,7 +22,7 @@ class WaitToStartPhase extends JoinablePhase {
                     console.error(err);
                 }
             }
-        }], 0);
+        }], [], 0);
     }
 
     testComplete () {

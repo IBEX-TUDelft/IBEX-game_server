@@ -4,6 +4,7 @@ import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-
 import gamePlayerRepository from '../repositories/gamePlayerRepository.js';
 import gameRoundRepository from '../repositories/gameRoundRepository.js';
 import Database from '../helpers/database.js'
+import fs from 'fs';
 
 export default {
     createGame: async function (gameParameters) {
@@ -173,6 +174,121 @@ export default {
                 cashForSniping: cashForSniping,
                 player_role: role
             };
+
+            await gamePlayerRepository.create(player);
+        }
+
+        return gameId;
+    },
+    createForDataset: async function (dataset, title) {
+        const gameId = await gameRepository.create({ "title": title});
+
+        const parameters = {};
+
+        for (let i = 0; i < dataset.parameters.length; i++) {
+            const parameter = dataset.parameters[i];
+
+            switch(parameter.type) {
+                case 'number':
+                    parameters[parameter.key] = parseInt(parameter.value);
+                    break;;
+                default:
+                    parameters[parameter.key] = parameter.value;
+            }
+
+            console.log(`${parameter.key} (${parameter.type} vs ${typeof parameter.value}): ${parameter.value}`);
+
+            if (parameter.type === 'number' && (parameter.value == null || parameter.value === "")) {
+                continue;
+            }
+
+            parameter.gameId = gameId;
+
+            const parameterId = await gameParameterRepository.create(parameter);
+        }
+
+        //3 Create the players
+        /* Roles:
+         *
+         * 1: Speculator
+         * 2: Developer
+         * 3: Owner
+         */
+        const roles = [3,2]; //It starts with an owner, then a developer
+        const usedNames = [];
+
+        /*for (let i = 0; i < gameParameters.developers.count; i++) {
+            roles.push(2);
+        }*/
+
+        for (let i = 1; i < parameters.owners_count; i++) {
+            roles.push(3);
+        }
+
+        for (let i = 0; i < parameters.speculators_count; i++) {
+            roles.push(1);
+        }
+
+        const playersCount = roles.length;
+
+        console.log('Creating players');
+
+        for (let i = 0; i < playersCount; i++) {
+            //const role = roles.splice(Math.floor(Math.random() * roles.length), 1)[0];
+            const role = roles.splice(0, 1)[0];
+
+            let name = null;
+
+            while (name == null || usedNames.includes(name)) {
+                name = uniqueNamesGenerator({
+                    dictionaries: [colors],
+                    style: "capital"
+                });    
+            }
+
+            usedNames.push(name);
+
+            let balance;
+            let shares;
+            let cashForSniping = 0;
+
+            switch (role) {
+                case 1:
+                    balance = parameters.speculator_balance;
+                    shares = parameters.speculator_shares;
+                    cashForSniping = parameters.cash_for_snipers;
+                    break;
+                case 2:
+                    balance = parameters.developer_balance;
+                    shares = parameters.developer_shares;
+                    break;
+                case 3:
+                    balance = parameters.owner_balance;
+                    shares = parameters.owner_shares;
+                    break;
+            }
+
+            const player = {
+                name: name,
+                recovery_string: uniqueNamesGenerator({
+                    dictionaries: [adjectives, animals],
+                    style: "lowerCase",
+                    separator: " "
+                }),        /* Roles:
+                *
+                * 1: Speculator
+                * 2: Developer
+                * 3: Owner
+                */
+                game_id: gameId,
+                player_number: i + 1,
+                balance: balance,
+                shares: shares,
+                cashForSniping: cashForSniping,
+                player_role: role
+            };
+
+            console.log(player);
 
             await gamePlayerRepository.create(player);
         }

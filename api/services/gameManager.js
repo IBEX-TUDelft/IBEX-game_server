@@ -11,7 +11,7 @@ export default {
         return {
             wssManager: null,
             games: [],
-            startGame: async function(gameId) {
+            startGame: async function(gameId, record = true) {
                 console.log('GAMEMASTER Game ID: ' + gameId + " Typeof: " + typeof gameId);
 
                 if (this.games.find(g => g.data.id  == gameId) != null) {
@@ -110,15 +110,15 @@ export default {
 
                 switch(gameData.parameters.game_type) {
                     case 'harberger':
-                        game = new Harberger(gameData);
+                        game = new Harberger(gameData, record);
                         await game.init();
                         break;
                     case 'futarchy':
-                        game = new Futarchy(gameData);
+                        game = new Futarchy(gameData, record);
                         await game.init();
                         break;
                     case 'voting':
-                        game = new Voting(gameData);
+                        game = new Voting(gameData, record);
                         await game.init();
                         break;
                     default:

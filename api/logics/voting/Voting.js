@@ -11,8 +11,8 @@ import Vote from './phases/Vote.js';
 import End from './phases/6.js';
 
 export default class Voting extends Logic {
-    constructor(data) {
-        super(data, [WaitToStartPhase, Introduction, Chat, Request, Offer, Chat, Vote, End], 'Voting');
+    constructor(data, record) {
+        super(data, [WaitToStartPhase, Introduction, Chat, Request, Offer, Chat, Vote, End], 'Voting', record);
     }
 
     getExpectation(playerNumber, round) {

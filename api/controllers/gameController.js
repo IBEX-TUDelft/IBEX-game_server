@@ -4,6 +4,8 @@ import Controller from '../helpers/controller.js';
 import WssManagement from '../services/wssGameService.js';
 import GameManagement from '../services/gameManager.js';
 import gameRepository from '../repositories/gameRepository.js';
+import fs from 'fs';
+import { AppEvents, PhaseBegins, PhaseComplete } from '../helpers/AppEvents.js';
 
 export default {
     apply (app) {
@@ -139,6 +141,133 @@ export default {
                 Controller.handleSuccess(res, {}, 'Game started');
             } else {
                 Controller.handleGenericError(res, error, 400);
+            }
+        });
+
+        Controller.addGetRoute(app, '/api/v1/simulation-datasets/list', true, async (req, res) => {
+            fs.readdir('../records/', (error, files) => {
+                if (error == null) {
+                    Controller.handleSuccess(res, files, 'Simulation datasets found');
+                } else {
+                    console.error(error);
+                    Controller.handleGenericError(res, error, 500);
+                }
+            });
+        });
+
+        Controller.addGetRoute(app, '/api/v1/simulation-datasets/play', true, async (req, res) => {
+            const name = req.query.name;
+            const title = req.query.title;
+
+            console.log(`Gonna play ${name} as ${title}`);
+            let dataset;
+
+            try {
+                console.log(`Reading dataset ${name} ...`);
+
+                const raw = fs.readFileSync(`../records/${name}`);
+
+                console.log(`Done. Parsing its content ...`);
+
+                dataset = JSON.parse(raw);
+
+                console.log(`Done. Checking if there is data ...`);
+
+                if (dataset == null) {
+                    throw new Error(`Simulation dataset ${name} is empty`)
+                }
+
+                console.log(`Done. Creating the game ...`);
+
+                const gameId = await gameService.createForDataset(dataset, title);
+
+                console.log(`Done. Starting the game ...`);
+
+                const error = await gameManager.startGame(gameId, false);
+
+                console.log(`Done.`);
+
+                if (error != null) {
+                    throw new Error(`Could not run simulation dataset ${name}: ${error}`);
+                }
+
+                const game = gameManager.games.find(g => g.data.id === gameId);
+
+                if (game == null) {
+                    throw(`Could not find ${gameId} in the game manager`);
+                }
+                
+                let j = 0;
+                
+                while (j < dataset.log.length) {
+                    const event = dataset.log[j];
+
+                    if (event.phase < game.data.currentRound.phase) {
+                        console.error(`Phase out of sync. Event: ${event.phase}, game: ${game.data.currentRound.phase}`);
+                        break;
+                    }
+
+                    if (event.phase > game.data.currentRound.phase) {
+                        console.log(`Event for ${event.phase}, waiting for the game to move to that phase`);
+
+                        await new Promise(resolve => {
+                            const listener = ({phase}) => {
+                                console.log(`Game moved to phase ${phase}`);
+    
+                                if (phase === event.phase) {
+                                    AppEvents.get(gameId).removeListener(PhaseBegins, listener);
+                                    resolve();
+                                }
+                            };
+
+                            AppEvents.get(gameId).addListener(PhaseBegins, listener)
+                        });
+                    }
+
+                    if (event.content != null) {
+                        event.content.gameId = gameId;
+                    }
+
+                    console.log(`Playing event ${j}: ${event.type} for phase ${event.phase} in phase ${game.data.currentRound.phase}`);
+
+                    if (event.type === "phase-timeout") {
+                        AppEvents.get(gameId).emit(PhaseComplete, {
+                            "number": event.number
+                        });
+
+                        j++;
+
+                        continue;
+                    }
+
+                    let ws = {
+                        "send": function() {}
+                    };
+
+                    const player = game.data.players.find(p => p.number === event.number);
+
+                    console.log(game.data.players);
+
+                    if (event.number != null) {
+                        ws.player = {
+                            "number": event.number,
+                            "role": player.role
+                        }
+                    }
+
+                    await gameManager.handleMessage(ws, event.content);
+
+                    j++;
+                }
+
+                Controller.handleSuccess(res, {
+                    "id" : gameId,
+                    "type": game.data.type.toLowerCase()
+                }, 'Game created and run with your simulation dataset');
+            } catch (e) {
+                console.error(`Could not run simulation dataset ${name}`, e);
+                Controller.handleGenericError(res, `Could not run simulation dataset ${name}: ${e.message}`, 400);
+                return;
             }
         });
 
