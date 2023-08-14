@@ -259,13 +259,18 @@
 
                         self.players.forEach(player => {
                             const values = self.getPlayerValues(player.number, round.round);
-                            const compensationReq = self.extractDataFromObject(self.compensationRequests[roundNr].find(cr => cr.number === player.number), 'compensationRequests', 1);
-                            const compensationOffer = player.role != 2 ? self.compensationOffers[roundNr][1] : '';
+                            let compensationReq = self.extractDataFromObject(self.compensationRequests[roundNr].find(cr => cr.number === player.number), 'compensationRequests', 1);
+                            if (compensationReq == null && player.role === 3) {
+                                compensationReq = 0;
+                            }
+
+                            const compensationOffer = (self.compensationOffers[roundNr][1] | 0);
                             const compensationOfferNumber = isNaN(parseInt(compensationOffer)) ? 0 : parseInt(compensationOffer);
+
                             const requestSubmitted = player.role != 2 ? (isNaN(parseInt(compensationReq)) ? 'No' : 'Yes') : '';
                             const compensationReqNumber = isNaN(parseInt(compensationReq)) ? 0 : parseInt(compensationReq);
                             const compensationDelta = player.role != 2 ? (compensationOfferNumber - compensationReqNumber) : '';
-                            const offerSubmitted = player.role === 2 ? (!isNaN(parseInt(compensationOffer)) ? 'No' : 'Yes') : '';
+                            const offerSubmitted = player.role === 2 ? (isNaN(parseInt(compensationOffer)) ? 'No' : 'Yes') : '';
 
                             let total = values[winningCondition];
 

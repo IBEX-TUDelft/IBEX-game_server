@@ -25,7 +25,9 @@ class Phase3 extends JoinablePhase {
                     game.id,
                     player.number,
                     "compensation-request-received",
-                    {}
+                    {
+                        "compensationRequests": message.compensationRequests
+                    }
                 );
 
                 if (err != null) {

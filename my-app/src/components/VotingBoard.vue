@@ -440,6 +440,16 @@ export default {
                                 self.forms.selectedCondition = null;
                             }
 
+                            if (self.game.phase === 4 && self.player.role === 3 && self.player.compensationRequestReceived === false )  {
+                                console.log('Resetting player\' compensation requests');
+                                self.player.compensationRequests = [0, 0].map(c => self.formatService.format(c));
+                            }
+
+                            if (self.game.phase === 5 && self.player.role === 2 && self.player.compensationOfferReceived === false)  {
+                                console.log('Resetting player\' compensation offers');
+                                self.game.compensationOffers = [0, 0].map(c => self.formatService.format(c));
+                            }
+
                             if (self.game.phase > 0) {
                                 self.updateSummary();
                             }
@@ -512,6 +522,8 @@ export default {
                         case 'compensation-request-received':
                             self.player.compensationRequestReceived = true;
 
+                            self.player.compensationRequests = ev.data.compensationRequests.map(c => self.formatService.format(c));
+
                             break;
                         case 'compensation-requests-received':
                             ev.data.compensationRequests.forEach( cr => {
@@ -537,6 +549,8 @@ export default {
                         case 'compensation-offer-received':
                             self.player.compensationOfferReceived = true;
 
+                            self.game.compensationOffers = ev.data.compensationOffers.map(c => self.formatService.format(c));
+
                             break;
                         case 'compensation-decision-received':
                             self.player.compensationDecisionReceived = true;
@@ -546,11 +560,6 @@ export default {
                             self.player.property.lastOffer = ev.data.compensationOffers;
                             self.game.compensationOffers = ev.data.compensationOffers;
 
-                            /*if (self.player.role === 3) {
-                                if (self.player.property.v[0] > self.player.property.v[1] + self.game.compensationOffers[1]) {
-                                    self.acknowledge('compensation-insufficient-owner-title', 'compensation-insufficient-owner-description');
-                                }
-                            }*/
                             break;
                         case 'final-profit':
                             self.player.result = ev.data;
@@ -779,6 +788,8 @@ export default {
                 "type": "compensation-request",
                 "compensationRequests": self.player.compensationRequests.map(c => new LocalizedNumberParser(self.format).parse(c))
             });
+
+            self.player.compensationRequests = [0,0].map(c => self.formatService.format(c));
         },
         async submitCompensationOffers() {
             const self = this;
@@ -798,6 +809,8 @@ export default {
                 "type": "compensation-offer",
                 "compensationOffers": compensations
             });
+
+            self.game.compensationOffers = [0,0].map(c => self.formatService.format(c));
         },
         findPlayerByNumber(number) {
             return this.game.players.find(p => p.number === number);

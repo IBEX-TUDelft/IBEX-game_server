@@ -508,6 +508,11 @@ export default class {
         console.log('Should have entered the new phase');
 
         await GameRepository.saveData(data.id, data);
+
+        AppEvents.get(this.data.id).emit(PhaseBegins, {
+            "phase": this.data.currentRound.phase,
+            "round": this.data.currentRound.number
+         });
     }
 
     refreshWallet() {

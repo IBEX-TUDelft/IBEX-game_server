@@ -26,7 +26,9 @@ class Phase4 extends JoinablePhase {
                     game.id,
                     player.number,
                     "compensation-offer-received",
-                    {}
+                    {
+                        "compensationOffers": message.compensationOffers
+                    }
                 );
 
                 if (err != null) {

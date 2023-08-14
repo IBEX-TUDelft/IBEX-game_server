@@ -199,24 +199,51 @@ export default {
                 
                 let j = 0;
                 
+                function gameIsAhead(gameRound, event) {
+                    if (gameRound.number < event.round) {
+                        return false;
+                    }
+
+                    if (gameRound.number > event.round) {
+                        return true;
+                    }
+
+                    return gameRound.phase > event.phase;
+                }
+
+                function gameIsBehind(gameRound, event) {
+                    if (gameRound.number < event.round) {
+                        return true;
+                    }
+
+                    if (gameRound.number > event.round) {
+                        return false;
+                    }
+
+                    return gameRound.phase < event.phase;
+                }
+
                 while (j < dataset.log.length) {
                     const event = dataset.log[j];
 
-                    if (event.phase < game.data.currentRound.phase) {
-                        console.error(`Phase out of sync. Event: ${event.phase}, game: ${game.data.currentRound.phase}`);
+                    if (gameIsAhead(game.data.currentRound, event)) {
+                        console.error(`Out of sync, event behind. Event = ${event.round}:${event.phase}, game = ${game.data.currentRound.number}:${game.data.currentRound.phase}`);
+                        console.error(event);
                         break;
                     }
 
-                    if (event.phase > game.data.currentRound.phase) {
-                        console.log(`Event for ${event.phase}, waiting for the game to move to that phase`);
+                    if (gameIsBehind(game.data.currentRound, event)) {
+                        console.log(`Event for ${event.round}:${event.phase}, waiting for the game (${game.data.currentRound.number}:${game.data.currentRound.phase}) to move to that phase`);
 
                         await new Promise(resolve => {
-                            const listener = ({phase}) => {
-                                console.log(`Game moved to phase ${phase}`);
+                            const listener = ({phase, round}) => {
+                                console.log(`Game moved to phase ${round}:${phase}`);
     
-                                if (phase === event.phase) {
+                                if (!gameIsBehind(game.data.currentRound, event)) {
                                     AppEvents.get(gameId).removeListener(PhaseBegins, listener);
                                     resolve();
+                                } else {
+                                    console.log(`Waiting for ${event.round}:${event.phase},but still in (${game.data.currentRound.number}:${game.data.currentRound.phase}). Exiting ...`);
                                 }
                             };
 
@@ -232,7 +259,7 @@ export default {
 
                     if (event.type === "phase-timeout") {
                         AppEvents.get(gameId).emit(PhaseComplete, {
-                            "number": event.number
+                            "number": event.phase
                         });
 
                         j++;
