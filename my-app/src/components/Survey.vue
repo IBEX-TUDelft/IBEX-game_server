@@ -38,7 +38,7 @@
                             <option value="bsc1">bsc1</option>
                             <option value="bsc2">bsc2</option>
                             <option value="bsc3">bsc3</option>
-                            <option value="bsc4">bsc1</option>
+                            <option value="bsc4">bsc4</option>
                             <option value="msc1">msc1</option>
                             <option value="msc2">msc2</option>
                             <option value="other">other</option>
