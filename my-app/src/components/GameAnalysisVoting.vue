@@ -21,7 +21,7 @@
 
         <div>
             <b-card no-body>
-                <b-tabs card v-model="roundIndex">
+                <b-tabs card v-model="roundIndex" v-if="rounds != null">
                     <b-tab v-for="round in rounds.filter(r => r.round > 0)" :key="round.round">
 
                         <template #title>
