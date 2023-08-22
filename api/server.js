@@ -5,6 +5,7 @@ import randomId from 'random-id';
 import Utils from './helpers/utils.js';
 import moment from 'moment';
 import GameController from './controllers/gameController.js';
+import ResourceController from './controllers/resourceController.js';
 import users from './repositories/userRepository.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,8 +18,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../my-app/dist')));
 
 GameController.apply(app);
-
-
+ResourceController.apply(app);
 
 app.get('/api/users', (req, res) => {
   res.json();

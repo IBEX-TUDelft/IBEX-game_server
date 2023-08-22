@@ -1,11 +1,11 @@
 <template>
-  <b-col><div class="d-flex flex-column h-100">
+  <b-container fluid class="no-gutters">
     <Header />
     <div>
         <Games v-if="games.length > 0" :games="games" />
         <div v-else><p>No games to display. Click &quot;<b>New Game</b>&quot; on the right top menu to create a new one.</p></div>
     </div>
-  </div></b-col>
+  </b-container>
 </template>
 
 <script>

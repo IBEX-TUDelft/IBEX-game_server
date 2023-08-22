@@ -103,7 +103,7 @@
                 </b-row>
 
                 <b-row class="no-gutters justify-content-center flex-grow-1">
-                        <button type="button" @click='submit()' class="btn btn-danger">Send</button>
+                    <button type="button" @click='submit()' class="btn btn-danger">Send</button>
                 </b-row>
             </b-form>
             <b-row v-else class="no-gutters justify-content-center flex-grow-1">

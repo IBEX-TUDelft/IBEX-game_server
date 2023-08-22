@@ -1,5 +1,5 @@
 <template>
-  <b-navbar id="navbar" toggleable="md" type="dark" variant="info">
+  <b-navbar class="p-0" id="navbar" toggleable="md" type="dark" variant="info" style="margin-left: -15px; margin-right: -15px;">
     <b-nav>
       <b-nav-item>
         <b-button style="width: 125px" v-if="$route.path != '/dashboard'" variant="primary" @click="dashboard">Home</b-button>

@@ -260,14 +260,21 @@
                         self.players.forEach(player => {
                             const values = self.getPlayerValues(player.number, round.round);
                             let compensationReq = self.extractDataFromObject(self.compensationRequests[roundNr].find(cr => cr.number === player.number), 'compensationRequests', 1);
+
+                            let requestSubmitted = player.role === 3 ? 'Yes' : '';
+
+                            console.log(`Player ${player.number} (${player.role}): `);
+                            console.log(compensationReq);
+
                             if (compensationReq == null && player.role === 3) {
                                 compensationReq = 0;
+                                requestSubmitted = 'No';
                             }
 
-                            const compensationOffer = (self.compensationOffers[roundNr][1] | 0);
+                            const compensationOffer = self.compensationOffers[roundNr][1];
                             const compensationOfferNumber = isNaN(parseInt(compensationOffer)) ? 0 : parseInt(compensationOffer);
 
-                            const requestSubmitted = player.role != 2 ? (isNaN(parseInt(compensationReq)) ? 'No' : 'Yes') : '';
+                            //const requestSubmitted = player.role != 2 ? (isNaN(parseInt(compensationReq)) ? 'No' : 'Yes') : '';
                             const compensationReqNumber = isNaN(parseInt(compensationReq)) ? 0 : parseInt(compensationReq);
                             const compensationDelta = player.role != 2 ? (compensationOfferNumber - compensationReqNumber) : '';
                             const offerSubmitted = player.role === 2 ? (isNaN(parseInt(compensationOffer)) ? 'No' : 'Yes') : '';
@@ -300,7 +307,7 @@
                             const survey = self.surveys.find(s => s.number === player.number);
 
                             xls.push([self.startTime,self.dataset,player.number,round.round, player.tag, player.role, self.ruleset, values[0], values[1],
-                            '',compensationReq, requestSubmitted, compensationOffer, offerSubmitted, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
+                            '',compensationReq, requestSubmitted, compensationOfferNumber, offerSubmitted, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
                             self.getStandingCounter(round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No',
                             playerReward?.basePoints, playerReward?.profit, playerReward?.points, playerReward?.factor, playerReward?.exchange, playerReward?.reward, player.paymentToken,
                             survey?.age, survey?.gender, survey?.yearOfStudy, survey?.faculty, survey?.risk
