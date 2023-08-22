@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid vh-100 p-0">
+  <b-container fluid class="no-gutters">
     <Header />
     <div v-if="datasets.length > 0" class="d-flex">
       <b-table class="mx-3" :items="datasets" :fields="fields" head-variant="dark" :fixed="true">
@@ -11,7 +11,7 @@
     <div v-else>
       <p>No data to display. Play a new game to create one, or, alternatively, upload one from other sources.</p>
     </div>
-  </div>
+  </b-container>
 </template>
 
 <script>
