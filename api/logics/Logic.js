@@ -29,16 +29,20 @@ export default class {
             throw new Error('Game phase classes not present');
         }
 
-        if (!['Harberger', 'Futarchy', 'Voting'].includes(type)) {
-            throw new Error(`The game type must be Harberger, Futarchy or Voting. It was ${type}`);
+        const allowedTypes = ['Harberger', 'Futarchy', 'Voting', 'Market'];
+
+        if (!allowedTypes.includes(type)) {
+            throw new Error(`Allowed types: ${allowedTypes.join(', ')}. It was ${type}`);
         }
 
         const sessions = JSON.parse(fs.readFileSync('./resources/sessions.json'));
 
-        const session = sessions.find(s => s.id === data.parameters.session_number);
+        if (type != 'Market') {
+            const session = sessions.find(s => s.id === data.parameters.session_number);
 
-        this.valueSeries = session.rounds.map(r => r.values);
-        this.signalSeries = session.rounds.map(r => r.signals);
+            this.valueSeries = session.rounds.map(r => r.values);
+            this.signalSeries = session.rounds.map(r => r.signals);
+        }
 
         this.data = data;
         this.phases = phases;
@@ -65,117 +69,119 @@ export default class {
 
         const paymentTokens = [];
 
-        self.data.players.forEach(player => {
-            let paymentToken = self.generatePaymentToken();
-            
-            while (paymentTokens.includes(paymentToken)) {
-                paymentToken = self.generatePaymentToken();
-            }
+        if (self.data.parameters.game_type != 'market') {
+            self.data.players.forEach(player => {
+                let paymentToken = self.generatePaymentToken();
+                
+                while (paymentTokens.includes(paymentToken)) {
+                    paymentToken = self.generatePaymentToken();
+                }
 
-            paymentTokens.push(paymentToken);
+                paymentTokens.push(paymentToken);
 
-            player.paymentToken = paymentToken;
+                player.paymentToken = paymentToken;
 
-            player.summaries = [];
+                player.summaries = [];
 
-            switch (player.role) {
-                case 1:
-                    player.tag = `Speculator ${player.number - self.data.players.filter(p => p.role === 3).length - 1}`;
-                    break;
-                case 2:
-                    player.tag = `Developer`;
-                    break;
-                case 3:
-                    if (player.number === 1) {
-                        player.tag = `Owner 1`;
+                switch (player.role) {
+                    case 1:
+                        player.tag = `Speculator ${player.number - self.data.players.filter(p => p.role === 3).length - 1}`;
+                        break;
+                    case 2:
+                        player.tag = `Developer`;
+                        break;
+                    case 3:
+                        if (player.number === 1) {
+                            player.tag = `Owner 1`;
+                        } else {
+                            player.tag = `Owner ${player.number - 1}`;
+                        }
+                        break;
+                    default:
+                        throw new Error(`Player with unexpected role (should be 1, 2 or 3): ${player.role}`);
+                }
+
+                if (self.data.type != 'Voting') {
+                    player.S = [0, 0, 0];
+                }
+
+                if (player.role != 2 && player.role != 3) {
+                    console.log(`Not assigning a property to ${player.name}, because its role (${player.role}, ${typeof player.role}) is not 2 or 3`);
+                    return;
+                }
+
+                const property = {
+                    id: self.data.properties.length + 1,
+                    owner: player.number,
+                    name: uniqueNamesGenerator({
+                        dictionaries: [adjectives, animals],
+                        separator: " ",
+                        style: "capital"
+                    }) + " Lot",
+                    v: []
+                }
+
+                player.property = property;
+
+                let value;
+
+                if (player.role === 2) {
+                    value = {
+                        noProject: {
+                            low: self.data.parameters.developer_no_project_low,
+                            fixed: self.data.parameters.developer_no_project_fixed,
+                            high: self.data.parameters.developer_no_project_high
+                        },
+                        projectA: {
+                            low: self.data.parameters.developer_project_a_low,
+                            fixed: self.data.parameters.developer_project_a_fixed,
+                            high: self.data.parameters.developer_project_a_high
+                        },
+                        projectB: {
+                            low: self.data.parameters.developer_project_b_low,
+                            fixed: self.data.parameters.developer_project_b_fixed,
+                            high: self.data.parameters.developer_project_b_high
+                        }
+                    }
+                } else if (player.role === 3) {
+                    value = {
+                        noProject: {
+                            low: self.data.parameters.owner_no_project_low,
+                            fixed: self.data.parameters.owner_no_project_fixed,
+                            high: self.data.parameters.owner_no_project_high
+                        },
+                        projectA: {
+                            low: self.data.parameters.owner_project_a_low,
+                            fixed: self.data.parameters.owner_project_a_fixed,
+                            high: self.data.parameters.owner_project_a_high
+                        },
+                        projectB: {
+                            low: self.data.parameters.owner_project_b_low,
+                            fixed: self.data.parameters.owner_project_b_fixed,
+                            high: self.data.parameters.owner_project_b_high
+                        }
+                    }
+                }
+
+                const conditions = ['noProject', 'projectA', 'projectB'];
+
+                for (let j = 0; j < 3; j++) {
+                    const boundaries = value[conditions[j]];
+
+                    let vj;
+
+                    if (boundaries.fixed != null) {
+                        vj = boundaries.fixed;
                     } else {
-                        player.tag = `Owner ${player.number - 1}`;
+                        vj = boundaries.low + Math.round((boundaries.high - boundaries.low) / 5000 * Math.random()) * 5000;
                     }
-                    break;
-                default:
-                    throw new Error(`Player with unexpected role (should be 1, 2 or 3): ${player.role}`);
-            }
 
-            if (self.data.type != 'Voting') {
-                player.S = [0, 0, 0];
-            }
-
-            if (player.role != 2 && player.role != 3) {
-                console.log(`Not assigning a property to ${player.name}, because its role (${player.role}, ${typeof player.role}) is not 2 or 3`);
-                return;
-            }
-
-            const property = {
-                id: self.data.properties.length + 1,
-                owner: player.number,
-                name: uniqueNamesGenerator({
-                    dictionaries: [adjectives, animals],
-                    separator: " ",
-                    style: "capital"
-                }) + " Lot",
-                v: []
-            }
-
-            player.property = property;
-
-            let value;
-
-            if (player.role === 2) {
-                value = {
-                    noProject: {
-                        low: self.data.parameters.developer_no_project_low,
-                        fixed: self.data.parameters.developer_no_project_fixed,
-                        high: self.data.parameters.developer_no_project_high
-                    },
-                    projectA: {
-                        low: self.data.parameters.developer_project_a_low,
-                        fixed: self.data.parameters.developer_project_a_fixed,
-                        high: self.data.parameters.developer_project_a_high
-                    },
-                    projectB: {
-                        low: self.data.parameters.developer_project_b_low,
-                        fixed: self.data.parameters.developer_project_b_fixed,
-                        high: self.data.parameters.developer_project_b_high
-                    }
-                }
-            } else if (player.role === 3) {
-                value = {
-                    noProject: {
-                        low: self.data.parameters.owner_no_project_low,
-                        fixed: self.data.parameters.owner_no_project_fixed,
-                        high: self.data.parameters.owner_no_project_high
-                    },
-                    projectA: {
-                        low: self.data.parameters.owner_project_a_low,
-                        fixed: self.data.parameters.owner_project_a_fixed,
-                        high: self.data.parameters.owner_project_a_high
-                    },
-                    projectB: {
-                        low: self.data.parameters.owner_project_b_low,
-                        fixed: self.data.parameters.owner_project_b_fixed,
-                        high: self.data.parameters.owner_project_b_high
-                    }
-                }
-            }
-
-            const conditions = ['noProject', 'projectA', 'projectB'];
-
-            for (let j = 0; j < 3; j++) {
-                const boundaries = value[conditions[j]];
-
-                let vj;
-
-                if (boundaries.fixed != null) {
-                    vj = boundaries.fixed;
-                } else {
-                    vj = boundaries.low + Math.round((boundaries.high - boundaries.low) / 5000 * Math.random()) * 5000;
+                    property.v.push(vj);
                 }
 
-                property.v.push(vj);
-            }
-
-            self.data.properties.push(property);
-        });
+                self.data.properties.push(property);
+            });
+        }
 
         this.data.results = [];
 
@@ -340,56 +346,58 @@ export default class {
             const rewards = [];
 
             this.data.players.forEach(p => {
-                let factor;
-                let basePoints;
+                if (this.data.parameters.game_type != 'market') {
+                    let factor;
+                    let basePoints;
 
-                switch(p.role) {
-                    case 1:
-                        factor = this.data.parameters.speculators_reward_scale_factor;
-                        basePoints = this.data.parameters.speculators_base_points;
-                        break;
-                    case 2:
-                        factor = this.data.parameters.developers_reward_scale_factor;
-                        basePoints = this.data.parameters.developers_base_points;
-                        break;
-                    case 3:
-                        factor = this.data.parameters.owners_reward_scale_factor;
-                        basePoints = this.data.parameters.owners_base_points;
-                        break;
-                    default:
-                        throw new Error(`Player ${p.number} role not clear: ${p.role}`);
+                    switch(p.role) {
+                        case 1:
+                            factor = this.data.parameters.speculators_reward_scale_factor;
+                            basePoints = this.data.parameters.speculators_base_points;
+                            break;
+                        case 2:
+                            factor = this.data.parameters.developers_reward_scale_factor;
+                            basePoints = this.data.parameters.developers_base_points;
+                            break;
+                        case 3:
+                            factor = this.data.parameters.owners_reward_scale_factor;
+                            basePoints = this.data.parameters.owners_base_points;
+                            break;
+                        default:
+                            throw new Error(`Player ${p.number} role not clear: ${p.role}`);
+                    }
+
+                    const profit = self.getProfit(p.number, chosenRound);
+
+                    const points = basePoints + profit;
+
+                    const reward = {
+                        "number": p.number,
+                        "round": chosenRound,
+                        "reward": Math.round(points * 100 / factor) / 100 + showupFee,
+                        "basePoints": basePoints,
+                        "showupFee": showupFee,
+                        "gameFee": Math.round(points * 100 / factor) / 100,
+                        "profit": profit,
+                        "points": points,
+                        "factor": factor,
+                        "exchange": Math.round(1000000 / factor) / 1000000,
+                        "paymentToken": p.paymentToken
+                    };
+
+                    const err = self.wss.sendEvent(
+                        self.data.id,
+                        p.number,
+                        "reward",
+                        reward
+                    );
+        
+                    if (err != null) {
+                        console.error(err);
+                    }
+
+                    rewards.push(reward);
                 }
-
-                const profit = self.getProfit(p.number, chosenRound);
-
-                const points = basePoints + profit;
-
-                const reward = {
-                    "number": p.number,
-                    "round": chosenRound,
-                    "reward": Math.round(points * 100 / factor) / 100 + showupFee,
-                    "basePoints": basePoints,
-                    "showupFee": showupFee,
-                    "gameFee": Math.round(points * 100 / factor) / 100,
-                    "profit": profit,
-                    "points": points,
-                    "factor": factor,
-                    "exchange": Math.round(1000000 / factor) / 1000000,
-                    "paymentToken": p.paymentToken
-                };
-
-                const err = self.wss.sendEvent(
-                    self.data.id,
-                    p.number,
-                    "reward",
-                    reward
-                );
-    
-                if (err != null) {
-                    console.error(err);
-                }
-
-                rewards.push(reward);
             });
 
             this.data.rewards = rewards;

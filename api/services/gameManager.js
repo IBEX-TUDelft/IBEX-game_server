@@ -5,6 +5,7 @@ import WS from '../helpers/websocket.js';
 import Harberger from '../logics/harberger/Harberger.js';
 import Futarchy from '../logics/futarchy/Futarchy.js';
 import Voting from '../logics/voting/Voting.js';
+import Market from '../logics/market/Market.js';
 
 export default {
     create() {
@@ -84,22 +85,24 @@ export default {
                     }
                 });
 
-                const gamePlayers = await gamePlayerRepository.findByGameId(gameRecord.id);
+                if (gameData.parameters.game_type != 'market') {
+                    const gamePlayers = await gamePlayerRepository.findByGameId(gameRecord.id);
 
-                gamePlayers.forEach(p => {
-                    p.shares = parseInt(p.shares);
-                    p.balance = parseInt(p.balance);
-                    p.cashForSniping = gameData.parameters.cash_for_snipers;
-                    p.game_id = parseInt(p.game_id);
-                })
+                    gamePlayers.forEach(p => {
+                        p.shares = parseInt(p.shares);
+                        p.balance = parseInt(p.balance);
+                        p.cashForSniping = gameData.parameters.cash_for_snipers;
+                        p.game_id = parseInt(p.game_id);
+                    })
 
-                gameData.parameters.total_players = gameData.parameters.speculators_count + gameData.parameters.owners_count + gameData.parameters.developers_count;
+                    gameData.parameters.total_players = gameData.parameters.speculators_count + gameData.parameters.owners_count + gameData.parameters.developers_count;
 
-                if (gamePlayers.length != gameData.parameters.total_players) {
-                    return `Game ${gameId} has ${gamePlayers.length} players but ${gameData.parameters.total_players} were expected. This is most likely a player generation a bug`;
+                    if (gamePlayers.length != gameData.parameters.total_players) {
+                        return `Game ${gameId} has ${gamePlayers.length} players but ${gameData.parameters.total_players} were expected. This is most likely a player generation a bug`;
+                    }
+
+                    gameData.players.push(...gamePlayers);
                 }
-
-                gameData.players.push(...gamePlayers);
 
                 console.log(`Game ${gameId} loaded.`);
                 //console.log(gameData);
@@ -119,6 +122,10 @@ export default {
                         break;
                     case 'voting':
                         game = new Voting(gameData, record);
+                        await game.init();
+                        break;
+                    case 'market':
+                        game = new Market(gameData, record);
                         await game.init();
                         break;
                     default:

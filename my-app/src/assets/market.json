@@ -1,0 +1,73 @@
+{
+    "parameters": {
+        "format": "nl"
+    },
+    "defaultBasePoints": {
+        "speculator": 0,
+        "developer": 500000,
+        "owner": 0
+    },
+    "defaultRewardScaleFactor": {
+        "speculator": 1,
+        "developer": 50000,
+        "owner": 20000
+    },
+    "defaultBoundaries": {
+        "owner": {
+            "noproject": {
+                "low": 350000,
+                "high": 600000
+            },
+            "project": {
+                "low": 150000,
+                "high": 350000
+            }
+        },
+        "developer": {
+            "noproject": {
+                "low": 200000,
+                "high": 500000
+            },
+            "project": {
+                "low": 500000,
+                "high": 2750000
+            }
+        }
+    },
+    "timers": [0, 300],
+    "instructions": {
+        "phases": [{
+            "number": 0,
+            "tag": "Introduction",
+            "admin": "Click \"Start\" when the players are ready.",
+            "player": "Wait for an admin to click \"Start\"."
+        }, {
+            "number": 1,
+            "tag": "Market",
+            "admin": "Click Terminate to end the market phase",
+            "player": "Trade shares with other players"
+        }, {
+            "number": 2,
+            "tag": "Results",
+            "admin": "Review results of this round.",
+            "player": "Review results of this round."
+        }]
+    }, "placeHolders": {
+        "admin-start-button": "Start",
+        "admin-stop-button": "Terminate",
+        "confirm-start-game": "Let's start?",
+        "confirm-start-game-description": "This is just to confirm you want to start the game, and it's not a misclick.",
+        "confirm-end-game": "Are you sure?",
+        "confirm-end-game-description": "By confirming this action you will end the game for all players.",
+        "waiting-for-admin-to-start": "Wait for an Admin to start the game",
+        "public-signal-tooltip": "This public valuation is known to everyone",
+        "private-signal-tooltip": "This valuation is known to you only. Other players may have a private valuation themselves",
+        "real-value-tooltip": "This is the real value of one share. All the signals are generated starting from it and adding an error",
+        "price-tooltip": "This is the price agreed on the last contract",
+        "acknowledge-button": "Ok",
+        "confirm-button": "Confirm",
+        "cancel-button": "Cancel"
+    }, "styles": {
+        "size-of-transition-filler": 36
+    }
+}

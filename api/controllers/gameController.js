@@ -6,6 +6,20 @@ import GameManagement from '../services/gameManager.js';
 import gameRepository from '../repositories/gameRepository.js';
 import fs from 'fs';
 import { AppEvents, PhaseBegins, PhaseComplete } from '../helpers/AppEvents.js';
+import { v4 as uuidv4 } from 'uuid';
+import { 
+    MarketPlayer,
+    MARKET_ADMIN,
+    MARKET_PLAYER,
+    MARKET_GAME_ADMIN,
+    MARKET_GAME_KNOWS_ALL,
+    MARKET_GAME_PRIV_SIG_ONLY,
+    MARKET_GAME_PUB_SIG_ONLY,
+    MARKET_GAME_KNOWS_NOTHING
+}from '../logics/market/MarketPlayer.js';
+import Utils from '../helpers/utils.js';
+import { WebSocket } from 'ws';
+import RandomService from '../services/randomService.js';
 
 export default {
     apply (app) {
@@ -395,6 +409,132 @@ export default {
             }
 
             Controller.handleSuccess(res, data, 'Data available');
+        });
+
+        Controller.addGetRoute(app, '/api/v1/games/market/join', false, async (req, res) => {
+            const gameId = parseInt(req.query.gameId);
+
+            const game = gameManager.games.find(g => g.data.id === gameId);
+
+            if (game == null) {
+                console.log(gameManager.games);
+                return Controller.handleGenericError(res, `Game with id ${gameId} not found`, 400);
+            }
+
+            const gameData = game.data;
+
+            const player = new MarketPlayer();
+
+            let verification;
+
+            try {
+                verification = Utils.verifyJWT(req.query.token);
+            } catch (e) {
+                console.log('New unathenticated player');
+            }
+
+            if (verification == null || verification.role != 0)  {
+                player.authority = MARKET_PLAYER;
+            } else {
+                player.authority = MARKET_ADMIN;
+                player.role = MARKET_GAME_ADMIN;
+            }
+
+            player.gameId = gameId;
+
+            while (
+                player.recovery === '' ||
+                gameData.players.find(p => p.recovery === player.recovery) != null
+            ) {
+                player.recovery = uuidv4();
+            }
+
+            player.wallet = {
+                "balance": gameData.parameters.cash_per_player,
+                "shares" : gameData.parameters.shares_per_player 
+            }
+
+            player.shares = gameData.parameters.shares_per_player;
+            player.cash = gameData.parameters.cash_per_player;
+
+            player.number = gameData.players.length;
+            
+            const knowsPublicSignal = player.role === MARKET_GAME_ADMIN ? true : game.getRandomlyKnowsPublicSignal();
+            const knowsPrivateSignal = player.role === MARKET_GAME_ADMIN ? false : game.getRandomlyKnowsPrivateSignal();
+
+            if (knowsPrivateSignal) {
+                player.signal = game.generateSignal();
+            }
+
+            if (player.role === MARKET_GAME_ADMIN ) {
+                player.signal = gameData.realValue;
+            }
+
+            if (player.authority === MARKET_PLAYER) {
+                if (knowsPrivateSignal && knowsPublicSignal) {
+                    player.role = MARKET_GAME_KNOWS_ALL;
+                } else if (knowsPrivateSignal) {
+                    player.role = MARKET_GAME_PRIV_SIG_ONLY;
+                } else if (knowsPublicSignal) {
+                    player.role = MARKET_GAME_PUB_SIG_ONLY;
+                } else {
+                    player.role = MARKET_GAME_KNOWS_NOTHING;
+                }
+            }
+
+            gameData.players.push(player);
+            gameData.assignedPlayers = gameData.players.length;
+
+            Controller.handleSuccess(res, {
+                "redirect": `/market/${gameId}/${player.recovery}`,
+                "player": player
+            }, 'Joined');
+        });
+
+        Controller.addGetRoute(app, '/api/v1/games/market/players', true, async (req, res) => {
+            const gameId = parseInt(req.query.gameId);
+
+            const game = gameManager.games.find(g => g.data.id === gameId);
+
+            if (game == null) {
+                console.log(gameManager.games);
+                return Controller.handleGenericError(res, `Game with id ${gameId} not found`, 400);
+            }
+
+            const gameData = game.data;
+
+            const sockets = Array.from(wssManager.wss.clients).filter(ws => {
+                return ws.player?.gameId === gameId;
+            });
+
+            const players = gameData.players.map(p => {
+                return {
+                    "number": p.number,
+                    "cash": p.cash,
+                    "shares": p.shares,
+                    "recovery": p.recovery,
+                    "connected": false
+                }
+            });
+
+            players.forEach(p => {
+                const socket = sockets.find(ws => ws.player?.number === p.number);
+
+                if (socket == null) {
+                    console.log(`Player ${p.number} doesn't have an active web socket`);
+                    return;
+                }
+
+                p.connected = socket.readyState === WebSocket.OPEN;
+
+                if (p.connected) {
+                    delete p.recovery;
+                }
+            });
+
+            Controller.handleSuccess(res, {
+                players
+            }, `Player of game ${gameId}`);
         });
     }
 };

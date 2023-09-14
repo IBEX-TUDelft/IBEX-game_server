@@ -13,6 +13,7 @@ import GameMarketLog from '../components/GameMarketLog';
 import GameChatLog from '../components/GameChatLog';
 import GameSurveys from '../components/GameSurveys';
 import SimulationList from '../components/SimulationList';
+import DoubleAuctionBoard from '../components/DoubleAuctionBoard';
 
 Vue.use(VueRouter)
 
@@ -63,6 +64,11 @@ const routes = [
     path: '/voting/:id/:recovery',
     name: 'Voting Board',
     component: VotingBoard
+  },
+  {
+    path: '/market/:id/:recovery',
+    name: 'Double Auction Board',
+    component: DoubleAuctionBoard
   },
   {
     path: '/lobby',

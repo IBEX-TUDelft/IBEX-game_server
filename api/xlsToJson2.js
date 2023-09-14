@@ -150,7 +150,7 @@ function numberToCell(row, column) {
                 rx.signals[1].speculator.push(signalToCellValue(roundOffset + 3, sniperOffset + p));
             }
 
-            sx.rounds.push(rx);
+            //sx.rounds.push(rx);
         }
     }
 

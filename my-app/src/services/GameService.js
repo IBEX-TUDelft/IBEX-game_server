@@ -84,3 +84,16 @@ export async function findSurveys(gameId) {
 
   return response.data.data;
 }
+
+export async function joinMarketGame(gameId) {
+  const token = localStorage.getItem("token");
+
+  const response = await http.get("/games/market/join", {
+    params: {
+        "gameId": gameId,
+        "token": token
+    }
+  });
+
+  return response.data.data;
+}

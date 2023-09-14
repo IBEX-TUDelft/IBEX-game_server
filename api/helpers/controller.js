@@ -63,5 +63,10 @@ const addGetRoute = function (app, route, permissionRequired, handler) {
 }
 
 export default {
-    handleGenericError, handleServerError, handlePermissionError, handleSuccess, addPostRoute, addGetRoute
+    handleGenericError,
+    handleServerError,
+    handlePermissionError,
+    handleSuccess,
+    addPostRoute,
+    addGetRoute
 }

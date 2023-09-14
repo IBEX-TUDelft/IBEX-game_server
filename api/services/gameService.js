@@ -12,73 +12,98 @@ export default {
         //1 Create the game
         const gameId = await gameRepository.create(gameParameters);
 
+        let parameters;
+
         //2 Create the parameters
-        const parameters = [
-            {key: "game_type", type: "string", value: gameParameters.game_type},
-            {key: "session_number", type: "number", value: gameParameters.session_number},
-            {key: "round_count", type: "number", value: gameParameters.round_count},
-            {key: "practice_round", type: "boolean", value: gameParameters.practice},
-            {key: "minutes_for_trading", type: "number", value: gameParameters.minutes_for_trading},
-            {key: "minutes_for_sniping", type: "number", value: gameParameters.minutes_for_sniping},
-            {key: "tax_rate_initial", type: "number", value: gameParameters.tax_rate.initial},
-            {key: "tax_rate_final", type: "number", value: gameParameters.tax_rate.final},
-            {key: "signal_low", type: "float", value: gameParameters.signal.low},
-            {key: "signal_high", type: "float", value: gameParameters.signal.high},
-            {key: "generate_signals", type: "boolean", value: gameParameters.signal.generate},
 
-            {key: "speculators_count", type: "number", value: gameParameters.speculators.count},
-            {key: "speculator_balance", type: "number", value: gameParameters.speculators.balance},
-            {key: "speculator_shares", type: "number", value: gameParameters.speculators.shares},
-            {key: "max_lot_purchases", type: "number", value: gameParameters.speculators.max_lot_purchases},
-            {key: "cash_for_snipers", type: "number", value: gameParameters.speculators.cash_for_snipers},
-            {key: "speculators_base_points", type: "number", value: gameParameters.speculators.base_points},
-            {key: "speculators_reward_scale_factor", type: "number", value: gameParameters.speculators.reward_scale_factor},
+        if (gameParameters.game_type === 'market') {
+            parameters = [
+                {key: "round_count", type: "number", value: 1}, //TODO: decide in game?
+                {key: "practice_round", type: "boolean", value: false}, //TODO: decide in game?
+                {key: "game_type", type: "string", value: gameParameters.game_type},
+                {key: "player_max_number", type: "number", value: gameParameters.player_max_number},
+                {key: "player_min_number", type: "number", value: gameParameters.player_min_number},
+                {key: "use_bots", type: "boolean", value: gameParameters.use_bots},
+                {key: "shares_per_player", type: "number", value: gameParameters.shares_per_player},
+                {key: "cash_per_player", type: "number", value: gameParameters.cash_per_player},
+                {key: "market_timer", type: "number", value: gameParameters.market_timer},
+                {key: "distribution_type", type: "string", value: gameParameters.distribution_type},
+                {key: "players_knowing_private_signal", type: "number", value: gameParameters.players_knowing_private_signal},
+                {key: "players_knowing_public_signal", type: "number", value: gameParameters.players_knowing_public_signal},
+                {key: "mean", type: "number", value: gameParameters.mean},
+                {key: "variance", type: "number", value: gameParameters.variance},
+                {key: "linear_min", type: "number", value: gameParameters.linear_min},
+                {key: "linear_max", type: "number", value: gameParameters.linear_max},
+                {key: "signal_error", type: "number", value: gameParameters.signal_error}
+            ];
+        } else {
+            parameters = [
+                {key: "game_type", type: "string", value: gameParameters.game_type},
+                {key: "session_number", type: "number", value: gameParameters.session_number},
+                {key: "round_count", type: "number", value: gameParameters.round_count},
+                {key: "practice_round", type: "boolean", value: gameParameters.practice},
+                {key: "minutes_for_trading", type: "number", value: gameParameters.minutes_for_trading},
+                {key: "minutes_for_sniping", type: "number", value: gameParameters.minutes_for_sniping},
+                {key: "tax_rate_initial", type: "number", value: gameParameters.tax_rate.initial},
+                {key: "tax_rate_final", type: "number", value: gameParameters.tax_rate.final},
+                {key: "signal_low", type: "float", value: gameParameters.signal.low},
+                {key: "signal_high", type: "float", value: gameParameters.signal.high},
+                {key: "generate_signals", type: "boolean", value: gameParameters.signal.generate},
 
-            {key: "developers_count", type: "number", value: gameParameters.developers.count},
-            {key: "developer_balance", type: "number", value: gameParameters.developers.balance},
-            {key: "developer_shares", type: "number", value: gameParameters.developers.shares},
-            {key: "developer_no_project_low", type: "number", value: gameParameters.developers.profit.no_project.low},
-            {key: "developer_no_project_fixed", type: "number", value: gameParameters.developers.profit.no_project.fixed},
-            {key: "developer_no_project_high", type: "number", value: gameParameters.developers.profit.no_project.high},
-            {key: "developer_project_a_low", type: "number", value: gameParameters.developers.profit.project_a.low},
-            {key: "developer_project_a_fixed", type: "number", value: gameParameters.developers.profit.project_a.fixed},
-            {key: "developer_project_a_high", type: "number", value: gameParameters.developers.profit.project_a.high},
-            {key: "developer_project_b_low", type: "number", value: gameParameters.developers.profit.project_b.low},
-            {key: "developer_project_b_fixed", type: "number", value: gameParameters.developers.profit.project_b.fixed},
-            {key: "developer_project_b_high", type: "number", value: gameParameters.developers.profit.project_b.high},
-            {key: "developers_base_points", type: "number", value: gameParameters.developers.base_points},
-            {key: "developers_reward_scale_factor", type: "number", value: gameParameters.developers.reward_scale_factor},
+                {key: "speculators_count", type: "number", value: gameParameters.speculators.count},
+                {key: "speculator_balance", type: "number", value: gameParameters.speculators.balance},
+                {key: "speculator_shares", type: "number", value: gameParameters.speculators.shares},
+                {key: "max_lot_purchases", type: "number", value: gameParameters.speculators.max_lot_purchases},
+                {key: "cash_for_snipers", type: "number", value: gameParameters.speculators.cash_for_snipers},
+                {key: "speculators_base_points", type: "number", value: gameParameters.speculators.base_points},
+                {key: "speculators_reward_scale_factor", type: "number", value: gameParameters.speculators.reward_scale_factor},
 
-            {key: "owners_count", type: "number", value: gameParameters.owners.count},
-            {key: "owner_balance", type: "number", value: gameParameters.owners.balance},
-            {key: "owner_shares", type: "number", value: gameParameters.owners.shares},
-            {key: "owner_no_project_low", type: "number", value: gameParameters.owners.profit.no_project.low},
-            {key: "owner_no_project_fixed", type: "number", value: gameParameters.owners.profit.no_project.fixed},
-            {key: "owner_no_project_high", type: "number", value: gameParameters.owners.profit.no_project.high},
-            {key: "owner_project_a_low", type: "number", value: gameParameters.owners.profit.project_a.low},
-            {key: "owner_project_a_fixed", type: "number", value: gameParameters.owners.profit.project_a.fixed},
-            {key: "owner_project_a_high", type: "number", value: gameParameters.owners.profit.project_a.high},
-            {key: "owner_project_b_low", type: "number", value: gameParameters.owners.profit.project_b.low},
-            {key: "owner_project_b_fixed", type: "number", value: gameParameters.owners.profit.project_b.fixed},
-            {key: "owner_project_b_high", type: "number", value: gameParameters.owners.profit.project_b.high},
-            {key: "owners_base_points", type: "number", value: gameParameters.owners.base_points},
-            {key: "owners_reward_scale_factor", type: "number", value: gameParameters.owners.reward_scale_factor},
+                {key: "developers_count", type: "number", value: gameParameters.developers.count},
+                {key: "developer_balance", type: "number", value: gameParameters.developers.balance},
+                {key: "developer_shares", type: "number", value: gameParameters.developers.shares},
+                {key: "developer_no_project_low", type: "number", value: gameParameters.developers.profit.no_project.low},
+                {key: "developer_no_project_fixed", type: "number", value: gameParameters.developers.profit.no_project.fixed},
+                {key: "developer_no_project_high", type: "number", value: gameParameters.developers.profit.no_project.high},
+                {key: "developer_project_a_low", type: "number", value: gameParameters.developers.profit.project_a.low},
+                {key: "developer_project_a_fixed", type: "number", value: gameParameters.developers.profit.project_a.fixed},
+                {key: "developer_project_a_high", type: "number", value: gameParameters.developers.profit.project_a.high},
+                {key: "developer_project_b_low", type: "number", value: gameParameters.developers.profit.project_b.low},
+                {key: "developer_project_b_fixed", type: "number", value: gameParameters.developers.profit.project_b.fixed},
+                {key: "developer_project_b_high", type: "number", value: gameParameters.developers.profit.project_b.high},
+                {key: "developers_base_points", type: "number", value: gameParameters.developers.base_points},
+                {key: "developers_reward_scale_factor", type: "number", value: gameParameters.developers.reward_scale_factor},
 
-            {key: "seconds_for_deliberation", type: "number", value: gameParameters.seconds_for_deliberation},
+                {key: "owners_count", type: "number", value: gameParameters.owners.count},
+                {key: "owner_balance", type: "number", value: gameParameters.owners.balance},
+                {key: "owner_shares", type: "number", value: gameParameters.owners.shares},
+                {key: "owner_no_project_low", type: "number", value: gameParameters.owners.profit.no_project.low},
+                {key: "owner_no_project_fixed", type: "number", value: gameParameters.owners.profit.no_project.fixed},
+                {key: "owner_no_project_high", type: "number", value: gameParameters.owners.profit.no_project.high},
+                {key: "owner_project_a_low", type: "number", value: gameParameters.owners.profit.project_a.low},
+                {key: "owner_project_a_fixed", type: "number", value: gameParameters.owners.profit.project_a.fixed},
+                {key: "owner_project_a_high", type: "number", value: gameParameters.owners.profit.project_a.high},
+                {key: "owner_project_b_low", type: "number", value: gameParameters.owners.profit.project_b.low},
+                {key: "owner_project_b_fixed", type: "number", value: gameParameters.owners.profit.project_b.fixed},
+                {key: "owner_project_b_high", type: "number", value: gameParameters.owners.profit.project_b.high},
+                {key: "owners_base_points", type: "number", value: gameParameters.owners.base_points},
+                {key: "owners_reward_scale_factor", type: "number", value: gameParameters.owners.reward_scale_factor},
 
-            {key: "timer_phase_0", type: "number", value: gameParameters.timers.phase_0},
-            {key: "timer_phase_1", type: "number", value: gameParameters.timers.phase_1},
-            {key: "timer_phase_2", type: "number", value: gameParameters.timers.phase_2},
-            {key: "timer_phase_3", type: "number", value: gameParameters.timers.phase_3},
-            {key: "timer_phase_4", type: "number", value: gameParameters.timers.phase_4},
-            {key: "timer_phase_5", type: "number", value: gameParameters.timers.phase_5},
-            {key: "timer_phase_6", type: "number", value: gameParameters.timers.phase_6},
-            {key: "timer_phase_7", type: "number", value: gameParameters.timers.phase_7},
-            {key: "timer_phase_8", type: "number", value: gameParameters.timers.phase_8},
-            {key: "timer_phase_9", type: "number", value: gameParameters.timers.phase_9},
+                {key: "seconds_for_deliberation", type: "number", value: gameParameters.seconds_for_deliberation},
 
-            {key: "show_up_fee", type: "number", value: gameParameters.show_up_fee}
-        ];
+                {key: "timer_phase_0", type: "number", value: gameParameters.timers.phase_0},
+                {key: "timer_phase_1", type: "number", value: gameParameters.timers.phase_1},
+                {key: "timer_phase_2", type: "number", value: gameParameters.timers.phase_2},
+                {key: "timer_phase_3", type: "number", value: gameParameters.timers.phase_3},
+                {key: "timer_phase_4", type: "number", value: gameParameters.timers.phase_4},
+                {key: "timer_phase_5", type: "number", value: gameParameters.timers.phase_5},
+                {key: "timer_phase_6", type: "number", value: gameParameters.timers.phase_6},
+                {key: "timer_phase_7", type: "number", value: gameParameters.timers.phase_7},
+                {key: "timer_phase_8", type: "number", value: gameParameters.timers.phase_8},
+                {key: "timer_phase_9", type: "number", value: gameParameters.timers.phase_9},
+
+                {key: "show_up_fee", type: "number", value: gameParameters.show_up_fee}
+            ];
+        }
 
         for (let i = 0; i < parameters.length; i++) {
             const parameter = parameters[i];
@@ -92,6 +117,10 @@ export default {
             parameter.gameId = gameId;
 
             const parameterId = await gameParameterRepository.create(parameter);
+        }
+
+        if (gameParameters.game_type === 'market') {
+            return gameId;
         }
 
         //3 Create the players

@@ -38,6 +38,8 @@ import Header from './Header.vue'
 
 const CHARACTERS ='abcdefghijklmnopqrstuvwxyz0123456789';
 
+import * as GameService from '../services/GameService';
+
 export default {
     name: 'Games',
     data() {
@@ -78,6 +80,9 @@ export default {
 
                 if (game.type === 'voting') {
                     routeData = this.$router.resolve({path: `/voting/${id}/${this.generateString(63)}${game.assignedPlayers}`});
+                } else if (game.type === 'market') {
+                    const result = await GameService.joinMarketGame(id);
+                    routeData = this.$router.resolve({path: result.redirect });
                 } else {
                     routeData = this.$router.resolve({path: `/board/${id}/${this.generateString(63)}${game.assignedPlayers}`});
                 }
