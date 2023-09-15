@@ -3,14 +3,14 @@
         "format": "nl"
     },
     "defaultBasePoints": {
-        "speculator": 55000,
-        "developer": 5000,
-        "owner": 15000
+        "speculator": 200000,
+        "developer": 250000,
+        "owner": 250000
     },
     "defaultRewardScaleFactor": {
-        "speculator": 11000,
-        "developer": 65000,
-        "owner": 22000
+        "speculator": 20000,
+        "developer": 50000,
+        "owner": 20000
     },
     "defaultBoundaries": {
         "owner": {
@@ -34,7 +34,7 @@
             }
         }
     },
-    "timers": [null, 12, 120, 120, 3, 3, 600, 120, 120, 30],
+    "timers": [null, 15, 90, 120, 3, 3, 270, 60, 90, 15],
     "instructions": {
         "phases": [{
             "number": 0,

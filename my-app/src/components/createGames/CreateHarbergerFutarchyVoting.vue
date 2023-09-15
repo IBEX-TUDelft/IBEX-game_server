@@ -387,7 +387,7 @@ export default {
             project_b_owner_fixed: 150000,
             project_b_owner_high: 200000,
             tax_rate_initial: 1,
-            tax_rate_final: 25,
+            tax_rate_final: 33,
             signal_low: 0.95,
             signal_high: 1.05,
             generate_signals: false,

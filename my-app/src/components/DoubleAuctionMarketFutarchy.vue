@@ -25,7 +25,7 @@ export default {
             fields: ['name', 'price'],
             activity: [],
             markets: [],
-            leading: 0
+            leading: 1
         }
     },
     methods: {
