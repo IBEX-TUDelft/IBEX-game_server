@@ -97,3 +97,16 @@ export async function joinMarketGame(gameId) {
 
   return response.data.data;
 }
+
+export async function getGameJson(gameId) {
+  const token = localStorage.getItem("token");
+
+  const response = await http.get("/games/json", {
+    params: {
+        "gameId": gameId,
+        "token": token
+    }
+  });
+
+  return response.data.data;
+}

@@ -536,5 +536,13 @@ export default {
                 players
             }, `Player of game ${gameId}`);
         });
+
+        Controller.addGetRoute(app, '/api/v1/games/json', true, async (req, res) => {
+            const gameId = parseInt(req.query.gameId);
+
+            const raw = fs.readFileSync(`../records/${gameId}.log.json`);
+
+            Controller.handleSuccess(res, raw.toString(), 'Data available');
+        });
     }
 };
