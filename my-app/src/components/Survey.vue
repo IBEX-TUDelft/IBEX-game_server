@@ -119,11 +119,11 @@ export default {
     data() {
         return {
             sent: false,
-            age: 20,
-            gender: 'Female',
-            yearOfStudy: 'bsc1',
-            faculty: 'TPM',
-            risk: 5
+            age: null,
+            gender: null,
+            yearOfStudy: null,
+            faculty: null,
+            risk: null
         }
     },
     methods: {
