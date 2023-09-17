@@ -98,7 +98,16 @@ export default {
 
             self.markets.sort((a, b) => b.price - a.price);
 
-            self.leading = self.markets[0].condition;
+            const npMarket = this.markets.find(m => m.condition === 0);
+            const pMarket = this.markets.find(m => m.condition === 1);
+
+            if (pMarket.price >= npMarket.price) {
+                self.leading = 1;
+            } else {
+                self.leading = 0;
+            }
+
+            //self.leading = self.markets[0].condition;
 
             console.log(this.markets);
         });
