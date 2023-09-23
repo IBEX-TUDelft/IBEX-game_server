@@ -46,7 +46,7 @@
                             v-model="distribution_type"
                             name="distribution_type"
                         >
-                            <b-form-radio value="linear">Linear</b-form-radio>
+                            <b-form-radio value="linear">Uniform</b-form-radio>
                             <b-form-radio value="normal">Normal (Gaussian)</b-form-radio>
                         </b-form-radio-group>
                     </b-form-group>

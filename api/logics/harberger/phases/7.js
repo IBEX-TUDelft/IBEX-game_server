@@ -92,6 +92,8 @@ class Phase7 extends JoinablePhase {
             const property = player.property;
 
             if (property == null || (property.d != null && property.d.length > 0)) {
+                //No property: then no need of default declaration
+                //There are already declarations: then no need of default declaration
                 return;
             }
 
@@ -114,7 +116,7 @@ class Phase7 extends JoinablePhase {
                 "role": player.role,
                 "value": [...player.property.v],
                 "declaration": property.d,
-                "taxes": property.d.map(d => d * self.game.parameters.tax_rate_initial / 100),
+                "taxes": property.d.map(d => d * self.game.parameters.tax_rate_final / 100),
                 "declared": false
             });
         });

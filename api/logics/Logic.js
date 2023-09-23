@@ -40,6 +40,8 @@ export default class {
         if (type != 'Market') {
             const session = sessions.find(s => s.id === data.parameters.session_number);
 
+            data.dataset = data.parameters.session_number;
+
             this.valueSeries = session.rounds.map(r => r.values);
             this.signalSeries = session.rounds.map(r => r.signals);
         }
@@ -340,6 +342,8 @@ export default class {
             console.log('The game is over');
 
             const chosenRound = Math.floor(Math.random() * this.data.parameters.round_count) + 1;
+
+            this.data.rewardRound = chosenRound;
 
             const showupFee = this.data.parameters.show_up_fee;
 

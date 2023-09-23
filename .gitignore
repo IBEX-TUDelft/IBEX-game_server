@@ -1,6 +1,8 @@
 node_modules
 dist
 api/.env
+api/public.key
+api/private.key
 my-app/.env
 api/app.err
 api/app.log
