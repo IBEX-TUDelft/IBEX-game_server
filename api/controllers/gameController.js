@@ -433,8 +433,64 @@ export default {
                 console.log('New unathenticated player');
             }
 
+            const desiredRatios = [
+                gameData.parameters.players_knowing_both_signals,
+                gameData.parameters.players_knowing_private_signal,
+                gameData.parameters.players_knowing_public_signal,
+                gameData.parameters.players_knowing_no_signal
+            ];
+
+            const getQuadraticDistance = (delta = [0, 0, 0, 0]) => {
+                if (delta.length != 4) {
+                    throw new Error(`Delta vector length not compatible. Must be 4, was ${delta.length}`);
+                }
+
+                const total = gameData.players.filter(p => p.role != MARKET_GAME_ADMIN).length
+                     + delta[0] + delta[1] + delta[2] + delta[3];
+
+                const currentRatios = [
+                    (gameData.players.filter(p => p.role === MARKET_GAME_KNOWS_ALL).length + delta[0]) * 100 / total,
+                    (gameData.players.filter(p => p.role === MARKET_GAME_PRIV_SIG_ONLY).length + delta[1]) * 100 / total,
+                    (gameData.players.filter(p => p.role === MARKET_GAME_PUB_SIG_ONLY).length + delta[2]) * 100 / total,
+                    (gameData.players.filter(p => p.role === MARKET_GAME_KNOWS_NOTHING).length + delta[3]) * 100 / total
+                ];
+
+                let distance = 0;
+
+                for (let i = 0; i < currentRatios.length; i++) {
+                    distance += Math.pow(Math.abs(currentRatios[i] - desiredRatios[i]), 2);
+                }
+
+                return distance;
+            }
+
             if (verification == null || verification.role != 0)  {
                 player.authority = MARKET_PLAYER;
+
+                let best = null;
+                let bestScore = null;
+
+                const roles = [
+                    MARKET_GAME_KNOWS_ALL,
+                    MARKET_GAME_PRIV_SIG_ONLY,
+                    MARKET_GAME_PUB_SIG_ONLY,
+                    MARKET_GAME_KNOWS_NOTHING
+                ];
+
+                for (let i = 0; i < 4; i++) {
+                    const delta = [0, 0, 0, 0];
+
+                    delta[i] = 1;
+
+                    const score = getQuadraticDistance(delta);
+
+                    if (bestScore == null || score < bestScore) {
+                        best = i;
+                        bestScore = score;
+                    }
+                }
+
+                player.role = roles[best];
             } else {
                 player.authority = MARKET_ADMIN;
                 player.role = MARKET_GAME_ADMIN;
@@ -459,8 +515,10 @@ export default {
 
             player.number = gameData.players.length;
             
-            const knowsPublicSignal = player.role === MARKET_GAME_ADMIN ? true : game.getRandomlyKnowsPublicSignal();
-            const knowsPrivateSignal = player.role === MARKET_GAME_ADMIN ? false : game.getRandomlyKnowsPrivateSignal();
+            //const knowsPublicSignal = player.role === MARKET_GAME_ADMIN ? true : game.getRandomlyKnowsPublicSignal();
+            //const knowsPrivateSignal = player.role === MARKET_GAME_ADMIN ? false : game.getRandomlyKnowsPrivateSignal();
+
+            const knowsPrivateSignal = [MARKET_GAME_KNOWS_ALL, MARKET_GAME_PRIV_SIG_ONLY].includes(player.role);
 
             if (knowsPrivateSignal) {
                 player.signal = game.generateSignal();
@@ -470,7 +528,7 @@ export default {
                 player.signal = gameData.realValue;
             }
 
-            if (player.authority === MARKET_PLAYER) {
+            /*if (player.authority === MARKET_PLAYER) {
                 if (knowsPrivateSignal && knowsPublicSignal) {
                     player.role = MARKET_GAME_KNOWS_ALL;
                 } else if (knowsPrivateSignal) {
@@ -480,7 +538,7 @@ export default {
                 } else {
                     player.role = MARKET_GAME_KNOWS_NOTHING;
                 }
-            }
+            }*/
 
             gameData.players.push(player);
             gameData.assignedPlayers = gameData.players.length;

@@ -33,13 +33,13 @@
             </b-col>
         </b-row>
 
-        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase === 2 || game.over">
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 2 && player.role != 0)">
             <b-col class="d-flex align-items-center justify-content-center flex-column">
                 <div v-html="getProfitString()"/>
             </b-col>
         </b-row>
 
-        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase === 1 && !transitioning">
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 1 && !transitioning) || (game.phase === 2 && player.role === 0)">
             <b-col class="d-flex align-items-center justify-content-center flex-column col-6">
                 <DoubleAuctionMarket ref="doubleAuctionMarket"
                     :connection="connection"
@@ -110,7 +110,7 @@
                     ruleset: "",
                     properties: [],
                     boundaries: null,
-                    publicSignal: "TBD",
+                    publicSignal: null,
                     players: [],
                     currentPrice: null
                 },
@@ -198,7 +198,7 @@
                 this.player.market = null;
 
                 this.phase = 0;
-                this.publicSignal = "TBD";
+                this.publicSignal = null;
             },
             getRootContext() {
                 return this;
@@ -282,7 +282,7 @@
                                 }
 
                                 var initialInstructions = self.dictionary.instructions.phases[self.game.phase][
-                                    ['admin', 'player', 'player', 'player'][self.player.role != null ? self.player.role : 1]
+                                    ['admin', 'player', 'player', 'player', 'player'][self.player.role != null ? self.player.role : 1]
                                 ];
 
                                 self.player.instructions = initialInstructions;
@@ -653,7 +653,9 @@
                 self.game.ruleset = response.gameData.game.ruleset;
 
                 self.game.phaseTag = self.dictionary.instructions.phases[self.game.phase]?.tag;
-                
+
+                self.showIntructions = true;
+
                 console.log('AWAITING TO RECOVER THE DATA');
 
                 await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load
@@ -661,6 +663,16 @@
                 self.recover(response.gameData);
 
                 console.log('DATA RECOVERED');
+
+                const phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
+                    ['admin', 'player', 'player', 'player', 'player'][self.player.role]
+                ];
+
+                self.player.instructions = phaseInstructions;
+
+                if (self.game.currentPrice == null) {
+                    self.game.currentPrice = self.game.publicSignal | 0;
+                }
 
                 await new Promise(resolve => setTimeout(resolve, 1)); //allows the refs to load
 
@@ -675,7 +687,12 @@
                 console.log(err);
             }
 
-            setInterval(() => {
+            const intervalId = setInterval(() => {
+                if (this.game.over) {
+                    clearInterval(intervalId);
+                    return;
+                }
+
                 let price = this.game.currentPrice;
 
                 if (price == null) {

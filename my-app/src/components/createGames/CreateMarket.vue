@@ -28,6 +28,24 @@
                 </div>
             </div>
 
+            <b-row>
+                <CreateCol3>
+                    <label htmlFor="exampleInputEmail1">Transaction cost paid by sellers</label>
+                </CreateCol3>
+
+                <CreateCol3 class="form-group col-md-3 align-items-center">
+                    <input type="number" class="form-control" v-model="seller_transaction_cost" name="seller_transaction_cost" id="seller_transaction_cost" aria-describedby="emailHelp" placeholder="6" />
+                </CreateCol3>
+
+                <CreateCol3>
+                    <label htmlFor="exampleInputEmail1">Transaction cost paid by buyers</label>
+                </CreateCol3>
+
+                <CreateCol3 class="form-group col-md-3 align-items-center">
+                    <input type="number" class="form-control" v-model="buyer_transaction_cost" name="buyer_transaction_cost" id="buyer_transaction_cost" aria-describedby="emailHelp" placeholder="6" />
+                </CreateCol3>
+            </b-row>
+
             <div class="row">
                 <div class="col-md-12 mt-3 mb-3">
                     <h3>Real Value and Signal</h3>
@@ -145,7 +163,25 @@
 
             <b-row>
                 <CreateCol3>
-                    <label htmlFor="exampleInputEmail1">Players (%) Knowing Their Private Signal</label>
+                    <label htmlFor="exampleInputEmail1">Players (%) Knowing Both Signals</label>
+                </CreateCol3>
+
+                <CreateCol3 class="form-group col-md-3 align-items-center">
+                    <input type="number" class="form-control" v-model="players_knowing_both_signals" name="players_knowing_both_signals" id="players_knowing_both_signals" aria-describedby="emailHelp" placeholder="6" />
+                </CreateCol3>
+
+                <CreateCol3>
+                    <label htmlFor="exampleInputEmail1">Players (%) Knowing Only the Public Signal</label>
+                </CreateCol3>
+
+                <CreateCol3 class="form-group col-md-3 align-items-center">
+                    <input type="number" class="form-control" v-model="players_knowing_public_signal" name="players_knowing_public_signal" id="players_knowing_public_signal" aria-describedby="emailHelp" placeholder="6" />
+                </CreateCol3>
+            </b-row>
+
+            <b-row>
+                <CreateCol3>
+                    <label htmlFor="exampleInputEmail1">Players (%) Knowing Only the Private Signal</label>
                 </CreateCol3>
 
                 <CreateCol3 class="form-group col-md-3 align-items-center">
@@ -153,12 +189,18 @@
                 </CreateCol3>
 
                 <CreateCol3>
-                    <label htmlFor="exampleInputEmail1">Players (%) Knowing the Public Signal</label>
+                    <label htmlFor="exampleInputEmail1">Players (%) Not Knowing any Signal</label>
                 </CreateCol3>
 
                 <CreateCol3 class="form-group col-md-3 align-items-center">
-                    <input type="number" class="form-control" v-model="players_knowing_public_signal" name="players_knowing_public_signal" id="players_knowing_public_signal" aria-describedby="emailHelp" placeholder="6" />
+                    <input type="number" class="form-control" v-model="players_knowing_no_signal" name="players_knowing_no_signal" id="players_knowing_no_signal" aria-describedby="emailHelp" placeholder="6" />
                 </CreateCol3>
+            </b-row>
+
+            <b-row style="color: darkred;" v-if="getTotalKnowledgePercentage() != 100">
+                <b-col class="col-12">
+                    <p>The sum of the percentages given to the different groups of players must be exactly 100. Currently it is <b>{{ getTotalKnowledgePercentage() }}</b></p>
+                </b-col>
             </b-row>
         </b-col>
     </b-row>
@@ -179,20 +221,28 @@ export default {
             shares_per_player: 1,
             cash_per_player: 100,
             market_timer: 5,
-            players_knowing_private_signal: 100,
             distribution_type: 'linear',
             linear_min: 50,
             linear_max: 100,
             signal_error: 5,
             mean: 100,
             variance: 10,
-            players_knowing_public_signal: 100
+            players_knowing_both_signals: 50,
+            players_knowing_private_signal: 50,
+            players_knowing_public_signal: 0,
+            players_knowing_no_signal: 0,
+            buyer_transaction_cost: 0,
+            seller_transaction_cost: 0,
         }
     },
     components: {
         CreateCol3
     },
     methods: {
+        getTotalKnowledgePercentage() {
+            return parseInt(this.players_knowing_both_signals) + parseInt(this.players_knowing_no_signal) +
+            parseInt(this.players_knowing_private_signal) + parseInt(this.players_knowing_public_signal);
+        },
         generateName() {
             const date = new Date();
             const month = date.toLocaleString('default', { month: 'long' });
@@ -243,6 +293,8 @@ export default {
                 market_timer: this.market_timer,
                 players_knowing_private_signal: this.players_knowing_private_signal,
                 players_knowing_public_signal: this.players_knowing_public_signal,
+                players_knowing_both_signals: this.players_knowing_both_signals,
+                players_knowing_no_signal: this.players_knowing_no_signal,
                 mean: this.mean,
                 variance: this.variance,
                 distribution_type: this.distribution_type,
@@ -260,7 +312,9 @@ export default {
 
         EventService.removeAllListeners('go_ahead_with_game_creation');
         EventService.on('go_ahead_with_game_creation', () => {
-            this.$parent.createGameOnServer(this.getPayload())
+            if (this.getTotalKnowledgePercentage() == 100) {
+                this.$parent.createGameOnServer(this.getPayload())
+            }
         });
     }
 }
