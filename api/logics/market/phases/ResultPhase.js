@@ -32,14 +32,14 @@ class ResultPhase extends GamePhase {
         const finalPrice = marketPhase.finalPrice | 0;
 
         const initialValue = this.game.parameters.cash_per_player +
-            this.game.parameters.shares_per_player * realValue; //TODO: should be the "real value"
+            this.game.parameters.shares_per_player * realValue;
 
         console.log(`Final price: ${realValue}, Initial value: ${initialValue} = ${this.game.parameters.cash_per_player} +
             ${this.game.parameters.shares_per_player} * ${realValue}`);
 
         this.game.players.forEach(p => {
             const finalValue = p.wallet.balance +
-                p.wallet.shares * realValue; //TODO: should be the "real value"
+                p.wallet.shares * realValue;
 
             const profit = Math.round ( (finalValue - initialValue) * 100 ) / 100;
 

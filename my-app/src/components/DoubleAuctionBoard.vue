@@ -67,7 +67,7 @@
     import dictionary from '../assets/market.json';
     import { getGameStatus } from '../services/GameService'
     import EventService from '../services/EventService';
-    import FormatService from '../services/FormatService';
+    import FormatService from '../services/FormatServiceDoubleAuction';
     import VueApexCharts from 'vue-apexcharts'
 
     export default {
@@ -130,7 +130,8 @@
                 series: [{
                     name: 'Price',
                     data: []
-                }]
+                }],
+                inputNumberCount: 0
             };
         },
         components: {
@@ -484,11 +485,30 @@
                 }
 
                 return true;
-            }, onChange(e) {
+            }, async onChangeWrapper(e) {
                 if (!this.isAllowed(e)) {
                     return false;
                 }
 
+                this.inputNumberCount ++;
+
+                const id = this.inputNumberCount;
+
+                await new Promise((resolve) => setTimeout(resolve, 250) );
+
+                if (id != this.inputNumberCount) {
+                    return;
+                }
+
+                try {
+                    this.onChange(e);
+                } catch(err) {
+                    console.error('While handling an input', err);
+                }
+
+                this.inputNumberCount --;
+            },
+            onChange(e) {
                 if (e.target.value == null || e.target.value.trim() == '') {
                     return;
                 }
@@ -519,6 +539,8 @@
                 const relativePositionOfKey = valueToCaret.split(key).length - 1;
                 
                 e.target.value = this.reformat(e.target.value);
+
+                console.log(`e.target.value: ${e.target.value}`);
 
                 let caret = 0;
                 let repetitionOfKeys = 0;

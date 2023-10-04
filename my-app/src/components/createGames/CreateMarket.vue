@@ -301,6 +301,8 @@ export default {
                 linear_min: this.linear_min,
                 linear_max: this.linear_max,
                 signal_error: this.signal_error,
+                buyer_transaction_cost: this.buyer_transaction_cost,
+                seller_transaction_cost: this.seller_transaction_cost
             };
         }
     },

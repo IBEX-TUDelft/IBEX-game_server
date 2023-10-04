@@ -68,7 +68,7 @@ export default class PostOrderHandler extends MessageHandler{
                 .map(o => o.price)
                 .reduce((a, b) => a + b, 0);
 
-            if (player.wallet.balance - order.price < committedSum) {
+            if (player.wallet.balance - order.price - phase.buyerTransactionCost < committedSum) {
                 const remainder = player.wallet.balance - committedSum;
 
                 WS.sendEvent(
@@ -76,7 +76,7 @@ export default class PostOrderHandler extends MessageHandler{
                     'order-refused',
                     {
                         "message": `You have already committed much of your balance (${committedSum}) in other bids,
-                         The remainder ${remainder} is not enough to bid ${order.price}. 
+                         The remainder ${remainder} is not enough to bid ${order.price} (plus a fee equal to ${phase.buyerTransactionCost}).
                          You may cancel previous bids to free some of your balance.`,
                         "placeholder": "no-balance-available",
                         "parameters": [committedSum, remainder, order.price]

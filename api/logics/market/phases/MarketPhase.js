@@ -16,6 +16,8 @@ class MarketPhase extends GamePhase {
         wallets: [],
         finalPrice: null
     }
+    buyerTransactionCost = 0;
+    sellerTransactionCost = 0;
 
     constructor(game, wss) {
         super (game, wss, [
@@ -23,6 +25,14 @@ class MarketPhase extends GamePhase {
             new CancelOrderHandler(),
             new EndHandler()
         ]);
+
+        if (typeof game.parameters.buyer_transaction_cost === 'number') {
+            this.buyerTransactionCost = game.parameters.buyer_transaction_cost;
+        }
+
+        if (typeof game.parameters.seller_transaction_cost === 'number') {
+            this.sellerTransactionCost = game.parameters.seller_transaction_cost;
+        }
     }
 
     async onExit () {
@@ -315,15 +325,19 @@ class MarketPhase extends GamePhase {
             return `Player ${from} (from), does not have the shares to complete the operation: ${fromPlayer.wallet.shares} < ${quantity}`;
         }
 
-        if (toPlayer.wallet.balance < quantity * price) {
-            return `Player ${to} (to), does not have the funds to complete the operation: ${toPlayer.wallet.balance} < ${quantity * price}`;
+        if (toPlayer.wallet.balance < quantity * price + this.buyerTransactionCost) {
+            return `Player ${to} (to), does not have the funds to complete the operation: ${toPlayer.wallet.balance} < ${quantity * price + this.buyerTransactionCost}`;
+        }
+
+        if (fromPlayer.wallet.balance + quantity * price < this.sellerTransactionCost) {
+            return `Player ${from} (from), does not have the funds to complete the operation: ${fromPlayer.wallet.balance + quantity * price} < ${this.sellerTransactionCost}`;
         }
 
         console.log(fromPlayer);
         console.log(toPlayer);
 
         fromPlayer.wallet.shares -= quantity;
-        fromPlayer.wallet.balance += quantity * price;
+        fromPlayer.wallet.balance += quantity * price - this.sellerTransactionCost;
 
         self.results.log.push({
             "id": order.id,
@@ -347,7 +361,9 @@ class MarketPhase extends GamePhase {
             "price": price,
             "bestBid": self.getBestBid(),
             "bestAsk": self.getBestAsk(),
-            "book": self.printBook()
+            "book": self.printBook(),
+            "buyerFee": this.buyerTransactionCost,
+            "sellerFee": this.sellerTransactionCost
         });
 
         this.wss.sendEvent(
@@ -359,7 +375,9 @@ class MarketPhase extends GamePhase {
                     "type": "sale",
                     "quantity": quantity,
                     "price": price,
-                    "total": quantity * price
+                    "total": quantity * price - this.sellerTransactionCost,
+                    "buyerFee": this.buyerTransactionCost,
+                    "sellerFee": this.sellerTransactionCost
                 },
                 "balance": fromPlayer.wallet.balance,
                 "shares" : fromPlayer.wallet.shares
@@ -367,7 +385,7 @@ class MarketPhase extends GamePhase {
         );
 
         toPlayer.wallet.shares += quantity;
-        toPlayer.wallet.balance -= quantity * price;
+        toPlayer.wallet.balance -= quantity * price - this.buyerTransactionCost;
 
         this.wss.sendEvent(
             this.game.id,
@@ -378,7 +396,9 @@ class MarketPhase extends GamePhase {
                     "type": "purchase",
                     "quantity": quantity,
                     "price": price,
-                    "total": quantity * price
+                    "total": quantity * price - this.buyerTransactionCost,
+                    "buyerFee": this.buyerTransactionCost,
+                    "sellerFee": this.sellerTransactionCost
                 },
                 "balance": toPlayer.wallet.balance,
                 "shares" : toPlayer.wallet.shares
@@ -390,7 +410,9 @@ class MarketPhase extends GamePhase {
                 "order": self.orderList[self.orderList.length - 1],
                 "quantity": quantity,
                 "price": price,
-                "total": quantity * price
+                "total": quantity * price,
+                "buyerFee": this.buyerTransactionCost,
+                "sellerFee": this.sellerTransactionCost
             },
             "from": {
                 "number": fromPlayer.number,
@@ -413,6 +435,8 @@ class MarketPhase extends GamePhase {
                 "from": fromPlayer.number,
                 "to": toPlayer.number,
                 "price": price,
+                "buyerFee": this.buyerTransactionCost,
+                "sellerFee": this.sellerTransactionCost,
                 "median": medianLastSeven
             }
         );

@@ -315,6 +315,8 @@ export default class {
            "phase": this.data.currentRound.phase,
            "round": this.data.currentRound.number
         });
+
+        await this.data.currentPhase.updateAndTest();
     }
 
     async beginRound () {

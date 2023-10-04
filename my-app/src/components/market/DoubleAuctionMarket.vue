@@ -369,7 +369,7 @@ export default {
             return this.$parent.isAllowed(e);
         },
         onChange(e) {
-            return this.$parent.onChange(e);
+            return this.$parent.onChangeWrapper(e);
         },
         parseFormatted(numericalString, def) {
             return this.$parent.parseFormatted(numericalString, def);
