@@ -1,3 +1,4 @@
+import { GameOver, AppEvents } from "../../helpers/AppEvents.js";
 import randomService from "../../services/randomService.js";
 import Logic from "../Logic.js";
 import { MARKET_GAME_ADMIN, MARKET_GAME_KNOWS_ALL, MARKET_GAME_PRIV_SIG_ONLY, MARKET_GAME_PUB_SIG_ONLY } from "./MarketPlayer.js";
@@ -15,6 +16,17 @@ export default class Market extends Logic {
         this.data.publicSignal = this.generateSignal();
 
         console.log(`Market real value: ${this.data.realValue}`);
+
+        AppEvents.get(this.data.id).addListener(GameOver, () => {
+            this.data.players.filter(p => p.role === MARKET_GAME_ADMIN).forEach(admin => {
+                this.wss.sendEvent(
+                    this.data.id,
+                    admin.number,
+                    "market-statistics",
+                    this.getStatistics()
+                );
+            });
+        });
     }
     
     //Always overwritten
@@ -120,6 +132,10 @@ export default class Market extends Logic {
 
         if (this.data.currentRound.phase > 1) {
             data.game.currentPrice = this.data.results.find(r => r.round === this.data.currentRound.number).phase[1].finalPrice;
+
+            if (player.role === MARKET_GAME_ADMIN) {
+                data.game.statistics = this.getStatistics();
+            }
         }
 
         if (this.data.currentPhase.timer.set === true) {
@@ -205,5 +221,67 @@ export default class Market extends Logic {
         const percentageError = absPercentageError * ( 1 - Math.random() * 2 ); //given absPercentageError = 5, a range from -5 to 5
 
         return Math.round( ( 100 + percentageError ) * this.data.realValue) / 100 ;
+    }
+
+    getStatistics() {
+        const source = this.data.results.find(r => r.round === this.data.currentRound.number).phase[1];
+
+        const statistics = {
+            "buyers": {
+                "count": [0, 0, 0, 0, 0],
+                "averagePrivateSignal": 0
+            },
+            "sellers":  {
+                "count": [0, 0, 0, 0, 0],
+                "averagePrivateSignal": 0
+            }
+        };
+
+        if (source == null || source.log == null || source.log.length === 0) {
+            return statistics;
+        }
+
+        const players = this.data.players;
+
+        const buyers = [];
+        const sellers = [];
+
+        source.log.filter(l => ['Sell', 'Buy'].includes(l.action)).forEach(l => {
+            const buyer = players.find(p => p.number === l.buyer.number);
+            const seller = players.find(p => p.number === l.seller.number);
+
+            if (buyers.find(b => b.number === buyer.number) == null) {
+                buyers.push(buyer);
+            }
+
+            statistics.buyers.count[buyer.role] ++;
+
+            if (sellers.find(s => s.number === seller.number) == null) {
+                sellers.push(seller);
+            }
+
+            statistics.sellers.count[seller.role] ++;
+        });
+
+        const buyersWithPrivateSignal = buyers
+            .filter(b => b.role != MARKET_GAME_ADMIN)
+            .filter(b => b.signal != null);
+
+        const avgBuyersPvtSignal = buyersWithPrivateSignal
+            .map(b => b.signal)
+            .reduce((a,n) => {return a + n}, 0) / buyersWithPrivateSignal.length;
+
+        const sellersWithPrivateSignal = sellers
+            .filter(b => b.role != MARKET_GAME_ADMIN)
+            .filter(b => b.signal != null);
+
+        const avgSellersPvtSignal = sellersWithPrivateSignal
+            .map(b => b.signal)
+            .reduce((a,n) => {return a + n}, 0) / sellersWithPrivateSignal.length;
+
+        statistics.buyers.averagePrivateSignal = Math.round(avgBuyersPvtSignal * 100) / 100;
+        statistics.sellers.averagePrivateSignal = Math.round(avgSellersPvtSignal * 100) / 100;
+
+        return statistics;
     }
 }

@@ -385,7 +385,7 @@ class MarketPhase extends GamePhase {
         );
 
         toPlayer.wallet.shares += quantity;
-        toPlayer.wallet.balance -= quantity * price - this.buyerTransactionCost;
+        toPlayer.wallet.balance -= quantity * price + this.buyerTransactionCost;
 
         this.wss.sendEvent(
             this.game.id,

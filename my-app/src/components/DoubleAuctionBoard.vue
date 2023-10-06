@@ -41,11 +41,44 @@
 
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 1 && !transitioning) || (game.phase === 2 && player.role === 0)">
             <b-col class="d-flex align-items-center justify-content-center flex-column col-6">
-                <DoubleAuctionMarket ref="doubleAuctionMarket"
+                <DoubleAuctionMarket v-if="game.over != true" ref="doubleAuctionMarket"
                     :connection="connection"
                     :game="game"
                     :player="player"
                 />
+                <div v-else class="container-fluid">
+                    <table class="table table-bordered" style="table-layout: fixed;">
+                        <thead class="thead-dark text-center">
+                            <th>Knowledge</th>
+                            <th>Purchases</th>
+                            <th>Sales</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(name, i) in ['Admin', 'Know both signals', 'Knows private signal', 'Knows public signal', 'Knows no signal']" :key="i">
+                                <td>{{ name }}</td>
+                                <td class="text-center">{{ game.statistics.buyers.count[i] }}</td>
+                                <td class="text-center">{{ game.statistics.sellers.count[i] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered" style="table-layout: fixed;">
+                        <thead class="thead-dark text-center">
+                            <th>Type of Behaviour</th>
+                            <th>Average Private Signal</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Buyer</td>
+                                <td class="text-center">{{ Math.round(game.statistics.buyers.averagePrivateSignal * 100) / 100 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Seller</td>
+                                <td class="text-center">{{ Math.round(game.statistics.sellers.averagePrivateSignal * 100) / 100 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </b-col>
 
             <b-col class="d-flex align-items-center justify-content-center flex-column col-6">
@@ -112,7 +145,17 @@
                     boundaries: null,
                     publicSignal: null,
                     players: [],
-                    currentPrice: null
+                    currentPrice: null,
+                    statistics: {
+                        buyers: {
+                            count: [0, 0, 0, 0, 0],
+                            averagePrivateSignal: 0
+                        },
+                        sellers:  {
+                            count: [0, 0, 0, 0, 0],
+                            averagePrivateSignal: 0
+                        }
+                    }
                 },
                 player: {
                     instructions: "",
@@ -391,6 +434,9 @@
                             case 'contract-fulfilled':
                                 self.game.currentPrice = ev.data.price;
                                 break;
+                            case 'market-statistics':
+                                self.game.statistics = ev.data;
+                                break;
                             default:
                                 console.error(`Type ${ev.eventType} was not understood`);
                         }
@@ -506,7 +552,7 @@
                     console.error('While handling an input', err);
                 }
 
-                this.inputNumberCount --;
+                this.inputNumberCount = 0;
             },
             onChange(e) {
                 if (e.target.value == null || e.target.value.trim() == '') {
@@ -673,7 +719,9 @@
             if (response.gameData != null) {
                 self.game.phase = response.gameData.game.phase;
                 self.game.ruleset = response.gameData.game.ruleset;
-
+                if (response.gameData.game.statistics != null) {
+                    self.game.statistics = response.gameData.game.statistics;
+                }
                 self.game.phaseTag = self.dictionary.instructions.phases[self.game.phase]?.tag;
 
                 self.showIntructions = true;
