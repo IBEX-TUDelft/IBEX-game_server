@@ -224,17 +224,24 @@
                 this.connection.send(JSON.stringify(msg));
             },
             getProfitString() {
-                const introduction = `The final price was <b>${this.game.currentPrice}</b>, the real value was <b>${this.game.realValue}</b>. `
+                let profit = 0;
+                let placeHolder = 'reward-message-profit';
 
-                if (this.player.profit == null) {
-                    return introduction + 'No profit report is available';
+                if (this.player.profit != null) {
+                    profit = Math.abs(this.player.profit);
+
+                    if (this.player.profit < 0) {
+                        placeHolder = 'reward-message-loss';
+                    }
                 }
 
-                if (this.player.profit < 0) {
-                    return introduction + `Trading, you lost <b>${-this.player.profit}</b>`;
-                }
-
-                return introduction + `Trading, you earned <b>${this.player.profit}</b>`;
+                return this.resolvePlaceHolder(placeHolder,
+                    this.game.realValue,
+                    this.player.wallet.shares,
+                    this.player.wallet.balance,
+                    this.player.wallet.shares * this.game.realValue + this.player.wallet.balance,
+                    profit
+                );
             },
             resetToPhaseZero() {
                 this.player.signals = [];
