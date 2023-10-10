@@ -592,7 +592,9 @@ export default {
         Controller.addGetRoute(app, '/api/v1/games/repair', true, async (req, res) => {
             const records = await listGames();
 
-            records.forEach(async g => {
+            for (let i = 0; i < records.length; i++) {
+                let g = records[i];
+
                 const data = await gameService.findGameData(g.id);
 
                 if (data == null) {
@@ -606,7 +608,9 @@ export default {
                 data.rewardRound = data.rewards[0].round;
 
                 await gameRepository.saveData(data.id, data);
-            });
+
+                console.log(`Repaired rewardRound of game ${g.id}`);
+            }
 
             Controller.handleSuccess(res, {}, 'Data available');
         });
