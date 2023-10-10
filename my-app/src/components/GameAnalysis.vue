@@ -481,7 +481,7 @@
                     'Num_Bids_NP', 'Num_Asks_NP', 'Num_Buys_NP', 'Num_Sells_NP', 'Ending_Cash_NP', 'Ending_Shares_NP', '',
                     'Num_Bids_P', 'Num_Asks_P', 'Num_Buys_P', 'Num_Sells_P', 'Ending_Cash_P', 'Ending_Shares_P', '',
                     'snipe1_end_result', 'Property Value_min_Tax1', 'Trading_Result', 'snipe2_end_results', 'Property Value_min_Tax2', 'Total Earnings',
-                    'reward_round', 'base_points', 'points', 'final_score', 'factor', 'exchange_rate', 'expected_reward', 'reward', 'Payment_Token',
+                    'reward_round', 'base_points', 'points', 'final_score', 'factor', 'exchange_rate', 'reward', 'Payment_Token',
                     'Age', 'Gender', 'Year_of_Study', 'Faculty', 'Risk_Choice'
                 ]);                
 
@@ -822,8 +822,8 @@
                             xlsRow.push(total + playerReward.basePoints); //xlsRow.push(playerReward.points);
                             xlsRow.push(playerReward.factor);
                             xlsRow.push(playerReward.exchange);
-                            const gameRecalculatedRewad = Math.round(100 * (total + playerReward.basePoints) / playerReward.factor) / 100;
-                                xlsRow.push(gameRecalculatedRewad + playerReward.showupFee);
+                            /*const gameRecalculatedRewad = Math.round(100 * (total + playerReward.basePoints) / playerReward.factor) / 100;
+                            xlsRow.push(gameRecalculatedRewad + playerReward.showupFee);*/
                             if (roundIdx === self.rewardRound) {
                                 xlsRow.push(playerReward.reward);
                             } else {
