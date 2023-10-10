@@ -598,11 +598,12 @@ export default {
                 const data = await gameService.findGameData(g.id);
 
                 if (data == null) {
-                    return console.error(`Game ${g.id} not found`);
+                    console.error(`Game ${g.id} not found`);
+                    continue;
                 }
 
                 if (data.rewardRound != null || data.rewards == null || data.rewards.length == 0) {
-                    return;
+                    continue;
                 }
 
                 data.rewardRound = data.rewards[0].round;
