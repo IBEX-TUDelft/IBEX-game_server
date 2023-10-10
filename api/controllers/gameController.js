@@ -514,9 +514,6 @@ export default {
             player.cash = gameData.parameters.cash_per_player;
 
             player.number = gameData.players.length;
-            
-            //const knowsPublicSignal = player.role === MARKET_GAME_ADMIN ? true : game.getRandomlyKnowsPublicSignal();
-            //const knowsPrivateSignal = player.role === MARKET_GAME_ADMIN ? false : game.getRandomlyKnowsPrivateSignal();
 
             const knowsPrivateSignal = [MARKET_GAME_KNOWS_ALL, MARKET_GAME_PRIV_SIG_ONLY].includes(player.role);
 
@@ -527,18 +524,6 @@ export default {
             if (player.role === MARKET_GAME_ADMIN ) {
                 player.signal = gameData.realValue;
             }
-
-            /*if (player.authority === MARKET_PLAYER) {
-                if (knowsPrivateSignal && knowsPublicSignal) {
-                    player.role = MARKET_GAME_KNOWS_ALL;
-                } else if (knowsPrivateSignal) {
-                    player.role = MARKET_GAME_PRIV_SIG_ONLY;
-                } else if (knowsPublicSignal) {
-                    player.role = MARKET_GAME_PUB_SIG_ONLY;
-                } else {
-                    player.role = MARKET_GAME_KNOWS_NOTHING;
-                }
-            }*/
 
             gameData.players.push(player);
             gameData.assignedPlayers = gameData.players.length;
@@ -602,6 +587,28 @@ export default {
             const raw = fs.readFileSync(`../records/${gameId}.log.json`);
 
             Controller.handleSuccess(res, raw.toString(), 'Data available');
+        });
+
+        Controller.addGetRoute(app, '/api/v1/games/repair', true, async (req, res) => {
+            const records = await listGames();
+
+            records.forEach(async g => {
+                const data = await gameService.findGameData(g.id);
+
+                if (data == null) {
+                    return console.error(`Game ${g.id} not found`);
+                }
+
+                if (data.rewardRound != null || data.rewards == null || data.rewards.length == 0) {
+                    return;
+                }
+
+                data.rewardRound = data.rewards[0].round;
+
+                await gameRepository.saveData(data.id, data);
+            });
+
+            Controller.handleSuccess(res, {}, 'Data available');
         });
     }
 };
