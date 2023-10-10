@@ -477,8 +477,8 @@
                 }
             });
 
-            this.rewardRound = surveyResponse.data.data.rewardRound;
-            this.ruleset = surveyResponse.data.data.ruleset;
+            this.rewardRound = response.data.data.rewardRound;
+            this.ruleset = response.data.data.ruleset;
             this.surveys = surveyResponse.data.data.records;
 
             function extractProperty (rounds, phase, property) {
