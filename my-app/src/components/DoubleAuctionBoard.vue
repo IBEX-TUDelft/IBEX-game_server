@@ -47,6 +47,8 @@
                     :player="player"
                 />
                 <div v-else class="container-fluid">
+                    <p class="text-center">Real value: <b>{{ player.signal }}</b></p>
+
                     <table class="table table-bordered" style="table-layout: fixed;">
                         <thead class="thead-dark text-center">
                             <th>Knowledge</th>
