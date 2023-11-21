@@ -761,6 +761,9 @@
                         tradingResult = (self.wallets[roundIdx].find(w => w.number === player.number).wallet[winningCondition].balance - player.balance) +
                         (self.wallets[roundIdx].find(w => w.number === player.number).wallet[winningCondition].shares - player.shares) * finalPrice
 
+                        const tradingSum = self.wallets[roundIdx].find(w => w.number === player.number).wallet[winningCondition].balance +
+                            self.wallets[roundIdx].find(w => w.number === player.number).wallet[winningCondition].shares * finalPrice
+
                         //Aggregate Results
                         if (player.role === 1) {
                             firstSnipeResult = self.firstSnipeResults[roundIdx].filter(sr => sr.player.number === player.number && sr.profit != null)
@@ -805,7 +808,7 @@
 
                         if (player.role != 1) {
                             const value = self.firstDeclarations[roundIdx].find(d => d.player === player.number).value[winningCondition];
-                            total = value - firstTaxes - secondTaxes + firstSnipeResult + secondSnipeResult + tradingResult;
+                            total = value - firstTaxes - secondTaxes + firstSnipeResult + secondSnipeResult + tradingSum;
                         } else {
                             total = firstSnipeResult + secondSnipeResult + tradingResult;
                         }
