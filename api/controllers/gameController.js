@@ -342,24 +342,24 @@ export default {
         Controller.addGetRoute(app, '/api/v1/games/market-log', false, async (req, res) => {
             const gameId = parseInt(req.query.game_id);
 
-            const game = gameManager.games.find(g => g.data.id  == gameId);
+            const game = await gameService.findGameData(gameId);
 
             const data = {
-                "ruleset": game.data.type,
-                "players": game.data.players.map(p => {
+                "ruleset": game.type,
+                "players": game.players.map(p => {
                     return {
                         "number": p.number,
                         "tag": p.tag
                     }
                 }),
-                "conditions": game.data.conditions,
-                "marketLogs": game.data.results.filter(r => r.phase[6] != null).map(r => r.phase[6].log)
+                "conditions": game.conditions,
+                "marketLogs": game.results.filter(r => r.phase[6] != null).map(r => r.phase[6].log)
             };
 
-            if (game.data.type === 'Futarchy') {
-                data.winningConditions = game.data.results.filter(r => r.phase[6] != null).map(r => r.phase[6].winningCondition)
-            } else if (game.data.type === 'Harberger') {
-                data.winningConditions = game.data.results.filter(r => r.phase[3] != null).map(r => r.phase[3].winningCondition)
+            if (game.type === 'Futarchy') {
+                data.winningConditions = game.results.filter(r => r.phase[6] != null).map(r => r.phase[6].winningCondition)
+            } else if (game.type === 'Harberger') {
+                data.winningConditions = game.results.filter(r => r.phase[3] != null).map(r => r.phase[3].winningCondition)
             }
 
             Controller.handleSuccess(res, data, 'Data available');
