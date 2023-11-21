@@ -665,7 +665,7 @@
                         } else {
                             xlsRow.push(secondDeclaration.declaration[winningCondition]);
                             xlsRow.push(secondDeclaration.taxes[winningCondition]);
-                            xlsRow.push(firstDeclaration.declared === true ? 'Yes' : 'No'); //Pressed 'Declare' buttons
+                            xlsRow.push(secondDeclaration.declared === true ? 'Yes' : 'No'); //Pressed 'Declare' buttons
                         }//End pf Second Declarations and Taxes
 
                         xlsRow.push(null);

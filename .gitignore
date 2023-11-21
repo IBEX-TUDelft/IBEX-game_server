@@ -3,6 +3,8 @@ dist
 api/.env
 api/public.key
 api/private.key
+api/public.key.old
+api/private.key.old
 my-app/.env
 api/app.err
 api/app.log
