@@ -31,7 +31,7 @@
                                     :header="message.participants"
                                     header-tag="header"
                                 >
-                                    <b-card-text><b>{{ players.find(p => p.number === message.sender).tag }}</b>: {{ message.text }}</b-card-text>
+                                    <b-card-text><b>{{ players.find(p => p.number === message.sender).tag }}</b>: {{ decode(message.text) }}</b-card-text>
                                 </b-card>
                             </div>
                         </div>
@@ -44,6 +44,7 @@
 </template>
 <script>
     import XLSX from 'xlsx';
+    import he from 'he';
 
     const roleMap = {
         1: "Sniper",
@@ -74,6 +75,9 @@
         created() {
         },
         methods: {
+            decode(str) {
+                return he.decode(str);
+            },
             getValue(declaration, property, index) {
                 let value
                 
@@ -142,13 +146,13 @@
                         'Message'
                     ]);
 
-                    self.chatLog[round.round - 1].forEach(message => {
+                    self.chatLog[round.round].forEach(message => {
                         xls.push([
                             [message.sender, ...message.to]
                                 .sort((a,b,) => a - b)
                                 .map(number => self.players.find(p => p.number === number).tag)
                                 .join(','),
-                            message.text
+                            self.decode(message.text)
                         ]);
                     });
 

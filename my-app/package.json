@@ -15,6 +15,7 @@
     "bootstrap-vue": "^2.16.0",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
+    "he": "^1.2.0",
     "localized-number-parser": "^1.0.3",
     "unique-names-generator": "^4.6.0",
     "vue": "^2.6.14",
