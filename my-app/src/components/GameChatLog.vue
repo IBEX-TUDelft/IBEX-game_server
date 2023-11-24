@@ -26,7 +26,7 @@
                         </template>
 
                         <div class="row">
-                            <div v-for="message in (chatLog[round.round - 1] == null ? [] : chatLog[round.round - 1])" :key="message.number" class="col-12 mb-1 px-0">
+                            <div v-for="message in (chatLog[round.round] == null ? [] : chatLog[round.round])" :key="message.number" class="col-12 mb-1 px-0">
                                 <b-card 
                                     :header="message.participants"
                                     header-tag="header"
