@@ -368,17 +368,18 @@ export default {
         Controller.addGetRoute(app, '/api/v1/games/chat-log', false, async (req, res) => {
             const gameId = parseInt(req.query.game_id);
 
-            const game = gameManager.games.find(g => g.data.id  == gameId);
+            //const game = gameManager.games.find(g => g.data.id  == gameId);
+            const game = await gameService.findGameData(gameId);
 
             const data = {
-                "ruleset": game.data.type,
-                "players": game.data.players.map(p => {
+                "ruleset": game.type,
+                "players": game.players.map(p => {
                     return {
                         "number": p.number,
                         "tag": p.tag
                     }
                 }),
-                "results": game.data.results
+                "results": game.results
             };
 
             Controller.handleSuccess(res, data, 'Data available');
