@@ -12,7 +12,7 @@
                         <label htmlFor="exampleInputEmail1">Age</label>
                     </div>
                     <div class="form-group col-md-3">
-                        <input type="number" class="form-control" v-model="age" name="age" id="age" aria-describedby="emailHelp" />
+                        <input @keydown="isAllowed" type="number" class="form-control" v-model="age" name="age" id="age" aria-describedby="emailHelp" />
                     </div>
                 </b-row>
 
@@ -147,7 +147,15 @@ export default {
             } catch (err) {
                 console.log('Something went wrong while sending the survey', err);
             }
-        }
+        }, isAllowed(e) {
+                if (![8,35,36,46,48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105].includes(e.which)) {
+                    console.log(`Sorry ${e.which}`)
+                    e.preventDefault();
+                    return false;
+                }
+
+                return true;
+            }
     }
 }
 </script>
