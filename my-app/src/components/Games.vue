@@ -17,7 +17,7 @@
                     <td>
                         <div class="btn-toolbar pull-right row-12">
                             <div class="mr-2">
-                                <button v-if="item.round_number == null || item.round_number == 0" type="button" @click="startGame(item.id)" class="btn btn-success mr-1">Start</button>
+                                <button v-if="item.started === false && item.ended_at == null" type="button" @click="startGame(item.id)" class="btn btn-success mr-1">Start</button>
                             </div>
                             <div class="mr-2">
                                 <button type="button" @click='deleteGame(item.id)' class="btn btn-danger">Delete</button>

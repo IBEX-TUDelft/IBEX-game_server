@@ -50,7 +50,7 @@ export default {
     async mounted () {
         const response = await this.$http.get("/games/started");
 
-        this.games = response.data.data;
+        this.games = response.data.data.filter(game => game.ended_at == null);
     },
     components: {
         Header

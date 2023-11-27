@@ -10,7 +10,6 @@
 
 <script>
 import Header from './Header.vue'
-//import CreateUser from './CreateUser.vue'
 import Games from './Games.vue'
 import { getAllUsers, createUser } from '../services/UserService'
 import { listGames } from '../services/GameService'

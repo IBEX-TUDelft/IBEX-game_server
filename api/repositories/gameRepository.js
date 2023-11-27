@@ -211,6 +211,19 @@ export default {
                     }
             });
         });
-        
+    },
+    endGame: async function(gameId) {
+        return await new Promise((resolve, reject) => {
+            this.pool.query(
+                `update games set ended_at = NOW() where id = ${gameId} ;`,
+                (err, res) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        console.log(res);
+                        resolve();
+                    }
+            });
+        });
     }
 }

@@ -61,9 +61,12 @@ export default {
                 const game = gs.find(g => g.id === r.id);
 
                 if (game == null) {
+                    r.started = false;
                     continue;
                 }
                 
+                r.started = true;
+
                 if (game.currentRound != null) {
                     r.round_number = game.currentRound;
                 }
@@ -313,17 +316,21 @@ export default {
         });
 
         Controller.addGetRoute(app, '/api/v1/games/started', false, async (req, res) => {
-            const games = gameManager.games.map(g => g.data).map(d => { return {
+            const records = await gameRepository.list();
+
+            const games = records
+                .filter(r => r.ended_at == null)
+                .filter(r => gameManager.games.find(g => g.data.id === r.id) != null)
+                .map(r => {
+                    return gameManager.games.find(g => g.data.id === r.id).data;
+                }).map(d => { return {
                     "id": d.id,
                     "title": d.title,
                     "type": d.parameters.game_type,
                     "assignedPlayers": d.assignedPlayers,
                     "currentRound": d.currentRound
-                }
-            });
+                }});
 
-            games.reverse();
-            
             Controller.handleSuccess(res, games, 'Data available');
         });
 

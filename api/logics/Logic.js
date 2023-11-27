@@ -415,6 +415,7 @@ export default class {
             clearInterval(this.phaseCheckingInterval);
             
             await GameRepository.saveData(this.data.id, this.data);
+            await GameRepository.endGame(this.data.id);
 
             return;
         }
