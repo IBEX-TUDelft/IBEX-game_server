@@ -307,11 +307,17 @@
 
                             const survey = self.surveys.find(s => s.number === player.number);
 
+                            const value = self.rounds[round.round].phase[1].players
+                                .find(p => p.number === player.number)
+                                .values[self.rounds[round.round].phase[7].winningCondition];
+                            
+                            const points = value + playerReward != null ? playerReward.basePoints : 0;
+
                             xls.push([self.startTime,self.dataset,player.number,round.round, player.tag, player.role, self.ruleset, values[0], values[1],
                             '',compensationReq, requestSubmitted, compensationOfferNumber, offerSubmitted, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
                             self.getStandingCounter(round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No', self.rewardRound,
-                            playerReward?.basePoints, playerReward?.profit, playerReward?.points, playerReward?.factor, playerReward?.exchange, playerReward?.reward, player.paymentToken,
-                            survey?.age, survey?.gender, survey?.yearOfStudy, survey?.faculty, survey?.risk
+                            playerReward?.basePoints, value, points, playerReward?.factor, playerReward?.exchange, round.round === playerReward?.round ? playerReward?.reward : ''
+                            , player.paymentToken, survey?.age, survey?.gender, survey?.yearOfStudy, survey?.faculty, survey?.risk
                             ]);
                         });
                     } catch (e) {

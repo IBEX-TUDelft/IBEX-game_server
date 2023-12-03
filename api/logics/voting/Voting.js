@@ -24,10 +24,12 @@ export default class Voting extends Logic {
     getProfit(playerNumber, round) {
         const result = this.data.results.find(r => r.round === round);
 
+        const winningCondition = result.phase[7].winningCondition;
+
         const player = this.data.players.find(p => p.number === playerNumber);
 
         const value = result.phase[1].players.find(p => p.number === playerNumber)
-            .values[this.data.winningCondition];
+            .values[winningCondition];
 
         let compensationOffers = result.phase[4].compensationOffers;
 
@@ -35,7 +37,7 @@ export default class Voting extends Logic {
             compensationOffers = [0,0];
         }
 
-        let compensation = compensationOffers[this.data.winningCondition];
+        let compensation = compensationOffers[winningCondition];
 
         if (player.role === 2) {
             compensation = - compensation * (result.phase[1].players.length - 1);
