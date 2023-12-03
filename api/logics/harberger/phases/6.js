@@ -111,6 +111,29 @@ class Phase6 extends JoinablePhase {
                     }
                 }
 
+                if (order.now === true) {
+                    let counterparts;
+
+                    if (order.type == 'ask') {
+                        counterparts = phase.orders[condition].filter(o => o.type === "bid" && o.sender != player.number);
+                    } else if (order.type === 'bid') {
+                        counterparts = phase.orders[condition].filter(o => o.type === "ask" && o.sender != player.number);
+                    }
+
+                    if (counterparts.length === 0) {
+                        wss.sendEvent(
+                            game.id,
+                            player.number,
+                            'order-refused',
+                            {
+                                "message": `Could not fulfill your order: no matching offers available`
+                            }
+                        );
+
+                        return;
+                    }
+                }
+
                 const nextOrder = {
                     "id": phase.nextOrderId[condition] + 1,
                     "sender": player.number,
