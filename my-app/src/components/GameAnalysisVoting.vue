@@ -311,7 +311,7 @@
                                 .find(p => p.number === player.number)
                                 .values[self.rounds[round.round].phase[7].winningCondition];
                             
-                            const points = value + playerReward != null ? playerReward.basePoints : 0;
+                            const points = value + (playerReward != null ? playerReward.basePoints : 0);
 
                             xls.push([self.startTime,self.dataset,player.number,round.round, player.tag, player.role, self.ruleset, values[0], values[1],
                             '',compensationReq, requestSubmitted, compensationOfferNumber, offerSubmitted, compensationDelta, self.getCompensationAccepted(round.round, player.number, 1),
