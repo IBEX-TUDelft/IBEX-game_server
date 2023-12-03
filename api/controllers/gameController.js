@@ -310,7 +310,7 @@ export default {
                 }, 'Game created and run with your simulation dataset');
             } catch (e) {
                 console.error(`Could not run simulation dataset ${name}`, e);
-                Controller.handleGenericError(res, `Could not run simulation dataset ${name}: ${e.message}`, 400);
+                Controller.handleGenericError(res, `Could not run simulation dataset ${name}: ${e.message}`, 500);
                 return;
             }
         });
@@ -597,8 +597,71 @@ export default {
             Controller.handleSuccess(res, raw.toString(), 'Data available');
         });
 
-        Controller.addGetRoute(app, '/api/v1/games/repair', true, async (req, res) => {
-            const records = await listGames();
+        Controller.addGetRoute(app, '/api/v1/games/repair', false, async (req, res) => {
+            try {
+                fs.readdir('../records', (err, files) => {
+                    if (err) {
+                        throw err;
+                    }
+
+                    files.forEach(async (file) => {
+                        // get the details of the file
+                        const parentId = parseInt(file.split('.')[0]);
+
+                        if (isNaN(parentId)) {
+                            console.error(`Simulation dataset ${file}'s parent is unknown. Could not repair`);
+                            return;
+                        }
+
+                        const data = await gameService.findGameData(parentId);
+
+                        if (data == null) {
+                            console.error(`Simulation dataset ${file}'s parent data is not available. Could not repair`);
+                            return;
+                        }
+
+                        const log = JSON.parse(fs.readFileSync(`../records/${file}`).toString());
+
+                        let changed = false;
+
+                        if (log.parameters.find(p => p.key === 'simulation_parent_id') == null) {
+                            log.parameters.push({
+                                "key": "simulation_parent_id",
+                                "type": "number",
+                                "value": parentId.toString()
+                            });
+                            changed = true;
+                        }
+
+                        if (log.parameters.find(p => p.key === 'simulation_reward_round') == null) {
+                            log.parameters.push({
+                                "key": "simulation_reward_round",
+                                "type": "number",
+                                "value": data.rewardRound.toString()
+                            });
+                            changed = true;
+                        }
+
+                        if (changed) {
+                            console.log(`Adding parent id and reward round to simulation ${file} ...`);
+                            fs.writeFileSync(`../records/${file}`, JSON.stringify(log));
+                            console.log(`Done adding parent id and reward round to simulation ${file}`);
+                        } else {
+                            console.log(`Simulation ${file} already has parent id and reward round.`);
+                        }
+
+                        //console.log(log.parameters);
+                    });
+                });
+
+                Controller.handleSuccess(res, {}, 'Repair script executed');
+            } catch (e) {
+                console.error(`Could not run the repair script`, e);
+                Controller.handleGenericError(res, `Could not run the repair script: ${e.message}`, 500);
+                return;
+            }
+
+            /*const records = await listGames();
 
             for (let i = 0; i < records.length; i++) {
                 let g = records[i];
@@ -619,9 +682,7 @@ export default {
                 await gameRepository.saveData(data.id, data);
 
                 console.log(`Repaired rewardRound of game ${g.id}`);
-            }
-
-            Controller.handleSuccess(res, {}, 'Data available');
+            }*/
         });
     }
 };

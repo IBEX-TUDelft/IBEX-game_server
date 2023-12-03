@@ -343,7 +343,14 @@ export default class {
         if (number > this.data.parameters.round_count ) {
             console.log('The game is over');
 
-            const chosenRound = Math.floor(Math.random() * this.data.parameters.round_count) + 1;
+            let chosenRound = this.data.parameters.simulation_reward_round;
+
+            if (chosenRound == null) {
+                chosenRound = Math.floor(Math.random() * this.data.parameters.round_count) + 1;
+                console.log('Reward round drawn randomly');
+            } else {
+                console.log('Reward round comes from the simulation dataset parameters');
+            }
 
             this.data.rewardRound = chosenRound;
 
@@ -409,7 +416,7 @@ export default class {
             this.data.rewards = rewards;
 
             this.wss.broadcastEvent(this.data.id, "game-over", {});
-            AppEvents.get(this.data.id).emit(GameOver);
+            AppEvents.get(this.data.id).emit(GameOver, chosenRound);
 
             this.over = true;
             clearInterval(this.phaseCheckingInterval);

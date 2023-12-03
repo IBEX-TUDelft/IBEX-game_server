@@ -20,8 +20,20 @@ export class GameRecorder {
             });
         });
 
-        AppEvents.get(gameId).addListener(GameOver, async () => {
+        AppEvents.get(gameId).addListener(GameOver, async (rewardRound) => {
             const parameters = await gameParameterRepository.findByGameId(gameId);
+
+            parameters.push({
+                "key": "simulation_parent_id",
+                "type": "number",
+                "value": gameId.toString()
+            });
+
+            parameters.push({
+                "key": "simulation_reward_round",
+                "type": "number",
+                "value": rewardRound.toString()
+            });
 
             const dataset = {
                 parameters,
