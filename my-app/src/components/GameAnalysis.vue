@@ -794,7 +794,7 @@
                             xlsRow.push(null);
                         } else {
                             xlsRow.push(
-                                self.firstDeclarations[roundIdx].find(fd => fd.player === player.number).declaration[winningCondition]
+                                self.firstDeclarations[roundIdx].find(fd => fd.player === player.number).value[winningCondition]
                                 - firstTaxes
                             );
                         }
@@ -806,7 +806,7 @@
                             xlsRow.push(null);
                         } else {
                             xlsRow.push(
-                                self.secondDeclarations[roundIdx].find(fd => fd.player === player.number).declaration[winningCondition]
+                                self.secondDeclarations[roundIdx].find(fd => fd.player === player.number).value[winningCondition]
                                 - secondTaxes
                             );
                         }
