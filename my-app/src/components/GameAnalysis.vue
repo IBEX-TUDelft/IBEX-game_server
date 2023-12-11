@@ -478,8 +478,8 @@
                     'snipe2_TO_owner1', 'snipe2_TO_owner2',	'snipe2_TO_owner3', 'snipe2_TO_owner4', 'snipe2_TO_owner5', 'snipe2_TO_dev', '',
                     'Dec2_Owner1_O', 'Dec2_Owner2_O', 'Dec2_Owner3_O', 'Dec2_Owner4_O', 'Dec2_Owner5_O', 'Dec2_Dev_O', '',
                     'snipe2_TO_owner1_result', 'snipe2_TO_owner2_result', 'snipe2_TO_owner3_result', 'snipe2_TO_owner4_result', 'snipe2_TO_owner5_result', 'snipe2_TO_dev_result', '',
-                    'Num_Bids_NP', 'Num_Asks_NP', 'Num_Buys_NP', 'Num_Sells_NP', 'Ending_Cash_NP', 'Ending_Shares_NP', '',
-                    'Num_Bids_P', 'Num_Asks_P', 'Num_Buys_P', 'Num_Sells_P', 'Ending_Cash_P', 'Ending_Shares_P', '',
+                    'Num_Bids_NP', 'Num_Asks_NP', 'Num_Buys_NP', 'Num_Sells_NP', 'Ending_Cash_NP', 'Ending_Shares_NP', 'Ending_Price_NP', '',
+                    'Num_Bids_P', 'Num_Asks_P', 'Num_Buys_P', 'Num_Sells_P', 'Ending_Cash_P', 'Ending_Shares_P', 'Ending_Price_P', '',
                     'snipe1_end_result', 'Property Value_min_Tax1', 'Trading_Result', 'snipe2_end_results', 'Property Value_min_Tax2', 'Total Earnings',
                     'reward_round', 'base_points', 'points', 'final_score', 'factor', 'exchange_rate', 'reward', 'Payment_Token',
                     'Age', 'Gender', 'Year_of_Study', 'Faculty', 'Risk_Choice'
@@ -747,6 +747,13 @@
                             xlsRow.push(myActions.filter(a => a.seller != null && a.seller.number === player.number).length);
                             xlsRow.push(self.wallets[roundIdx].find(w => w.number === player.number).wallet[c.id].balance);
                             xlsRow.push(self.wallets[roundIdx].find(w => w.number === player.number).wallet[c.id].shares);
+
+                            if (c.id === winningCondition) {
+                                xlsRow.push(self.rounds[roundIdx].phase[8].finalPrice); //TODO: should be the final price per condition
+                            } else {
+                                xlsRow.push(null);
+                            }
+                            
                             xlsRow.push(null);
                         });
 
