@@ -817,7 +817,7 @@
                             const value = self.firstDeclarations[roundIdx].find(d => d.player === player.number).value[winningCondition];
                             total = value - firstTaxes - secondTaxes + firstSnipeResult + secondSnipeResult + tradingSum;
                         } else {
-                            total = firstSnipeResult + secondSnipeResult + tradingResult;
+                            total = firstSnipeResult + secondSnipeResult + tradingSum;
                         }
 
                         xlsRow.push(total);
