@@ -4,7 +4,8 @@ import JoinablePhase from '../../JoinablePhase.js';
 class Phase3 extends JoinablePhase {
     startTime = 0;
     results = {
-        winningCondition: null
+        winningCondition: null,
+        snipes: []
     };
 
     constructor(game, wss, number) {
@@ -13,6 +14,11 @@ class Phase3 extends JoinablePhase {
             "role": [1],
             "action": function(ws, message, player, caller) {
                 console.log(`Player ${player.name} is done speculating`);
+
+                caller.results.snipes.push({
+                    "player": player.number,
+                    "snipe": message.snipe
+                });
 
                 console.log(message.snipe);
                 console.log(typeof message.snipe);

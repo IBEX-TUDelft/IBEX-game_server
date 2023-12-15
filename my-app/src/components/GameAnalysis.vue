@@ -591,14 +591,14 @@
                                         return;                                    
                                     }
 
-                                    const snipe = self.firstSnipes[roundIdx].find(fs => fs.player.number === player.number && fs.target.number === on);
+                                    const snipe = self.rounds[roundIdx].phase[3].snipes.find(s => s.player === player.number)?.snipe[c.id];
 
                                     if (snipe == null) {
                                         xlsRow.push('N');
                                         return;
                                     }
 
-                                    xlsRow.push(snipe.snipes[c.id] == null || !snipe.snipes[c.id] ? 'N' : 'Y');
+                                    xlsRow.push(!snipe.includes(on) ? 'N' : 'Y');
                                 });
                             }
 
