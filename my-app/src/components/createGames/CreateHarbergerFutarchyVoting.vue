@@ -459,6 +459,12 @@ export default {
             this.project_a_dev_high = this.configurations[this.$parent.game_type].defaultBoundaries.developer.project.high;
             this.project_a_owner_low = this.configurations[this.$parent.game_type].defaultBoundaries.owner.project.low;
             this.project_a_owner_high = this.configurations[this.$parent.game_type].defaultBoundaries.owner.project.high;
+
+            if (this.$parent.game_type === 'futarchy' || this.$parent.game_type === 'harberger') {
+                this.speculator_balance = this.configurations[this.$parent.game_type].defaultBalance.speculator;
+                this.developer_balance = this.configurations[this.$parent.game_type].defaultBalance.developer;
+                this.owner_balance = this.configurations[this.$parent.game_type].defaultBalance.owner;
+            }
         },
         getPayload() {
             return {
@@ -566,6 +572,7 @@ export default {
             self.configurations[mode].defaultBasePoints = dictionary.defaultBasePoints;
             self.configurations[mode].defaultRewardScaleFactor = dictionary.defaultRewardScaleFactor;
             self.configurations[mode].defaultBoundaries = dictionary.defaultBoundaries;
+            self.configurations[mode].defaultBalance = dictionary.defaultBalance;
 
             self.configurations[mode].phaseTags = [];
             
@@ -591,6 +598,13 @@ export default {
         self.project_a_dev_high = self.configurations[self.$parent.game_type].defaultBoundaries.developer.project.high;
         self.project_a_owner_low = self.configurations[self.$parent.game_type].defaultBoundaries.owner.project.low;
         self.project_a_owner_high = self.configurations[self.$parent.game_type].defaultBoundaries.owner.project.high;
+
+        console.log(self.speculator_balance = self.configurations[self.$parent.game_type])
+        if (self.$parent.game_type === 'futarchy' || self.$parent.game_type === 'harberger') {
+            self.speculator_balance = self.configurations[self.$parent.game_type].defaultBalance.speculator;
+            self.developer_balance = self.configurations[self.$parent.game_type].defaultBalance.developer;
+            self.owner_balance = self.configurations[self.$parent.game_type].defaultBalance.owner;
+        }
 
         EventService.removeAllListeners('game_type_changed');
         EventService.on('game_type_changed', this.onChangeGameType);

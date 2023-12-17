@@ -2,10 +2,15 @@
     "parameters": {
         "format": "nl"
     },
+    "defaultBalance": {
+        "speculator": 50000,
+        "developer": 300000,
+        "owner": 60000
+    },
     "defaultBasePoints": {
-        "speculator": 200000,
-        "developer": 250000,
-        "owner": 250000
+        "speculator": 400000,
+        "developer": 0,
+        "owner": 20000
     },
     "defaultRewardScaleFactor": {
         "speculator": 20000,
