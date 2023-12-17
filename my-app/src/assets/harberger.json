@@ -10,7 +10,7 @@
     "defaultBasePoints": {
         "speculator": 400000,
         "developer": 0,
-        "owner": 20000
+        "owner": 200000
     },
     "defaultRewardScaleFactor": {
         "speculator": 20000,
