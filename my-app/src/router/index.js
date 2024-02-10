@@ -25,6 +25,11 @@ const routes = [
     component: Login
   },
   {
+    path: '/login',
+    name: 'DirectLogin',
+    component: Login
+  },
+  {
     path: '/dashboard',
     name: 'Home',
     component: Dashboard,

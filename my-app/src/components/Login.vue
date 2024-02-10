@@ -75,8 +75,20 @@ export default {
 
     if (token != null) {
       this.$http.get("/auth/check", { params: { token }}).then(() => {
-        this.$router.push("/dashboard");
+        let home = process.env.VUE_APP_USER_HOME;
+
+        if (home == null) {
+          home = 'dashboard';
+        }
+
+        this.$router.push(`/${home}`);
+      }).catch((e) => {
+        console.error('While checking the access token', e);
       });
+    } else {
+      if (this.$route.path === '/') {
+        this.$router.push(`${process.env.VUE_APP_GUEST_HOME}`);
+      }
     }
   }
 };
