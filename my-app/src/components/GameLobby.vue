@@ -87,8 +87,12 @@ export default {
                     routeData = this.$router.resolve({path: `/board/${id}/${this.generateString(63)}${game.assignedPlayers}`});
                 }
                 
-                console.log('HRef:' + routeData.href);
-                window.open(routeData.href, '_blank');
+
+                if (process.env.VUE_APP_ON_JOIN_GAME === 'push') {
+                    this.$router.push({ path: routeData.href });
+                } else {
+                    window.open(routeData.href, '_blank');
+                }
             } catch (e) {
                 console.log(e);
             }
