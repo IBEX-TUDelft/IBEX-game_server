@@ -14,6 +14,7 @@ import GameChatLog from '../components/GameChatLog';
 import GameSurveys from '../components/GameSurveys';
 import SimulationList from '../components/SimulationList';
 import DoubleAuctionBoard from '../components/DoubleAuctionBoard';
+import RestoreList from '../components/RestoreList';
 
 Vue.use(VueRouter)
 
@@ -43,6 +44,14 @@ const routes = [
     path: '/simulation',
     name: 'Game Simulation Datasets',
     component: SimulationList,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/restore',
+    name: 'Game Restore',
+    component: RestoreList,
     meta: {
       requiresAuth: true
     }

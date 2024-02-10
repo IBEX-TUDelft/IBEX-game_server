@@ -424,6 +424,8 @@ export default class {
             await GameRepository.saveData(this.data.id, this.data);
             await GameRepository.endGame(this.data.id);
 
+            this.backup();
+
             return;
         }
         
@@ -613,5 +615,15 @@ export default class {
                 console.error(err);
             }
         })
+    }
+
+    async backup() {
+        const game = await GameRepository.findOne(this.data.id);
+
+        const data = JSON.parse(game.game_data);
+
+        data.endedAt = game.ended_at;
+
+        fs.writeFileSync(`../backup/${this.data.id}.json`, JSON.stringify(data));
     }
 }

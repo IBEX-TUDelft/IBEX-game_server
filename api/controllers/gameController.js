@@ -54,7 +54,23 @@ export default {
                     continue;
                 }
 
-                r.type = await gameRepository.getGameType(r.id);
+                try {
+                    const recordGameData = JSON.parse(r.game_data);
+                    if (recordGameData != null) {
+                        if (recordGameData.type != null) {
+                            r.type = recordGameData.type;
+                        }
+
+                        if (recordGameData.endedAt != null) {
+                            r.ended_at = recordGameData.endedAt;
+                        }
+                    }
+                } catch (errReadingData) {}
+
+
+                if (r.type == null) {
+                    r.type = await gameRepository.getGameType(r.id);
+                }
 
                 console.log(r.type);
 
@@ -683,6 +699,46 @@ export default {
 
                 console.log(`Repaired rewardRound of game ${g.id}`);
             }*/
+        });
+
+        Controller.addGetRoute(app, '/api/v1/games/backups', true, async (req, res) => {
+            const gamesInDb = await gameRepository.listCompact();
+
+            const gamesInBackup = fs.readdirSync('../backup');
+
+            let games = [];
+
+            for (let i = 0; i < gamesInBackup.length; i++) {
+                const backup = gamesInBackup[i];
+
+                const game = JSON.parse(fs.readFileSync(`../backup/${backup}`));
+
+                games.push({
+                    "id": game.id,
+                    "name": backup,
+                    "title": game.title,
+                    "type": game.parameters.game_type,
+                    "exists": gamesInDb.find(g => g.id === game.id) != null
+                });
+            }
+
+            games.sort((a, b) => b.id - a.id);
+            
+            Controller.handleSuccess(res, games, 'Data available');
+        });
+
+        Controller.addGetRoute(app, '/api/v1/games/restore', true, async (req, res) => {
+            const name = req.query.name;
+
+            const data = fs.readFileSync(`../backup/${name}`);
+
+            const game = JSON.parse(data);
+
+            console.log(game);
+
+            await gameRepository.restore(game.id, game.title, game, game.endedAt);
+
+            Controller.handleSuccess(res, {}, `Game with id ${game.id} restored.`);
         });
     }
 };

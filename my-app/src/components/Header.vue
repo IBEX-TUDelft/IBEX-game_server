@@ -13,6 +13,10 @@
     </div>
     <b-nav style="flex-wrap: nowrap;" class="justify-content-center">
       <b-nav-item>
+        <b-button style="width: 125px" v-if="$route.path != '/restore'" variant="primary" @click="restore">Restore</b-button>
+        <b-nav-text style="width: 125px; text-align: center;" v-else>Restore</b-nav-text>
+      </b-nav-item>
+      <b-nav-item>
         <b-button style="width: 125px" v-if="$route.path != '/simulation'" variant="primary" @click="simulation">Simulation</b-button>
         <b-nav-text style="width: 125px; text-align: center;" v-else>Simulation</b-nav-text>
       </b-nav-item>
@@ -69,6 +73,9 @@ export default {
     },
     simulation() {
       this.$router.push("/simulation");
+    },
+    restore() {
+      this.$router.push("/restore");
     },
   },
   created() {

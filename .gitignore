@@ -11,3 +11,4 @@ api/app.log
 api/APP_SERVER.PID
 records/*
 .vscode/*
+backup/*

@@ -225,5 +225,38 @@ export default {
                     }
             });
         });
-    }
+    },
+    listCompact: async function(parameters) {
+        return await Database.execute(`SELECT g.id, g.title, g.created_at, g.updated_at, g.ended_at 
+            FROM games g ORDER BY id DESC LIMIT 50;`);
+    },
+    restore: async function(id, title, data, endedAt) {
+        if (endedAt == null) {
+            endedAt = 'NOW()';
+        } else {
+            endedAt = `'${endedAt}'`;
+        }
+
+        return await new Promise((resolve, reject) => {
+            this.pool.query(`INSERT INTO games (
+                id,
+                title,
+                game_data,
+                ended_at
+            ) VALUES (
+                ${id},
+                '${title}',
+                '${JSON.stringify(data)}',
+                ${endedAt}
+            ) RETURNING id;`,
+                (err, res) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res.rows[0].id);
+                    }
+                }
+            );
+        });
+    },
 }
