@@ -86,7 +86,7 @@ export default {
         console.error('While checking the access token', e);
       });
     } else {
-      if (this.$route.path === '/') {
+      if (this.$route.path === '/' && process.env.VUE_APP_GUEST_HOME != null) {
         this.$router.push(`${process.env.VUE_APP_GUEST_HOME}`);
       }
     }
