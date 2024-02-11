@@ -142,6 +142,10 @@
                 return this.winningCondition === i ? 'Y' : 'N';
             },
             getPlayer(number) {
+                if (number == null) {
+                    return 'n/a';
+                }
+
                 return this.players.find(p => p.number === number).tag;
             },
             formatNumber(num) {
@@ -191,6 +195,10 @@
                         });
                     } else if (this.ruleset === 'Futarchy') {
                         this.marketLogs[index].forEach((m, i) => {
+                            if (i + 1 > this.conditions.length) {
+                                return;
+                            }
+
                             m.forEach(r => {
                                 xls.push([
                                     r.time,

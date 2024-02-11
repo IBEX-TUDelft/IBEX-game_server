@@ -287,6 +287,23 @@ class Phase6 extends JoinablePhase {
 
         const self = this;
 
+        this.results.log.forEach((condition, i) => condition.push({
+            "id": self.nextOrderId[i] ++,
+            "time": new Date(),
+            "round": self.game.currentRound.number,
+            "phase": 6,
+            "actor": {
+                "number": null,
+                "role": null
+            },
+            "action": 'market-started',
+            "quantity": null,
+            "price": null,
+            "bestBid": null,
+            "bestAsk": null,
+            "book": null
+        }));
+
         console.log(`Allowing ${self.game.parameters.minutes_for_trading} minutes for trading`);
 
         //this.setTimer(60 * 1000 * self.game.parameters.minutes_for_trading, 60 * 1000 * self.game.parameters.minutes_for_trading);
@@ -296,6 +313,23 @@ class Phase6 extends JoinablePhase {
         await super.onExit();
 
         const self = this;
+
+        this.results.log.forEach((condition, i) => condition.push({
+            "id": self.nextOrderId[i] ++,
+            "time": new Date(),
+            "round": self.game.currentRound.number,
+            "phase": 6,
+            "actor": {
+                "number": null,
+                "role": null
+            },
+            "action": 'market-ended',
+            "quantity": null,
+            "price": null,
+            "bestBid": null,
+            "bestAsk": null,
+            "book": null
+        }));
 
         this.results.wallets.push(...this.game.players.map(p => {
             return {
