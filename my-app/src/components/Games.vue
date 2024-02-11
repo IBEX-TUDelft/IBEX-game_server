@@ -48,6 +48,7 @@
 <script>
 import { getGameJson } from '../services/GameService';
 import * as VotingService from '../services/VotingService';
+import * as HarbergerFutarchyService from '../services/HarbergerFutarchyService';
 
 export default {
     name: 'Games',
@@ -160,8 +161,11 @@ export default {
             switch(type) {
                 case 'Voting':
                     return await VotingService.downloadAll(id);
+                case 'Harberger':
+                case 'Futarchy':
+                    return await HarbergerFutarchyService.downloadAll(id);
                 default:
-                    console.log(`Type not recognized: ${type}`);
+                    console.log(`Type not recognized (or TODO): ${type}`);
             }
         }
     }
