@@ -31,8 +31,11 @@
                             <div class="mr-2">
                                 <button type="button" @click='surveys(item.id)' class="btn btn-primary">Surveys</button>
                             </div>
-                            <div class="">
+                            <div class="mr-2">
                                 <button type="button" @click='gameJson(item.id)' class="btn btn-primary">{{ item.id }}.log.json</button>
+                            </div>
+                            <div class="">
+                                <button type="button" @click='downloadAll(item.id, item.type)' class="btn btn-success">Download All</button>
                             </div>
                         </div>
                     </td>
@@ -44,6 +47,7 @@
 
 <script>
 import { getGameJson } from '../services/GameService';
+import * as VotingService from '../services/VotingService';
 
 export default {
     name: 'Games',
@@ -150,6 +154,14 @@ export default {
                 window.open(routeData.href, '_blank');
             } catch (e) {
                 console.log(e);
+            }
+        },
+        async downloadAll(id, type) {
+            switch(type) {
+                case 'Voting':
+                    return await VotingService.downloadAll(id);
+                default:
+                    console.log(`Type not recognized: ${type}`);
             }
         }
     }
