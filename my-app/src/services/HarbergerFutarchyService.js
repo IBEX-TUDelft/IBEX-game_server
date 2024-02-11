@@ -29,7 +29,7 @@ export async function downloadWideExcel(data) {
 
     xls.push([
         'session', 'dataset', 'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
-        'Declaration1_noProject', 'Declaration1_projectA', 'Taxes1_noProject', 'Taxes1_projectA', 'Declaration1_acted', 'ProjectOutcome', '',
+        'Declaration1_noProject', 'Declaration1_projectA', 'Taxes1_noProject', 'Taxes1_projectA', 'Declaration1_acted', 'Project Realized', '',
         'Signal_PublicNP', 'sig_pubP', 'SigPrivateNP', 'SigPrivateP', '',
         'snipe1_TNP_owner1', 'snipe1_TNP_owner2', 'snipe1_TNP_owner3', 'snipe1_TNP_owner4', 'snipe1_TNP_owner5', 'snipe1_TNP_dev', '',
         'snipe1_TP_owner1', 'snipe1_TP_owner2', 'snipe1_TP_owner3', 'snipe1_TP_owner4', 'snipe1_TP_owner5', 'snipe1_TP_dev', '',
@@ -108,7 +108,8 @@ export async function downloadWideExcel(data) {
                 xlsRow.push(null);
             }
 
-            xlsRow.push(data.conditions[winningCondition].key); //outcome
+            //xlsRow.push(data.conditions[winningCondition].key); //outcome
+            xlsRow.push(winningCondition === 1 ? "Yes" : "No"); //outcome
 
             xlsRow.push(null);
 
