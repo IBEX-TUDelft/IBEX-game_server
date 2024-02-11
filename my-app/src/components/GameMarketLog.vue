@@ -163,7 +163,7 @@
                 self.indexes.forEach(index => {
                     const xls = [];
 
-                    xls.push([
+                    const headers = [
                         'Time',
                         'Phase',
                         'Actor',
@@ -175,9 +175,11 @@
                         'Best Bid',
                         'Best Ask',
                         'Book'
-                    ]);
+                    ];
 
                     if (this.ruleset === 'Harberger') {
+                        xls.push(headers);
+
                         this.marketLogs[index][this.winningConditions[index]].forEach(r => {
                             xls.push([
                                 r.time,
@@ -194,6 +196,10 @@
                             ]);
                         });
                     } else if (this.ruleset === 'Futarchy') {
+                        headers.push('Condition');
+                        
+                        xls.push(headers);
+
                         this.marketLogs[index].forEach((m, i) => {
                             if (i + 1 > this.conditions.length) {
                                 return;
