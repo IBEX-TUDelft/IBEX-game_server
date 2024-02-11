@@ -29,7 +29,8 @@ export async function downloadWideExcel(data) {
 
     xls.push([
         'session', 'dataset', 'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
-        'Declaration1_noProject', 'Declaration1_projectA', 'Taxes1_noProject', 'Taxes1_projectA', 'Declaration1_acted', 'Project Realized', '',
+        'Declaration1_noProject', 'Declaration1_projectA', 'Taxes1_noProject', 'Taxes1_projectA', 'Declaration1_acted',
+        'Project Realized', 'socialWelfare_NP', 'socialWelfare_P', 'Optimal_Outcome', '',
         'Signal_PublicNP', 'sig_pubP', 'SigPrivateNP', 'SigPrivateP', '',
         'snipe1_TNP_owner1', 'snipe1_TNP_owner2', 'snipe1_TNP_owner3', 'snipe1_TNP_owner4', 'snipe1_TNP_owner5', 'snipe1_TNP_dev', '',
         'snipe1_TP_owner1', 'snipe1_TP_owner2', 'snipe1_TP_owner3', 'snipe1_TP_owner4', 'snipe1_TP_owner5', 'snipe1_TP_dev', '',
@@ -108,8 +109,22 @@ export async function downloadWideExcel(data) {
                 xlsRow.push(null);
             }
 
-            //xlsRow.push(data.conditions[winningCondition].key); //outcome
+            const socialWelfare = [
+                data.firstDeclarations[roundIdx].map(fd => fd.value[0]).reduce((a,b) => a + b, 0),
+                data.firstDeclarations[roundIdx].map(fd => fd.value[1]).reduce((a,b) => a + b, 0)
+            ]
+
+            const optimal =
+                (socialWelfare[0] >= socialWelfare[1] && winningCondition === 0) ||
+                (socialWelfare[0] <= socialWelfare[1] && winningCondition === 1);
+
             xlsRow.push(winningCondition === 1 ? "Yes" : "No"); //outcome
+
+            xlsRow.push(socialWelfare[0]); //social welfare NP
+            xlsRow.push(socialWelfare[1]); //social welfare P
+
+            //xlsRow.push(data.conditions[winningCondition].key); //outcome
+            xlsRow.push(optimal ? 'Yes' : 'No' ); //Optimal
 
             xlsRow.push(null);
 

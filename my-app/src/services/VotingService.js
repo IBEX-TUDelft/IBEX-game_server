@@ -30,7 +30,8 @@ export async function downloadWideExcel(data) {
     xls.push([
         'session', 'dataset' ,'players.number', 'round', 'players.tag', 'players.role', 'ruleset', 'Value_noProject', 'Value_projectA',
         '', 'Compensation_Req', 'Request_Submitted','Compensation_Offer', 'Offer_Submitted', 'Compens_Delta', 'Vote', 'Num_Votes_for project', 'Total Value',
-        'Project Realized', 'Optimal_Outcome', 'Reward Round', 'Base Points', 'Points', 'Final Score', 'Factor', 'Exchange Rate', 'Reward', 'Payment_Token',
+        'Project Realized', 'socialWelfare_NP', 'socialWelfare_P', 'Optimal_Outcome',
+        'Reward Round', 'Base Points', 'Points', 'Final Score', 'Factor', 'Exchange Rate', 'Reward', 'Payment_Token',
         'Age', 'Gender', 'Year_of_Study', 'Faculty', 'Risk_Choice'
     ]);                
 
@@ -132,7 +133,9 @@ export async function downloadWideExcel(data) {
 
                 xls.push([data.startTime,data.dataset,player.number,round.round, player.tag, player.role, data.ruleset, values[0], values[1],
                 '',compensationReq, requestSubmitted, compensationOfferNumber, offerSubmitted, compensationDelta, getCompensationAccepted(data.players, data.compensationDecisions, round.round, player.number, 1),
-                getStandingCounter(data.standings, round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No', bestConditions.includes(winningCondition) ? 'Yes' : 'No', data.rewardRound,
+                getStandingCounter(data.standings, round.round, 1), total, winningCondition === 1 ? 'Yes' : 'No',
+                conditionTotals[0], conditionTotals[1],
+                bestConditions.includes(winningCondition) ? 'Yes' : 'No', data.rewardRound,
                 playerReward?.basePoints, value, points, playerReward?.factor, playerReward?.exchange, round.round === playerReward?.round ? playerReward?.reward : ''
                 , player.paymentToken, survey?.age, survey?.gender, survey?.yearOfStudy, survey?.faculty, survey?.risk
                 ]);
