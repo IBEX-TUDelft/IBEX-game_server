@@ -6,7 +6,7 @@ class Phase6 extends JoinablePhase {
     orderList = [[],[],[]];
     movementList = [[],[],[]];
     orders = [[],[],[]];
-    nextOrderId = [1,1,1];
+    nextOrderId = [0,0,0];
     complete = false;
     results = {
         snipes: [],
