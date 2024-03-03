@@ -44,17 +44,13 @@ class Phase3 extends JoinablePhase {
     async onEnter() {
         super.onEnter();
 
-        // Broadcasting the start of Phase 3 with clear instructions for all players
-        this.wss.broadcastEvent(
-            this.game.id,
-            "phase-initiation",
-            {
-                "phase": "3",
-                "title": "Compensation Request Phase",
-                "instructions": "All owners are now required to submit their compensation requests. Please review the project proposals and submit your request using the format provided in the game interface.",
-                "details": "Ensure your submission reflects your compensation expectations based on the developments proposed. This phase is crucial for setting the tone of negotiations."
-            }
-        );
+        // TODO: remove this with
+        const deadlineTimestamp = new Date(new Date().getTime() + 1*60000).toISOString();
+        this.wss.broadcastEvent(this.game.id, "phase-instructions", {
+            "phaseName": "Compensation Request Phase",
+            "instructions": "You are now in the Compensation Request Phase. As an owner, review the project proposals and submit your compensation request using the following format: {'compensationRequests': [value]}. Submit your request before the timer ends.",
+            "deadline": `The submission deadline is ${deadlineTimestamp}.`
+        });
 
         console.log('PHASE 3: Compensation Request Phase has begun.');
     }
