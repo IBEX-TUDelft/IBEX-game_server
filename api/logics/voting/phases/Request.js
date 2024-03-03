@@ -44,7 +44,25 @@ class Phase3 extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
 
-        console.log('PHASE 3');
+        console.log('PHASE 3 - Compensation Requests');
+
+        // Broadcast instructions for submitting compensation requests
+        const instructionMessage = {
+            "type": "event",
+            "eventType": "action-required",
+            "data": {
+                "instructions": "You are now required to submit your compensation request. Please reply with your compensation request in the following format: {\"gameId\":15,\"type\":\"compensation-request\",\"compensationRequests\":[null,X]}, where X is your request amount as an integer.",
+                "format": "{\"gameId\":15,\"type\":\"compensation-request\",\"compensationRequests\":[null,X]}",
+                "actionRequired": "Immediate response required."
+            }
+        };
+
+        // Use your existing method to broadcast this event to all relevant players
+        const err = this.wss.broadcastEvent(this.game.id, "instruction", instructionMessage);
+
+        if (err != null) {
+            console.error(`Error broadcasting compensation request instructions: ${err}`);
+        }
     }
 
     getData() {

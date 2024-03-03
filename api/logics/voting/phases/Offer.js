@@ -47,7 +47,25 @@ class Phase4 extends JoinablePhase {
 
         const self = this;
 
-        console.log('PHASE 4');
+        console.log('PHASE 4 - Compensation Offers');
+
+        // Instructing the LLM agent to make a compensation offer now
+        const instructionMessage = {
+            "instructions": "You are required to submit a compensation offer now. Please reply with your compensation offer in the following format: {\"gameId\":15,\"type\":\"compensation-offer\",\"compensationOffers\":[null,X]}, where X is your offer amount as an integer.",
+            "format": "{\"gameId\":15,\"type\":\"compensation-offer\",\"compensationOffers\":[null,X]}",
+            "actionRequired": "Immediate response required."
+        };
+
+        // Broadcast the instruction message to the LLM agent
+        const broadcastErr = this.wss.broadcastEvent(
+            this.game.id,
+            "action-required",
+            instructionMessage
+        );
+
+        if (broadcastErr != null) {
+            console.error("Error broadcasting compensation offer instruction:", broadcastErr);
+        }
 
         const err = self.wss.broadcastEvent(
             self.game.id,

@@ -14,7 +14,7 @@ class End extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
 
-        console.log('PHASE 6');
+        console.log('PHASE 6 - End');
 
         const self = this;
 
