@@ -10,11 +10,11 @@ class Phase4 extends JoinablePhase {
         compensationOffers: []
     };
 
-    constructor (game, wss, number) {
-        super (game, wss, [{
+    constructor(game, wss, number) {
+        super(game, wss, [{
             "type": "compensation-offer",
             "role": 2,
-            "action": function(ws, message, player, caller) {
+            "action": function (ws, message, player, caller) {
                 console.log(message);
 
                 caller.results.compensationOffers = message.compensationOffers;
@@ -42,25 +42,19 @@ class Phase4 extends JoinablePhase {
         ], number);
     }
 
-    async onEnter () {
+    async onEnter() {
         await super.onEnter();
 
-        const self = this;
+        console.log('PHASE 4: Submit Compensation Offers');
 
-        console.log('PHASE 4');
-
-        const err = self.wss.broadcastEvent(
-            self.game.id,
-            "compensation-requests-received",
+        // Broadcasting the initiation of compensation offer phase with clear instructions
+        const err = this.wss.broadcastEvent(
+            this.game.id,
+            "phase-initiation",
             {
-                "compensationRequests": self.game.players.map(p => {
-                    return {
-                        "number": p.number,
-                        "compensationRequests": p.compensationRequests
-                    }
-                })
-            },
-            2
+                "phase": "Compensation Offer",
+                "instructions": "As a developer, submit your compensation offers now using the provided format."
+            }
         );
 
         if (err != null) {
@@ -76,40 +70,28 @@ class Phase4 extends JoinablePhase {
         }
     }
 
-    testComplete () {
+    testComplete() {
         return this.game.players.find(p => p.role === 2 && p.submittedCompensationOffers === true) != null;
     }
 
     async onExit() {
         await super.onExit();
-        
-        const self = this;
-
+        // When exiting, provide a summary or next steps
         this.game.players.filter(p => p.role === 3).forEach(p => {
-            let compensationOffers = self.results.compensationOffers;
+            // Assuming compensationOffers has been correctly populated
+            let compensationOffers = this.results.compensationOffers || [0, 0];
 
-            if (compensationOffers == null || compensationOffers.length === 0) {
-                compensationOffers = [0 ,0];
-            }
-
-            const err = self.wss.sendEvent(
-                self.game.id,
+            this.wss.sendEvent(
+                this.game.id,
                 p.number,
-                "compensation-offer-made",
+                "phase-completion",
                 {
+                    "phase": "Compensation Offer",
+                    "message": "Compensation offers submitted. Review the offers and prepare for the next phase.",
                     "compensationOffers": compensationOffers
                 }
             );
-
-            if (err != null) {
-                console.error(err);
-            }
         });
-
-        if (this.results.compensationOffers == null) {
-            this.results.compensationOffers = [];
-            this.game.compensationOffers = [];
-        }
     }
 }
 
