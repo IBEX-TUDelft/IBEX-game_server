@@ -34,7 +34,7 @@ class End extends JoinablePhase {
 
         console.log('COMPENSATION OFFERS');
         console.log(self.game.compensationOffers);
-        
+
         let compensationOffers = self.game.compensationOffers;
 
 
@@ -98,6 +98,24 @@ class End extends JoinablePhase {
                 console.error(err);
             }
         });
+
+        // Broadcasting the end of the voting phase with the results and next steps
+        this.wss.broadcastEvent(
+            this.game.id,
+            "end-phase-results",
+            {
+                "title": "End of Game Results",
+                "message": "The voting phase has concluded. Here are the final results:",
+                "standings": this.results.standings.map(s => ({
+                    ...s,
+                    "description": `Project ${s.id} received ${s.counter} votes. Compensation offered: ${s.compensation}.`
+                })),
+                "winningCondition": `Project ${this.results.winningCondition} is selected with the highest votes.`,
+                "nextSteps": "The game has now concluded. Thank you for participating. Await further instructions or the next game session."
+            }
+        );
+
+        console.log('Final results have been broadcasted.');
     }
 
     testComplete () {

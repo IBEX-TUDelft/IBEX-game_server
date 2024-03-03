@@ -39,10 +39,22 @@ class Vote extends JoinablePhase {
         ], number);
     }
 
-    async onEnter () {
-        await super.onEnter();
+    async onEnter() {
+        super.onEnter(); // No need to await if super.onEnter() is not async
 
-        console.log('VOTING PHASE');
+        // Broadcasting the start of the voting phase with clear instructions
+        this.wss.broadcastEvent(
+            this.game.id,
+            "phase-initiation",
+            {
+                "phase": "Voting",
+                "title": "Voting on Compensation Offers",
+                "instructions": "Review the compensation offers carefully. Vote on each offer based on your judgment. Your decision should reflect whether you accept or reject each compensation offer made by the developers. Please submit your vote using the provided interface.",
+                "details": "This phase is critical for determining the compensation outcomes. Your decisions will directly influence the final compensation agreements."
+            }
+        );
+
+        console.log('VOTING PHASE: Review and Vote on Compensation Offers');
     }
 
     getData() {
@@ -58,11 +70,22 @@ class Vote extends JoinablePhase {
     }
 
     async onExit() {
-        await super.onExit();
+        super.onExit(); // No need to await if super.onExit() is not async
 
+        // Providing feedback on the completion of voting and guiding to the next steps
+        this.wss.broadcastEvent(
+            this.game.id,
+            "phase-completion",
+            {
+                "phase": "Voting",
+                "message": "The Voting Phase is now complete. Thank you for your participation. The results are being processed, and the outcome will be announced shortly. Please wait for the next instructions."
+            }
+        );
+
+        // Ensure all players have their compensation decisions set
         this.game.players.forEach(p => {
             if (p.role === 3 && p.compensationDecisions == null) {
-                p.compensationDecisions = [];
+                p.compensationDecisions = []; // Consider whether a default decision is appropriate
             }
         });
     }
