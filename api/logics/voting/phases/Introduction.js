@@ -12,66 +12,65 @@ class Introduction extends JoinablePhase {
         ], number);
     }
 
-    async onEnter () {
+    async onEnter() {
         await super.onEnter();
+        console.log('PHASE 1 - Introduction');
 
-        console.log('PHASE 1');
+        // Initialize player roles, properties, and game boundaries.
+        this.initializePlayerRolesAndBoundaries();
 
-        const self = this;
+        // Broadcast roles and initial instructions to players.
+        this.broadcastPlayerRolesAndInstructions();
+    }
 
-        this.game.players.forEach(p => {
-            self.results.players.push({
-                "number": p.number,
-                "values": [...p.property.v]
-            });
-        });
-
-        self.game.boundaries = {};
-
+    initializePlayerRolesAndBoundaries() {
+        this.game.boundaries = {};
         ['developer', 'owner'].forEach(role => {
-            self.game.boundaries[role] = {};
-
-            self.game.conditions.forEach(condition => {
-                self.game.boundaries[role][condition.key] = {
-                    "low": self.game.parameters[`${role}_${condition.parameter}_low`],
-                    "high": self.game.parameters[`${role}_${condition.parameter}_high`]
-                }
+            this.game.boundaries[role] = {};
+            this.game.conditions.forEach(condition => {
+                this.game.boundaries[role][condition.key] = {
+                    "low": this.game.parameters[`${role}_${condition.parameter}_low`],
+                    "high": this.game.parameters[`${role}_${condition.parameter}_high`]
+                };
             });
         });
+    }
 
-        for (let i = 0; i < this.game.players.length; i++) {
-            const player = this.game.players[i];
-
-            const err = self.wss.sendEvent(self.game.id, player.number, "assign-role", {
-                "role": player.role,
-                "property": player.property,
-                "boundaries": self.game.boundaries,
-                "id": i,
-                "number": player.number,
-                "tag": player.tag,
-                "conditions": self.game.conditions
-            });
-
+    broadcastPlayerRolesAndInstructions() {
+        this.game.players.forEach((player, index) => {
+            const roleMessage = this.createRoleAssignmentMessage(player, index);
+            const err = this.wss.sendEvent(this.game.id, player.number, "assign-role", roleMessage);
             if (err != null) {
-                console.error(err);
-            }
-        }
-
-        const players = self.game.players.map( p => {
-            return {
-                "number": p.number,
-                "role": p.role,
-                "tag": p.tag
+                console.error(`Error sending role assignment to player ${player.number}:`, err);
             }
         });
 
-        self.wss.broadcastEvent(
-            self.game.id,
-            "players-known",
-            {
-                "players": players
-            }
-        );
+        const playersInfo = this.game.players.map(player => ({
+            "number": player.number,
+            "role": player.role,
+            "tag": player.tag
+        }));
+
+        this.wss.broadcastEvent(this.game.id, "players-known", {
+            "players": playersInfo,
+            "instructions": "Review your role and prepare for the first phase. Specific instructions will follow."
+        });
+    }
+
+    createRoleAssignmentMessage(player, index) {
+        return {
+            "role": player.role,
+            "property": player.property,
+            "boundaries": this.game.boundaries[player.role === 1 ? 'developer' : 'owner'],
+            "id": index,
+            "number": player.number,
+            "tag": player.tag,
+            "conditions": this.game.conditions.map(condition => ({
+                "key": condition.key,
+                "range": this.game.boundaries[player.role === 1 ? 'developer' : 'owner'][condition.key]
+            })),
+            "instructions": `You are a ${player.tag}. Please wait for further instructions on your next actions.`
+        };
     }
 
     getData() {
