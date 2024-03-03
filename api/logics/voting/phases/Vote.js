@@ -49,9 +49,12 @@ class Vote extends JoinablePhase {
             "type": "event",
             "eventType": "action-required",
             "data": {
-                "instructions": "It's time to make your compensation decision. Please submit your vote regarding the project proposal. To vote for the project, reply with '1'. To vote against the project, reply with '0'. Use the following format for your response: {\"gameId\":15,\"type\":\"compensation-decision\",\"compensationDecisions\":[1]} for voting in favor, or {\"gameId\":15,\"type\":\"compensation-decision\",\"compensationDecisions\":[0]} to vote against.",
+                "actionType": "SubmitCompensationDecision",
+                "instructions": "It's time to make your compensation decision. Please submit your vote regarding the project proposal. To vote for the project, reply with '1'. To vote against the project, reply with '0'.",
                 "format": "{\"gameId\":15,\"type\":\"compensation-decision\",\"compensationDecisions\":[X]}",
-                "actionRequired": "Please submit your decision promptly.",
+                "actionRequiredBy": "Please submit your decision promptly.",
+                "deadline": "The submission deadline is [timestamp].",
+                "additionalInfo": "This phase determines the project's fate based on your vote."
             }
         };
 

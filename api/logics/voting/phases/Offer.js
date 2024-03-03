@@ -51,9 +51,16 @@ class Phase4 extends JoinablePhase {
 
         // Instructing the LLM agent to make a compensation offer now
         const instructionMessage = {
-            "instructions": "You are required to submit a compensation offer now. Please reply with your compensation offer in the following format: {\"gameId\":15,\"type\":\"compensation-offer\",\"compensationOffers\":[null,X]}, where X is your offer amount as an integer.",
-            "format": "{\"gameId\":15,\"type\":\"compensation-offer\",\"compensationOffers\":[null,X]}",
-            "actionRequired": "Immediate response required."
+            "type": "event",
+            "eventType": "action-required",
+            "data": {
+                "actionType": "MakeCompensationOffer",
+                "instructions": "You are required to submit a compensation offer now. Please use the following format: {\"gameId\":15,\"type\":\"compensation-offer\",\"compensationOffers\":[null,X]}, where X is your offer amount as an integer.",
+                "format": "{\"gameId\":15,\"type\":\"compensation-offer\",\"compensationOffers\":[null,X]}",
+                "actionRequiredBy": "Immediate response required.",
+                "deadline": "The submission deadline is [timestamp].",
+                "additionalInfo": "Your offer will be considered in the negotiation with property owners."
+            }
         };
 
         // Broadcast the instruction message to the LLM agent

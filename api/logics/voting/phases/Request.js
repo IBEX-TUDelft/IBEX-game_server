@@ -51,9 +51,12 @@ class Phase3 extends JoinablePhase {
             "type": "event",
             "eventType": "action-required",
             "data": {
-                "instructions": "You are now required to submit your compensation request. Please reply with your compensation request in the following format: {\"gameId\":15,\"type\":\"compensation-request\",\"compensationRequests\":[null,X]}, where X is your request amount as an integer.",
+                "actionType": "SubmitCompensationRequest",
+                "instructions": "You are now required to submit your compensation request. Please use the following format: {\"gameId\":15,\"type\":\"compensation-request\",\"compensationRequests\":[null,X]}, where X is your request amount as an integer.",
                 "format": "{\"gameId\":15,\"type\":\"compensation-request\",\"compensationRequests\":[null,X]}",
-                "actionRequired": "Immediate response required."
+                "actionRequiredBy": "Immediate response required.",
+                "deadline": "The submission deadline is [timestamp].",
+                "additionalInfo": "Ensure your request is justified based on the project's impact."
             }
         };
 
