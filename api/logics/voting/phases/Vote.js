@@ -39,11 +39,30 @@ class Vote extends JoinablePhase {
         ], number);
     }
 
-    async onEnter () {
+    async onEnter() {
         await super.onEnter();
 
         console.log('VOTING PHASE');
+
+        // Broadcast instructions for making a compensation decision
+        const instructionMessage = {
+            "type": "event",
+            "eventType": "action-required",
+            "data": {
+                "instructions": "It's time to make your compensation decision. Please submit your vote regarding the project proposal. To vote for the project, reply with '1'. To vote against the project, reply with '0'. Use the following format for your response: {\"gameId\":15,\"type\":\"compensation-decision\",\"compensationDecisions\":[1]} for voting in favor, or {\"gameId\":15,\"type\":\"compensation-decision\",\"compensationDecisions\":[0]} to vote against.",
+                "format": "{\"gameId\":15,\"type\":\"compensation-decision\",\"compensationDecisions\":[X]}",
+                "actionRequired": "Please submit your decision promptly.",
+            }
+        };
+
+        // Use your existing method to broadcast this event to all relevant players
+        const err = this.wss.broadcastEvent(this.game.id, "instruction", instructionMessage);
+
+        if (err != null) {
+            console.error(`Error broadcasting voting instructions: ${err}`);
+        }
     }
+
 
     getData() {
         const self = this;
