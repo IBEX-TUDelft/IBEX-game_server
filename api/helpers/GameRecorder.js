@@ -1,4 +1,4 @@
-import { AppEvents, GameOver, PhaseTimeout, PlayerMessage } from "./AppEvents.js";
+import { AppEvents, GameBegins, GameOver, PhaseTimeout, PlayerMessage } from "./AppEvents.js";
 import gameParameterRepository from "../repositories/gameParameterRepository.js";
 
 import fs from 'fs';
@@ -7,6 +7,16 @@ export class GameRecorder {
     log = [];
 
     constructor(gameId) {
+        AppEvents.get(gameId).addListener(GameBegins, message => {
+            this.log.push({
+                "content": message,
+                "type": GameBegins,
+                "phase": message.phase,
+                "round": message.round,
+                "time": Date.now()
+            });
+        });
+
         AppEvents.get(gameId).addListener(PlayerMessage, message => {
             this.log.push(message);
         });
@@ -16,7 +26,8 @@ export class GameRecorder {
                 "content": message,
                 "type": PhaseTimeout,
                 "phase": message.phase,
-                "round": message.round
+                "round": message.round,
+                "time": Date.now()
             });
         });
 
@@ -33,6 +44,12 @@ export class GameRecorder {
                 "key": "simulation_reward_round",
                 "type": "number",
                 "value": rewardRound.toString()
+            });
+
+            parameters.push({
+                "key": "impersonation_mode_compatible",
+                "type": "boolean",
+                "value": true
             });
 
             const dataset = {

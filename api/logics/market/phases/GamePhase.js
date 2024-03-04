@@ -83,7 +83,8 @@ export default class GamePhase {
             "tag": player?.tag,
             "phase": this.game.currentRound.phase,
             "round": this.game.currentRound.number,
-            "type": "message"
+            "type": "message",
+            "time": Date.now()
         });
 
         const handler = this.handlers.find(m => m.type === message.type);

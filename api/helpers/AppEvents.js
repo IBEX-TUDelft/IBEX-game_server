@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
 
+const GameBegins = "game-begins";
 const PhaseBegins = "phase-begins";
 const PhaseTimeout = "phase-timeout";
 const PhaseComplete = "phase-complete";
@@ -97,6 +98,7 @@ class AppEvents extends EventEmitter {
 export {
     AppEvents,
     AppTimer,
+    GameBegins,
     PhaseBegins,
     PhaseTimeout,
     PhaseComplete,

@@ -6,7 +6,7 @@ import GameService from "../services/gameService.js";
 import Utils from '../helpers/utils.js';
 import WS from '../helpers/websocket.js';
 import fs from 'fs';
-import { AppEvents, GameOver, PhaseBegins, PhaseComplete, PhaseTimeout } from '../helpers/AppEvents.js';
+import { AppEvents, GameBegins, GameOver, PhaseBegins, PhaseComplete, PhaseTimeout } from '../helpers/AppEvents.js';
 import { GameRecorder } from '../helpers/GameRecorder.js';
 
 export default class {
@@ -246,6 +246,8 @@ export default class {
 
             await this.nextPhase();
         });
+
+        AppEvents.get(this.data.id).emit(GameBegins);
 
         await this.beginRound();
     }
