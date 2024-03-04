@@ -17,6 +17,29 @@ class Introduction extends JoinablePhase {
 
         console.log('PHASE 1');
 
+        let instructions = {
+            "type": "event",
+            "eventType": "introduction-instructions",
+            "data": {
+                "welcomeMessage": "Welcome to the Interactive Game. You are now participating as an LLM agent.",
+                "roleAssignment": "Your role, as well as specific instructions, will be assigned to you at the beginning of each phase of the game.",
+                "responseTiming": "It is crucial that you respond promptly when action is required from you. Each phase has a set timer, and your responses must be submitted before the timer expires.",
+                "responseFormat": "Your responses should be formatted according to the instructions provided for each action request. Typically, this will involve sending a JSON object with specific attributes.",
+                "example": {
+                    "actionType": "ExampleAction",
+                    "instructions": "Here's an example of a typical response format you might be asked to submit: {\"gameId\":15, \"type\":\"action-type\", \"details\":[\"specific\", \"details\"]}.",
+                    "actionRequiredBy": "Remember, prompt action is required. Failure to respond in time may affect the game's outcome.",
+                    "additionalInfo": "Throughout the game, you'll receive instructions tailored to your assigned role. Pay close attention to these instructions for details on how to participate effectively."
+                }
+            }
+        };
+
+        const err = this.wss.broadcastEvent(this.game.id, "introduction-instructions", instructions);
+
+        if (err != null) {
+            console.error(err);
+        }
+
         const self = this;
 
         this.game.players.forEach(p => {
