@@ -16,7 +16,7 @@ class Introduction extends JoinablePhase {
         await super.onEnter();
 
         console.log('PHASE 1');
-
+        
         let instructions = {
             "type": "event",
             "eventType": "introduction-instructions",
