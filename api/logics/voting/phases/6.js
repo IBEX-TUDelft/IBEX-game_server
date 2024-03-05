@@ -14,8 +14,6 @@ class End extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
 
-        console.log('PHASE 6');
-
         const self = this;
 
         let validVotes = 0;
@@ -31,9 +29,6 @@ class End extends JoinablePhase {
         console.log(`Valid votes: ${validVotes}, Quorum: ${quorum}`);
 
         const developer = self.game.players.find(p => p.role === 2);
-
-        console.log('COMPENSATION OFFERS');
-        console.log(self.game.compensationOffers);
         
         let compensationOffers = self.game.compensationOffers;
 
@@ -78,8 +73,6 @@ class End extends JoinablePhase {
 
         self.game.winningCondition = winner.id;
         self.results.winningCondition = winner.id;
-
-        console.log(this.results);
 
         self.game.players.forEach(player => {
             const err = self.wss.sendEvent(

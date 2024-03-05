@@ -13,8 +13,6 @@ class Vote extends JoinablePhase {
             "type": "compensation-decision",
             "role": null,
             "action": function(ws, message, player, caller) {
-                console.log(message);
-
                 player.compensationDecisions = message.compensationDecisions;
                 caller.results.compensationDecisions.push({
                     "number": player.number,
@@ -41,8 +39,6 @@ class Vote extends JoinablePhase {
 
     async onEnter () {
         await super.onEnter();
-
-        console.log('VOTING PHASE');
     }
 
     getData() {

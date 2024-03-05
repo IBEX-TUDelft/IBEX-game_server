@@ -224,9 +224,6 @@ export default class {
         }
 
         AppEvents.get(this.data.id).addListener(PhaseTimeout, (data) => {
-            console.log(`Event ${PhaseTimeout} received with args:`);
-            console.log(data);
-
             if (data != null && data.phase != null && data.phase != this.data.currentRound.phase) {
                 console.log(`In phase ${this.data.currentRound.phase}, gotten a ${PhaseTimeout} event from a different phase: ${data.phase}`)
                 return;
@@ -236,9 +233,6 @@ export default class {
         });
 
         AppEvents.get(this.data.id).addListener(PhaseComplete, async (data) => {
-            console.log(`Event ${PhaseComplete} received with args:`);
-            console.log(data);
-
             if (data != null && data.number != null && data.number != this.data.currentRound.phase) {
                 console.log(`In phase ${this.data.currentRound.phase}, gotten a ${PhaseComplete} event from a different phase: ${data.number}`)
                 return;
@@ -261,9 +255,6 @@ export default class {
 
         this.data.results[this.data.results.length - 1].phase.push(this.data.currentPhase.results);
 
-        console.log(`Phase ${this.data.currentRound.phase} results:`);
-        console.log(this.data.currentPhase.results);
-
         await GameService.addPhaseData(
             this.data.currentRound.id,
             this.data.currentRound.phase,
@@ -275,8 +266,6 @@ export default class {
                 "round": this.data.currentRound.number
             });
             
-            console.log('Beginning a new round');
-
             await this.beginRound();
             
             return;
@@ -284,15 +273,11 @@ export default class {
 
         this.data.currentRound.phase += 1;
 
-        console.log(`Preparing phase ${this.data.currentRound.phase}`);
-
         const Phase = this.phases[this.data.currentRound.phase];
 
         this.data.currentPhase = Phase.create(this.data, this.wss, this.data.currentRound.phase);
         
         await this.data.currentPhase.onEnter();
-
-        console.log(`Phase ${this.data.currentRound.phase} of round ${this.data.currentRound.number} complete? ${this.data.currentPhase.testComplete()}`)
 
         await GameRepository.saveData(this.data.id, this.data);
 
@@ -483,14 +468,10 @@ export default class {
 
                     const coefficient = this.data.parameters.signal_low + delta;
 
-                    console.log(`delta1 = ${delta}, coefficient1 = ${coefficient}`);
-
                     const normalizedTaxRate = this.data.parameters.tax_rate_final / 100;
 
                     player.S[j] = Math.round(V[j] * coefficient * normalizedTaxRate / 100);
                 }
-
-                console.log(`${player.name} S = ${player.S}`);
             }
         }
 
@@ -514,11 +495,7 @@ export default class {
             "gameId": data.id
         }
 
-        console.log('Data saved');
-
         this.data.currentPhase = this.phases[0].create(this.data, this.wss, 0);
-
-        console.log('Phase created');
 
         let err = this.wss.broadcastEvent(this.data.id, "phase-transition", {
             "round": this.data.currentRound.number,
@@ -530,8 +507,6 @@ export default class {
         }
 
         await this.data.currentPhase.onEnter();
-
-        console.log('Should have entered the new phase');
 
         await GameRepository.saveData(data.id, data);
 

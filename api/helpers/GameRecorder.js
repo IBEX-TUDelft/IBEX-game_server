@@ -7,12 +7,12 @@ export class GameRecorder {
     log = [];
 
     constructor(gameId) {
-        AppEvents.get(gameId).addListener(GameBegins, message => {
+        AppEvents.get(gameId).addListener(GameBegins, () => {
             this.log.push({
-                "content": message,
+                "content": {},
                 "type": GameBegins,
-                "phase": message.phase,
-                "round": message.round,
+                "phase": 0,
+                "round": 1,
                 "time": Date.now()
             });
         });
@@ -49,7 +49,7 @@ export class GameRecorder {
             parameters.push({
                 "key": "impersonation_mode_compatible",
                 "type": "boolean",
-                "value": true
+                "value": "true"
             });
 
             const dataset = {

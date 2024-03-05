@@ -15,8 +15,6 @@ class Introduction extends JoinablePhase {
     async onEnter () {
         await super.onEnter();
 
-        console.log('PHASE 1');
-
         const self = this;
 
         this.game.players.forEach(p => {

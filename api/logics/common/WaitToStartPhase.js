@@ -8,8 +8,6 @@ class WaitToStartPhase extends JoinablePhase {
             "role": null,
             "action": function(ws, message, player, caller) {
                 player.ready = true;
-
-                console.log('REALLY HERE');
                 
                 let err = wss.sendEvent(
                     game.id,

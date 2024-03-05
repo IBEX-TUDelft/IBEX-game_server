@@ -15,8 +15,6 @@ class Phase4 extends JoinablePhase {
             "type": "compensation-offer",
             "role": 2,
             "action": function(ws, message, player, caller) {
-                console.log(message);
-
                 caller.results.compensationOffers = message.compensationOffers;
                 game.compensationOffers = message.compensationOffers;
 
@@ -46,8 +44,6 @@ class Phase4 extends JoinablePhase {
         await super.onEnter();
 
         const self = this;
-
-        console.log('PHASE 4');
 
         const err = self.wss.broadcastEvent(
             self.game.id,

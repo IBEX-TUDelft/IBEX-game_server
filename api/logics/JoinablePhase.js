@@ -18,8 +18,6 @@ export default class JoinablePhase extends Phase {
         
         const timer = this.game.parameters[`timer_phase_${this.number}`];
 
-        console.log(`Timer: ${timer}s type = ${typeof timer}`);
-
         if (timer != null && typeof timer === 'number' && timer > 0) {
             this.setTimer(timer * 1000, timer * 1000);
             AppEvents.get(this.game.id).phaseTimeout(timer * 1000, {

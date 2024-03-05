@@ -135,8 +135,6 @@ export default {
                 this.games.push(game);
 
                 await game.start(this.wssManager);
-
-                console.log(gameData);
                 
                 return null; //Success
             },

@@ -14,8 +14,6 @@ class Chat extends JoinablePhase {
             "type": "chat-with-players",
             "role": null,
             "action": function(ws, message, player, caller) {
-                console.log(message);
-
                 if (message.to == null || message.to.length === 0) {
                     WS.error(ws, `Game ${message.gameId}: no recipient specified to this message: ${message.text} from ${player.tag}`);
                     return;
@@ -61,10 +59,6 @@ class Chat extends JoinablePhase {
                     "to": message.to,
                     "text": message.text.replaceAll("'", "&lsquo;")
                 });
-
-                console.log(caller.results.chatLog[caller.results.chatLog.length - 1]);
-                console.log(caller.results.chatLog);
-                console.log(JSON.stringify(caller.results.chatLog));
             }
         }], [
             'Click on a plot to chat with its owner'
@@ -77,8 +71,6 @@ class Chat extends JoinablePhase {
         //const visibleTimeout = parseInt(process.env.VOTING_CHAT_FIXED_DURATION);
         const visibleTimeout = this.game.parameters.seconds_for_deliberation;
         const totalTimeout = (visibleTimeout + Math.floor(Math.random() * parseInt(process.env.VOTING_CHAT_MAX_EXTRA_TIME))) * 1000;
-
-        //console.log(`Timer: ${process.env.VOTING_CHAT_FIXED_DURATION}s visible, ${process.env.VOTING_CHAT_MAX_EXTRA_TIME}s extra. Total: ${totalTimeout}ms`);
 
         //this.setTimer(visibleTimeout * 1000, totalTimeout);
     }

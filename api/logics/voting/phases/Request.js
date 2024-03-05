@@ -13,8 +13,6 @@ class Phase3 extends JoinablePhase {
             "type": "compensation-request",
             "role": null,
             "action": function(ws, message, player, caller) {
-                console.log(message);
-
                 player.compensationRequests = message.compensationRequests;
                 caller.results.compensationRequests.push({
                     "number": player.number,
@@ -43,8 +41,6 @@ class Phase3 extends JoinablePhase {
 
     async onEnter () {
         await super.onEnter();
-
-        console.log('PHASE 3');
     }
 
     getData() {

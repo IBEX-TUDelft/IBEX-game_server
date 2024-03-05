@@ -41,8 +41,6 @@ export default class JoinHandler extends MessageHandler {
             "ruleset": game.type
         });
 
-        console.log(`ROUND NUMBER ${phase.number}`);
-
         if (phase.number === 0) {
             const err = wss.sendEvent (
                 game.id,
@@ -54,7 +52,7 @@ export default class JoinHandler extends MessageHandler {
             );
 
             if (err) {
-                console.error(err);
+                console.error(`While sending phase intructions (player ${player.number}: ${player.tag}, game ${game.id}) - `, err);
             }
         }
 

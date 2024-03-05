@@ -5,7 +5,7 @@ import WssManagement from '../services/wssGameService.js';
 import GameManagement from '../services/gameManager.js';
 import gameRepository from '../repositories/gameRepository.js';
 import fs from 'fs';
-import { AppEvents, PhaseBegins, PhaseComplete } from '../helpers/AppEvents.js';
+import { AppEvents, PhaseBegins, PhaseComplete, PlayerMessage } from '../helpers/AppEvents.js';
 import { v4 as uuidv4 } from 'uuid';
 import { 
     MarketPlayer,
@@ -216,6 +216,8 @@ export default {
 
                 console.log(`Done. Starting the game ...`);
 
+                wssManager.startGame(gameId);
+                
                 const error = await gameManager.startGame(gameId, false);
 
                 console.log(`Done.`);
@@ -301,12 +303,11 @@ export default {
                     }
 
                     let ws = {
-                        "send": function() {}
+                        "send": function() {},
+                        "on": function() {}
                     };
 
                     const player = game.data.players.find(p => p.number === event.number);
-
-                    console.log(game.data.players);
 
                     if (event.number != null) {
                         ws.player = {
@@ -739,6 +740,207 @@ export default {
             await gameRepository.restore(game.id, game.title, game, game.endedAt);
 
             Controller.handleSuccess(res, {}, `Game with id ${game.id} restored.`);
+        });
+
+        Controller.addGetRoute(app, '/api/v1/impersonation/play', true, async (req, res) => {
+            const name = req.query.name;
+            const title = req.query.title;
+            const impersonatedId = parseInt(req.query.impersonated_id);
+
+            if (impersonatedId == null || isNaN(impersonatedId)) {
+                return Controller.handleGenericError(res, `Could not run in impersionation mode: parameter impersonated_id not set`, 400);
+            }
+
+            let dataset;
+
+            try {
+                console.log(`Reading dataset ${name} ...`);
+
+                const raw = fs.readFileSync(`../records/${name}`);
+
+                console.log(`Done. Parsing its content ...`);
+
+                dataset = JSON.parse(raw);
+
+                let parameters = {};
+
+                dataset.parameters.forEach(p => {
+                    switch(p.type) {
+                        case 'boolean':
+                            parameters[p.key] = !!p.value;
+                            break;
+                        case 'float':
+                            parameters[p.key] = parseFloat(p.value);
+                            break;
+                        case 'number':
+                            parameters[p.key] = parseInt(p.value);
+                            break;
+                        default:
+                            parameters[p.key] = p.value;
+                    }
+                });
+
+                if (!parameters.impersonation_mode_compatible) {
+                    return Controller.handleGenericError(res, `Dataset ${name} is an old one and doesn't support impersonation`, 400);
+                }
+
+                const totalPlayers = parameters.speculators_count + parameters.owners_count + parameters.developers_count;
+
+                if (impersonatedId > totalPlayers) {
+                    return Controller.handleGenericError(res, `Dataset ${name} allows ${totalPlayers} players only. You can't impersonate player ${impersonatedId}, it doesn't  exist. Choose 1-${totalPlayers}`, 400);
+                }
+
+                console.log(`Done. Checking if there is data ...`);
+
+                if (dataset == null) {
+                    throw new Error(`Simulation dataset ${name} is empty`)
+                }
+
+                console.log(`Done. Creating the game ...`);
+
+                const gameId = await gameService.createForDataset(dataset, title);
+
+                console.log(`Done. Starting the game ...`);
+
+                wssManager.startGame(gameId);
+
+                const error = await gameManager.startGame(gameId, false);
+
+                console.log(`Done.`);
+
+                if (error != null) {
+                    throw new Error(`Could not run impersonation dataset ${name}: ${error}`);
+                }
+
+                const game = gameManager.games.find(g => g.data.id === gameId);
+
+                if (game == null) {
+                    throw(`Could not find ${gameId} in the game manager`);
+                }
+                
+                let j = 0;
+                
+                function gameIsAhead(gameRound, event) {
+                    if (gameRound.number < event.round) {
+                        return false;
+                    }
+
+                    if (gameRound.number > event.round) {
+                        return true;
+                    }
+
+                    return gameRound.phase > event.phase;
+                }
+
+                function gameIsBehind(gameRound, event) {
+                    if (gameRound.number < event.round) {
+                        return true;
+                    }
+
+                    if (gameRound.number > event.round) {
+                        return false;
+                    }
+
+                    return gameRound.phase < event.phase;
+                }
+
+                const beginLogIndex = dataset.log.findIndex(l => l.type === 'game-begins');
+                const beginLog = dataset.log[beginLogIndex];
+                dataset.log.splice(beginLogIndex, 1);
+
+                const log = dataset.log.filter(l => l.number != impersonatedId);
+
+                let startTime = beginLog.time;
+
+                while (j < log.length) {
+                    const event = log[j];
+
+                    if (gameIsAhead(game.data.currentRound, event)) {
+                        continue;
+                    }
+
+                    if (gameIsBehind(game.data.currentRound, event)) {
+                        console.log(`Event for ${event.round}:${event.phase}, waiting for the game (${game.data.currentRound.number}:${game.data.currentRound.phase}) to move to that phase`);
+
+                        await new Promise(resolve => {
+                            const listener = ({phase, round}) => {
+                                console.log(`Game moved to phase ${round}:${phase}`);
+    
+                                if (!gameIsBehind(game.data.currentRound, event)) {
+                                    AppEvents.get(gameId).removeListener(PhaseBegins, listener);
+                                    resolve();
+                                } else {
+                                    console.log(`Waiting for ${event.round}:${event.phase},but still in (${game.data.currentRound.number}:${game.data.currentRound.phase}). Exiting ...`);
+                                }
+                            };
+
+                            AppEvents.get(gameId).addListener(PhaseBegins, listener)
+                        });
+                    }
+
+                    if (event.content != null) {
+                        event.content.gameId = gameId;
+                    }
+
+                    let waitTime = event.time - startTime;
+
+                    if (waitTime < 0) {
+                        console.log(`WARNING - Detected wait time less than 0. it means that an event A was recorded after B even tough it happened earlier`);
+                        console.log(event);
+
+                        waitTime = 0;
+                    }
+
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
+
+                    startTime = event.time;
+
+                    console.log(`Playing event ${j}: ${event.type} for phase ${event.phase} in phase ${game.data.currentRound.phase}`);
+
+                    if (event.type === "phase-timeout") {
+                        j++;
+
+                        continue;
+                    }
+
+                    let ws = {
+                        "send": function() {},
+                        "on": function() {}
+                    };
+
+                    const player = game.data.players.find(p => p.number === event.number);
+
+                    if (event.number != null) {
+                        ws.player = {
+                            "number": event.number,
+                            "role": player.role
+                        }
+                    }
+
+                    await gameManager.handleMessage(ws, event.content);
+
+                    j++;
+
+                    if (event.content?.type === 'join' && game.data.assignedPlayers === impersonatedId - 1) {
+                        await new Promise(resolve => {
+                            AppEvents.get(gameId).addListener(PlayerMessage, message => {
+                                if (event.content?.type === 'join' && game.data.assignedPlayers === impersonatedId - 1) {
+                                    resolve();
+                                }
+                            });
+                        })
+                    }
+                }
+
+                Controller.handleSuccess(res, {
+                    "id" : gameId,
+                    "type": game.data.type.toLowerCase()
+                }, 'Game created and run with your simulation dataset');
+            } catch (e) {
+                console.error(`Could not run simulation dataset ${name}`, e);
+                Controller.handleGenericError(res, `Could not run simulation dataset ${name}: ${e.message}`, 500);
+                return;
+            }
         });
     }
 };
