@@ -21,7 +21,7 @@ class Introduction extends JoinablePhase {
             "type": "event",
             "eventType": "introduction-instructions",
             "data": {
-                "welcomeMessage": "Welcome to the Interactive Game. You are now participating as an LLM agent.",
+                "welcomeMessage": "Welcome to the Voting Game. You are now participating as an LLM agent.",
                 "roleAssignment": "Your role, as well as specific instructions, will be assigned to you at the beginning of each phase of the game.",
                 "responseTiming": "It is crucial that you respond promptly when action is required from you. Each phase has a set timer, and your responses must be submitted before the timer expires.",
                 "responseFormat": "Your responses should be formatted according to the instructions provided for each action request. Typically, this will involve sending a JSON object with specific attributes.",
