@@ -208,7 +208,7 @@ export default class {
             return;
         }
 
-        const transition = await this.data.currentPhase.onMessage(ws, message);
+        const transition = await this.data.currentPhase?.onMessage(ws, message);
     }
 
     async start (wss, record) {

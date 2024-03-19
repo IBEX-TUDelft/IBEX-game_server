@@ -37,14 +37,8 @@ export default {
                     ws.on('message', function (data) {
                         let message;
 
-                        console.log('Incoming WSS message');
-
                         try {
-                            console.log(data.toString());
-
                             message = JSON.parse(data.toString());
-
-                            console.log(message);
                         } catch(e) {
                             WS.send(ws, {
                                 "error": e.message
@@ -143,16 +137,11 @@ export default {
                     return `Game ${id} not found`;
                 }
 
-                console.log(`Game ${id} found`);
-
                 ws.player = {
                     gameId: id,
                     number: number,
                     role: role
                 }
-
-                console.log('Players in before');
-                console.log(game.players.map(w => w.player.number));
 
                 const index = game.players.findIndex(w => w.player.number === number);
 
@@ -162,9 +151,6 @@ export default {
                 }
 
                 game.players.push(ws);
-
-                console.log('Players in after');
-                console.log(game.players.map(w => w.player.number));
 
                 ws.on('close', function (code, reason) {
                     console.log(`Player ${ws.player.number} disconnected with code ${code}: ${reason}`)
@@ -199,9 +185,6 @@ export default {
                     players: [],
                     watchers: []
                 });
-
-                console.log('WS manager After starting a game:');
-                console.log(this.games);
             },
             deleteGame: async function (id) {
                 const game = this.games.find(g => g.id === id);
@@ -242,7 +225,7 @@ export default {
                         if (err != null) {
                             reject(err);
                         } else {
-                            console.log('WSS server losed.');
+                            console.log('WSS server closed.');
                             resolve();
                         }
                     });
