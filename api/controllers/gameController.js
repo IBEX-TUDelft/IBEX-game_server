@@ -818,6 +818,11 @@ export default {
                     throw(`Could not find ${gameId} in the game manager`);
                 }
                 
+                Controller.handleSuccess(res, {
+                    "id" : gameId,
+                    "type": game.data.type.toLowerCase()
+                }, 'Game created and run with your simulation dataset');
+
                 let j = 0;
                 
                 function gameIsAhead(gameRound, event) {
@@ -931,11 +936,6 @@ export default {
                         })
                     }
                 }
-
-                Controller.handleSuccess(res, {
-                    "id" : gameId,
-                    "type": game.data.type.toLowerCase()
-                }, 'Game created and run with your simulation dataset');
             } catch (e) {
                 console.error(`Could not run simulation dataset ${name}`, e);
                 Controller.handleGenericError(res, `Could not run simulation dataset ${name}: ${e.message}`, 500);
