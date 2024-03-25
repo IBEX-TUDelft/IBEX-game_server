@@ -817,11 +817,6 @@ export default {
                 if (game == null) {
                     throw(`Could not find ${gameId} in the game manager`);
                 }
-                
-                Controller.handleSuccess(res, {
-                    "id" : gameId,
-                    "type": game.data.type.toLowerCase()
-                }, 'Game created and run with your simulation dataset');
 
                 let j = 0;
                 
@@ -927,6 +922,11 @@ export default {
                     j++;
 
                     if (event.content?.type === 'join' && game.data.assignedPlayers === impersonatedId - 1) {
+                        Controller.handleSuccess(res, {
+                            "id" : gameId,
+                            "type": game.data.type.toLowerCase()
+                        }, 'Game created and run with your simulation dataset. You may now join.');
+
                         await new Promise(resolve => {
                             AppEvents.get(gameId).addListener(PlayerMessage, message => {
                                 if (event.content?.type === 'join' && game.data.assignedPlayers === impersonatedId - 1) {
