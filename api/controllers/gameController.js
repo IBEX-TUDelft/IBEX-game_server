@@ -921,7 +921,7 @@ export default {
 
                     startTime = event.time;
 
-                    console.log(`Playing event ${j}: ${event.type} for phase ${event.phase} in phase ${game.data.currentRound.phase}`);
+                    console.log(`Playing event ${j}: ${event.type} for phase ${event.phase} in phase ${game.data.currentRound.phase} at speed ${game.data.speed}`);
 
                     if (event.type === "phase-timeout") {
                         j++;
