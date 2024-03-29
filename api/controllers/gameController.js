@@ -742,6 +742,30 @@ export default {
             Controller.handleSuccess(res, {}, `Game with id ${game.id} restored.`);
         });
 
+        Controller.addGetRoute(app, '/api/v1/impersonation/set-speed', true, async (req, res) => {
+            const gameId = parseInt(req.query.id);
+            const speed = parseInt(req.query.speed);
+
+            if (speed < 1 || speed > 100) {
+                return Controller.handleGenericError(res, `Could not modify the game speed, it should be an integer in the interval 1-100. It was ${speed}`, 400);
+            }
+
+            const game = gameManager.games.find(g => g.data.id === gameId);
+
+            if (game == null) {
+                console.log(gameManager.games);
+                return Controller.handleGenericError(res, `Game with id ${gameId} not found`, 400);
+            }
+
+            game.data.speed = speed;
+
+            Controller.handleSuccess(res, {
+                "id" : gameId,
+                "type": game.data.type.toLowerCase(),
+                "speed": speed
+            }, `Speed changed to ${speed}`);
+        });
+
         Controller.addGetRoute(app, '/api/v1/impersonation/play', true, async (req, res) => {
             const name = req.query.name;
             const title = req.query.title;
@@ -852,6 +876,8 @@ export default {
 
                 let startTime = beginLog.time;
 
+                game.data.speed = 1;
+
                 while (j < log.length) {
                     const event = log[j];
 
@@ -882,7 +908,7 @@ export default {
                         event.content.gameId = gameId;
                     }
 
-                    let waitTime = event.time - startTime;
+                    let waitTime = (event.time - startTime) / game.data.speed;
 
                     if (waitTime < 0) {
                         console.log(`WARNING - Detected wait time less than 0. it means that an event A was recorded after B even tough it happened earlier`);
