@@ -39,7 +39,9 @@ export default {
 
                         try {
                             message = JSON.parse(data.toString());
+                            Utils.debug(message);
                         } catch(e) {
+                            console.error(`Error caused by the following message: ${data.toString()}`, e);
                             WS.send(ws, {
                                 "error": e.message
                             });
