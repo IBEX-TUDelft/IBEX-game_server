@@ -765,11 +765,11 @@
                             xlsRow.push(self.wallets[roundIdx].find(w => w.number === player.number).wallet[c.id].balance);
                             xlsRow.push(self.wallets[roundIdx].find(w => w.number === player.number).wallet[c.id].shares);
 
+                            xlsRow.push(self.rounds[roundIdx].phase[6].finalPrices[c.id]);
+
                             if (c.id === winningCondition) {
-                                xlsRow.push(self.rounds[roundIdx].phase[6].finalPrices[c.id]);
-                                xlsRow.push(self.rounds[roundIdx].phase[8].finalPrice); //TODO: should be the final price per condition
+                                xlsRow.push(self.rounds[roundIdx].phase[8].finalPrice);
                             } else {
-                                xlsRow.push(null);
                                 xlsRow.push(null);
                             }
                             
