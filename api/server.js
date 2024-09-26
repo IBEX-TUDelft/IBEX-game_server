@@ -104,6 +104,8 @@ app.listen(port, () => {
     console.log(`Server listening on the port::${port}`);
 });
 
+Utils.debug('Debug mode is on');
+
 // get the unhandled rejection and throw it to another fallback handler we already have.
 process.on('unhandledRejection', (reason, promise) => {
   throw reason;

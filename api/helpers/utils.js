@@ -47,9 +47,16 @@ const hashPassword = (password) => {
 	return hash
 }
 
-const debug = (message) => {
+const debug = (message, data) => {
 	if (process.env.DEBUG_MODE === 'yes') {
+		console.log('========WATCH!========');
 		console.log(message);
+		console.log('======================');
+		if (data != null) {
+			console.log('----------------------');
+			console.log(data);
+			console.log('----------------------');
+		}
 	}
 }
 

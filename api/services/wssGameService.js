@@ -69,6 +69,7 @@ export default {
                 const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
+                    Utils.debug('Game id null, broadcastEvent', data);
                     return `Game ${id} not found`;
                 }
 
@@ -86,6 +87,7 @@ export default {
                 const game = this.games.find(g => g.id === gameId);
 
                 if (game == null) {
+                    Utils.debug('Game id null, sendEvent', data);
                     return `Game ${gameId} not found`;
                 }
 
@@ -117,6 +119,7 @@ export default {
                 const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
+                    Utils.debug('Game id null, broadcastMessage', data);
                     return `Game ${id} not found`;
                 }
 
@@ -136,6 +139,7 @@ export default {
                 const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
+                    Utils.debug('Game id null, joinGame', data);
                     return `Game ${id} not found`;
                 }
 
@@ -163,6 +167,7 @@ export default {
                 const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
+                    Utils.debug('Game id null, watchGame', data);
                     return `Game ${id} not found`;
                 }
 

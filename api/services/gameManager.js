@@ -6,6 +6,7 @@ import Harberger from '../logics/harberger/Harberger.js';
 import Futarchy from '../logics/futarchy/Futarchy.js';
 import Voting from '../logics/voting/Voting.js';
 import Market from '../logics/market/Market.js';
+import Utils from '../helpers/utils.js';
 
 export default {
     create() {
@@ -24,6 +25,7 @@ export default {
                 const gameRecord = await gameRepository.findOne(gameId);
 
                 if (gameRecord == null) {
+                    console.log(`Could not start game ${gameId}: not found`);
                     return `Game ${gameId} not found`;
                 }
 
@@ -147,6 +149,7 @@ export default {
                 const game = self.games.find(g => g.data.id  === message.gameId);
 
                 if (game == null) {
+                    Utils.debug(`Game ${message.gameId} not found. Id null in message.gameId`, message);
                     WS.send(ws, {
                         "error": `Game ${message.gameId} not found`
                     });
