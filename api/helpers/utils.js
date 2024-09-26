@@ -47,7 +47,7 @@ const hashPassword = (password) => {
 	return hash
 }
 
-debug: (message) => {
+const debug = (message) => {
 	if (process.env.DEBUG_MODE === 'yes') {
 		console.log(message);
 	}
