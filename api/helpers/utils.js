@@ -47,7 +47,12 @@ const hashPassword = (password) => {
 	return hash
 }
 
+debug: (message) => {
+	if (process.env.DEBUG_MODE === 'yes') {
+		console.log(message);
+	}
+}
 
 export default {
-	hashPassword, verifyJWT, generateJWT
+	hashPassword, verifyJWT, generateJWT, debug
 }
