@@ -42,7 +42,6 @@ Should be "message".
 An event automatically triggered by the server when a phase's timeout is triggered.
 
 ```
-{
     "content": {
         "phase": 1,
         "round": 0
@@ -69,7 +68,6 @@ An event triggered by a player joining the game. A player may rejoin the game la
 The game waits until all players declare themselves ready.
 
 ```
-{
     "content": {
         "gameId": 149,
         "type": "player-is-ready"
