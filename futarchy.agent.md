@@ -134,36 +134,6 @@ During the market phase it is possible to post and cancel orders.
 
 In **Phase 6**, the **market phase**, you can add orders (bids or asks) and cancel them. Here's how you would include an additional example of an order being added, like a bid in the game:
 
-### Add Order (Bid)
-
-```
-{
-    "content": {
-        "order": {
-            "id": 2,
-            "sender": 2,
-            "price": 5,
-            "quantity": 1,
-            "type": "bid",
-            "condition": 1
-        },
-        "gameId": 888,
-        "type": "add-order"
-    }
-}
-```
-
-### Explanation:
-
-- **id**: This is the unique identifier for the order.
-- **sender**: Indicates the player submitting the order (in this case, player 2, who is a Developer in the example role list).
-- **price**: The price offered for the bid (set to 5).
-- **quantity**: Always set to 1, as only one share can be traded at a time.
-- **type**: "bid" signifies that this is an attempt to buy.
-- **condition**: 1 represents the development of the project (as opposed to the status quo, which would be 0).
-
-This is part of how players interact with the market during the game, posting their orders to buy or sell based on the two possible conditions.
-
 ### Post Order
 
 ```
