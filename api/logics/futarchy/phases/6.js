@@ -119,6 +119,17 @@ class Phase6 extends JoinablePhase {
                         counterparts = phase.orders[condition].filter(o => o.type == "bid" && o.sender != player.number);
                     } else if (order.type === 'bid') {
                         counterparts = phase.orders[condition].filter(o => o.type == "ask" && o.sender != player.number);
+                    } else {
+                        wss.sendEvent(
+                            game.id,
+                            player.number,
+                            'order-refused',
+                            {
+                                "message": `Order type must be one of ask|bid. it was: ${order.type}`
+                            }
+                        );
+
+                        return;
                     }
 
                     if (counterparts.length === 0) {

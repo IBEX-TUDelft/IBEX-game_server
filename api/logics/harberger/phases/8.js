@@ -31,7 +31,7 @@ class Phase8 extends JoinablePhase {
 
                 const winningConditionSnipes = message.snipe[game.winningCondition];
 
-                console.log('Winning condition snipes: ' + winningConditionSnipes.length);
+                console.log('Winning condition snipes: ' + winningConditionSnipes?.length);
 
                 if (winningConditionSnipes != null && winningConditionSnipes.length > 0) {
                     winningConditionSnipes.forEach(id => {

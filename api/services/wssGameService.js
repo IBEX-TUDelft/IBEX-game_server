@@ -119,7 +119,7 @@ export default {
                 const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
-                    Utils.debug('Game id null, broadcastMessage', data);
+                    Utils.debug('Game id null, broadcastMessage', {});
                     return `Game ${id} not found`;
                 }
 

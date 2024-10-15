@@ -166,22 +166,15 @@ During the market phase it is possible to post and cancel orders.
 
 ```
 {
-    "content": {
-        "order": {
-            "price": 3560,
-            "quantity": 1,
-            "condition": 0,
-            "type": "ask",
-            "now": false
-        },
-        "gameId": 888,
-        "type": "post-order"
-    },
-    "number": 5,
-    "tag": "Speculator 2",
-    "phase": 6,
-    "round": 1,
-    "type": "message"
+    gameId: 53,
+    type: 'post-order',
+    order: {
+        price: 11000,
+        quantity: 1,
+        condition: 0,
+        type: 'bid',
+        now: true
+    }
 }
 ```
 
@@ -203,19 +196,12 @@ Each submitted order, if accepted, receives an id, which is made public through 
 
 ```
 {
-    "content": {
-        "order": {
-            "id": 4,
-            "condition": 0
-        },
-        "gameId": 261,
-        "type": "cancel-order"
+    "order": {
+        "id": 4,
+        "condition": 0
     },
-    "number": 6,
-    "tag": "Owner 5",
-    "phase": 6,
-    "round": 0,
-    "type": "message"
+    "gameId": 261,
+    "type": "cancel-order"
 }
 ```
 
