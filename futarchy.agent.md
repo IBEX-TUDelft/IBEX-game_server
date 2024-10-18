@@ -1,265 +1,202 @@
 # Harberger
 
-This is a list of messages that can be sent by users, it doesn't include the messages that are received from the server.
+This is a list of messages that can be sent by users. It doesn't include the messages that are received from the server.
 
-## Common fields
+## Common Fields
 
-Notice that outside of the content, which is phase specific and will be interpreted by the phase handler, there is a number of items that are (optionally) present in every message and have always the same meaning
+Each message has a set of common fields that are either optional or required, and they always have the same meaning across phases. Below are the descriptions and the expected types for these fields.
 
-### Phase
+### Phase (Integer)
+The phase number to which the message belongs. Phases are represented by integers (e.g., `0`, `1`, `2`).
 
-An integer showing to which phase the message belongs
+### Round (Integer)
+The current round number. This is an integer (e.g., `0`, `1`, `2`).
 
-### Round
-
-The current round
-
-### Number
-
-The player number. It is often used as player identifier and in harberger, futarchy and voting it is univocally associated with the role
-
+### Number (Integer)
+The player number is used to uniquely identify a player. This is an integer between `1` and `12`. It corresponds to the player's role:
 1. Owner
 2. Developer
 3. Owner
 4. Owner
 5. Owner
 6. Owner
-7. Speculator (Harbeger and Futarchy)
-8. Speculator (Harbeger and Futarchy)
-9. Speculator (Harbeger and Futarchy)
-10. Speculator (Harbeger and Futarchy)
-11. Speculator (Harbeger and Futarchy)
-12. Speculator (Harbeger and Futarchy)
+7. Speculator (Harberger and Futarchy)
+8. Speculator (Harberger and Futarchy)
+9. Speculator (Harberger and Futarchy)
+10. Speculator (Harberger and Futarchy)
+11. Speculator (Harberger and Futarchy)
+12. Speculator (Harberger and Futarchy)
 
-### Type
+### Type (String)
+The type of message, always a string (e.g., `"join"`, `"declare"`, `"post-order"`).
 
-Should be "message".
-
-## Common
+## Messages
 
 ### Phase Timeout
-
-An event automatically triggered by the server when a phase's timeout is triggered.
+An event automatically triggered by the server when a phase's timeout occurs.
 
 ```
 {
-    "content": {
-        "phase": 1,
-        "round": 0
-    },
-    "type": "phase-timeout",
-    "phase": 1,
-    "round": 0
+    "phase": 1,  # Integer
+    "round": 0   # Integer
 }
 ```
 
 ### Join
-
-An event triggered by a player joining the game. A player may rejoin the game later on in every phase.
+This event is triggered when a player joins or rejoins the game. The `gameId` is an integer, while the `recovery` token is a string. 
 
 ```
 {
-    "content": {
-        "gameId": 149,
-        "type": "join",
-        "recovery": "5lmcp6739wck6fbhuf1y7s59537hrgek4a9dxbhuflod0fs6mu90kya1yf9dc540"
-    },
-    "phase": 0,
-    "round": 0,
-    "type": "message"
+    "gameId": 149,              # Integer
+    "type": "join",             # String
+    "recovery": "5lmcp6739..."  # String (alphanumeric token)
 }
 ```
 
 ## Phase 0
 
 ### Player is Ready
-
-The game waits until all players declare themselves ready.
+Players declare themselves ready to begin the game. The `gameId` is an integer.
 
 ```
 {
-    "content": {
-        "gameId": 149,
-        "type": "player-is-ready"
-    },
-    "number": 2,
-    "tag": "Developer",
-    "phase": 0,
-    "round": 0,
-    "type": "message"
+    "gameId": 149,              # Integer
+    "type": "player-is-ready"    # String
 }
 ```
 
 ## Phase 1
 
-Nothing in particular happens in phase 1, all players are shown their private and some public data.
+In Phase 1, no specific actions are sent by players. This phase is for data presentation only.
 
 ## Phase 2
 
-Each player owning a property should declare its expected revenue for the round. The declaration is an array, one per condition. 0 is the status quo, 1 represents the development of the project. Originally there were intended more project to be selectable, it is still advisable to send a third item with the value set to 0.
+### Declaration
+Each player owning a property should declare expected revenue for the round. The `declaration` is an array where:
+- The first item (`0`) represents the status quo condition.
+- The second item (`1`) represents the development of the project.
+- The optional third item is reserved for future use (set to `0`).
+
+All values in the `declaration` array are integers, representing expected revenue in the game.
 
 ```
 {
-    "content": {
-        "gameId": 149,
-        "type": "declare",
-        "declaration": [
-            598000,
-            215000,
-            0
-        ]
-    },
-    "number": 3,
-    "tag": "Owner 2",
-    "phase": 2,
-    "round": 0,
-    "type": "message"
+    "gameId": 149,              # Integer
+    "type": "declare",          # String
+    "declaration": [
+        598000,                 # Integer (Status quo condition)
+        215000,                 # Integer (Development condition)
+        0                       # Integer (Optional, currently unused)
+    ]
 }
 ```
 
 ## Phase 3
 
-In Futarchy, at this stage it is not yet decided which condition will prevail.
-Speculator may decide to take advantage of suspicious declarations by "overtaking" the business. This happens when the declared revenue is low enough to be quite sure it's possible to make more. In reality, in this game there is no takeover, but just a penalty applied to the property owner (if the declaration was indeed below the expected revenue) or vice versa, if the speculator was wrong. The penalty is half the gap between the declared and the expected revenue and can go either way: a speculator might receive a penalty if the declaration was above the expected revenue.
-
-When a speculator has decided, he sends an array of array. The main array contains an array per each condition (0: status quo, 1: project).
-In the condition array there is a list of owners whose declaration is to be challenged.
-
 ### Speculation
+Speculators may challenge declarations made by property owners. The `snipe` array contains arrays of player numbers (integers) for each condition (`0` and `1`), representing which owners' declarations are being challenged.
 
 ```
 {
-    "content": {
-        "gameId": 888,
-        "type": "done-speculating",
-        "snipe": [
-            [
-                2,
-                3
-            ],
-            [
-                1
-            ]
+    "gameId": 888,              # Integer
+    "type": "done-speculating", # String
+    "snipe": [
+        [
+            2,                  # Integer (Owner number)
+            3                   # Integer (Owner number)
+        ],
+        [
+            1                   # Integer (Owner number)
         ]
-    },
-    "number": 4,
-    "tag": "Speculator 1",
-    "phase": 3,
-    "round": 1,
-    "type": "message"
+    ]
 }
 ```
 
-## Phase 4
+## Phases 4 & 5
 
-Players wait in this phase.
-
-## Phase 5
-
-Players wait in this phase.
+These phases are waiting phases where no specific actions are expected from players.
 
 ## Phase 6
 
-During the market phase it is possible to post and cancel orders.
-
 ### Post Order
-
-```
-{
-    gameId: 53,
-    type: 'post-order',
-    order: {
-        price: 11000,
-        quantity: 1,
-        condition: 0,
-        type: 'bid',
-        now: true
-    }
-}
-```
-
-An order can be an attempt to sell (ask) or to buy (bid) a share of the social revenue (taxes) generated by the winning condition. The parameter **type** expresses this.
-
-The **quantity** is always one: it was originally requested to be flexible (even to allow for decimal) but for simplicity it is possible to trade only one share at a time.
-
-In Futarchy setup, there are several (two) markets ongoing at the same time, one per **condition** (0: status quo, 1: development of teh project), which must be indicated. 
-
-The **price** is always set.
-
-The **now** parameter, if set to true, tells the server to ignore the price indicated and resolve the user request at the best price avaible (buy at the lowest, sell at the highest). If it is false, the bid or ask will be resolved when a matching order is posted by somebody else.
-
-An order not immediately resolved is placed in the list of bids and asks for other traders to see.
-
-### Cancel Order
-
-Each submitted order, if accepted, receives an id, which is made public through a server message. The player who submitted the order can subsequently cancel it, before it is fulfilled.
+In the market phase, players can post orders to either buy (bid) or sell (ask) assets. The `order` object contains:
+- `price`: An integer representing the price of the asset.
+- `quantity`: Always `1` in the current setup.
+- `condition`: An integer representing the condition (`0` for status quo, `1` for project development).
+- `type`: A string that should be either `"ask"` (sell) or `"bid"` (buy).
+- `now`: A boolean value indicating if the order should be executed immediately (`true`) or placed for future matching (`false`).
 
 ```
 {
     "order": {
-        "id": 4,
-        "condition": 0
+        "price": 3560,           # Integer (Price of the asset)
+        "quantity": 1,           # Integer (Always 1)
+        "condition": 0,          # Integer (0 for status quo, 1 for development)
+        "type": "ask",           # String ("ask" for sell, "bid" for buy)
+        "now": false             # Boolean (true for immediate execution, false to wait)
     },
-    "gameId": 261,
-    "type": "cancel-order"
+    "gameId": 888,               # Integer
+    "type": "post-order"         # String
+}
+```
+
+### Cancel Order
+A player can cancel an order they previously submitted. The `id` is the unique identifier for the order, which is an integer. The `condition` indicates the condition under which the order was placed (`0` or `1`).
+
+```
+{
+    "order": {
+        "id": 4,                 # Integer (Order ID)
+        "condition": 0           # Integer (0 for status quo, 1 for development)
+    },
+    "gameId": 261,               # Integer
+    "type": "cancel-order"       # String
 }
 ```
 
 ## Phase 7
 
-After phase 6 it is known which one is the winning condition.
-
-In phase 7 a second declaration is submitted, similarly to phase 2, but only the winning condition is required.
-
-### Declare
+### Declaration
+Once the winning condition is determined, a second declaration is made, but only for the winning condition. This is similar to Phase 2, but only the winning condition is required.
 
 ```
 {
-    "content": {
-        "gameId": 149,
-        "type": "declare",
-        "declaration": [
-            598000,
-            215000,
-            0
-        ]
-    },
-    "number": 3,
-    "tag": "Owner 2",
-    "phase": 2,
-    "round": 0,
-    "type": "message"
+    "gameId": 149,               # Integer
+    "type": "declare",           # String
+    "declaration": [
+        598000                  # Integer (Revenue for the winning condition)
+    ]
 }
 ```
 
 ## Phase 8
 
-In phase 8 happens a new round of speculations.
-
 ### Speculation
+In this phase, another round of speculations occurs. Speculators may once again challenge property owners’ declarations. The format is the same as in Phase 3.
 
 ```
 {
-    "content": {
-        "gameId": 888,
-        "type": "done-speculating",
-        "snipe": [
-            [
-                2,
-                3
-            ],
-            []
-        ]
-    },
-    "number": 4,
-    "tag": "Speculator 1",
-    "phase": 3,
-    "round": 1,
-    "type": "message"
+    "gameId": 888,               # Integer
+    "type": "done-speculating",  # String
+    "snipe": [
+        [
+            2,                  # Integer (Owner number)
+            3                   # Integer (Owner number)
+        ],
+        []                      # No speculators for the second condition
+    ]
 }
 ```
 
-
 ## Phase 9
 
-In phase 9 players are shown their results and wait for the next round to start.
+Players are shown their results, and the next round will begin after this phase.
+
+---
+
+### Summary of Input Types:
+- **Integer**: Used for fields such as `gameId`, `price`, `quantity`, `round`, `phase`, and player numbers.
+- **String**: Used for message types like `"join"`, `"declare"`, `"post-order"`, and `"cancel-order"`. Also used for the recovery token and order types (`"ask"`, `"bid"`).
+- **Boolean**: Used in fields like `now` to determine whether to execute orders immediately (`true`) or place them for later matching (`false`).
+
+This version of the README clarifies the expected types for all input values, making it easier for users to understand what kind of data to send in the messages.
