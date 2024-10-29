@@ -7,24 +7,10 @@ export default {
         const wssManager =  {
             wss: new WebSocketServer({ port: process.env.VUE_APP_WSS_PORT}),
             gameManager: null,
-            allowedMessages: [ //TODO: belongs to the game logic
-                [{"type": "join", "role": null}], //0
-                [], //1
-                [], //2
-                [], //3
-                [], //4
-                [], //5
-                [], //6
-                [], //7
-                [], //8
-                []  //9
-            ],
             games: [],
             interval: null,
             init: function (gameManager) {
                 this.gameManager = gameManager;
-                this.allowedMessages.forEach(array => array.push({"type": "rejoin", "role": null})); //Can rejoin in each phase
-
                 const wss = this.wss;
                 const self = this;
 
