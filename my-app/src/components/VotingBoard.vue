@@ -636,7 +636,7 @@ export default {
             }
 
             if (self.forms.outgoingChatMessage == null || self.forms.outgoingChatMessage.trim().length === 0) {
-                this.acknowledge('message-problem-title', 'message-empty-description"');
+                this.acknowledge('message-problem-title', 'message-empty-description');
                 return;
             }
 
