@@ -4,6 +4,7 @@ import Controller from '../helpers/controller.js';
 import WssManagement from '../services/wssGameService.js';
 import GameManagement from '../services/gameManager.js';
 import gameRepository from '../repositories/gameRepository.js';
+import userRepository from '../repositories/userRepository.js';
 import fs from 'fs';
 import { AppEvents, PhaseBegins, PhaseComplete } from '../helpers/AppEvents.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -43,13 +44,57 @@ export default {
         gameManager.init(wssManager);
 
         Controller.addPostRoute(app, '/api/v1/games/create', true, async (req, res) => {
-            console.log('Creating a game');
-            console.log('---------------');
-            console.log(JSON.stringify(req.body.gameParameters));
-            console.log('---------------');
             const gameId = await gameService.createGame(req.body.gameParameters);
             
             Controller.handleSuccess(res, { id : gameId }, 'Game created');
+        });
+
+        Controller.addPostRoute(app, '/api/v1/games/create-for-llm', false, async (req, res) => {
+            console.log(`Logging in ${req.body.username}`);
+
+            try {
+              const user = await userRepository.login(req.body);
+
+              if (user == null) {
+                console.error(`User not found: ${req.body.username}`);
+
+                return res.status(401).json({
+                  data: {},
+                  status: true,
+                  message: 'Login failed'
+                });
+              }
+            } catch(e) {
+              console.error(`Error logging in ${req.body.username}`, e);
+              return res.status(401).json({
+                data: {},
+                status: true,
+                message: 'Login failed'
+              });    
+            }
+
+            console.log(`Login of ${req.body.username} successful, creating the game`);
+
+            try {
+                const gameId = await gameService.createGame(req.body.gameParameters);
+            
+                console.log(`Game created for ${req.body.username}: ${gameId}, starting the game`);
+
+                wssManager.startGame(gameId);
+    
+                const error = await gameManager.startGame(gameId);
+    
+                if (error != null) {
+                    throw new Error(error);
+                }
+
+                console.log(`Game created for ${req.body.username}: ${gameId}, successfully started`);
+
+                Controller.handleSuccess(res, { id : gameId }, 'Game created and started');
+            } catch (e) {
+                console.error('While creating and starting a new game', e);
+                Controller.handleGenericError(res, e.message, 400);
+            }
         });
 
         async function listGames() {
