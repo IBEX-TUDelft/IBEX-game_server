@@ -138,3 +138,78 @@ server {
 ```
 
 Try whenever possible to use automated action (see workflows)
+
+
+## Game management for LLM and automation
+
+### Obtain a login jwt to access admin functionalities
+
+Use your credentials to programmatically login. Send a POST request to `/api/v1/auth/login` with the following body:
+
+```
+{
+        "username": <username>
+        "password": <password>
+}
+```
+
+If the authentication succeeds, you will receive an answer in this format:
+
+```
+{
+        "data": {
+                "user": <record>,
+                "token": <token>,
+                refresh: <refreshtoken>
+        },
+        "status": true,
+        "message": "login successful"
+}
+```
+
+Store the <token> for later admin interactions
+
+### Create a game
+
+Send a POST request to `/api/v1/games/create?token=<token>` with the following payload with the payload located in resources/game.json, which is an example of a game parameter setup for futarchy.
+It will return a json response with the game id, which must be stored for further interactions
+
+```
+{
+        "id" : <gameId>
+}
+```
+
+### Start a game
+
+Send a GET request
+
+`/api/v1/games/start?game_id=<id>&token=<token>`
+
+Where the <id> is the one stored from the previous intercation.
+
+### Join a game with a websocket.
+
+You probably want to spin up a number of agents, each connecting to the game as a player. In order to do so, create as many agents as players you specified in the parameters (12 in the given example), then, for each, obtain a recovery code with the following GET call:
+
+```
+/api/v1/games/get-recovery?game_id=<id>
+```
+
+The game_id comes from the initial stage. The recovery code is in the response.
+
+```
+{
+        "recovery": <recovery>
+}
+```
+
+You may then send the join message via websocket:
+
+```
+{
+    "gameId": <id>,              # Integer
+    "type": "join",             # String
+    "recovery": <recovery> # String (alphanumeric token)
+}
+```
