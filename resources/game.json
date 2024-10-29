@@ -1,5 +1,6 @@
 {
-    "token": "a valid jwt",
+    "username": "an existing username",
+    "password": "the matching password",
     "gameParameters": {
         "title": "a_trivial_test",
         "tax_rate": {

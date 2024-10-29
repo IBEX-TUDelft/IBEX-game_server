@@ -142,73 +142,36 @@ Try whenever possible to use automated action (see workflows)
 
 ## Game management for LLM and automation
 
-### Obtain a login jwt to access admin functionalities
+### Create and start the game
 
-Use your credentials to programmatically login. Send a POST request to `/api/v1/auth/login` with the following body:
-
-```
-{
-        "username": <username>
-        "password": <password>
-}
-```
-
-If the authentication succeeds, you will receive an answer in this format:
+Create and start a game sending a POST request `/api/v1/games/create-for-llm`. In resources there is an example how to create a futarchy game. Remember to change the username and password with valid credentials.
 
 ```
 {
-        "data": {
-                "user": <record>,
-                "token": <token>,
-                refresh: <refreshtoken>
-        },
-        "status": true,
-        "message": "login successful"
+    "username": "an existing username",
+    "password": "the matching password",
+    "gameParameters": <see the example in resources/game.json>
 }
 ```
 
-Store the <token> for later admin interactions
+Here is a curl example (remember to set the header application/json for sending a json request):
 
-### Create a game
+```
+curl -X POST -H "Content-Type: application/json" -d '{"username":"a valid user","password":"the matching password","gameParameters":{"title":"a_trivial_test","tax_rate":{"initial":1,"final":33},"signal":{"low":0.95,"high":1.05,"generate":false},"speculators":{"count":6,"balance":50000,"shares":5,"max_lot_purchases":3,"cash_for_snipers":250000,"base_points":400000,"reward_scale_factor":20000},"developers":{"count":1,"balance":300000,"shares":30,"base_points":0,"reward_scale_factor":50000,"profit":{"no_project":{"low":200000,"fixed":350000,"high":500000},"project_a":{"low":500000,"fixed":1150000,"high":2750000},"project_b":{"low":1500000,"fixed":1750000,"high":2000000}}},"owners":{"count":5,"balance":60000,"shares":6,"base_points":200000,"reward_scale_factor":20000,"profit":{"no_project":{"low":350000,"fixed":425000,"high":600000},"project_a":{"low":150000,"fixed":275000,"high":350000},"project_b":{"low":100000,"fixed":150000,"high":200000}}},"timers":{"phase_0":null,"phase_1":15,"phase_2":90,"phase_3":120,"phase_4":3,"phase_5":3,"phase_6":270,"phase_7":60,"phase_8":90,"phase_9":15},"round_count":"1","game_type":"futarchy","practice":false,"minutes_for_trading":10,"minutes_for_sniping":2,"session_number":1,"seconds_for_deliberation":30,"show_up_fee":5}}' localhost:3080/api/v1/games/create-for-llm
+```
 
-Send a POST request to `/api/v1/games/create` with the following payload with the payload located in `resources/game.json`, which is an example of a game parameter setup for futarchy. Remember to replace the token with the one received in the previous part.
-The following is an example of this call using `curl`:
-```
-curl -X POST -H "Content-Type: application/json" -d '{"token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJ5YXJ5Iiwicm9sZSI6MCwiaWF0IjoxNzMwMjA2NzY3LCJleHAiOjE3NjE4MjkxNjcsImF1ZCI6Imp3dC1ub2RlIiwiaXNzIjoiand0LW5vZGUiLCJzdWIiOiJqd3Qtbm9kZSJ9.rwTaGj76dcJCmzBmEZBNC7F3Ur2Uop76a0szIJYuQFB-89cWZHkqfOBTs3NIxjEBvoNan_yCaTppBjl-h12N43Lgb3fagykSDmbbewhgnEQVNMPENmj_eAZg9btdthujn8nz7cff0oJYC_mxeBJgnt2InVm6Ca_Mxa_Ktnsp9GuV00vTXs0bQyWh5YbdPXxBal-9EBVnGBKrn8l025CZ1FgfSzpt_gk_M0qFqlvwlp6xGXB_IBm0EN9cwPaR6Fh5KqHLNjv9ixXIoP0aJn9elTOrqvH3Ww_LMiqjrogIeUcSK-gzZaXycz7nEWmpzA6hw0W_jJIVr-uxEWdWqzmiIw","gameParameters":{"title":"a_trivial_test","tax_rate":{"initial":1,"final":33},"signal":{"low":0.95,"high":1.05,"generate":false},"speculators":{"count":6,"balance":50000,"shares":5,"max_lot_purchases":3,"cash_for_snipers":250000,"base_points":400000,"reward_scale_factor":20000},"developers":{"count":1,"balance":300000,"shares":30,"base_points":0,"reward_scale_factor":50000,"profit":{"no_project":{"low":200000,"fixed":350000,"high":500000},"project_a":{"low":500000,"fixed":1150000,"high":2750000},"project_b":{"low":1500000,"fixed":1750000,"high":2000000}}},"owners":{"count":5,"balance":60000,"shares":6,"base_points":200000,"reward_scale_factor":20000,"profit":{"no_project":{"low":350000,"fixed":425000,"high":600000},"project_a":{"low":150000,"fixed":275000,"high":350000},"project_b":{"low":100000,"fixed":150000,"high":200000}}},"timers":{"phase_0":null,"phase_1":15,"phase_2":90,"phase_3":120,"phase_4":3,"phase_5":3,"phase_6":270,"phase_7":60,"phase_8":90,"phase_9":15},"round_count":"1","game_type":"futarchy","practice":false,"minutes_for_trading":10,"minutes_for_sniping":2,"session_number":1,"seconds_for_deliberation":30,"show_up_fee":5}}' localhost:8080/api/v1/games/create
-```
-It will return a json response with the game id, which must be stored for further interactions
+The server will return a data structure containing the game id, which is immediately usable:
 
 ```
 {
         "data": {
-                "id":2
+                "id":4
         },
         "status":true,
-        "message":"Game created"
+        "message":"Game created and started"
 }
 ```
 
-### Start a game
-
-Send a GET request to
-
-`/api/v1/games/start?game_id=<id>&token=<token>`
-
-See the following curl example:
-```
-curl -G -d "game_id=2" -d "token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJ5YXJ5Iiwicm9sZSI6MCwiaWF0IjoxNzMwMjA2NzY3LCJleHAiOjE3NjE4MjkxNjcsImF1ZCI6Imp3dC1ub2RlIiwiaXNzIjoiand0LW5vZGUiLCJzdWIiOiJqd3Qtbm9kZSJ9.rwTaGj76dcJCmzBmEZBNC7F3Ur2Uop76a0szIJYuQFB-89cWZHkqfOBTs3NIxjEBvoNan_yCaTppBjl-h12N43Lgb3fagykSDmbbewhgnEQVNMPENmj_eAZg9btdthujn8nz7cff0oJYC_mxeBJgnt2InVm6Ca_Mxa_Ktnsp9GuV00vTXs0bQyWh5YbdPXxBal-9EBVnGBKrn8l025CZ1FgfSzpt_gk_M0qFqlvwlp6xGXB_IBm0EN9cwPaR6Fh5KqHLNjv9ixXIoP0aJn9elTOrqvH3Ww_LMiqjrogIeUcSK-gzZaXycz7nEWmpzA6hw0W_jJIVr-uxEWdWqzmiIw" localhost:8080/api/v1/games/start
-```
-
-Where the <id> is the one stored from the previous intercation and the <token> is the authentication token.
-If successful, the answer will look like this (no data necessary from there to proceed)
-
-```
-{
-        "data":{},
-        "status":true,
-        "message":"Game started"
-}
-```
 ### Join a game with a websocket.
 
 You probably want to spin up a number of agents, each connecting to the game as a player. In order to do so, create as many agents as players you specified in the parameters (12 in the given example), then, for each, obtain a recovery code with the following GET call:
