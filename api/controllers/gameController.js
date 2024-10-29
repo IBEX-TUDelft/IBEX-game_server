@@ -19,7 +19,20 @@ import {
 }from '../logics/market/MarketPlayer.js';
 import Utils from '../helpers/utils.js';
 import { WebSocket } from 'ws';
-import RandomService from '../services/randomService.js';
+
+const CHARACTERS ='abcdefghijklmnopqrstuvwxyz0123456789';
+
+function generateString (length) {
+    let result = '';
+
+    const charactersLength = CHARACTERS.length;
+
+    for ( let i = 0; i < length; i++ ) {
+        result += CHARACTERS.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+}
 
 export default {
     apply (app) {
@@ -30,6 +43,10 @@ export default {
         gameManager.init(wssManager);
 
         Controller.addPostRoute(app, '/api/v1/games/create', true, async (req, res) => {
+            console.log('Creating a game');
+            console.log('---------------');
+            console.log(JSON.stringify(req.body.gameParameters));
+            console.log('---------------');
             const gameId = await gameService.createGame(req.body.gameParameters);
             
             Controller.handleSuccess(res, { id : gameId }, 'Game created');
@@ -360,6 +377,34 @@ export default {
             }
 
             Controller.handleSuccess(res, data, 'Data available');
+        });
+
+        Controller.addGetRoute(app, '/api/v1/games/get-recovery', false, async (req, res) => {
+            const gameId = parseInt(req.query.game_id);
+
+            const game = gameManager.games.find(g => g.data.id === gameId);
+
+            if (game == null) {
+                return Controller.handleGenericError(res, `Game ${gameId} was not found`, 400);
+            }
+
+            if (game == null) {
+                return Controller.handleGenericError(res, `Game ${gameId} has no data!`, 500);
+            }
+
+            let recovery = generateString(64);
+
+            while(true) {
+                const player = game.data.players.find(p => p.recovery === recovery);
+
+                if (player == null) {
+                    break;
+                }
+
+                recovery = generateString(64);
+            }
+
+            Controller.handleSuccess(res, {"recovery": recovery}, 'Data available');
         });
 
         Controller.addGetRoute(app, '/api/v1/games/market-log', false, async (req, res) => {
