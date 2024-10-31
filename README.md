@@ -172,7 +172,7 @@ The server will return a data structure containing the game id, which is immedia
 }
 ```
 
-### Join a game with a websocket.
+### Join a game with a websocket
 
 You probably want to spin up a number of agents, each connecting to the game as a player. In order to do so, create as many agents as players you specified in the parameters (12 in the given example), then, for each, obtain a recovery code with the following GET call:
 
@@ -180,7 +180,7 @@ You probably want to spin up a number of agents, each connecting to the game as 
 /api/v1/games/get-recovery?game_id=<id>
 ```
 
-Notice that no admin authentication is required to play games, you don't need to append the <token> to thisrequest. The game_id comes from the initial stage. The recovery code is in the response.
+Notice that no admin authentication is required to play games. The game_id comes from the initial stage. The recovery code is in the response.
 
 ```
 {
