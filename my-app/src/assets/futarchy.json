@@ -1,6 +1,7 @@
 {
     "parameters": {
-        "format": "nl"
+        "format": "nl",
+        "agentsOnly": false
     },
     "defaultBalance": {
         "speculator": 50000,

@@ -1,6 +1,7 @@
 {
     "parameters": {
-        "format": "nl"
+        "format": "nl",
+        "agentsOnly": false
     },
     "defaultBasePoints": {
         "speculator": 0,

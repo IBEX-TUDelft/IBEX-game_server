@@ -175,6 +175,17 @@
             </div>
 
             <div class="row">
+                <div class="form-group col-md-3" >
+                </div>
+
+                <div class="form-group col-md-9 d-flex">
+                    <b-form-checkbox type="checkbox" true-false="false" false-true="true" v-model="agents_only" name="agents_only" id="agents_only" class="d-flex align-items-center">
+                        <i><b>Use only agents</b></i> (All necessary agents will join the game right after you start it)
+                    </b-form-checkbox>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1"></label>
                 </div>
@@ -189,7 +200,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" v-if="!agents_only">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Count</label>
                 </div>
@@ -333,6 +344,7 @@ export default {
 
             },
             title: '',
+            agents_only: false,
             speculators_count: 6,
             speculator_balance: 45000,
             speculator_shares: 5,
@@ -440,6 +452,7 @@ export default {
                 this.speculators_count = this.state.previousSpeculatorCount;
             }
 
+            this.agents_only = this.configurations[this.$parent.game_type].parameters.agentsOnly;
             this.state.previousGameType = event.target.value;
 
             this.speculators_base_points = this.configurations[this.$parent.game_type].defaultBasePoints.speculator;
@@ -548,6 +561,7 @@ export default {
                     phase_9: this.phase_timers[9]
                 },
                 round_count: this.round_count,
+                agents_only: this.agents_only,
                 game_type: this.$parent.game_type,
                 practice: this.practice_round,
                 minutes_for_trading: this.minutes_for_trading,
@@ -568,6 +582,7 @@ export default {
         for (let mode of ['voting', 'harberger', 'futarchy']) {
             const dictionary = self.dictionary[mode];
 
+            self.configurations[mode].parameters = dictionary.parameters;
             self.configurations[mode].timers = dictionary.timers;
             self.configurations[mode].defaultBasePoints = dictionary.defaultBasePoints;
             self.configurations[mode].defaultRewardScaleFactor = dictionary.defaultRewardScaleFactor;
@@ -580,6 +595,8 @@ export default {
                 self.configurations[mode].phaseTags.push(phase.tag);
             });
         }
+
+        self.agents_only = self.configurations[this.$parent.game_type].parameters.agentsOnly;
 
         self.speculators_base_points =  self.configurations[self.$parent.game_type].defaultBasePoints.speculator,
         self.owners_base_points = self.configurations[self.$parent.game_type].defaultBasePoints.owner,

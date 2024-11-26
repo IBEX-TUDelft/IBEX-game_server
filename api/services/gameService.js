@@ -53,6 +53,7 @@ export default {
                 {key: "signal_low", type: "float", value: gameParameters.signal.low},
                 {key: "signal_high", type: "float", value: gameParameters.signal.high},
                 {key: "generate_signals", type: "boolean", value: gameParameters.signal.generate},
+                {key: "agents_only", type: "boolean", value: gameParameters.agents_only},
 
                 {key: "speculators_count", type: "number", value: gameParameters.speculators.count},
                 {key: "speculator_balance", type: "number", value: gameParameters.speculators.balance},

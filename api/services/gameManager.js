@@ -1,3 +1,4 @@
+import axios from 'axios';
 import gameRepository from '../repositories/gameRepository.js';
 import gameParameterRepository from '../repositories/gameParameterRepository.js';
 import gamePlayerRepository from '../repositories/gamePlayerRepository.js';
@@ -6,6 +7,7 @@ import Harberger from '../logics/harberger/Harberger.js';
 import Futarchy from '../logics/futarchy/Futarchy.js';
 import Voting from '../logics/voting/Voting.js';
 import Market from '../logics/market/Market.js';
+import { resolve } from 'node:path';
 
 export default {
     create() {
@@ -135,6 +137,18 @@ export default {
                 this.games.push(game);
 
                 await game.start(this.wssManager);
+
+                if (gameData.parameters.agents_only === true) {
+                    try {
+                    const response = await axios.get(`http://${process.env.AGENT_MANAGER_ADDRESS}:${process.env.AGENT_MANAGER_PORT}/` +
+                        `spawn-agents?game_id=${gameId}&game_type=${gameData.parameters.game_type}&agent_count=${gameData.parameters.total_players}`)
+
+                    console.log(`Response from the agent server: ${response}`);
+                    } catch (e) {
+                        console.log(e.cause.rawPacket.toString());
+                        throw e;
+                    }
+                }
 
                 console.log(gameData);
                 
