@@ -140,12 +140,20 @@ export default {
 
                 if (gameData.parameters.agents_only === true) {
                     try {
-                    const response = await axios.get(`http://${process.env.AGENT_MANAGER_ADDRESS}:${process.env.AGENT_MANAGER_PORT}/` +
-                        `spawn-agents?game_id=${gameId}&game_type=${gameData.parameters.game_type}&agent_count=${gameData.parameters.total_players}`)
+                        /*const response = await axios.get(`http://${process.env.AGENT_MANAGER_ADDRESS}:${process.env.AGENT_MANAGER_PORT}/` +
+                        `spawn-agents?game_id=${gameId}&game_type=${gameData.parameters.game_type}&agent_count=${gameData.parameters.total_players}`);*/
 
-                    console.log(`Response from the agent server: ${response}`);
+                        const response = await axios.post(
+                            `http://${process.env.AGENT_MANAGER_ADDRESS}:${process.env.AGENT_MANAGER_PORT}/spawn-agents`,
+                            {
+                                game_id: gameId,
+                                game_type: gameData.parameters.game_type,
+                                agents: gameData.parameters.total_players
+                            }
+                        );
+                        console.log(`Response from the agent server: ${response}`);
                     } catch (e) {
-                        console.log(e.cause.rawPacket.toString());
+                        console.log(e);
                         throw e;
                     }
                 }
