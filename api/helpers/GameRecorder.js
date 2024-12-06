@@ -46,7 +46,13 @@ export class GameRecorder {
                 "server-log": this.serverLog
             }
 
-            fs.writeFileSync(`../records/${gameId}.log.json`, JSON.stringify(dataset));
+            const dir = '../records';
+
+            if (!fs.existsSync(dir)){
+                fs.mkdirSync(dir, { recursive: true });
+            }
+
+            fs.writeFileSync(`${dir}/${gameId}.log.json`, JSON.stringify(dataset));
         });
     }
 }

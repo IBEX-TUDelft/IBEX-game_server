@@ -624,6 +624,12 @@ export default class {
 
         data.endedAt = game.ended_at;
 
-        fs.writeFileSync(`../backup/${this.data.id}.json`, JSON.stringify(data));
+        const dir = '../backup';
+
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        fs.writeFileSync(`${dir}/${this.data.id}.json`, JSON.stringify(data));
     }
 }

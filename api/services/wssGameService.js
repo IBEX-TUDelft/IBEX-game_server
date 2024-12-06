@@ -62,6 +62,10 @@ export default {
                     return `Game ${id} not found`;
                 }
 
+                if (type == 'phase-transition') {
+                    this.updateGame(id, data.round, data.phase);
+                }
+                
                 game.players.forEach(ws => {
                     if (role == null || ws.player.role === role) {
                         WS.sendEvent(ws, type, data);
@@ -71,10 +75,6 @@ export default {
                 game.watchers.forEach(ws => {
                     WS.sendEvent(ws, type, data);
                 });
-
-                if (type == 'phase-transition') {
-                    this.updateGame(id, data.round, data.phase);
-                }
 
                 AppEvents.get(id).emit(ServerMessage, {
                     "sent": {
