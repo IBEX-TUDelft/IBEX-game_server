@@ -5,6 +5,7 @@ const PhaseTimeout = "phase-timeout";
 const PhaseComplete = "phase-complete";
 const PlayerMessage = "player-message";
 const GameOver = "game-over";
+const ServerMessage = "server-message";
 
 class AppTimer {
     id;
@@ -101,5 +102,6 @@ export {
     PhaseTimeout,
     PhaseComplete,
     PlayerMessage,
+    ServerMessage,
     GameOver
 };

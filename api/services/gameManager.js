@@ -151,14 +151,13 @@ export default {
                                 agents: gameData.parameters.total_players
                             }
                         );
-                        console.log(`Response from the agent server: ${response}`);
+                        console.log(`Response from the agent server`);
+                        console.log(response.data);
                     } catch (e) {
                         console.log(e);
                         throw e;
                     }
                 }
-
-                console.log(gameData);
                 
                 return null; //Success
             },

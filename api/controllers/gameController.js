@@ -353,7 +353,7 @@ export default {
                     console.log(`Playing event ${j}: ${event.type} for phase ${event.phase} in phase ${game.data.currentRound.phase}`);
 
                     if (event.type === "phase-timeout") {
-                        AppEvents.get(gameId).emit(PhaseComplete, {
+                        AppEvents.get(gameId).emit(PhaseComplete, { //TODO not consistent with similar events, having phase and round instead of number
                             "number": event.phase
                         });
 

@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws';
-import Utils from '../helpers/utils.js';
+import { AppEvents, ServerMessage } from '../helpers/AppEvents.js';
 import WS from '../helpers/websocket.js';
 
 export default {
@@ -71,6 +71,22 @@ export default {
                 game.watchers.forEach(ws => {
                     WS.sendEvent(ws, type, data);
                 });
+
+                if (type == 'phase-transition') {
+                    this.updateGame(id, data.round, data.phase);
+                }
+
+                AppEvents.get(id).emit(ServerMessage, {
+                    "sent": {
+                        type,
+                        data
+                    },
+                    "meta": {
+                        "recipient": role == null ? "all": role,
+                        "round": game.round,
+                        "phase": game.phase
+                    }
+                });
             },
             sendEvent(gameId, playerNumber, type, data) {
                 const game = this.games.find(g => g.id === gameId);
@@ -87,6 +103,17 @@ export default {
 
                 WS.sendEvent(ws, type, data);
 
+                AppEvents.get(gameId).emit(ServerMessage, {
+                    "sent": {
+                        type,
+                        data
+                    },
+                    "meta": {
+                        "recipient": playerNumber,
+                        "round": game.round,
+                        "phase": game.phase
+                    }
+                });
             },
             broadcastInfo(id, message, role) {
                 this.broadcastMessage(id, "info", message, role);

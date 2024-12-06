@@ -1,14 +1,19 @@
-import { AppEvents, GameOver, PhaseTimeout, PlayerMessage } from "./AppEvents.js";
+import { AppEvents, GameOver, PhaseTimeout, PlayerMessage, ServerMessage } from "./AppEvents.js";
 import gameParameterRepository from "../repositories/gameParameterRepository.js";
 
 import fs from 'fs';
 
 export class GameRecorder {
     log = [];
+    serverLog = [];
 
     constructor(gameId) {
         AppEvents.get(gameId).addListener(PlayerMessage, message => {
             this.log.push(message);
+        });
+
+        AppEvents.get(gameId).addListener(ServerMessage, message => {
+            this.serverLog.push(message);
         });
 
         AppEvents.get(gameId).addListener(PhaseTimeout, message => {
@@ -37,7 +42,8 @@ export class GameRecorder {
 
             const dataset = {
                 parameters,
-                "log": this.log
+                "log": this.log,
+                "server-log": this.serverLog
             }
 
             fs.writeFileSync(`../records/${gameId}.log.json`, JSON.stringify(dataset));
