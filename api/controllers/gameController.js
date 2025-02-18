@@ -223,7 +223,7 @@ export default {
             Controller.handleSuccess(res, records, `Game ${gameId} deleted.`);
         });
 
-        Controller.addPostRoute(app, '/api/v1/games/delete-programmatically', true, async (req, res) => {
+        Controller.addPostRoute(app, '/api/v1/games/delete-programmatically', false, async (req, res) => {
             console.log(`Logging in ${req.body.username}`);
 
             try {
