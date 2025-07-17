@@ -223,6 +223,52 @@ export default {
             Controller.handleSuccess(res, records, `Game ${gameId} deleted.`);
         });
 
+        Controller.addPostRoute(app, '/api/v1/games/delete-programmatically', false, async (req, res) => {
+            console.log(`Logging in ${req.body.username}`);
+
+            try {
+              const user = await userRepository.login(req.body);
+
+              if (user == null) {
+                console.error(`User not found: ${req.body.username}`);
+
+                return res.status(401).json({
+                  data: {},
+                  status: true,
+                  message: 'Login failed'
+                });
+              }
+            } catch(e) {
+              console.error(`Error logging in ${req.body.username}`, e);
+              return res.status(401).json({
+                data: {},
+                status: true,
+                message: 'Login failed'
+              });    
+            }
+
+            console.log(`Login of ${req.body.username} successful, creating the game`);
+
+            try {
+                const gameId = parseInt(req.body.game_id);
+
+                await gameService.deleteById(gameId);
+
+                await wssManager.deleteGame(gameId);
+
+                await gameManager.deleteGame(gameId);
+
+                const records = await listGames();
+
+                console.log(records);
+
+                Controller.handleSuccess(res, records, `Game ${gameId} deleted.`);
+            } catch (err) {
+                console.error('While deleting a game', err);
+                Controller.handleGenericError(res, err.message, 400);
+            }
+        });
+
         Controller.addGetRoute(app, '/api/v1/games/start', true, async (req, res) => {
             const gameId = parseInt(req.query.game_id);
 
