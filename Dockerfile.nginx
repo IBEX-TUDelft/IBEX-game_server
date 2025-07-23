@@ -1,0 +1,35 @@
+# Stage 1: Build Vue frontend
+FROM node:20-alpine AS build-stage
+WORKDIR /app
+
+# Declare ARGs for env vars you want to pass
+ARG VUE_APP_API
+ARG VUE_APP_WSS
+ARG VUE_APP_GUEST_HOME
+ARG VUE_APP_USER_HOME
+
+# Export them so Vue CLI can use them
+ENV VUE_APP_API=$VUE_APP_API
+ENV VUE_APP_WSS=$VUE_APP_WSS
+ENV VUE_APP_GUEST_HOME=$VUE_APP_GUEST_HOME
+ENV VUE_APP_USER_HOME=$VUE_APP_USER_HOME
+
+# (Optional) Debug
+RUN echo "Building with API=$VUE_APP_API, WSS=$VUE_APP_WSS"
+
+COPY my-app/package*.json ./
+RUN npm install
+COPY my-app .
+RUN npm run build
+
+FROM nginx:alpine
+
+# Copy built frontend files
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+
+COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+COPY nginx/entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
