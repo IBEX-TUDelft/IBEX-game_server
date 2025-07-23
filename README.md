@@ -263,9 +263,11 @@ If you change the frontend or the nginx configuration, rebuild the nginx contain
 
 To update the backend container following code changes, just do as follows (notice that tagging with -t might be not necessary):
 
-`cd api`
-`docker build -t yaryribero/yaryribero/gs-backend .`
-`docker push yaryribero/yaryribero/gs-backend`
+```
+cd api
+docker build -t yaryribero/yaryribero/gs-backend .
+docker push yaryribero/yaryribero/gs-backend
+```
 
 ### database
 
