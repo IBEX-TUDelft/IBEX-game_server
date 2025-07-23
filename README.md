@@ -197,3 +197,90 @@ You may then send the join message via websocket:
     "recovery": <recovery> # String (alphanumeric token)
 }
 ```
+
+# Working with containers
+
+## Deploying the available docker-compose
+
+### Requirements
+
+1. Docker installed with ability to run compose. You will need to use a console (powershell in Windows)
+2. Free ports:
+        8080 UI administration port
+        18080 Database UI administration port
+3. Access to internet and to the docker hub (no corporate restrictions)
+
+### Installation
+
+1. Download (and unzip) the zip file contained in the docker-compose directory, or checkout the directory itself.
+2. Open a console, move to the docker-compose directory created in step 1
+3. Run `docker compose up`
+
+Following these instructions, docker will pull the required images and run all applications. You can then manage the whole contained app using Docker Desktop.
+
+### User Interfaces
+
+General Administration: localhost:8080
+Database administration: localhost:18080
+
+### Connection endpoints
+
+You can connect to the following server endpoint with external clients
+
+Server API: localhost:8080/api/v1
+Websocket: localhost:8080/wss
+
+### Admin credentials
+
+Admin credentials are established once and for all at the moment of the installation on the machine, through the .env file located in the zip file. It can be modified to change the credentials.
+
+For the database administration, use these credentials on localhost:18080. 
+
+Database User: harb_docker_user
+Database Pass: Tn3yn3h9cYds7Yhc5Q8641dOMvOYp05a
+Database Name: harb_docker
+
+The admin user is created in the db/admin.sql file in the installation directory, it allows to log in on localhost:8080
+
+user: admin
+pass: 5TK174F5JeyoxF5U6A0PJo76oL5X7oXW
+
+Changing these credentials at installation time requires to modify the query generating the user in db/admin.sql with a new password that needs to be encrypted with brcrypt (use https://www.browserling.com/tools/bcrypt for example)
+
+## Updating the containers
+
+When you update the code, you should update the container affected by the changes and the package in docker-compose, if affected as well. The package is instructed to fetch always the latest version, which should trigger and update. In some cases, bracking changes will require to uninstall previous version of a container, with loss of data that should be exported before proceeding.
+All shown commands assume the project containers still reside at the original developer's Docker Hub repository (yaryribero)
+
+### nginx (frontend: Web server with UI)
+
+If you change the frontend or the nginx configuration, rebuild the nginx container
+
+`docker compose -f build.docker-compose.yml build nginx`
+`docker push yaryribero/gs-nginx`
+
+### backend
+
+To update the backend container following code changes, just do as follows (notice that tagging with -t might be not necessary):
+
+`cd api`
+`docker build -t yaryribero/yaryribero/gs-backend .`
+`docker push yaryribero/yaryribero/gs-backend`
+
+### database
+
+Reinstalling the database might cause data loss. You can add scripts to the docker-compose/db section or modify the existing ones, just remember to repackage everything after.
+
+### packaging all
+
+You can build all at the same time:
+
+`docker compose -f build.docker-compose.yml build nginx`
+
+Remember that two files with be used directly during the build process:
+
+build.docker-compose.yml
+.env
+
+Modify them accordingly
+
