@@ -1,0 +1,67 @@
+# Web App admin user
+# user: admin
+# pass: 5TK174F5JeyoxF5U6A0PJo76oL5X7oXW
+#
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    #volumes:
+    #  - type: tmpfs
+    #    target: /dev/shm
+    #    tmpfs:
+    #      size: 134217728 # 128*2^20 bytes = 128Mb
+    environment:
+      POSTGRES_PASSWORD: ${VUE_APP_PGPASSWORD}
+      POSTGRES_USER: ${VUE_APP_PGUSER}
+      POSTGRES_DB: ${VUE_APP_PGDATABASE}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/database.sql:/docker-entrypoint-initdb.d/01-database.sql:ro
+      - ./db/admin.sql:/docker-entrypoint-initdb.d/02-admin.sql:ro
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 18080:8080
+
+  backend:
+    image: yaryribero/gs-backend
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    environment:
+      VUE_APP_PGHOST: ${VUE_APP_PGHOST}
+      VUE_APP_PGPORT: ${VUE_APP_PGPORT}
+      VUE_APP_PGUSER: ${VUE_APP_PGUSER}
+      VUE_APP_PGPASSWORD: ${VUE_APP_PGPASSWORD}
+      VUE_APP_PGDATABASE: ${VUE_APP_PGDATABASE}
+      VUE_APP_WSS_PORT: ${VUE_APP_WSS_PORT}
+      VUE_APP_WSS_PING_INTERVAL: ${VUE_APP_WSS_PING_INTERVAL}
+      BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS}
+      API_PORT: ${API_PORT}
+      VOTING_CHAT_FIXED_DURATION: ${VOTING_CHAT_FIXED_DURATION}
+      VOTING_CHAT_MAX_EXTRA_TIME: ${VOTING_CHAT_MAX_EXTRA_TIME}
+      PROJECT_COUNT: ${PROJECT_COUNT}
+    depends_on:
+      - db
+
+  nginx:
+    image: yaryribero/gs-nginx
+    ports:
+      - "8080:80"
+    environment:
+      VUE_APP_WSS_PORT: ${VUE_APP_WSS_PORT}
+      API_PORT: ${API_PORT}
+      BACKEND_HOST: backend
+    depends_on:
+      - db
+      - backend
+
+volumes:
+  pgdata:
