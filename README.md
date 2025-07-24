@@ -200,6 +200,17 @@ You may then send the join message via websocket:
 
 # Working with containers
 
+## Build and deploy
+
+1. Checkout the code
+2. Copy the .env.example to .env and configure according to your needs
+3. run 
+
+```
+docker builder prune
+docker compose -f build.docker-compose.yml up
+```
+
 ## Deploying the available docker-compose
 
 ### Requirements
