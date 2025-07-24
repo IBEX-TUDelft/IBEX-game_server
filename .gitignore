@@ -13,3 +13,4 @@ records/*
 .vscode/*
 backup/*
 proof.js
+.env
