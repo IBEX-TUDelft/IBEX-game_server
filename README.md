@@ -2,9 +2,9 @@
 
 ## Front-end
 
-1. After checking the code out, Go to the my-app directory
-2. Make sure your code is up to date, if it's not, run `git pull`
-3. Copy the .env.example to .env: current values should be suitable in all cases.
+1. Make sure your code is up to date, if it's not, run `git pull`
+2. After checking the code out, go to the my-app directory
+3. Copy the .env.example to .env: current values should be suitable in most cases.
 4. Run `npm i` to download all dependencies
 5. Run `npm run build` to build the static app: it will generate a dist directory with the static files.
 6. Copy the content of dist to your server root. For example, if you use apache2 on Linux, that would be /var/www/html and the command to run would be
@@ -22,14 +22,14 @@ sudo cp -R dist/* /var/www/html
 
 ## Back-end
 
-1. Check the code out, go to the api directory and copy .env.example to .env
+1. Check the code out from github, go to the api directory and copy .env.example to .env
 2. Install postgres
 3. Create a user for the app matching the credential in your .env file.
 4. Create a database matching the db name specified in the .env database, assign to the db user the required privileges (must be done using postgres commands)
 5. Generate the tables, running `db/database.sql`with psql.
 6. Run `npm i` to download all dependencies
 7. Run the server `node server.js`
-8. Maybe can help having some scripts to automate the process in the api directory like:
+8. This process can be automated with scripts in the api directory like:
 
 ---
 ## start.sh
@@ -42,7 +42,7 @@ disown $PID
 echo $PID > APP_SERVER.PID
 ```
 
-Will run the server in the background and direct logs and errors to specific files, accessible with less in following mode:
+This will run the server in the background and direct logs and errors to specific files, accessible with less in following mode:
 
 `less +F app.log`
 
@@ -85,7 +85,8 @@ Stops the server, updates the code, updates the libraries and start it afresh.
 
 ## Server
 
-You need to have an appropriate configuration to run the server. See the following configuration for `yary.eu` as an example, running the application locally doesn't require an ssl certificate.
+You need to have an appropriate configuration to run the server. 
+See the following configuration for `yary.eu` as an example, running the application locally doesn't require an ssl certificate.
 Note that the `/api` and `/wss` have to be set for the communication between browser and server to work.
 
 ```
@@ -137,7 +138,118 @@ server {
 
 ```
 
-Try whenever possible to use automated action (see workflows)
+Try to use automated actions whenever possible (see workflows)
+
+
+# Containerized Setup IBEX game server
+The game server can be installed from containers, this is easier to do in many cases as most of the internal setup is then done by the container. 
+There are two flavors of this installation, one that takes the existing image on github and installs it as-is, and one the first builds and then 
+
+## Requirements
+
+1. Docker installed with ability to run compose. You will need to use a console (powershell in Windows)
+2. Free ports:  
+       UI administration port, default at 8080
+       Database UI administration port, default at 18080
+3. Access to internet and to the docker hub (no corporate restrictions)
+4. Docker or alternative program. For this instruction it is assumed you use Docker.
+
+
+## Build and deploy a new Docker image with the possibility to change settings:
+
+1. Checkout the code from github
+2. Open a console, move to the docker-compose directory created in step 1
+3. In the docker-compose folder, copy the .env.example to .env and configure according to your needs
+4. In the docker-compose folder, configure the docker-compose.yml according to your needs
+5. In the docker-compose folder, run the following instructions
+
+```
+docker builder prune
+docker compose -f build.docker-compose.yml up
+```
+This removes existing docker containers and then builds and deploys the containers based on the settings in the .env and docker-compose.yml files.
+
+## Deploying the static, pre-build image from the docker hub
+
+### Installation
+
+1. Download (and unzip) the zip file contained in the docker-compose directory, or checkout the directory itself.
+2. Open a console, move to the docker-compose directory created in step 1
+3. In the docker-compose folder, run the following instruction: `docker compose up`
+
+Following these instructions, docker will pull the required images and run all applications. You can then manage the whole contained app using Docker Desktop.
+
+# After Installation 
+
+With the settings in the orriginal files, your endpoints and credentials are as below. 
+Note that if you changed the .env or docker-compose.yml, this might change 
+
+### User Interfaces
+
+General Administration: localhost:8080  
+Database administration: localhost:18080  
+
+### Connection endpoints
+
+Server API: localhost:8080/api/v1  
+Websocket: localhost:8080/wss  
+
+### Admin credentials
+
+Admin credentials are established once and for all at the moment of the installation on the machine, through the .env file. It can be modified to change the credentials.  
+
+For the database administration, use these credentials on localhost:18080.   
+
+Database User: harb_docker_user  
+Database Pass: Tn3yn3h9cYds7Yhc5Q8641dOMvOYp05a  
+Database Name: harb_docker  
+
+The admin user is created in the db/admin.sql file in the installation directory, it allows one to log in on localhost:8080  
+
+user: admin  
+pass: 5TK174F5JeyoxF5U6A0PJo76oL5X7oXW  
+
+Changing these credentials at installation time requires to modify the query generating the user in db/admin.sql with a new password that needs to be encrypted with brcrypt (use https://www.browserling.com/tools/bcrypt for example)
+
+## Updating the containers
+
+When you update the code, you should update the container affected by the changes and the package in docker-compose, if affected as well. 
+The package is instructed to always fetch the latest version, which should trigger and update. In some cases, bracking changes will require you to uninstall previous version of a container. Unistalling a container implies all data is lost, so export any all data before proceeding.
+All commands in this example assume the project containers still reside at the original developer's Docker Hub repository (yaryribero)
+
+### nginx (frontend: Web server with UI)
+
+If you change the frontend or the nginx configuration, rebuild the nginx container  
+
+`docker compose -f build.docker-compose.yml build nginx`  
+`docker push yaryribero/gs-nginx`  
+
+### backend
+
+To update the backend container following code changes, just do as follows (notice that tagging with -t might be not necessary):
+
+```
+cd api  
+docker build -t yaryribero/yaryribero/gs-backend   
+docker push yaryribero/yaryribero/gs-backend  
+```
+
+### database
+
+Reinstalling the database might cause data loss. You can add scripts to the docker-compose/db section or modify the existing ones, just remember to repackage everything after.
+
+### packaging all
+
+You can build all at the same time:  
+
+`docker compose -f build.docker-compose.yml build nginx`  
+
+Remember that two files with be used directly during the build process:  
+
+build.docker-compose.yml  
+.env  
+
+
 
 ## Game management for LLM and automation
 
@@ -197,103 +309,6 @@ You may then send the join message via websocket:
 }
 ```
 
-# Containerized Setup IBEX game server
-
-## Build and deploy
-
-1. Checkout the code
-2. In the docker-compose folder, copy the .env.example to .env and configure according to your needs
-3. run 
-
-```
-docker builder prune
-docker compose -f build.docker-compose.yml up
-```
-
-## Deploying the available docker-compose
-
-
-### Requirements
-
-1. Docker installed with ability to run compose. You will need to use a console (powershell in Windows)
-2. Free ports:
-        8080 UI administration port
-        18080 Database UI administration port
-3. Access to internet and to the docker hub (no corporate restrictions)
-
-### Installation
-
-1. Download (and unzip) the zip file contained in the docker-compose directory, or checkout the directory itself.
-2. Open a console, move to the docker-compose directory created in step 1
-3. Run `docker compose up`
-
-Following these instructions, docker will pull the required images and run all applications. You can then manage the whole contained app using Docker Desktop.
-
-### User Interfaces
-
-General Administration: localhost:8080
-Database administration: localhost:18080
-
-### Connection endpoints
-
-You can connect to the following server endpoint with external clients
-
-Server API: localhost:8080/api/v1
-Websocket: localhost:8080/wss
-
-### Admin credentials
-
-Admin credentials are established once and for all at the moment of the installation on the machine, through the .env file located in the zip file. It can be modified to change the credentials.
-
-For the database administration, use these credentials on localhost:18080. 
-
-Database User: harb_docker_user
-Database Pass: Tn3yn3h9cYds7Yhc5Q8641dOMvOYp05a
-Database Name: harb_docker
-
-The admin user is created in the db/admin.sql file in the installation directory, it allows to log in on localhost:8080
-
-user: admin
-pass: 5TK174F5JeyoxF5U6A0PJo76oL5X7oXW
-
-Changing these credentials at installation time requires to modify the query generating the user in db/admin.sql with a new password that needs to be encrypted with brcrypt (use https://www.browserling.com/tools/bcrypt for example)
-
-## Updating the containers
-
-When you update the code, you should update the container affected by the changes and the package in docker-compose, if affected as well. The package is instructed to fetch always the latest version, which should trigger and update. In some cases, bracking changes will require to uninstall previous version of a container, with loss of data that should be exported before proceeding.
-All shown commands assume the project containers still reside at the original developer's Docker Hub repository (yaryribero)
-
-### nginx (frontend: Web server with UI)
-
-If you change the frontend or the nginx configuration, rebuild the nginx container
-
-`docker compose -f build.docker-compose.yml build nginx`
-`docker push yaryribero/gs-nginx`
-
-### backend
-
-To update the backend container following code changes, just do as follows (notice that tagging with -t might be not necessary):
-
-```
-cd api
-docker build -t yaryribero/yaryribero/gs-backend .
-docker push yaryribero/yaryribero/gs-backend
-```
-
-### database
-
-Reinstalling the database might cause data loss. You can add scripts to the docker-compose/db section or modify the existing ones, just remember to repackage everything after.
-
-### packaging all
-
-You can build all at the same time:
-
-`docker compose -f build.docker-compose.yml build nginx`
-
-Remember that two files with be used directly during the build process:
-
-build.docker-compose.yml
-.env
 
 Modify them accordingly
 
