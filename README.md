@@ -1,4 +1,4 @@
-# Voting, Harberger and Futarchy Setup
+# Manual Setup IBEX Game server 
 
 ## Front-end
 
@@ -139,7 +139,6 @@ server {
 
 Try whenever possible to use automated action (see workflows)
 
-
 ## Game management for LLM and automation
 
 ### Create and start the game
@@ -198,12 +197,12 @@ You may then send the join message via websocket:
 }
 ```
 
-# Working with containers
+# Containerized Setup IBEX game server
 
 ## Build and deploy
 
 1. Checkout the code
-2. Copy the .env.example to .env and configure according to your needs
+2. In the docker-compose folder, copy the .env.example to .env and configure according to your needs
 3. run 
 
 ```
@@ -212,6 +211,7 @@ docker compose -f build.docker-compose.yml up
 ```
 
 ## Deploying the available docker-compose
+
 
 ### Requirements
 
