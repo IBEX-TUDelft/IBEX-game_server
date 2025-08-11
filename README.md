@@ -1,3 +1,8 @@
+There are two ways to install the game server, a manual installation directly on the server, or an installation within a container. 
+Below both methods are explained.   
+The installation fixes interfaces and admin passwords, default passwords can be find below the installation instructions.
+The installation assumes 
+
 # Manual Setup IBEX Game server 
 
 ## Front-end
@@ -147,13 +152,21 @@ There are two flavors of this installation, one that takes the existing image on
 
 ## Requirements
 
-1. Docker installed with ability to run compose. You will need to use a console (powershell in Windows)
+1. Docker (or alternative) installed with ability to run compose. You will need to use a console (powershell in Windows)
 2. Free ports:  
        UI administration port, default at 8080
        Database UI administration port, default at 18080
 3. Access to internet and to the docker hub (no corporate restrictions)
-4. Docker or alternative program. For this instruction it is assumed you use Docker.
 
+## Deploying the static, pre-build image from the docker hub
+
+### Installation
+
+1. Download (and unzip) the zip file contained in the docker-compose directory, or checkout the directory itself.
+2. Open a console, move to the docker-compose directory created in step 1
+3. In the docker-compose folder, run the following instruction: `docker compose up`
+
+Following these instructions, docker will pull the required images and run all applications. You can then manage the whole contained app using Docker Desktop.
 
 ## Build and deploy a new Docker image with the possibility to change settings:
 
@@ -169,15 +182,7 @@ docker compose -f build.docker-compose.yml up
 ```
 This removes existing docker containers and then builds and deploys the containers based on the settings in the .env and docker-compose.yml files.
 
-## Deploying the static, pre-build image from the docker hub
 
-### Installation
-
-1. Download (and unzip) the zip file contained in the docker-compose directory, or checkout the directory itself.
-2. Open a console, move to the docker-compose directory created in step 1
-3. In the docker-compose folder, run the following instruction: `docker compose up`
-
-Following these instructions, docker will pull the required images and run all applications. You can then manage the whole contained app using Docker Desktop.
 
 # After Installation 
 
