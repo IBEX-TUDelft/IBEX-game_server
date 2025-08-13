@@ -6,7 +6,7 @@
 services:
 
   db:
-    image: postgres
+    image: postgres:17
     restart: always
     # set shared memory limit when using docker compose
     shm_size: 128mb
@@ -24,6 +24,10 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./db/database.sql:/docker-entrypoint-initdb.d/01-database.sql:ro
       - ./db/admin.sql:/docker-entrypoint-initdb.d/02-admin.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U harb_docker_user -d harb_docker"]
+      interval: 5s
+      retries: 5
 
   adminer:
     image: adminer
