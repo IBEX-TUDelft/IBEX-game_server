@@ -286,6 +286,10 @@ export default {
         });
 
         Controller.addGetRoute(app, '/api/v1/simulation-datasets/list', true, async (req, res) => {
+            if (!fs.existsSync('../records') ) {
+                return Controller.handleSuccess(res, [], 'No simulation datasets found');
+            }
+
             fs.readdir('../records/', (error, files) => {
                 if (error == null) {
                     Controller.handleSuccess(res, files, 'Simulation datasets found');
@@ -751,6 +755,10 @@ export default {
 
         Controller.addGetRoute(app, '/api/v1/games/repair', false, async (req, res) => {
             try {
+                if (!fs.existsSync('../records') ) {
+                    return Controller.handleSuccess(res, [], 'No record datasets found');
+                }
+
                 fs.readdir('../records', (err, files) => {
                     if (err) {
                         throw err;
@@ -840,7 +848,11 @@ export default {
         Controller.addGetRoute(app, '/api/v1/games/backups', true, async (req, res) => {
             const gamesInDb = await gameRepository.listCompact();
 
-            const gamesInBackup = fs.readdirSync('../backup');
+            let gamesInBackup = [];
+
+            if (fs.existsSync('../backup') ) {
+                gamesInBackup = fs.readdirSync('../backup');
+            }
 
             let games = [];
 
