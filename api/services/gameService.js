@@ -16,7 +16,17 @@ export default {
 
         //2 Create the parameters
 
-        if (gameParameters.game_type === 'market') {
+        if (gameParameters.game_type === 'goods-market') {
+            parameters = [
+                {key: "game_type", type: "string", value: gameParameters.game_type},
+                {key: "player_max_number", type: "number", value: gameParameters.player_max_number},
+                {key: "player_min_number", type: "number", value: gameParameters.player_min_number},
+                {key: "use_bots", type: "boolean", value: gameParameters.use_bots},
+                {key: "bad_quality_ratio", type: "number", value: gameParameters.bad_quality_ratio},
+                {key: "cash_per_player", type: "number", value: gameParameters.cash_per_player},
+                {key: "timer_phase_1", type: "number", value: gameParameters.timer_phase_1}
+            ]
+        } else if (gameParameters.game_type === 'market') {
             parameters = [
                 {key: "round_count", type: "number", value: 1}, //TODO: decide in game?
                 {key: "practice_round", type: "boolean", value: false}, //TODO: decide in game?
@@ -124,7 +134,7 @@ export default {
             const parameterId = await gameParameterRepository.create(parameter);
         }
 
-        if (gameParameters.game_type === 'market') {
+        if (gameParameters.game_type === 'market' || gameParameters.game_type === 'goods-market') {
             return gameId;
         }
 

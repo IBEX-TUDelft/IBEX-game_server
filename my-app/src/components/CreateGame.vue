@@ -14,12 +14,14 @@
                     <option value="futarchy">Futarchy</option>
                     <option value="voting">Voting</option>
                     <option value="market">Double Auction</option>
+                    <option value="goods-market">Goods Market</option>
                 </select>
             </b-col>
         </b-row>
 
         <HarbergerFutarchyVoting v-if="['voting', 'harberger', 'futarchy'].includes(game_type)"  />
         <CreateMarket v-if="game_type === 'market'" />
+        <CreateGoodsMarket v-if="game_type === 'goods-market'" />
 
         <b-row class="no-gutters justify-content-center flex-grow-1 p-3">
             <button type="button" @click='pushCreate()' class="btn btn-danger">Create</button>
@@ -34,6 +36,7 @@ import CreateMarket from './createGames/CreateMarket.vue';
 
 import EventService from '../services/EventService.js';
 import { createGame } from '../services/GameService'
+import CreateGoodsMarket from './createGames/CreateGoodsMarket.vue';
 
 export default {
     name: 'CreateGame',
@@ -45,7 +48,8 @@ export default {
     components: {
         Header,
         HarbergerFutarchyVoting,
-        CreateMarket
+        CreateMarket,
+        CreateGoodsMarket
     },
     methods: {
         onChangeGameType(event) {
