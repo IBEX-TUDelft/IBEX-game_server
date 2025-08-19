@@ -7,13 +7,26 @@ import Harberger from '../logics/harberger/Harberger.js';
 import Futarchy from '../logics/futarchy/Futarchy.js';
 import Voting from '../logics/voting/Voting.js';
 import Market from '../logics/market/Market.js';
+import GoodsMarket from '../logics/goods_market/GoodsMarket.ts';
 import { resolve } from 'node:path';
 
 export default {
+    instance: null,
+    get() {
+        if (this.instance == null) {
+            this.instance = this.create();
+        }
+        return this.instance;
+    },
     create() {
-        return {
+        if (this.instance != null) {
+            return this.instance;
+        }
+
+        this.instance = {
             wssManager: null,
             games: [],
+            inited: false,
             startGame: async function(gameId, record = true) {
                 console.log('GAMEMASTER Game ID: ' + gameId + " Typeof: " + typeof gameId);
 
@@ -87,7 +100,7 @@ export default {
                     }
                 });
 
-                if (gameData.parameters.game_type != 'market') {
+                if (gameData.parameters.game_type != 'market' && gameData.parameters.game_type != 'goods-market') {
                     const gamePlayers = await gamePlayerRepository.findByGameId(gameRecord.id);
 
                     gamePlayers.forEach(p => {
@@ -130,6 +143,10 @@ export default {
                         game = new Market(gameData, record);
                         await game.init();
                         break;
+                    case 'goods-market':
+                        game = new GoodsMarket(gameData, record);
+                        await game.init();
+                        break;
                     default:
                         console.error(`Game type unknown: ${gameData.parameters.game_type}`);
                 }
@@ -162,7 +179,13 @@ export default {
                 return null; //Success
             },
             init(wssManager) {
+                if (this.inited) {
+                    return;
+                }
+
                 this.wssManager = wssManager;
+
+                this.inited = true;
             },
             handleMessage: async function (ws, message) {
                 const self = this;
@@ -203,6 +226,8 @@ export default {
             deleteGame: function (gameId) {
                 this.games = this.games.filter(g => g.data.id  != gameId);
             }
-        }
+        };
+
+        return this.instance;
     }
 }

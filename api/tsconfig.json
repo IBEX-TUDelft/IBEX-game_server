@@ -2,14 +2,16 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     "target": "ES2020",              // Modern JS
-    "module": "commonjs",            // Node default
-    "moduleResolution": "node",
+    "module": "NodeNext",            // Node default
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "allowJs": true,                  // ✅ Let TS handle .js files too
     "checkJs": false,                 // Don't type-check JS yet
     "outDir": "dist",
     "strict": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
   "exclude": ["node_modules"] 
 }

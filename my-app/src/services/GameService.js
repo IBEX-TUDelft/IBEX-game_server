@@ -9,14 +9,14 @@ const http = axios.create({
 });
 
 export async function listGames() {
-    const token = localStorage.getItem("token");
-    const response = await http.get("/games/list", {
-        params: {
-            token
-        }
-    });
-    
-    return response.data.data;
+  const token = localStorage.getItem("token");
+  const response = await http.get("/games/list", {
+    params: {
+      token
+    }
+  });
+
+  return response.data.data;
 }
 
 export async function createGame(gameParameters) {
@@ -28,15 +28,15 @@ export async function createGame(gameParameters) {
   }
 
   const response = await http.post("/games/create", parameters);
-  
+
   return response.data.data;
 }
 
 export async function getGameStatus(id, recovery) {
   const response = await http.get("/games/status", {
     params: {
-        "id": id,
-        "recovery": recovery
+      "id": id,
+      "recovery": recovery
     }
   });
 
@@ -52,7 +52,7 @@ export async function saveTemplate(template) {
 export async function loadTemplateList(type) {
   const response = await http.get("/templates/list", {
     params: {
-        "type": type
+      "type": type
     }
   });
 
@@ -62,7 +62,7 @@ export async function loadTemplateList(type) {
 export async function loadTemplate(id) {
   const response = await http.get("/templates/load", {
     params: {
-        "id": id
+      "id": id
     }
   });
 
@@ -78,7 +78,7 @@ export async function sendSurvey(data) {
 export async function findSurveys(gameId) {
   const response = await http.get("/games/surveys", {
     params: {
-        "id": gameId
+      "id": gameId
     }
   });
 
@@ -90,8 +90,21 @@ export async function joinMarketGame(gameId) {
 
   const response = await http.get("/games/market/join", {
     params: {
-        "gameId": gameId,
-        "token": token
+      "gameId": gameId,
+      "token": token
+    }
+  });
+
+  return response.data.data;
+}
+
+export async function joinGoodsMarketGame(gameId) {
+  const token = localStorage.getItem("token");
+
+  const response = await http.get("/games/goods-market/join", {
+    params: {
+      "gameId": gameId,
+      "token": token
     }
   });
 
@@ -103,8 +116,8 @@ export async function getGameJson(gameId) {
 
   const response = await http.get("/games/json", {
     params: {
-        "gameId": gameId,
-        "token": token
+      "gameId": gameId,
+      "token": token
     }
   });
 

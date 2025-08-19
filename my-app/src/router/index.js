@@ -14,6 +14,7 @@ import GameChatLog from '../components/GameChatLog';
 import GameSurveys from '../components/GameSurveys';
 import SimulationList from '../components/SimulationList';
 import DoubleAuctionBoard from '../components/DoubleAuctionBoard';
+import GoodsMarketBoard from '../components/GoodsMarketBoard';
 import RestoreList from '../components/RestoreList';
 
 Vue.use(VueRouter)
@@ -83,6 +84,11 @@ const routes = [
     path: '/market/:id/:recovery',
     name: 'Double Auction Board',
     component: DoubleAuctionBoard
+  },
+  {
+    path: '/goods-market/:id/:recovery',
+    name: 'Goods Market Board',
+    component: GoodsMarketBoard
   },
   {
     path: '/lobby',

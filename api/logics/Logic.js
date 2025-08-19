@@ -29,7 +29,7 @@ export default class {
             throw new Error('Game phase classes not present');
         }
 
-        const allowedTypes = ['Harberger', 'Futarchy', 'Voting', 'Market'];
+        const allowedTypes = ['Harberger', 'Futarchy', 'Voting', 'Market', 'GoodsMarket'];
 
         if (!allowedTypes.includes(type)) {
             throw new Error(`Allowed types: ${allowedTypes.join(', ')}. It was ${type}`);
@@ -37,7 +37,7 @@ export default class {
 
         const sessions = JSON.parse(fs.readFileSync('./resources/sessions.json'));
 
-        if (type != 'Market') {
+        if (type != 'Market' && type != 'GoodsMarket') {
             const session = sessions.find(s => s.id === data.parameters.session_number);
 
             data.dataset = data.parameters.session_number;

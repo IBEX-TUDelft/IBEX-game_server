@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
-    "@types/node": "^24.2.1",
+    "@types/node": "^24.3.0",
     "del": "^8.0.0",
     "fancy-log": "^2.0.0",
     "gulp": "^5.0.1",

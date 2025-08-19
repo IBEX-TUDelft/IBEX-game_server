@@ -83,6 +83,9 @@ export default {
                 } else if (game.type === 'market') {
                     const result = await GameService.joinMarketGame(id);
                     routeData = this.$router.resolve({path: result.redirect });
+                } else if (game.type === 'goods-market') {
+                    const result = await GameService.joinGoodsMarketGame(id);
+                    routeData = this.$router.resolve({path: result.redirect });
                 } else {
                     routeData = this.$router.resolve({path: `/board/${id}/${this.generateString(63)}${game.assignedPlayers}`});
                 }

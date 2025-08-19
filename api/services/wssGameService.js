@@ -3,13 +3,32 @@ import { AppEvents, ServerMessage } from '../helpers/AppEvents.js';
 import WS from '../helpers/websocket.js';
 
 export default {
+    instance: null,
+    get() {
+        if (this.instance == null) {
+            console.log('Creating new WSS instance (GET)');
+            this.instance = this.create();
+        }
+        return this.instance;
+    },
     create() {
-        const wssManager =  {
+        if (this.instance != null) {
+            return this.instance;
+        }
+
+        console.log('Creating new WSS instance (CREATE)');
+
+        this.instance =  {
             wss: new WebSocketServer({ port: process.env.VUE_APP_WSS_PORT}),
             gameManager: null,
             games: [],
             interval: null,
+            inited: false,
             init: function (gameManager) {
+                if (this.inited) {
+                    return;
+                }
+
                 this.gameManager = gameManager;
                 const wss = this.wss;
                 const self = this;
@@ -21,32 +40,42 @@ export default {
                     });
 
                     ws.on('message', function (data) {
-                        let message;
-
-                        console.log('Incoming WSS message');
-
                         try {
+                            let message;
+
+                            console.log('Incoming WSS message');
+
                             console.log(data.toString());
 
                             message = JSON.parse(data.toString());
 
                             console.log(message);
+
+                            const game = self.games.find(g => g.id  === message.gameId);
+    
+                            self.gameManager.handleMessage(ws, message);
+
                         } catch(e) {
                             WS.send(ws, {
                                 "error": e.message
                             });
                             return;
                         }
+                    });
 
-                        const game = self.games.find(g => g.id  === message.gameId);
-    
-                        self.gameManager.handleMessage(ws, message);
+                    ws.on('error', function (data) {
+                        console.error('WebSocket error observed:', data);
+                    });
+
+                    ws.on('close', function (code, reason) {
+                        console.error('WebSocket closed:', code, reason.toString());
                     });
                 });
 
                 this.interval = setInterval(function ping() {
                     wss.clients.forEach(function each(ws) {
                         if (ws.isAlive === false) {
+                            console.log(`WebSocket connection is dead, terminating it`);
                             return ws.terminate();
                         }
         
@@ -54,6 +83,8 @@ export default {
                         ws.ping();
                     });
                 }, process.env.VUE_APP_WSS_PING_INTERVAL);
+
+                this.inited = true;
             },
             broadcastEvent: function(id, type, data, role) {
                 const game = this.games.find(g => g.id === id);
@@ -263,6 +294,6 @@ export default {
             }
         };
 
-        return wssManager;
+        return this.instance;
     }
 }
