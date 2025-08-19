@@ -2,10 +2,10 @@ import { GameOver, AppEvents } from "../../helpers/AppEvents.js";
 import randomService from "../../services/randomService.js";
 import Logic from "../Logic.js";
 import WaitingPhase from '../market/phases/WaitingPhase.js';
-import { GoodsMarketAuthority } from "./GoodsMarketAuthority.js";
-import GoodsMarketPlayer from "./GoodsMarketPlayer.js";
-import MarketPhase from "./phases/MarketPhase.js";
-import ResultPhase from "./phases/ResultPhase.js";
+import { GoodsMarketAuthority } from "./GoodsMarketAuthority.ts";
+import GoodsMarketPlayer from "./GoodsMarketPlayer.ts";
+import MarketPhase from "./phases/MarketPhase.ts";
+import ResultPhase from "./phases/ResultPhase.ts";
 
 /**
  * Expected game parameters for the goods market.

@@ -3,10 +3,10 @@ import GameManagement from '../services/gameManager.js';
 import Controller from '../helpers/controller.js';
 import GoodsMarketPlayer from '../logics/goods_market/GoodsMarketPlayer.ts';
 import Utils from '../helpers/utils.js';
-import { GoodsMarketAuthority } from '../logics/goods_market/GoodsMarketAuthority.js';
+import { GoodsMarketAuthority } from '../logics/goods_market/GoodsMarketAuthority.ts';
 import { v4 as uuidv4 } from 'uuid';
-import Good from '../logics/goods_market/Good.js';
-import { GoodQuality } from '../logics/goods_market/GoodQuality.js';
+import Good from '../logics/goods_market/Good.ts';
+import { GoodQuality } from '../logics/goods_market/GoodQuality.ts';
 import { Request, Response } from 'express';
 
 export default {
