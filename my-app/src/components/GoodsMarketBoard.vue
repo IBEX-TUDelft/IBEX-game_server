@@ -928,7 +928,7 @@
                 console.log('DATA RECOVERED');
 
                 const phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
-                    ['admin', 'player', 'player', 'player', 'player'][self.player.authority]
+                    ['admin', 'buyer', 'seller'][self.player.authority]
                 ];
 
                 self.player.instructions = phaseInstructions;
