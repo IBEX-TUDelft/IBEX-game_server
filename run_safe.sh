@@ -1,7 +1,5 @@
 #!/bin/bash
 
-git checkout feature/ts_support
-
 if [ ! -f .env ]; then
     echo "WARNING: using .env.example to populate .env: better if you create your own .env file"
     cp .env.example .env
