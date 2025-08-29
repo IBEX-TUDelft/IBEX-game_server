@@ -24,6 +24,10 @@ export default {
                 {key: "use_bots", type: "boolean", value: gameParameters.use_bots},
                 {key: "bad_quality_ratio", type: "number", value: gameParameters.bad_quality_ratio},
                 {key: "cash_per_player", type: "number", value: gameParameters.cash_per_player},
+                {key: "high_quality_value", type: "number", value: gameParameters.high_quality_value},
+                {key: "high_quality_delta", type: "number", value: gameParameters.high_quality_delta},
+                {key: "low_quality_value", type: "number", value: gameParameters.low_quality_value},
+                {key: "low_quality_delta", type: "number", value: gameParameters.low_quality_delta},
                 {key: "timer_phase_1", type: "number", value: gameParameters.timer_phase_1},
                 {key: "round_count", type: "number", value: 1},
                 {key: "practice_round", type: "boolean", value: false}

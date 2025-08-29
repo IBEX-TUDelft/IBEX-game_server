@@ -44,8 +44,8 @@
                             </div>
                             <div class="row-12 mb-auto mt-2">
                                 <ul>
-                                    <li v-if="player.wallet.goods.find(g => g.quality === 'good')">{{ player.wallet.goods.filter(g => g.quality === 'good').length }} Good</li>
-                                    <li v-if="player.wallet.goods.find(g => g.quality === 'bad')">{{ player.wallet.goods.filter(g => g.quality === 'bad').length }} Bad</li>
+                                    <li v-if="player.wallet.goods.find(g => g.quality === 'good')">{{ player.wallet.goods.filter(g => g.quality === 'good').length }} High Quality</li>
+                                    <li v-if="player.wallet.goods.find(g => g.quality === 'bad')">{{ player.wallet.goods.filter(g => g.quality === 'bad').length }} Low Quality</li>
                                 </ul>
                             </div>
                         </div>

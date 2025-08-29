@@ -419,6 +419,8 @@ export default class {
                 this.data.rewards = rewards;
 
                 AppEvents.get(this.data.id).emit(GameOver, chosenRound);
+            } else {
+                AppEvents.get(this.data.id).emit(GameOver, 1);
             }
 
             this.wss.broadcastEvent(this.data.id, "game-over", {});

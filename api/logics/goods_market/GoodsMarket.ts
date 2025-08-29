@@ -25,8 +25,11 @@ export default class GoodsMarket extends Logic {
         console.log(`Parameters: ${JSON.stringify(data.parameters)}`);
 
         AppEvents.get(this.data.id).addListener(GameOver, () => {
+            console.log('The game is over, sending a market statistics update to all admins');
             this.data.players.filter((p: GoodsMarketPlayer) => p.authority === GoodsMarketAuthority.ADMIN)
                 .forEach((admin: GoodsMarketPlayer) => {
+                    console.log(`Sending statistics to admin ${admin.number}`);
+
                     this.wss.sendEvent(
                         this.data.id,
                         admin.number,
@@ -98,8 +101,11 @@ export default class GoodsMarket extends Logic {
                 orders: null,
                 currentPrice: null,
                 statistics: null,
-                realValue: null,
-                tickers: null
+                tickers: null,
+                realValues: {
+                    highQuality: null,
+                    lowQuality: null
+                }
             },
             player: {},
             timer: null
@@ -114,7 +120,9 @@ export default class GoodsMarket extends Logic {
                 "role": player.role,
                 "recovery": player.recovery,
                 "wallet": player.wallet,
-                "profit": this.getCurrentProfit(number)
+                "profit": this.getCurrentProfit(number),
+                "signals": player.signals,
+                "initialWallet": player.initialWallet
             };
         }
 
@@ -159,30 +167,11 @@ export default class GoodsMarket extends Logic {
         }
 
         if (this.data.currentRound.phase === 2 || this.over === true) {
-            data.game.realValue = this.data.realValue;
+            data.game.realValues.highQuality = this.data.parameters.high_quality_value;
+            data.game.realValues.lowQuality = this.data.parameters.low_quality_value;
         }
 
         return data;
-    }
-
-    generateRealValue() {
-        if (this.data.parameters.distribution_type === 'linear') {
-            const value = randomService.getLinearlyDistributedNumber(
-                this.data.parameters.linear_min,
-                this.data.parameters.linear_max
-            );
-
-            return Math.round(value * 100) / 100;
-        } else if (this.data.parameters.distribution_type === 'normal') {
-            const value = randomService.getNormallyDistributedRandomNumber(
-                this.data.parameters.mean,
-                this.data.parameters.variance
-            );
-
-            return Math.round(value * 100) / 100;
-        } else {
-            throw new Error(`Expecting distribution type as linear or normal, but was ${this.data.parameters.distribution_type}`);
-        }
     }
 
     getStatistics() {

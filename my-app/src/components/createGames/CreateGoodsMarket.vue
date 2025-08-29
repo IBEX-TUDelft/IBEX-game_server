@@ -29,6 +29,42 @@
             </div>
 
             <div class="row">
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">High Quality Good Value</label>
+                </div>
+                
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="high_quality_value" name="high_quality_value" id="high_quality_value" aria-describedby="emailHelp" placeholder="6" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Low Quality Good Value</label>
+                </div>
+                
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="low_quality_value" name="low_quality_value" id="low_quality_value" aria-describedby="emailHelp" placeholder="6" />
+                </div>
+            </div>
+
+                        <div class="row">
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">High Quality Good Signal Delta (%)</label>
+                </div>
+                
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="high_quality_delta" name="high_quality_delta" id="high_quality_delta" aria-describedby="emailHelp" placeholder="6" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label htmlFor="exampleInputEmail1">Low Quality Good Signal Delta (%)</label>
+                </div>
+                
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" v-model="low_quality_delta" name="low_quality_delta" id="low_quality_delta" aria-describedby="emailHelp" placeholder="6" />
+                </div>
+            </div>
+            
+            <div class="row">
                 <div class="col-md-12 mt-3 mb-3">
                     <h3>Players</h3>
                 </div>
@@ -59,8 +95,9 @@
 
             <div class="row">
                 <div class="form-group col-md-3">
-                    <label htmlFor="exampleInputEmail1">Bad Good Chance (%)</label>
+                    <label htmlFor="exampleInputEmail1">Low Quality Good Chance (%)</label>
                 </div>
+
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="bad_quality_ratio" name="bad_quality_ratio" id="bad_quality_ratio" aria-describedby="emailHelp" placeholder="6" />
                 </div>
@@ -68,6 +105,7 @@
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">Cash per Player</label>
                 </div>
+
                 <div class="form-group col-md-3">
                     <input type="number" class="form-control" v-model="cash_per_player" name="cash_per_player" id="cash_per_player" aria-describedby="emailHelp" placeholder="6" />
                 </div>
@@ -90,7 +128,11 @@ export default {
             use_bots: false,
             bad_quality_ratio: 50,
             cash_per_player: 75,
-            timer_phase_1: 5
+            timer_phase_1: 5,
+            high_quality_value: 70,
+            high_quality_delta: 10,
+            low_quality_value: 20,
+            low_quality_delta: 10
         }
     },
     components: {
@@ -145,6 +187,10 @@ export default {
                 bad_quality_ratio: this.bad_quality_ratio,
                 cash_per_player: this.cash_per_player,
                 timer_phase_1: this.timer_phase_1 * 60,
+                high_quality_value: this.high_quality_value,
+                high_quality_delta: this.high_quality_delta,
+                low_quality_value: this.low_quality_value,
+                low_quality_delta: this.low_quality_delta
             };
         }
     },

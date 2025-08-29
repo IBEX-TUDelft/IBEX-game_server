@@ -12,7 +12,6 @@ export default class MarketPhase extends JoinablePhase {
     orderList = [];
     movementList = [];
     orders: GoodsMarketOrder[] = [];
-    nextOrderId = 1;
     results: {
         log: any[];
         transactions: {

@@ -34,7 +34,60 @@
         </b-row>
 
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 2 && player.authority != 0)">
-            <b-col class="d-flex align-items-center justify-content-center flex-column">
+            <b-col class="d-flex align-items-center justify-content-center flex-column p-3">
+                <table style="text-align: center; width: 100%; table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th colspan="9"><h3>Final Results</h3></th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>High Quality Goods</th>
+                            <th>Value per Unit</th>
+                            <th>High Quality Total</th>
+                            <th>Low Quality Goods</th>
+                            <th>Value per Unit</th>
+                            <th>Low Quality Total</th>
+                            <th>Cash</th>
+                            <th>Grand Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr :style="{ backgroundColor: '#f2f2f2', borderBottom: '1px solid #ddd' }">
+                            <td>Final Wallet</td>
+                            <td>{{ player.wallet?.goods?.filter(good => good.quality === 'good').length || 0 }}</td>
+                            <td>{{ formatUs(game.realValues.highQuality) }}</td>
+                            <td>{{ (player.wallet?.goods?.filter(good => good.quality === 'good').length || 0) * game.realValues.highQuality }}</td>
+                            <td>{{ player.wallet?.goods?.filter(good => good.quality === 'bad').length || 0 }}</td>
+                            <td>{{ formatUs(game.realValues.lowQuality) }}</td>
+                            <td>{{ (player.wallet?.goods?.filter(good => good.quality === 'bad').length || 0) * game.realValues.lowQuality }}</td>
+                            <td>{{ formatUs(player.wallet?.cash) }}</td>
+                            <td>{{ formatUs(getWalletValue()) }}</td>
+                        </tr>
+                        <tr :style="{ backgroundColor: 'transparent', borderBottom: '1px solid #ddd' }">
+                            <td>Initial Wallet</td>
+                            <td>{{ player.initialWallet?.goods?.filter(good => good.quality === 'good').length || 0 }}</td>
+                            <td>{{ formatUs(game.realValues.highQuality) }}</td>
+                            <td>{{ (player.initialWallet?.goods?.filter(good => good.quality === 'good').length || 0) * game.realValues.highQuality }}</td>
+                            <td>{{ player.initialWallet?.goods?.filter(good => good.quality === 'bad').length || 0 }}</td>
+                            <td>{{ formatUs(game.realValues.lowQuality) }}</td>
+                            <td>{{ (player.initialWallet?.goods?.filter(good => good.quality === 'bad').length || 0) * game.realValues.lowQuality }}</td>
+                            <td>{{ formatUs(player.initialWallet?.cash) }}</td>
+                            <td>{{ formatUs(getInitialWalletValue()) }}</td>
+                        </tr>
+                        <tr :style="{ backgroundColor: '#f2f2f2', borderBottom: '1px solid #ddd' }">
+                            <td>Profit</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{ formatUs(getWalletValue() - getInitialWalletValue()) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div v-html="getProfitString()"/>
             </b-col>
         </b-row>
@@ -46,41 +99,6 @@
                     :game="game"
                     :player="player"
                 />
-                <!--div v-else class="container-fluid">
-                    <p class="text-center">Real value: <b>{{ player.signal }}</b></p>
-
-                    <table class="table table-bordered" style="table-layout: fixed;">
-                        <thead class="thead-dark text-center">
-                            <th>Knowledge</th>
-                            <th>Purchases</th>
-                            <th>Sales</th>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(name, i) in ['Admin', 'Know both signals', 'Knows private signal', 'Knows public signal', 'Knows no signal']" :key="i">
-                                <td>{{ name }}</td>
-                                <td class="text-center">{{ game.statistics.buyers.count[i] }}</td>
-                                <td class="text-center">{{ game.statistics.sellers.count[i] }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <table class="table table-bordered" style="table-layout: fixed;">
-                        <thead class="thead-dark text-center">
-                            <th>Type of Behaviour</th>
-                            <th>Average Private Signal</th>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Buyer</td>
-                                <td class="text-center">{{ Math.round(game.statistics.buyers.averagePrivateSignal * 100) / 100 }}</td>
-                            </tr>
-                            <tr>
-                                <td>Seller</td>
-                                <td class="text-center">{{ Math.round(game.statistics.sellers.averagePrivateSignal * 100) / 100 }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div-->
             </b-col>
 
             <b-col :class="'d-flex align-items-center justify-content-center flex-column' + (game.over ? ' col-12' : ' col-6')">
@@ -92,7 +110,7 @@
 
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 2 && player.authority === 0)">
             <b-col v-if="game.over" class="d-flex align-items-center justify-content-center flex-column col-6 p-2">
-                <table style="width: 100%; text-align: center;">
+                <table style="width: 100%; text-align: center;" v-if="game.statistics != null && game.statistics.buyers != null">
                     <thead>
                         <tr>
                             <th colspan="2">Buyers</th>
@@ -112,7 +130,7 @@
             </b-col>
 
             <b-col v-if="game.over" class="d-flex align-items-center justify-content-center flex-column col-6 p-2">
-                <table style="width: 100%; text-align: center;">
+                <table style="width: 100%; text-align: center;" v-if="game.statistics != null && game.statistics.buyers != null">
                     <thead>
                         <tr>
                             <th colspan="2" style="text-align: center;">Sellers</th>
@@ -192,6 +210,10 @@
                     publicSignal: null,
                     players: [],
                     currentPrice: null,
+                    realValues: {
+                        highQuality: null,
+                        lowQuality: null
+                    },
                     statistics: {
                         buyers: {
                             count: [0, 0, 0, 0, 0],
@@ -210,14 +232,23 @@
                     recovery: null,
                     role: null,
                     market: null,
+                    signals: {
+                        highQualitySignal: null,
+                        lowQualitySignal: null
+                    },
                 },
                 chartOptions: {
                     xaxis: {
                         categories: [],
                         type: 'datetime',
                         labels: {
-                            datetimeUTC: false, // 👈 This will display local time instead of UTC
+                            datetimeUTC: false, // This will display local time instead of UTC
                         },
+                    },
+                    yaxis: {
+                        min: 0,
+                        max: 100,
+                        tickAmount: 10
                     },
                     animations: {
                         enabled: true,
@@ -225,6 +256,9 @@
                         dynamicAnimation: {
                             speed: 1000
                         }
+                    },
+                    annotations: {
+                        yaxis: []
                     }
                 },
                 series: [{
@@ -281,6 +315,10 @@
                 this.connection.send(JSON.stringify(msg));
             },
             getProfitString() {
+                if (this.player.wallet == null) {
+                    return 'n/a';
+                }
+
                 let profit = 0;
                 let placeHolder = 'reward-message-profit';
 
@@ -292,11 +330,22 @@
                     }
                 }
 
+                const highQualityGoods = this.player.wallet.goods.filter(good => good.quality === 'good').length || 0;
+                const lowQualityGoods = this.player.wallet.goods.filter(good => good.quality === 'bad').length || 0;
+
+                const finalWalletValue = this.game.realValues.highQuality * highQualityGoods + this.game.realValues.lowQuality * lowQualityGoods + this.player.wallet.cash;
+                const initialWalletValue = this.game.realValues.highQuality * (this.player.initialWallet?.goods.filter(good => good.quality === 'good').length || 0) + this.game.realValues.lowQuality * (this.player.initialWallet?.goods.filter(good => good.quality === 'bad').length || 0) + this.player.initialWallet?.cash;
+
                 return this.resolvePlaceHolder(placeHolder,
-                    this.game.currentPrice,
-                    this.player.wallet.goods.length,
+                    this.game.realValues.highQuality,
+                    highQualityGoods,
+                    this.game.realValues.highQuality * highQualityGoods,
+                    this.game.realValues.lowQuality,
+                    lowQualityGoods,
+                    this.game.realValues.lowQuality * lowQualityGoods,
                     this.player.wallet.cash,
-                    this.player.wallet.goods.length * this.game.currentPrice + this.player.wallet.cash,
+                    finalWalletValue,
+                    initialWalletValue,
                     profit
                 );
             },
@@ -323,6 +372,30 @@
                     self.player[prop] = gameData.player[prop];
                 }
 
+                self.chartOptions.annotations.yaxis.push({
+                    y: self.player.signals.lowQualitySignal,
+                    borderColor: "#FF4560",
+                    label: {
+                        borderColor: "#FF4560",
+                        style: {
+                        color: "#fff",
+                        background: "#FF4560",
+                        },
+                        text: "Low Quality Signal",
+                    }
+                }, {
+                    y: self.player.signals.highQualitySignal,
+                    borderColor: "#00E396",
+                    label: {
+                        borderColor: "#00E396",
+                        style: {
+                            color: "#fff",
+                            background: "#00E396",
+                        },
+                        text: "High Quality Signal",
+                    }
+                });
+
                 if (gameData.game.over != null) {
                     self.game.over = gameData.game.over;
                 }
@@ -333,14 +406,6 @@
 
                 console.log('GAME')
                 console.log(self.game);
-
-                if (self.game.boundaries != null) {
-                    if (self.player.authority == 2) {
-                        self.player.boundaries = self.game.boundaries.developer;
-                    } else if (self.player.authority == 3) {
-                        self.player.boundaries = self.game.boundaries.owner;
-                    }
-                }
 
                 if (self.game.orders != null && self.game.orders.length > 0) {
                     if (self.game.orders != null) {
@@ -403,8 +468,32 @@
                                     self.player[key] = ev.data[key];
                                 }
 
+                                self.chartOptions.annotations.yaxis.push({
+                                    y: self.player.signals.lowQualitySignal,
+                                    borderColor: "#FF4560",
+                                    label: {
+                                        borderColor: "#FF4560",
+                                        style: {
+                                        color: "#fff",
+                                        background: "#FF4560",
+                                        },
+                                        text: "Low Quality Signal",
+                                    },
+                                }, {
+                                    y: self.player.signals.highQualitySignal,
+                                    borderColor: "#00E396",
+                                    label: {
+                                        borderColor: "#00E396",
+                                        style: {
+                                            color: "#fff",
+                                            background: "#00E396",
+                                        },
+                                        text: "High Quality Signal",
+                                    }
+                                });
+
                                 var initialInstructions = self.dictionary.instructions.phases[self.game.phase][
-                                    ['admin', 'player', 'player', 'player', 'player'][self.player.authority != null ? self.player.authority : 1]
+                                    ['admin', 'buyer', 'seller'][self.player.authority != null ? self.player.authority : 1]
                                 ];
 
                                 self.player.instructions = initialInstructions;
@@ -420,7 +509,7 @@
                                 self.game.phaseTag = self.dictionary.instructions.phases[self.game.phase]?.tag;
 
                                 var phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
-                                    ['admin', 'player', 'player', 'player'][self.player.authority]
+                                    ['admin', 'buyer', 'seller'][self.player.authority]
                                 ];
 
                                 self.showIntructions = false;
@@ -505,7 +594,7 @@
                                 break;
                             case 'profit-report':
                                 self.player.profit = ev.data.profit;
-                                self.game.realValue = ev.data.realValue;
+                                self.game.realValues = ev.data.realValues;
                                 self.game.currentPrice = ev.data.finalPrice;
 
                                 break;
@@ -764,6 +853,22 @@
                 });
             }, formatUs(n) {
                 return this.formatService.format(n);
+            }, getWalletValue() {
+                const highQualityGoods = this.player.wallet?.goods?.filter(good => good.quality === 'good').length || 0;
+                const highQualityValue = highQualityGoods * this.game.realValues.highQuality;
+
+                const lowQualityGoods = this.player.wallet?.goods?.filter(good => good.quality === 'bad').length || 0;
+                const lowQualityValue = lowQualityGoods * this.game.realValues.lowQuality;
+
+                return highQualityValue + lowQualityValue + this.player.wallet?.cash || 0;
+            }, getInitialWalletValue() {
+                const highQualityGoods = this.player.initialWallet?.goods?.filter(good => good.quality === 'good').length || 0;
+                const highQualityValue = highQualityGoods * this.game.realValues.highQuality;
+
+                const lowQualityGoods = this.player.initialWallet?.goods?.filter(good => good.quality === 'bad').length || 0;
+                const lowQualityValue = lowQualityGoods * this.game.realValues.lowQuality;
+
+                return highQualityValue + lowQualityValue + this.player.initialWallet?.cash || 0;
             }
         },
         async mounted () {

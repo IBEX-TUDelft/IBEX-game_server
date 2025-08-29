@@ -60,7 +60,7 @@ export default class PostOrderHandler extends MessageHandler {
             //There can be only one ask at a time
             const activeAsks = phase.orders.filter((o: GoodsMarketOrder) => o.sender === player.number && o.type === GoodsMarketOrderType.ASK);
 
-            if (activeAsks.length > 1) {
+            if (activeAsks.length >= 1) {
                 return WS.sendEvent(
                     ws,
                     'order-refused',
@@ -87,7 +87,7 @@ export default class PostOrderHandler extends MessageHandler {
             //There can be only one bid at a time
             const activeBids = phase.orders.filter((o: GoodsMarketOrder) => o.sender === player.number && o.type === GoodsMarketOrderType.BID);
 
-            if (activeBids.length > 1) {
+            if (activeBids.length >= 1) {
                 return WS.sendEvent(
                     ws,
                     'order-refused',

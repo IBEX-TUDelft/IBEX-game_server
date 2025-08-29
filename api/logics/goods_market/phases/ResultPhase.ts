@@ -1,6 +1,6 @@
 import JoinablePhase from "../../JoinablePhase.js";
 import GoodsMarketPlayer from "../model/GoodsMarketPlayer.ts";
-import { GoodsMarketAuthority } from "../model/GoodsMarketTypes.ts";
+import { GoodsMarketAuthority, GoodsMarketGoodQuality } from "../model/GoodsMarketTypes.ts";
 
 export default class ResultPhase extends JoinablePhase {
     results: {
@@ -42,21 +42,16 @@ export default class ResultPhase extends JoinablePhase {
         }));
 
         this.game.players.forEach((p: GoodsMarketPlayer) => {
-            const currentValue = p.wallet.cash + p.wallet.goods.length * finalPrice;
+            const currentValue = this.getWalletValue(p.wallet);
+            const initialValue = this.getWalletValue(p.initialWallet);
 
-            let profit = 0;
-
-            if (p.authority === GoodsMarketAuthority.BUYER) {
-                profit = Math.round((currentValue - this.game.parameters.cash_per_player) * 100) / 100; //The buyer began with cash
-                console.log(`Player ${p.number} profit: ${profit} = ${currentValue} - ${this.game.parameters.cash_per_player}`);
-            } else if (p.authority === GoodsMarketAuthority.SELLER) {
-                profit = Math.round((currentValue - finalPrice) * 100) / 100; //The seller's profit is decreased by the initial value he had. Initially he had one good, whose value is now known as the final price
-                console.log(`Player ${p.number} profit: ${profit} = ${currentValue} - ${finalPrice}`);
-            }
+            let profit = Math.round((currentValue - initialValue) * 100) / 100;
 
             this.results.profits.push({
                 "number": p.number,
-                "profit": profit
+                "profit": profit,
+                "finalWallet": {...p.wallet},
+                "initialWallet": {...p.initialWallet}
             });
 
             this.wss.sendEvent(
@@ -65,10 +60,22 @@ export default class ResultPhase extends JoinablePhase {
                 "profit-report",
                 {
                     "profit": profit,
-                    "finalPrice": finalPrice
+                    "finalPrice": finalPrice,
+                    "finalWallet": {...p.wallet},
+                    "initialWallet": {...p.initialWallet},
+                    "realValues": {
+                        "highQuality": this.game.parameters.high_quality_value,
+                        "lowQuality": this.game.parameters.low_quality_value
+                    }
                 }
             );
         });
     }
 
+    getWalletValue(wallet: { cash: number; goods: { quality: GoodsMarketGoodQuality; }[]; }) {
+        const highQualityGoodValue = wallet.goods.filter(good => good.quality === GoodsMarketGoodQuality.GOOD).length * this.game.parameters.high_quality_value;
+        const lowQualityGoodValue = wallet.goods.filter(good => good.quality === GoodsMarketGoodQuality.BAD).length * this.game.parameters.low_quality_value;
+
+        return wallet.cash + highQualityGoodValue + lowQualityGoodValue;
+    }
 }

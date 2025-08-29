@@ -58,9 +58,15 @@ export default {
                         player.role = GoodsMarketAuthority.SELLER;
                     }
                 }
+
+                player.signals.highQualitySignal = getDeltaAdjustedValue(gameData.parameters.high_quality_value, gameData.parameters.high_quality_delta);
+                player.signals.lowQualitySignal = getDeltaAdjustedValue(gameData.parameters.low_quality_value, gameData.parameters.low_quality_delta);
             } else {
                 player.authority = GoodsMarketAuthority.ADMIN;
                 player.role = verification.role;
+
+                player.signals.highQualitySignal = gameData.parameters.high_quality_value;
+                player.signals.lowQualitySignal = gameData.parameters.low_quality_value;
             }
 
             player.gameId = gameId;
@@ -95,6 +101,11 @@ export default {
                 }
             }
 
+            player.initialWallet = {
+                cash: player.wallet.cash,
+                goods: [...player.wallet.goods]
+            };
+
             player.number = gameData.players.length;
 
             gameData.players.push(player);
@@ -106,4 +117,8 @@ export default {
             }, 'Joined');
         });
     }
+}
+
+function getDeltaAdjustedValue(value: number, delta: number): number {
+    return Math.round(value * (100 - delta + Math.random() * delta * 2)) / 100;
 }
