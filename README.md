@@ -148,14 +148,23 @@ Try to use automated actions whenever possible (see workflows)
 
 # Containerized Setup IBEX game server
 The game server can be installed from containers, this is easier to do in many cases as most of the internal setup is then done by the container. 
-There are two flavors of this installation, one that takes the existing image on github and installs it as-is, and one the first builds and then 
+There are two flavors of this installation, one that takes the existing image on github and installs it as-is, and one the first builds and then.
+
+If you have run this app via a docker container before, it can happen that you still have parts of the data on your disk. This causes issues with the postgress database.
+Before starting new containers (after an update for instance), make sure to wipe the volumes used by the old run. 
+You can wipe all old containers and volumes by going to the folder that contains the build.docker-compose.yml and .env files file (default: IBEX-game_server), and there run a compose down instruction with the '-v' option:
+
+```
+docker compose -f  build.docker-compose.yml down -v
+```
+WARNING: this will wipe any and all data that you stored in the game server, users, sessions, simulations, everything. 
 
 ## Requirements
 
 1. Docker (or alternative) installed with ability to run compose. You will need to use a console (powershell in Windows)
 2. Free ports:  
-       UI administration port, default at 8080
-       Database UI administration port, default at 18080
+      - UI administration port, default at 8080  
+      - Database UI administration port, default at 18080  
 3. Access to internet and to the docker hub (no corporate restrictions)
 
 ## Deploying the static, pre-build image from the docker hub
@@ -164,8 +173,10 @@ There are two flavors of this installation, one that takes the existing image on
 
 1. Download (and unzip) the zip file contained in the docker-compose directory, or checkout the directory itself.
 2. Open a console, move to the docker-compose directory created in step 1
-3. In the docker-compose folder, run the following instruction: `docker compose up`
-
+3. In the docker-compose folder, run the following instruction:
+```
+    `docker compose up`
+```
 Following these instructions, docker will pull the required images and run all applications. You can then manage the whole contained app using Docker Desktop.
 
 ## Build and deploy a new Docker image with the possibility to change settings:
@@ -177,10 +188,9 @@ Following these instructions, docker will pull the required images and run all a
 5. In the docker-compose folder, run the following instructions
 
 ```
-docker builder prune
 docker compose -f build.docker-compose.yml up
 ```
-This removes existing docker containers and then builds and deploys the containers based on the settings in the .env and docker-compose.yml files.
+This builds and deploys the containers based on the settings in the .env and docker-compose.yml files.
 
 
 
@@ -219,7 +229,8 @@ Changing these credentials at installation time requires to modify the query gen
 ## Updating the containers
 
 When you update the code, you should update the container affected by the changes and the package in docker-compose, if affected as well. 
-The package is instructed to always fetch the latest version, which should trigger and update. In some cases, bracking changes will require you to uninstall previous version of a container. Unistalling a container implies all data is lost, so export any all data before proceeding.
+The package is instructed to always fetch the latest version, which should trigger and update. In some cases, bracking changes will require you to uninstall previous version of a container.
+Unistalling a container implies all data is lost, so export any all data before proceeding. To get a clean install, compose down the containers as described above. 
 All commands in this example assume the project containers still reside at the original developer's Docker Hub repository (yaryribero)
 
 ### nginx (frontend: Web server with UI)
