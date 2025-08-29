@@ -1,0 +1,83 @@
+{
+    "parameters": {
+        "format": "nl",
+        "agentsOnly": false
+    },
+    "defaultBasePoints": {
+        "speculator": 0,
+        "developer": 500000,
+        "owner": 0
+    },
+    "defaultRewardScaleFactor": {
+        "speculator": 1,
+        "developer": 50000,
+        "owner": 20000
+    },
+    "defaultBoundaries": {
+        "owner": {
+            "noproject": {
+                "low": 350000,
+                "high": 600000
+            },
+            "project": {
+                "low": 150000,
+                "high": 350000
+            }
+        },
+        "developer": {
+            "noproject": {
+                "low": 200000,
+                "high": 500000
+            },
+            "project": {
+                "low": 500000,
+                "high": 2750000
+            }
+        }
+    },
+    "timers": [0, 300],
+    "instructions": {
+        "phases": [{
+            "number": 0,
+            "tag": "Introduction",
+            "admin": "Click \"Start\" when the players are ready.",
+            "player": "Wait for an admin to click \"Start\"."
+        }, {
+            "number": 1,
+            "tag": "Market",
+            "admin": "Click Terminate to end the market phase",
+            "player": "Trade goods with other players"
+        }, {
+            "number": 2,
+            "tag": "Results",
+            "admin": "Review results of this round.",
+            "player": "Review results of this round."
+        }]
+    }, "placeHolders": {
+        "admin-start-button": "Start",
+        "admin-stop-button": "Terminate",
+        "confirm-start-game": "Let's start?",
+        "confirm-start-game-description": "This is just to confirm you want to start the game, and it's not a misclick.",
+        "confirm-end-game": "Are you sure?",
+        "confirm-end-game-description": "By confirming this action you will end the game for all players.",
+        "waiting-for-admin-to-start": "Wait for an Admin to start the game",
+        "public-signal-tooltip": "This public valuation is known to everyone",
+        "private-signal-tooltip": "This valuation is known to you only. Other players may have a private valuation themselves",
+        "real-value-tooltip": "This is the real value of one share. All the signals are generated starting from it and adding an error",
+        "price-tooltip": "This is the price agreed on the last contract",
+        "acknowledge-button": "Ok",
+        "confirm-button": "Confirm",
+        "cancel-button": "Cancel",
+        "reward-message-profit": "The final good price was <b>${0}</b>, you own <b>${1}</b> goods yielding a value of <b>${0}</b> times <b>${1}</b>. You have a remaining cash balance of <b>${2}</b>. Your total value remaining is <b>${3}</b>. You earned <b>${4}</b> by trading.",
+        "reward-message-loss": "The final good price was <b>${0}</b>, you own <b>${1}</b> goods yielding a value of <b>${0}</b> times <b>${1}</b>. You have a remaining cash balance of <b>${2}</b>. Your total value remaining is <b>${3}</b>. You lost <b>${4}</b> by trading.",
+        "order-price-missing": "The price for the order was not provided",
+        "order-price-negative": "The specified price (<b>${0}</b>) for the order was negative",
+        "phase-illegal-state": "You are trying to add one ask or bid, but you already have one of that kind.",
+        "no-goods-available": "You don't have goods to offer to the market. Buy one first",
+        "insufficient-funds": "You don't have enough cash to place this order, which requires <b>${0}</b>",
+        "could-not-find-bids": "No bid found",
+        "could-not-find-asks": "No ask found"
+    }, "styles": {
+        "size-of-transition-filler": 36
+    }
+}

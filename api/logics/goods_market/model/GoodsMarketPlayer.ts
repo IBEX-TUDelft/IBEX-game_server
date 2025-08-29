@@ -1,5 +1,5 @@
-import Good from "./Good.ts";
-import { GoodsMarketAuthority } from "./GoodsMarketAuthority.ts";
+import GoodsMarketGood from "./GoodsMarketGood.ts";
+import { GoodsMarketAuthority } from "./GoodsMarketTypes.ts";
 
 export default class GoodsMarketPlayer {
 
@@ -7,9 +7,11 @@ export default class GoodsMarketPlayer {
     authority: GoodsMarketAuthority;
     gameId: number;
     number: number;
+    role: number;
+
     wallet: {
         cash: number;
-        goods: Good[];
+        goods: GoodsMarketGood[];
     };
 
     constructor() {

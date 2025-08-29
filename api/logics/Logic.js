@@ -286,8 +286,12 @@ export default class {
 
         const Phase = this.phases[this.data.currentRound.phase];
 
-        this.data.currentPhase = Phase.create(this.data, this.wss, this.data.currentRound.phase);
-        
+        if (Phase.create != null) {
+            this.data.currentPhase = Phase.create(this.data, this.wss, this.data.currentRound.phase);
+        } else {
+            this.data.currentPhase = new Phase(this.data, this.wss, this.data.currentRound.phase);
+        }
+
         await this.data.currentPhase.onEnter();
 
         console.log(`Phase ${this.data.currentRound.phase} of round ${this.data.currentRound.number} complete? ${this.data.currentPhase.testComplete()}`)
@@ -337,86 +341,87 @@ export default class {
                 number = 0;
             }
         }
-
-        this.refreshWallet();
         
         if (number > this.data.parameters.round_count ) {
             console.log('The game is over');
 
-            let chosenRound = this.data.parameters.simulation_reward_round;
+            if (this.data.parameters.show_up_fee != null ) { //Reward mode on
+                let chosenRound = this.data.parameters.simulation_reward_round;
 
-            if (chosenRound == null) {
-                chosenRound = Math.floor(Math.random() * this.data.parameters.round_count) + 1;
-                console.log('Reward round drawn randomly');
-            } else {
-                console.log('Reward round comes from the simulation dataset parameters');
+                if (chosenRound == null) {
+                    chosenRound = Math.floor(Math.random() * this.data.parameters.round_count) + 1;
+                    console.log('Reward round drawn randomly');
+                } else {
+                    console.log('Reward round comes from the simulation dataset parameters');
+                }
+
+                this.data.rewardRound = chosenRound;
+
+                const showupFee = this.data.parameters.show_up_fee;
+
+                const rewards = [];
+
+                this.data.players.forEach(p => {
+                    if (this.data.parameters.game_type != 'market') {
+                        let factor;
+                        let basePoints;
+
+                        switch(p.role) {
+                            case 1:
+                                factor = this.data.parameters.speculators_reward_scale_factor;
+                                basePoints = this.data.parameters.speculators_base_points;
+                                break;
+                            case 2:
+                                factor = this.data.parameters.developers_reward_scale_factor;
+                                basePoints = this.data.parameters.developers_base_points;
+                                break;
+                            case 3:
+                                factor = this.data.parameters.owners_reward_scale_factor;
+                                basePoints = this.data.parameters.owners_base_points;
+                                break;
+                            default:
+                                throw new Error(`Player ${p.number} role not clear: ${p.role}`);
+                        }
+
+                        const profit = self.getProfit(p.number, chosenRound);
+
+                        const points = basePoints + profit;
+
+                        const reward = {
+                            "number": p.number,
+                            "round": chosenRound,
+                            "reward": Math.round(points * 100 / factor) / 100 + showupFee,
+                            "basePoints": basePoints,
+                            "showupFee": showupFee,
+                            "gameFee": Math.round(points * 100 / factor) / 100,
+                            "profit": profit,
+                            "points": points,
+                            "factor": factor,
+                            "exchange": Math.round(1000000 / factor) / 1000000,
+                            "paymentToken": p.paymentToken
+                        };
+
+                        const err = self.wss.sendEvent(
+                            self.data.id,
+                            p.number,
+                            "reward",
+                            reward
+                        );
+            
+                        if (err != null) {
+                            console.error(err);
+                        }
+
+                        rewards.push(reward);
+                    }
+                });
+
+                this.data.rewards = rewards;
+
+                AppEvents.get(this.data.id).emit(GameOver, chosenRound);
             }
 
-            this.data.rewardRound = chosenRound;
-
-            const showupFee = this.data.parameters.show_up_fee;
-
-            const rewards = [];
-
-            this.data.players.forEach(p => {
-                if (this.data.parameters.game_type != 'market') {
-                    let factor;
-                    let basePoints;
-
-                    switch(p.role) {
-                        case 1:
-                            factor = this.data.parameters.speculators_reward_scale_factor;
-                            basePoints = this.data.parameters.speculators_base_points;
-                            break;
-                        case 2:
-                            factor = this.data.parameters.developers_reward_scale_factor;
-                            basePoints = this.data.parameters.developers_base_points;
-                            break;
-                        case 3:
-                            factor = this.data.parameters.owners_reward_scale_factor;
-                            basePoints = this.data.parameters.owners_base_points;
-                            break;
-                        default:
-                            throw new Error(`Player ${p.number} role not clear: ${p.role}`);
-                    }
-
-                    const profit = self.getProfit(p.number, chosenRound);
-
-                    const points = basePoints + profit;
-
-                    const reward = {
-                        "number": p.number,
-                        "round": chosenRound,
-                        "reward": Math.round(points * 100 / factor) / 100 + showupFee,
-                        "basePoints": basePoints,
-                        "showupFee": showupFee,
-                        "gameFee": Math.round(points * 100 / factor) / 100,
-                        "profit": profit,
-                        "points": points,
-                        "factor": factor,
-                        "exchange": Math.round(1000000 / factor) / 1000000,
-                        "paymentToken": p.paymentToken
-                    };
-
-                    const err = self.wss.sendEvent(
-                        self.data.id,
-                        p.number,
-                        "reward",
-                        reward
-                    );
-        
-                    if (err != null) {
-                        console.error(err);
-                    }
-
-                    rewards.push(reward);
-                }
-            });
-
-            this.data.rewards = rewards;
-
             this.wss.broadcastEvent(this.data.id, "game-over", {});
-            AppEvents.get(this.data.id).emit(GameOver, chosenRound);
 
             this.over = true;
             clearInterval(this.phaseCheckingInterval);
@@ -427,6 +432,8 @@ export default class {
             this.backup();
 
             return;
+        } else {
+            this.refreshWallet();
         }
         
         let ownerCounter = 0;

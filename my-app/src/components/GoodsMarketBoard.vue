@@ -27,26 +27,26 @@
         <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase === 0">
             <b-col class="d-flex align-items-center justify-content-center flex-column">
                 <b-row>
-                    <b-button v-if="player.role === 0" size="lg" @click="startGame" variant="primary">{{ resolvePlaceHolder('admin-start-button') }}</b-button>
+                    <b-button v-if="player.authority === 0" size="lg" @click="startGame" variant="primary">{{ resolvePlaceHolder('admin-start-button') }}</b-button>
                     <div v-else>{{ resolvePlaceHolder('waiting-for-admin-to-start') }}</div>
                 </b-row>
             </b-col>
         </b-row>
 
-        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 2 && player.role != 0)">
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 2 && player.authority != 0)">
             <b-col class="d-flex align-items-center justify-content-center flex-column">
                 <div v-html="getProfitString()"/>
             </b-col>
         </b-row>
 
-        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 1 && !transitioning) || (game.phase === 2 && player.role === 0)">
-            <b-col class="d-flex align-items-center justify-content-center flex-column col-6">
-                <DoubleAuctionMarket v-if="game.over != true" ref="doubleAuctionMarket"
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 1 && !transitioning) || (game.phase === 2 && player.authority === 0)">
+            <b-col class="d-flex align-items-center justify-content-center flex-column col-6" v-if="game.over != true" >
+                <GoodsDoubleAuctionMarket ref="doubleAuctionMarket"
                     :connection="connection"
                     :game="game"
                     :player="player"
                 />
-                <div v-else class="container-fluid">
+                <!--div v-else class="container-fluid">
                     <p class="text-center">Real value: <b>{{ player.signal }}</b></p>
 
                     <table class="table table-bordered" style="table-layout: fixed;">
@@ -80,26 +80,70 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </div-->
             </b-col>
 
-            <b-col class="d-flex align-items-center justify-content-center flex-column col-6">
-                <VueApexCharts width="500px" height="500px" type="line" :options="chartOptions" :series="series" />
+            <b-col :class="'d-flex align-items-center justify-content-center flex-column' + (game.over ? ' col-12' : ' col-6')">
+                <div style="width: 100%">
+                    <VueApexCharts height="500px" type="line" :options="chartOptions" :series="series" />
+                </div>
             </b-col>
         </b-row>
 
-        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase === 1 && player.role === 0">
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="(game.phase === 2 && player.authority === 0)">
+            <b-col v-if="game.over" class="d-flex align-items-center justify-content-center flex-column col-6 p-2">
+                <table style="width: 100%; text-align: center;">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Buyers</th>
+                        </tr>
+                        <tr>
+                            <th>Player</th>
+                            <th>Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(buyer, index) in game.statistics.buyers" :key="index" :style="{ backgroundColor: index % 2 === 0 ? '#f2f2f2' : 'transparent', borderBottom: '1px solid #ddd' }">
+                            <td>{{ buyer.number }}</td>
+                            <td class="text-center">{{ buyer.profit }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </b-col>
+
+            <b-col v-if="game.over" class="d-flex align-items-center justify-content-center flex-column col-6 p-2">
+                <table style="width: 100%; text-align: center;">
+                    <thead>
+                        <tr>
+                            <th colspan="2" style="text-align: center;">Sellers</th>
+                        </tr>
+                        <tr>
+                            <th>Player</th>
+                            <th>Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(seller, index) in game.statistics.sellers" :key="index" :style="{ backgroundColor: index % 2 === 0 ? '#f2f2f2' : 'transparent', borderBottom: '1px solid #ddd' }">
+                            <td>{{ seller.number }}</td>
+                            <td class="text-center">{{ seller.profit }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </b-col>
+        </b-row>
+
+        <b-row class="no-gutters justify-content-center flex-grow-1" v-if="game.phase === 1 && player.authority === 0">
             <b-col class="d-flex align-items-center justify-content-center">
-                <b-button v-if="player.role === 0" size="lg" @click="endGame" variant="danger">{{ resolvePlaceHolder('admin-stop-button') }}</b-button>
+                <b-button v-if="player.authority === 0" size="lg" @click="endGame" variant="danger">{{ resolvePlaceHolder('admin-stop-button') }}</b-button>
             </b-col>
         </b-row>
     </div></b-col>
 </template>
 <script>
-    import DoubleAuctionMarket from './market/DoubleAuctionMarket.vue';
+    import GoodsDoubleAuctionMarket from './goodsMarket/GoodsDoubleAuctionMarket.vue';
     import Confirm from './modals/Confirm.vue';
     import Acknowledge from './modals/Acknowledge.vue';
-    import dictionary from '../assets/market.json';
+    import dictionary from '../assets/goods-market.json';
     import { getGameStatus } from '../services/GameService'
     import EventService from '../services/EventService';
     import FormatService from '../services/FormatServiceDoubleAuction';
@@ -170,7 +214,18 @@
                 chartOptions: {
                     xaxis: {
                         categories: [],
+                        type: 'datetime',
+                        labels: {
+                            datetimeUTC: false, // 👈 This will display local time instead of UTC
+                        },
                     },
+                    animations: {
+                        enabled: true,
+                        easing: 'linear',
+                        dynamicAnimation: {
+                            speed: 1000
+                        }
+                    }
                 },
                 series: [{
                     name: 'Price',
@@ -180,12 +235,12 @@
             };
         },
         components: {
-            DoubleAuctionMarket,
+            GoodsDoubleAuctionMarket,
             Confirm,
             Acknowledge,
             VueApexCharts
         },
-        name: 'DoubleAuctionBoard',
+        name: 'GoodsDoubleAuctionBoard',
         methods: {
             getToken() {
                 return localStorage.getItem("token");
@@ -238,10 +293,10 @@
                 }
 
                 return this.resolvePlaceHolder(placeHolder,
-                    this.game.realValue,
-                    this.player.wallet.shares,
-                    this.player.wallet.balance,
-                    this.player.wallet.shares * this.game.realValue + this.player.wallet.balance,
+                    this.game.currentPrice,
+                    this.player.wallet.goods.length,
+                    this.player.wallet.cash,
+                    this.player.wallet.goods.length * this.game.currentPrice + this.player.wallet.cash,
                     profit
                 );
             },
@@ -280,9 +335,9 @@
                 console.log(self.game);
 
                 if (self.game.boundaries != null) {
-                    if (self.player.role == 2) {
+                    if (self.player.authority == 2) {
                         self.player.boundaries = self.game.boundaries.developer;
-                    } else if (self.player.role == 3) {
+                    } else if (self.player.authority == 3) {
                         self.player.boundaries = self.game.boundaries.owner;
                     }
                 }
@@ -304,6 +359,20 @@
                     }
                 }
                 
+                if (self.game.tickers != null && self.game.tickers.length > 0) {
+                    console.log('Recovering tickers', self.game.tickers);
+
+                    self.game.currentPrice = self.game.tickers[self.game.tickers.length - 1].price;
+
+                    self.series = [{
+                        name: 'Price',
+                        data: self.game.tickers.slice(-100).map(t => ({
+                            x: t.time,
+                            y: t.price
+                        }))
+                    }];
+                }
+
                 if (gameData.timer != null) {
                     self.timer.end = gameData.timer > Date.now() ? gameData.timer : Date.now();
 
@@ -335,7 +404,7 @@
                                 }
 
                                 var initialInstructions = self.dictionary.instructions.phases[self.game.phase][
-                                    ['admin', 'player', 'player', 'player', 'player'][self.player.role != null ? self.player.role : 1]
+                                    ['admin', 'player', 'player', 'player', 'player'][self.player.authority != null ? self.player.authority : 1]
                                 ];
 
                                 self.player.instructions = initialInstructions;
@@ -351,7 +420,7 @@
                                 self.game.phaseTag = self.dictionary.instructions.phases[self.game.phase]?.tag;
 
                                 var phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
-                                    ['admin', 'player', 'player', 'player'][self.player.role]
+                                    ['admin', 'player', 'player', 'player'][self.player.authority]
                                 ];
 
                                 self.showIntructions = false;
@@ -398,8 +467,8 @@
                                 break;
                             }
                             case 'asset-movement': {
-                                self.player.wallet.balance = ev.data.balance;
-                                self.player.wallet.shares = ev.data.shares;
+                                self.player.wallet.goods = ev.data.goods;
+                                self.player.wallet.cash = ev.data.cash;
 
                                 break;
                             }
@@ -442,6 +511,14 @@
                                 break;
                             case 'contract-fulfilled':
                                 self.game.currentPrice = ev.data.price;
+
+                                self.series = [{
+                                    data: [...self.series[0].data.slice(-99), {
+                                        x: ev.data.time,
+                                        y: ev.data.price
+                                    }]
+                                }];
+                                
                                 break;
                             case 'market-statistics':
                                 self.game.statistics = ev.data;
@@ -746,7 +823,7 @@
                 console.log('DATA RECOVERED');
 
                 const phaseInstructions = self.dictionary.instructions.phases[self.game.phase][
-                    ['admin', 'player', 'player', 'player', 'player'][self.player.role]
+                    ['admin', 'player', 'player', 'player', 'player'][self.player.authority]
                 ];
 
                 self.player.instructions = phaseInstructions;
@@ -767,25 +844,6 @@
             } catch (err) {
                 console.log(err);
             }
-
-            /*const intervalId = setInterval(() => {
-                if (this.game.over) {
-                    clearInterval(intervalId);
-                    return;
-                }
-
-                let price = this.game.currentPrice;
-
-                if (price == null) {
-                    price = this.game.publicSignal | 0;
-                }
-
-                this.chartOptions.xaxis.categories.push(this.chartOptions.xaxis.categories.length * 5);
-
-                this.series = [{
-                    data: [...this.series[0].data, price]
-                }];
-            }, 5000);*/
         }
     }
 </script>

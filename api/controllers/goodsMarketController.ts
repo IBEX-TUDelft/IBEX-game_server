@@ -1,12 +1,11 @@
 import WssManagement from '../services/wssGameService.js';
 import GameManagement from '../services/gameManager.js';
 import Controller from '../helpers/controller.js';
-import GoodsMarketPlayer from '../logics/goods_market/GoodsMarketPlayer.ts';
+import GoodsMarketPlayer from '../logics/goods_market/model/GoodsMarketPlayer.ts';
 import Utils from '../helpers/utils.js';
-import { GoodsMarketAuthority } from '../logics/goods_market/GoodsMarketAuthority.ts';
 import { v4 as uuidv4 } from 'uuid';
-import Good from '../logics/goods_market/Good.ts';
-import { GoodQuality } from '../logics/goods_market/GoodQuality.ts';
+import GoodsMarketGood from '../logics/goods_market/model/GoodsMarketGood.ts';
+import { GoodsMarketGoodQuality, GoodsMarketAuthority } from '../logics/goods_market/model/GoodsMarketTypes.ts';
 import { Request, Response } from 'express';
 
 export default {
@@ -29,6 +28,8 @@ export default {
 
             const gameData = game.data;
 
+            console.log(`Parameters: ${JSON.stringify(gameData.parameters)}`);
+
             const player : GoodsMarketPlayer = new GoodsMarketPlayer();
 
             let verification;
@@ -40,15 +41,32 @@ export default {
             }
 
             if (verification == null || verification.role != 0) {
-                player.authority = Math.random() < 0.5 ? GoodsMarketAuthority.BUYER : GoodsMarketAuthority.SELLER; // Randomly assign BUYER or SELLER authority
+                if (gameData.players.filter((p: GoodsMarketPlayer) => p.role === GoodsMarketAuthority.SELLER).length === 0) {
+                    player.authority = GoodsMarketAuthority.SELLER;
+                    player.role = GoodsMarketAuthority.SELLER;
+                } else {
+                    const sellerRatio = gameData.players.filter((p: GoodsMarketPlayer) => p.role === GoodsMarketAuthority.SELLER).length /
+                        gameData.players.filter((p: GoodsMarketPlayer) => p.role !== GoodsMarketAuthority.ADMIN).length;
+
+                    console.log(`Current seller ratio: ${sellerRatio}`);
+                    
+                    if (sellerRatio > 0.5) {
+                        player.authority = GoodsMarketAuthority.BUYER;
+                        player.role = GoodsMarketAuthority.BUYER;
+                    } else {
+                        player.authority = GoodsMarketAuthority.SELLER;
+                        player.role = GoodsMarketAuthority.SELLER;
+                    }
+                }
             } else {
                 player.authority = GoodsMarketAuthority.ADMIN;
+                player.role = verification.role;
             }
 
             player.gameId = gameId;
 
             while (
-                player.recovery === '' ||
+                player.recovery == null || player.recovery === '' ||
                 gameData.players.find((p: GoodsMarketPlayer) => p.recovery === player.recovery) != null
             ) {
                 player.recovery = uuidv4();
@@ -56,10 +74,25 @@ export default {
 
             if (player.authority === GoodsMarketAuthority.BUYER) {
                 player.wallet.cash = gameData.parameters.cash_per_player;
-            } else {
-                const quality: GoodQuality = Math.random() * 100 > gameData.parameters.bad_quality_ratio ?
-                    GoodQuality.GOOD : GoodQuality.BAD;
-                player.wallet.goods.push(new Good(quality));
+            } else if (player.authority === GoodsMarketAuthority.SELLER) {
+                if (gameData.players.filter((p: GoodsMarketPlayer) => p.role === GoodsMarketAuthority.SELLER).length === 0) {
+                    player.wallet.goods.push(new GoodsMarketGood(GoodsMarketGoodQuality.GOOD));
+                } else {
+                    const totalGoods = gameData.players
+                        .map((p: GoodsMarketPlayer) => p.wallet.goods)
+                        .reduce((acc: number, g: GoodsMarketGood[]) => acc + g.length, 0);
+                    
+                    const badRatio = gameData.players
+                        .map((p: GoodsMarketPlayer) => p.wallet.goods)
+                        .flat()
+                        .filter((g: GoodsMarketGood) => g.quality === GoodsMarketGoodQuality.BAD).length / totalGoods;
+
+                    if (badRatio * 100 < gameData.parameters.bad_quality_ratio) {
+                        player.wallet.goods.push(new GoodsMarketGood(GoodsMarketGoodQuality.BAD));
+                    } else {
+                        player.wallet.goods.push(new GoodsMarketGood(GoodsMarketGoodQuality.GOOD));
+                    }
+                }
             }
 
             player.number = gameData.players.length;

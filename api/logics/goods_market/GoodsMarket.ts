@@ -2,8 +2,8 @@ import { GameOver, AppEvents } from "../../helpers/AppEvents.js";
 import randomService from "../../services/randomService.js";
 import Logic from "../Logic.js";
 import WaitingPhase from '../market/phases/WaitingPhase.js';
-import { GoodsMarketAuthority } from "./GoodsMarketAuthority.ts";
-import GoodsMarketPlayer from "./GoodsMarketPlayer.ts";
+import { GoodsMarketAuthority } from "./model/GoodsMarketTypes.ts";
+import GoodsMarketPlayer from "./model/GoodsMarketPlayer.ts";
 import MarketPhase from "./phases/MarketPhase.ts";
 import ResultPhase from "./phases/ResultPhase.ts";
 
@@ -21,6 +21,8 @@ export default class GoodsMarket extends Logic {
 
     constructor(data, record) {
         super(data, [WaitingPhase, MarketPhase, ResultPhase], 'GoodsMarket', record);
+
+        console.log(`Parameters: ${JSON.stringify(data.parameters)}`);
 
         AppEvents.get(this.data.id).addListener(GameOver, () => {
             this.data.players.filter((p: GoodsMarketPlayer) => p.authority === GoodsMarketAuthority.ADMIN)
@@ -86,7 +88,7 @@ export default class GoodsMarket extends Logic {
         return 0; //TODO
     }
 
-    getRecoveryData(number) {
+    getRecoveryData(number: number) {
         const data = {
             game: {
                 phase: this.data.currentRound.phase,
@@ -96,18 +98,20 @@ export default class GoodsMarket extends Logic {
                 orders: null,
                 currentPrice: null,
                 statistics: null,
-                realValue: null
+                realValue: null,
+                tickers: null
             },
             player: {},
             timer: null
         }
 
-        const player: GoodsMarketPlayer = this.data.players.find(p => p.number === number);
+        const player: GoodsMarketPlayer = this.data.players.find((p: GoodsMarketPlayer) => p.number === number);
 
         if (player != null) {
             data.player = {
                 "number": player.number,
                 "authority": player.authority,
+                "role": player.role,
                 "recovery": player.recovery,
                 "wallet": player.wallet,
                 "profit": this.getCurrentProfit(number)
@@ -130,6 +134,11 @@ export default class GoodsMarket extends Logic {
             if (movementList.length > 0) {
                 data.game.currentPrice = movementList[movementList.length - 1].movement.price;
             }
+
+            data.game.tickers = movementList.map((m: { movement: { price: number, time: number }}) => ({
+                "price": m.movement.price,
+                "time": m.movement.time
+            }));
         }
 
         if (this.data.currentRound.phase > 1) {
@@ -138,6 +147,11 @@ export default class GoodsMarket extends Logic {
             if (player.authority === GoodsMarketAuthority.ADMIN) {
                 data.game.statistics = this.getStatistics();
             }
+
+            data.game.tickers = this.data.results.find(r => r.round === this.data.currentRound.number).phase[1].transactions.map(t => ({
+                time: t.time,
+                price: t.price
+            }));
         }
 
         if (this.data.currentPhase.timer.set === true) {
@@ -174,15 +188,31 @@ export default class GoodsMarket extends Logic {
     getStatistics() {
         const source = this.data.results.find(r => r.round === this.data.currentRound.number).phase[1];
 
-        const statistics = {
-        };
-
         if (source == null || source.log == null || source.log.length === 0) {
-            return statistics;
+            return {};
         }
 
-        const players = this.data.players;
+        const buyers = this.data.players.filter((p: GoodsMarketPlayer) => p.authority === GoodsMarketAuthority.BUYER).map((p: GoodsMarketPlayer) => {
+            return {
+                "number": p.number,
+                "profit": this.getCurrentProfit(p.number)
+            };
+        });
 
-        return statistics;
+        buyers.sort((a: { profit: number; }, b: { profit: number; }) => b.profit - a.profit);
+
+        const sellers = this.data.players.filter((p: GoodsMarketPlayer) => p.authority === GoodsMarketAuthority.SELLER).map((p: GoodsMarketPlayer) => {
+            return {
+                "number": p.number,
+                "profit": this.getCurrentProfit(p.number)
+            };
+        });
+
+        sellers.sort((a: { profit: number; }, b: { profit: number; }) => b.profit - a.profit);
+
+        return {
+            buyers,
+            sellers
+        };
     }
 }

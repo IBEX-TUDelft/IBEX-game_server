@@ -72,7 +72,11 @@ export default class Phase {
         }
     }
 
+    /**
+     * @returns {Promise<boolean>}
+     */
     async testComplete() {
+        return this.complete;
     }
 
     getData () {

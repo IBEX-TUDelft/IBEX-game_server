@@ -62,6 +62,8 @@ export default {
                 const gameParameters = await gameParameterRepository.findByGameId(gameRecord.id);
 
                 gameParameters.forEach(gp => {
+                    console.debug(`Loading parameter ${gp.key} (${gp.type}): ${gp.value}`);
+                    
                     switch(gp.type) {
                         case 'string':
                             gameData.parameters[gp.key] = gp.value;
