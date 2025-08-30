@@ -1,7 +1,8 @@
 {
     "parameters": {
         "format": "nl",
-        "agentsOnly": false
+        "agentsOnly": false,
+        "timezone": "Europe/Amsterdam"
     },
     "defaultBasePoints": {
         "speculator": 0,

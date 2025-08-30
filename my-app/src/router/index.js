@@ -16,6 +16,8 @@ import SimulationList from '../components/SimulationList';
 import DoubleAuctionBoard from '../components/DoubleAuctionBoard';
 import GoodsMarketBoard from '../components/GoodsMarketBoard';
 import RestoreList from '../components/RestoreList';
+import GoodsMarketTradingLog from '../components/goodsMarket/GoodsMarketTradingLog.vue';
+import GoodsMarketResults from '../components/goodsMarket/GoodsMarketResults.vue';
 
 Vue.use(VueRouter)
 
@@ -119,6 +121,16 @@ const routes = [
     path: '/surveys/:id',
     name: 'Game Surveys',
     component: GameSurveys
+  },
+  {
+    path: '/goods-market/:id',
+    name: 'Goods Market Trading Log',
+    component: GoodsMarketTradingLog
+  },
+  {
+    path: '/goods-market-results/:id',
+    name: 'Goods Market Results',
+    component: GoodsMarketResults
   }
 ]
 

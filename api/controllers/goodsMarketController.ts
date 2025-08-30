@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import GoodsMarketGood from '../logics/goods_market/model/GoodsMarketGood.ts';
 import { GoodsMarketGoodQuality, GoodsMarketAuthority } from '../logics/goods_market/model/GoodsMarketTypes.ts';
 import { Request, Response } from 'express';
+import gameService from '../services/gameService.js';
 
 export default {
     apply(app) {
@@ -116,7 +117,26 @@ export default {
                 "player": player
             }, 'Joined');
         });
-    }
+
+        Controller.addGetRoute(app, '/api/v1/games/goods-market/market-log', false, async (req, res) => {
+            const gameId = parseInt(req.query.game_id);
+
+            const game = await gameService.findGameData(gameId);
+
+            const data = {
+                "ruleset": game.type,
+                "players": game.players.map(p => {
+                    return {
+                        "number": p.number,
+                        "tag": p.tag
+                    }
+                }),
+                "marketLog": game.results[1].phase[1].log
+            };
+
+            Controller.handleSuccess(res, data, 'Data available');
+        });
+}
 }
 
 function getDeltaAdjustedValue(value: number, delta: number): number {

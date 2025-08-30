@@ -1,0 +1,188 @@
+<template>
+    <b-container fluid class="no-gutters">
+
+        <b-navbar id="navbar" toggleable="md" type="dark" variant="info" style="margin-left: -15px; margin-right: -15px;">
+            <b-navbar-nav>
+                <b-nav-item active>Ruleset: Goods Market</b-nav-item>
+            </b-navbar-nav>
+            <div class="container justify-content-center">
+                <b-navbar-brand>
+                    Goods Market Results
+                </b-navbar-brand>
+            </div>
+            <b-navbar-nav class="ml-auto">
+                <button :disabled="results == null || results.length === 0" class="btn btn-success" @click="exportXlsx">Export</button>
+            </b-navbar-nav>
+        </b-navbar>
+
+        <b-row>
+            <b-col>
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <tr style="text-align: center;">
+                            <th scope="col"></th>
+                            <th scope="col" colspan="2">Values</th>
+                            <th scope="col" colspan="4">Initial Wallet</th>
+                            <th scope="col" colspan="4">Final Wallet</th>
+                            <th scope="col"></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Player</th>
+                            <th scope="col">High Quality Good</th>
+                            <th scope="col">Low Quality Good</th>
+                            <th scope="col">Cash</th>
+                            <th scope="col">High Quality Goods</th>
+                            <th scope="col">Low Quality Goods</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Cash</th>
+                            <th scope="col">High Quality Goods</th>
+                            <th scope="col">Low Quality Goods</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="entry in results" :key="entry.id">
+                            <td>{{ entry.number }}</td>
+                            <td>{{ highQualityValue }}</td>
+                            <td>{{ lowQualityValue}}</td>
+                            <td>{{ entry.initialWallet.cash }}</td>
+                            <td>{{ entry.initialWallet.goods.filter(g => g.quality === 'good').length }}</td>
+                            <td>{{ entry.initialWallet.goods.filter(g => g.quality === 'bad').length }}</td>
+                            <td>{{ getWalletValue(entry.initialWallet) }}</td>
+                            <td>{{ entry.finalWallet.cash }}</td>
+                            <td>{{ entry.finalWallet.goods.filter(g => g.quality === 'good').length }}</td>
+                            <td>{{ entry.finalWallet.goods.filter(g => g.quality === 'bad').length }}</td>
+                            <td>{{ getWalletValue(entry.finalWallet) }}</td>
+                            <td>{{ getWalletValue(entry.finalWallet) - getWalletValue(entry.initialWallet) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </b-col>
+        </b-row>
+    </b-container>
+</template>
+
+<script>
+    import * as XLSX from "xlsx";
+    import dictionary from '../../assets/goods-market.json';
+
+    export default {
+        data() {
+            return {
+                gameId: null,
+                results: null,
+                players: null,
+                highQualityValue: null,
+                lowQualityValue: null
+            };
+        },
+        components: {
+        },
+        name: 'GoodsMarketTradingLog',
+        created() {
+        },
+        methods: {
+            getWalletValue(wallet) {
+                let value = wallet.cash;
+
+                value += wallet.goods.filter(g => g.quality === 'good').length * this.highQualityValue;
+                value += wallet.goods.filter(g => g.quality === 'bad').length * this.lowQualityValue;
+
+                return value;
+            },
+            formatNumber(num) {
+                if (num == null || typeof num != 'number') {
+                    return num;
+                }
+
+                return num.toLocaleString('en-US');
+            },
+            formatTimestamp(timestamp) {
+                if (timestamp == null || typeof timestamp != 'number') {
+                    return timestamp;
+                }
+
+                const options = {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                }
+
+                return new Date(timestamp).toLocaleString(dictionary.parameters.format, options);
+            },
+            exportXlsx() {
+                const self = this;
+
+                const wb = XLSX.utils.book_new();
+
+                const xls = [];
+
+                const headers = [
+                    "Player",
+                    "High Quality Good Value per Unit",
+                    "Low Quality Good Value per Unit",
+                    "Initial Cash",
+                    "Initial High Quality Goods",
+                    "Initial Low Quality Goods",
+                    "Initial Total",
+                    "Final Cash",
+                    "Final High Quality Goods",
+                    "Final Low Quality Goods",
+                    "Final Total",
+                    "Profit"
+                ];
+
+                xls.push(headers);
+
+                self.results.forEach(r => {
+                    xls.push([
+                        r.number,
+                        self.highQualityValue,
+                        self.lowQualityValue,
+                        r.initialWallet.cash,
+                        r.initialWallet.goods.filter(g => g.quality === 'good').length,
+                        r.initialWallet.goods.filter(g => g.quality === 'bad').length,
+                        self.getWalletValue(r.initialWallet),
+                        r.finalWallet.cash,
+                        r.finalWallet.goods.filter(g => g.quality === 'good').length,
+                        r.finalWallet.goods.filter(g => g.quality === 'bad').length,
+                        self.getWalletValue(r.finalWallet),
+                        self.getWalletValue(r.finalWallet) - self.getWalletValue(r.initialWallet)
+                    ]);
+                });
+
+                /* convert state to workbook */
+                const ws = XLSX.utils.aoa_to_sheet(xls);
+                XLSX.utils.book_append_sheet(wb, ws, `Round ${1}`);
+
+                /* generate file and send to client */
+                XLSX.writeFile(wb, `${this.gameId}.results.xlsx`);
+            }
+        },
+        async mounted () {
+            const self = this;
+
+            const token = localStorage.getItem("token");
+
+            this.gameId = parseInt(this.$route.params.id);
+
+            const gameData = await this.$http.get("/games/data", {
+                params: {
+                    token,
+                    game_id: self.gameId
+                }
+            });
+
+            this.players = gameData.data.data.players.filter(p => p.role != 0);
+
+            this.results = gameData.data.data.results[1].phase[2].profits.filter (profit => this.players.find(pl => pl.number === profit.number) != null);
+
+            this.highQualityValue = gameData.data.data.parameters.high_quality_value;
+            this.lowQualityValue = gameData.data.data.parameters.low_quality_value;
+        }
+    }
+</script>

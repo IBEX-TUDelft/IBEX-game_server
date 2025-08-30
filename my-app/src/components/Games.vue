@@ -120,8 +120,9 @@ export default {
         analyseGame: async function (id, type) {
             let subPath = 'analyse';
 
-            console.log('TYPE ' + type)
-            if (type?.toString().toLowerCase() === 'voting') {
+            if (type?.toString().toLowerCase() === 'goodsmarket') {
+                subPath = 'goods-market-results';
+            } else if (type?.toString().toLowerCase() === 'voting') {
                 subPath = 'analyse-voting';
             }
 
@@ -136,7 +137,9 @@ export default {
         interationLog: async function (id, type) {
             let subPath = 'market';
 
-            if (type?.toString().toLowerCase() === 'voting') {
+            if (type?.toString().toLowerCase() === 'goodsmarket') {
+                subPath = 'goods-market';
+            } else if (type?.toString().toLowerCase() === 'voting') {
                 subPath = 'chat';
             }
 
