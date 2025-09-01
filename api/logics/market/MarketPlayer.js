@@ -15,6 +15,8 @@ class MarketPlayer {
     cash = -1;
     gameId = -1;
     role = -1;
+    wallet = null;
+    signal = null;
 }
 
 export {

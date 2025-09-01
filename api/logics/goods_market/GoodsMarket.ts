@@ -1,5 +1,4 @@
 import { GameOver, AppEvents } from "../../helpers/AppEvents.js";
-import randomService from "../../services/randomService.js";
 import Logic from "../Logic.js";
 import WaitingPhase from '../market/phases/WaitingPhase.js';
 import { GoodsMarketAuthority } from "./model/GoodsMarketTypes.ts";
@@ -17,7 +16,7 @@ import ResultPhase from "./phases/ResultPhase.ts";
  * - `player_min_number`: Minimum number of players in the game.
  * - `use_bots`: Whether to use bots in the game.
  */
-export default class GoodsMarket extends Logic {
+export class GoodsMarket extends Logic {
 
     constructor(data, record) {
         super(data, [WaitingPhase, MarketPhase, ResultPhase], 'GoodsMarket', record);

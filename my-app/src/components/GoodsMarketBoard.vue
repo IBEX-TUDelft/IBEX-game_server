@@ -381,7 +381,7 @@
                         color: "#fff",
                         background: "#FF4560",
                         },
-                        text: "Low Quality Signal",
+                        text: "Low Quality Median Valuation",
                     }
                 }, {
                     y: self.player.signals.highQualitySignal,
@@ -392,7 +392,7 @@
                             color: "#fff",
                             background: "#00E396",
                         },
-                        text: "High Quality Signal",
+                        text: "High Quality Median Valuation",
                     }
                 });
 
@@ -477,7 +477,7 @@
                                         color: "#fff",
                                         background: "#FF4560",
                                         },
-                                        text: "Low Quality Signal",
+                                        text: "Low Quality Median Valuation",
                                     },
                                 }, {
                                     y: self.player.signals.highQualitySignal,
@@ -488,7 +488,7 @@
                                             color: "#fff",
                                             background: "#00E396",
                                         },
-                                        text: "High Quality Signal",
+                                        text: "High Quality Median Valuation",
                                     }
                                 });
 

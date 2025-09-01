@@ -7,7 +7,7 @@ import Harberger from '../logics/harberger/Harberger.js';
 import Futarchy from '../logics/futarchy/Futarchy.js';
 import Voting from '../logics/voting/Voting.js';
 import Market from '../logics/market/Market.js';
-import GoodsMarket from '../logics/goods_market/GoodsMarket.ts';
+import { GoodsMarket } from '../logics/goods_market/GoodsMarket.ts';
 import { resolve } from 'node:path';
 
 export default {

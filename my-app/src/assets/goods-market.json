@@ -48,8 +48,8 @@
             "number": 1,
             "tag": "Market",
             "admin": "Click Terminate to end the market phase",
-            "buyer": "Your goal is to buy a high quality good at the best possible price.",
-            "seller": "Your goal is to maximise your profit, trading goods at the best possible price."
+            "buyer": "Your goal is to maximise the value of your wallet (cash + valuation of the goods).",
+            "seller": "Your goal is to maximise the value of your wallet (cash + valuation of the goods)."
         }, {
             "number": 2,
             "tag": "Results",
@@ -65,15 +65,12 @@
         "confirm-end-game": "Are you sure?",
         "confirm-end-game-description": "By confirming this action you will end the game for all players.",
         "waiting-for-admin-to-start": "Wait for an Admin to start the game",
-        "public-signal-tooltip": "This public valuation is known to everyone",
-        "private-signal-tooltip": "This valuation is known to you only. Other players may have a private valuation themselves",
-        "real-value-tooltip": "This is the real value of one share. All the signals are generated starting from it and adding an error",
         "price-tooltip": "This is the price agreed on the last contract",
         "acknowledge-button": "Ok",
         "confirm-button": "Confirm",
         "cancel-button": "Cancel",
-        "reward-message-profit": "The high quality real good value was <b>${0}</b>, you own <b>${1}</b> high quality goods yielding a value of <b>${2}</b>. The low quality real good value was <b>${3}</b>, you own <b>${4}</b> low quality goods yielding a value of <b>${5}</b>. You have a remaining cash balance of <b>${6}</b>. Your total final value is <b>${7}</b>, from which the initial value <b>${8}</b> must be deducted to calculate the profit. You earned <b>${9}</b> by trading.",
-        "reward-message-loss": "The high quality real good value was <b>${0}</b>, you own <b>${1}</b> high quality goods yielding a value of <b>${2}</b>. The low quality real good value was <b>${3}</b>, you own <b>${4}</b> low quality goods yielding a value of <b>${5}</b>. You have a remaining cash balance of <b>${6}</b>. Your total final value is <b>${7}</b>, from which the initial value <b>${8}</b> must be deducted to calculate the profit. You lost <b>${9}</b> by trading.",
+        "reward-message-profit": "The high quality real good valuation was <b>${0}</b>, you own <b>${1}</b> high quality goods yielding a value of <b>${2}</b>. The low quality real good value was <b>${3}</b>, you own <b>${4}</b> low quality goods yielding a value of <b>${5}</b>. You have a remaining cash balance of <b>${6}</b>. Your total final value is <b>${7}</b>, from which the initial value <b>${8}</b> must be deducted to calculate the profit. You earned <b>${9}</b> by trading.",
+        "reward-message-loss": "The high quality real good valuation was <b>${0}</b>, you own <b>${1}</b> high quality goods yielding a value of <b>${2}</b>. The low quality real good value was <b>${3}</b>, you own <b>${4}</b> low quality goods yielding a value of <b>${5}</b>. You have a remaining cash balance of <b>${6}</b>. Your total final value is <b>${7}</b>, from which the initial value <b>${8}</b> must be deducted to calculate the profit. You lost <b>${9}</b> by trading.",
         "order-price-missing": "The price for the order was not provided",
         "order-price-negative": "The specified price (<b>${0}</b>) for the order was negative",
         "phase-illegal-state": "You are trying to add one ask or bid, but you already have one of that kind.",

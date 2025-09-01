@@ -30,7 +30,7 @@
 
             <div class="row">
                 <div class="form-group col-md-3">
-                    <label htmlFor="exampleInputEmail1">High Quality Good Value</label>
+                    <label htmlFor="exampleInputEmail1">High Quality Good Median Valuation</label>
                 </div>
                 
                 <div class="form-group col-md-3">
@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="form-group col-md-3">
-                    <label htmlFor="exampleInputEmail1">Low Quality Good Value</label>
+                    <label htmlFor="exampleInputEmail1">Low Quality Good Median Valuation</label>
                 </div>
                 
                 <div class="form-group col-md-3">
@@ -46,7 +46,7 @@
                 </div>
             </div>
 
-                        <div class="row">
+            <div class="row">
                 <div class="form-group col-md-3">
                     <label htmlFor="exampleInputEmail1">High Quality Good Signal Delta (%)</label>
                 </div>

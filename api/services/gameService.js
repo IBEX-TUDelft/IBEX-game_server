@@ -318,6 +318,14 @@ export default {
                     break;
             }
 
+            if (balance == null) {
+                balance = 0;
+            }
+
+            if (shares == null) {
+                shares = 0;
+            }
+
             const player = {
                 name: name,
                 recovery_string: uniqueNamesGenerator({
