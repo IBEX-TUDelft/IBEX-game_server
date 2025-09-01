@@ -618,6 +618,25 @@ export default {
             }
         });
 
+        Controller.addGetRoute(app, '/api/v1/games/market/market-log', false, async (req, res) => {
+            const gameId = parseInt(req.query.game_id?.toString());
+
+            const game = await gameService.findGameData(gameId);
+
+            const data = {
+                "ruleset": game.type,
+                "players": game.players.map(p => {
+                    return {
+                        "number": p.number,
+                        "tag": p.tag
+                    }
+                }),
+                "marketLog": game.results[1].phase[1].log
+            };
+
+            Controller.handleSuccess(res, data, 'Data available');
+        });
+
         Controller.addGetRoute(app, '/api/v1/games/market/players', true, async (req, res) => {
             const gameId = parseInt(req.query.gameId);
 

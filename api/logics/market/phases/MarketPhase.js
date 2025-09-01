@@ -340,7 +340,8 @@ class MarketPhase extends GamePhase {
         fromPlayer.wallet.balance += quantity * price - this.sellerTransactionCost;
 
         self.results.log.push({
-            "id": order.id,
+            "id": PostOrderHandler.nextLogEntryId++,
+            "orderId": order.id,
             "time": new Date(),
             "round": self.game.currentRound.number,
             "phase": 6,

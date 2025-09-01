@@ -6,6 +6,9 @@ export default class PostOrderHandler extends MessageHandler{
         super('post-order', null, true);
     }
 
+    static nextOrderId = 0;
+    static nextLogEntryId = 0;
+
     action (ws, message, player, phase) {
         const order = message.order;
 
@@ -88,7 +91,7 @@ export default class PostOrderHandler extends MessageHandler{
         }
 
         const nextOrder = {
-            "id": phase.nextOrderId + 1,
+            "id": PostOrderHandler.nextOrderId++,
             "sender": player.number,
             "price": order.price,
             "quantity": order.quantity,
@@ -98,7 +101,8 @@ export default class PostOrderHandler extends MessageHandler{
         phase.orderList.push(nextOrder);
         
         phase.results.log.push({
-            "id": nextOrder.id,
+            "id": PostOrderHandler.nextLogEntryId++,
+            "orderId": nextOrder.id,
             "time": new Date(),
             "round": phase.game.currentRound.number,
             "phase": 6,
@@ -128,11 +132,8 @@ export default class PostOrderHandler extends MessageHandler{
 
         if (result.quantity > 0) {
             if (!order.now) {
-                const nextId = phase.nextOrderId;
-                phase.nextOrderId ++;
-
                 const newOrder = {
-                    "id": nextId,
+                    "id": nextOrder.id,
                     "sender": player.number,
                     "price": order.price,
                     "quantity": result.quantity,
