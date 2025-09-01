@@ -196,14 +196,11 @@ export default {
             let order;
 
             const balance = this.$props.player.wallet.cash;
-            const shares = this.$props.player.wallet.goods;
+            const goods = this.$props.player.wallet.goods;
 
+            console.log(`Posting order of type ${type} (now: ${now}) with balance: ${balance}, goods: ${goods}`);
             switch(type) {
                 case "ask":
-                    if (shares < 1) {
-                        return;
-                    }
-
                     order = {
                         "price": now ? 0 : self.parseFormatted(self.ask_price),
                         "quantity": 1,
@@ -215,10 +212,6 @@ export default {
 
                     break;
                 case "bid":
-                    if (balance < self.bid_price) {
-                        return;
-                    }
-
                     order = {
                         "price": now ? 0 : self.parseFormatted(self.bid_price),
                         "quantity": 1,

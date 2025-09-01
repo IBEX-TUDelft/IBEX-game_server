@@ -1,6 +1,6 @@
 import JoinablePhase from "../../JoinablePhase.js";
 import GoodsMarketPlayer from "../model/GoodsMarketPlayer.ts";
-import { GoodsMarketAuthority, GoodsMarketGoodQuality } from "../model/GoodsMarketTypes.ts";
+import { GoodsMarketGoodQuality } from "../model/GoodsMarketTypes.ts";
 
 export default class ResultPhase extends JoinablePhase {
     results: {
@@ -42,14 +42,15 @@ export default class ResultPhase extends JoinablePhase {
         }));
 
         this.game.players.forEach((p: GoodsMarketPlayer) => {
-            const currentValue = this.getWalletValue(p.wallet);
-            const initialValue = this.getWalletValue(p.initialWallet);
+            const currentValue = this.getWalletValue(p);
+            const initialValue = this.getInitialWalletValue(p);
 
             let profit = Math.round((currentValue - initialValue) * 100) / 100;
 
             this.results.profits.push({
                 "number": p.number,
                 "profit": profit,
+                "signals": {...p.signals},
                 "finalWallet": {...p.wallet},
                 "initialWallet": {...p.initialWallet}
             });
@@ -72,10 +73,17 @@ export default class ResultPhase extends JoinablePhase {
         });
     }
 
-    getWalletValue(wallet: { cash: number; goods: { quality: GoodsMarketGoodQuality; }[]; }) {
-        const highQualityGoodValue = wallet.goods.filter(good => good.quality === GoodsMarketGoodQuality.GOOD).length * this.game.parameters.high_quality_value;
-        const lowQualityGoodValue = wallet.goods.filter(good => good.quality === GoodsMarketGoodQuality.BAD).length * this.game.parameters.low_quality_value;
+    getWalletValue(player: GoodsMarketPlayer) {
+        const highQualityGoodValue = player.wallet.goods.filter(good => good.quality === GoodsMarketGoodQuality.GOOD).length * player.signals.highQualitySignal;
+        const lowQualityGoodValue = player.wallet.goods.filter(good => good.quality === GoodsMarketGoodQuality.BAD).length * player.signals.lowQualitySignal;
 
-        return wallet.cash + highQualityGoodValue + lowQualityGoodValue;
+        return player.wallet.cash + highQualityGoodValue + lowQualityGoodValue;
+    }
+
+    getInitialWalletValue(player: GoodsMarketPlayer) {
+        const highQualityGoodValue = player.initialWallet.goods.filter(good => good.quality === GoodsMarketGoodQuality.GOOD).length * player.signals.highQualitySignal;
+        const lowQualityGoodValue = player.initialWallet.goods.filter(good => good.quality === GoodsMarketGoodQuality.BAD).length * player.signals.lowQualitySignal;
+
+        return player.initialWallet.cash + highQualityGoodValue + lowQualityGoodValue;
     }
 }

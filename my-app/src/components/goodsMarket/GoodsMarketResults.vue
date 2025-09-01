@@ -21,7 +21,7 @@
                     <thead class="thead-dark">
                         <tr style="text-align: center;">
                             <th scope="col"></th>
-                            <th scope="col" colspan="2">Values</th>
+                            <th scope="col" colspan="2">Median Valuations</th>
                             <th scope="col" colspan="4">Initial Wallet</th>
                             <th scope="col" colspan="4">Final Wallet</th>
                             <th scope="col"></th>
@@ -44,17 +44,21 @@
                     <tbody>
                         <tr v-for="entry in results" :key="entry.id">
                             <td>{{ entry.number }}</td>
-                            <td>{{ highQualityValue }}</td>
-                            <td>{{ lowQualityValue}}</td>
+                            <td>{{ entry.signals.highQualitySignal }}</td>
+                            <td>{{ entry.signals.lowQualitySignal }}</td>
                             <td>{{ entry.initialWallet.cash }}</td>
                             <td>{{ entry.initialWallet.goods.filter(g => g.quality === 'good').length }}</td>
                             <td>{{ entry.initialWallet.goods.filter(g => g.quality === 'bad').length }}</td>
-                            <td>{{ getWalletValue(entry.initialWallet) }}</td>
+                            <td>{{ getInitialWalletValue(entry) }}</td>
                             <td>{{ entry.finalWallet.cash }}</td>
                             <td>{{ entry.finalWallet.goods.filter(g => g.quality === 'good').length }}</td>
                             <td>{{ entry.finalWallet.goods.filter(g => g.quality === 'bad').length }}</td>
-                            <td>{{ getWalletValue(entry.finalWallet) }}</td>
-                            <td>{{ getWalletValue(entry.finalWallet) - getWalletValue(entry.initialWallet) }}</td>
+                            <td>{{ getFinalWalletValue(entry) }}</td>
+                            <td>{{ getProfit(entry) }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan = "11"><b>Total Welfare</b></td>
+                            <td><b>{{ results?.reduce((acc, r) => Math.round((acc + getProfit(r)) * 100) / 100, 0) }}</b></td>
                         </tr>
                     </tbody>
                 </table>
@@ -83,13 +87,34 @@
         created() {
         },
         methods: {
-            getWalletValue(wallet) {
+            getInitialWalletValue(result) {
+                const wallet = result.initialWallet;
+
                 let value = wallet.cash;
 
-                value += wallet.goods.filter(g => g.quality === 'good').length * this.highQualityValue;
-                value += wallet.goods.filter(g => g.quality === 'bad').length * this.lowQualityValue;
+                value += wallet.goods.filter(g => g.quality === 'good').length * result.signals.highQualitySignal;
+                value += wallet.goods.filter(g => g.quality === 'bad').length * result.signals.lowQualitySignal;
 
-                return value;
+                return value.toFixed(2);
+            },
+            getFinalWalletValue(result) {
+                const wallet = result.finalWallet;
+
+                let value = wallet.cash;
+
+                value += wallet.goods.filter(g => g.quality === 'good').length * result.signals.highQualitySignal;
+                value += wallet.goods.filter(g => g.quality === 'bad').length * result.signals.lowQualitySignal;
+
+                return value.toFixed(2);
+            },
+            getProfit(result) {
+                const expected = Math.round((this.getFinalWalletValue(result) - this.getInitialWalletValue(result)) * 100) / 100;
+
+                if (expected !== result.profit) {
+                    throw new Error(`Profit mismatch for player ${result.number}: expected ${expected}, got ${result.profit}`);
+                }
+
+                return expected;
             },
             formatNumber(num) {
                 if (num == null || typeof num != 'number') {

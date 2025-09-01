@@ -4,7 +4,7 @@ import Controller from '../helpers/controller.js';
 import GoodsMarketPlayer from '../logics/goods_market/model/GoodsMarketPlayer.ts';
 import { Request, Response } from 'express';
 import gameService from '../services/gameService.js';
-import MarketService from '../services/GoodsMarketService.ts';
+import { GoodsMarketService } from '../services/GoodsMarketService.ts';
 
 export default {
     apply(app) {
@@ -18,7 +18,7 @@ export default {
             const gameId = parseInt(req.query.gameId?.toString());
 
             try {
-                const player: GoodsMarketPlayer = await MarketService.join(gameId, req.query.token?.toString());
+                const player: GoodsMarketPlayer = await GoodsMarketService.join(gameId, req.query.token?.toString());
 
                 Controller.handleSuccess(res, {
                     "redirect": `/goods-market/${gameId}/${player.recovery}`,

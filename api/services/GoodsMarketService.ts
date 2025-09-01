@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const gameManager = GameManagement.get();
 
-export default {
+export const GoodsMarketService = {
     async join(gameId: number, token: string): Promise<GoodsMarketPlayer> {
         const game = gameManager.games.find(g => g.data.id === gameId);
 

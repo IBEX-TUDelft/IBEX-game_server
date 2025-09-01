@@ -21,7 +21,7 @@ import {
 import Utils from '../helpers/utils.js';
 import { WebSocket } from 'ws';
 import{ MarketService } from '../services/MarketService.ts';
-
+import { GoodsMarketService } from '../services/GoodsMarketService.ts';
 const CHARACTERS = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
 function generateString(length) {

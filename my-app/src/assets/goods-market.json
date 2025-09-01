@@ -75,10 +75,13 @@
         "order-price-negative": "The specified price (<b>${0}</b>) for the order was negative",
         "phase-illegal-state": "You are trying to add one ask or bid, but you already have one of that kind.",
         "no-goods-available": "You don't have goods to offer to the market. Buy one first",
-        "insufficient-funds": "You don't have enough cash to place this order, which requires <b>${0}</b>",
+        "insufficient-funds": "You don't have enough cash to place this order, which requires ${0}",
         "could-not-find-bids": "No bids found",
         "could-not-find-asks": "No asks found",
-        "order-refused": "The order was refused"
+        "order-refused": "The order was refused",
+        "high-quality-median-valuation": "Your personal valuation of a high quality good",
+        "low-quality-median-valuation": "Your personal valuation of a low quality good",
+        "total-social-profit": "Total Welfare"
     }, "styles": {
         "size-of-transition-filler": 36
     }
