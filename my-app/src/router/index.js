@@ -18,6 +18,7 @@ import GoodsMarketBoard from '../components/GoodsMarketBoard';
 import RestoreList from '../components/RestoreList';
 import GoodsMarketTradingLog from '../components/goodsMarket/GoodsMarketTradingLog.vue';
 import GoodsMarketResults from '../components/goodsMarket/GoodsMarketResults.vue';
+import MarketResults from '../components/market/MarketResults.vue';
 
 Vue.use(VueRouter)
 
@@ -106,6 +107,11 @@ const routes = [
     path: '/market/:id',
     name: 'Market Log',
     component: GameMarketLog
+  },
+  {
+    path: '/market-results/:id',
+    name: 'Market Results',
+    component: MarketResults
   },
   {
     path: '/chat/:id',

@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 const gameManager = GameManagement.get();
 
 export const GoodsMarketService = {
-    async join(gameId: number, token: string): Promise<GoodsMarketPlayer> {
+    async join(gameId: number, token: string, recovery?: string): Promise<GoodsMarketPlayer> {
         const game = gameManager.games.find(g => g.data.id === gameId);
 
         if (game == null) {
@@ -17,9 +17,17 @@ export const GoodsMarketService = {
 
         const gameData = game.data;
 
-        console.log(`Parameters: ${JSON.stringify(gameData.parameters)}`);
+        let player: GoodsMarketPlayer;
 
-        const player: GoodsMarketPlayer = new GoodsMarketPlayer();
+        if (recovery != null) {
+            player = gameData.players.find((p: GoodsMarketPlayer) => p.recovery === recovery);
+
+            if (player != null) {
+                return player;
+            }
+        }
+
+        player = new GoodsMarketPlayer();
 
         let verification;
 
@@ -59,6 +67,7 @@ export const GoodsMarketService = {
         }
 
         player.gameId = gameId;
+        player.recovery = recovery;
 
         while (
             player.recovery == null || player.recovery === '' ||

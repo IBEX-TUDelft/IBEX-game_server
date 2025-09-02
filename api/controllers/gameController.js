@@ -129,24 +129,10 @@ export default {
                     continue;
                 }
 
-                /*try {
-                    const recordGameData = JSON.parse(r.game_data);
-                    if (recordGameData != null) {
-                        if (recordGameData.type != null) {
-                            r.type = recordGameData.type;
-                        }
-
-                        if (recordGameData.endedAt != null) {
-                            r.ended_at = recordGameData.endedAt;
-                        }
-                    }
-                } catch (errReadingData) { }*/
-
                 r.type = typeMap[r.type];
 
                 if (r.type == null) {
                     throw new Error(`Game ${r.id} has no type!`);
-                    //r.type = await gameRepository.getGameType(r.id);
                 }
 
                 console.log(r.type);
@@ -431,18 +417,22 @@ export default {
                         continue;
                     }
 
-                    console.log(`Game type: ${game.data.parameters.game_type}, event type: ${event.content?.type}`);
-
                     if (event.content?.type === "join") {
                         let player;
 
                         if (game.data.parameters.game_type === "market") {
-                            player = await MarketService.join(gameId, req.headers.authorization);
+                            player = await MarketService.join(gameId, req.headers.authorization, event.content?.recovery);
                         } else if (game.data.parameters.game_type === "goods-market") {
-                            player = await GoodsMarketService.join(gameId, req.headers.authorization);
+                            player = await GoodsMarketService.join(gameId, req.headers.authorization, event.content?.recovery);
                         }
 
-                        player.number = event.number;
+                        if (player != null) {
+                            if (event.number != null) {
+                                player.number = event.number;
+                            } else {
+                                event.number = player.number;
+                            }
+                        }
                     }
 
                     let ws = {
@@ -451,6 +441,14 @@ export default {
 
                     const player = game.data.players.find(p => p.number === event.number);
 
+                    if (player == null) {
+                        if (["market", "goods-market"].includes(game.data.parameters.game_type)) {
+                            console.log(event);
+                            console.log(game.data.players.map(p => p.number));
+                            throw new Error(`Player ${event.number} not found`);
+                        }
+                    }
+
                     if (
                         (event.content?.type === "start-game" || event.content?.type === "end-game") &&
                         (game.data.parameters.game_type === "market" || game.data.parameters.game_type === "goods-market")
@@ -458,7 +456,7 @@ export default {
                         player.role = 0;
                     }
 
-                    if (event.number != null) {
+                    if (event.number != null && player != null) {
                         ws.player = {
                             "number": event.number,
                             "role": player.role

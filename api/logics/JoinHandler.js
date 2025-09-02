@@ -7,11 +7,14 @@ export default class JoinHandler extends MessageHandler {
     }
 
     action (ws, message, p, phase) {
+        console.log('CALLING JOIN HANDLER');
         const game = phase.game;
         const wss = phase.wss;
 
         console.log(`Assigned players: ${game.assignedPlayers}, Total players: ${game.parameters.total_players}`);
 
+        console.log(`Player recovery ID: ${message.recovery}`);
+        console.log("players", game.players.map(p => { return { "number": p.number, "recovery": p.recovery }; }));
         let player = game.players.find(p => p.recovery === message.recovery);
 
         let responseMessage;
@@ -33,9 +36,11 @@ export default class JoinHandler extends MessageHandler {
             responseMessage = `Player ${player.number} rejoined the game`;
         }
 
+        console.log(responseMessage)
+
         wss.joinGame(ws, game.id, player.role, player.number);
 
-        WS.sendEvent(ws, "assign-name", {
+        /*WS.sendEvent(ws, "assign-name", {
             "name" : player.name,
             "number": player.number,
             "ruleset": game.type
@@ -56,7 +61,7 @@ export default class JoinHandler extends MessageHandler {
             if (err) {
                 console.error(err);
             }
-        }
+        }*/
 
         wss.broadcastInfo(game.id, responseMessage, null);
     }

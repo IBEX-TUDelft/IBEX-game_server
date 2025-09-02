@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 const gameManager = GameManagement.get();
 
 export const MarketService = {
-    async join(gameId: number, token: string): Promise<MarketPlayer> {
+    async join(gameId: number, token: string, recovery?: string): Promise<MarketPlayer> {
         const game = gameManager.games.find(g => g.data.id === gameId);
 
         if (game == null) {
@@ -24,7 +24,17 @@ export const MarketService = {
 
         const gameData = game.data;
 
-        const player = new MarketPlayer();
+        let player: MarketPlayer;
+
+        if (recovery != null) {
+            player = gameData.players.find((p: MarketPlayer) => p.recovery === recovery);
+
+            if (player != null) {
+                return player;
+            }
+        }
+
+        player = new MarketPlayer();
 
         let verification: { role: number; };
 
@@ -98,6 +108,7 @@ export const MarketService = {
         }
 
         player.gameId = gameId;
+        player.recovery = recovery;
 
         while (
             player.recovery === '' ||

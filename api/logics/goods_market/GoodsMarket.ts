@@ -21,8 +21,6 @@ export class GoodsMarket extends Logic {
     constructor(data, record) {
         super(data, [WaitingPhase, MarketPhase, ResultPhase], 'GoodsMarket', record);
 
-        console.log(`Parameters: ${JSON.stringify(data.parameters)}`);
-
         AppEvents.get(this.data.id).addListener(GameOver, () => {
             console.log('The game is over, sending a market statistics update to all admins');
             this.data.players.filter((p: GoodsMarketPlayer) => p.authority === GoodsMarketAuthority.ADMIN)

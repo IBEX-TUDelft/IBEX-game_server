@@ -20,14 +20,15 @@
                 <table class="table table-bordered">
                     <thead class="thead-dark">
                         <tr style="text-align: center;">
-                            <th scope="col"></th>
+                            <th scope="col" colspan="2">Player</th>
                             <th scope="col" colspan="2">Median Valuations</th>
                             <th scope="col" colspan="4">Initial Wallet</th>
                             <th scope="col" colspan="4">Final Wallet</th>
                             <th scope="col"></th>
                         </tr>
                         <tr>
-                            <th scope="col">Player</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Role</th>
                             <th scope="col">High Quality Good</th>
                             <th scope="col">Low Quality Good</th>
                             <th scope="col">Cash</th>
@@ -44,6 +45,7 @@
                     <tbody>
                         <tr v-for="entry in results" :key="entry.id">
                             <td>{{ entry.number }}</td>
+                            <td>{{ ["Admin", "Buyer", "Seller"][players.find(p => p.number === entry.number)?.role] }}</td>
                             <td>{{ entry.signals.highQualitySignal }}</td>
                             <td>{{ entry.signals.lowQualitySignal }}</td>
                             <td>{{ entry.initialWallet.cash }}</td>
@@ -57,7 +59,7 @@
                             <td>{{ getProfit(entry) }}</td>
                         </tr>
                         <tr>
-                            <td colspan = "11"><b>Total Welfare</b></td>
+                            <td colspan = "12"><b>Total Welfare</b></td>
                             <td><b>{{ results?.reduce((acc, r) => Math.round((acc + getProfit(r)) * 100) / 100, 0) }}</b></td>
                         </tr>
                     </tbody>

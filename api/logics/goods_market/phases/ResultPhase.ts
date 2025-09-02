@@ -49,6 +49,7 @@ export default class ResultPhase extends JoinablePhase {
 
             this.results.profits.push({
                 "number": p.number,
+                "role": p.role,
                 "profit": profit,
                 "signals": {...p.signals},
                 "finalWallet": {...p.wallet},

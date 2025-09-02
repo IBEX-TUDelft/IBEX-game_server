@@ -77,35 +77,6 @@
         created() {
         },
         methods: {
-            getValue(declaration, property, index) {
-                let value
-                
-                if (index != null) {
-                    value = declaration[property][index];
-                } else {
-                    value = declaration[property];
-                }
-
-                if (value < 0) {
-                    return '';
-                }
-
-                return value;
-            },
-            getYesOrNo(bool) {
-                if (bool == null) {
-                    return '';
-                }
-
-                return bool ? 'Y' : 'N';
-            },
-            getPlayer(number) {
-                if (number == null) {
-                    return 'n/a';
-                }
-
-                return this.players.find(p => p.number === number).tag;
-            },
             formatNumber(num) {
                 if (num == null || typeof num != 'number') {
                     return num;

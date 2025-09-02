@@ -5,6 +5,7 @@
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Game</th>
+                    <th scope="col">Type</th>
                     <th scope="col">Created</th>
                     <th scope="col">Controls</th>
                 </tr>
@@ -13,6 +14,7 @@
                 <tr v-for="item in games" :key="item.id">
                     <td>{{ item.id }}</td>
                     <td>{{ item.title }}</td>
+                    <td>{{ item.type }}</td>
                     <td>{{ item.created_at }}</td>
                     <td>
                         <div class="btn-toolbar pull-right row-12">
@@ -50,6 +52,7 @@ import { getGameJson } from '../services/GameService';
 import * as VotingService from '../services/VotingService';
 import * as HarbergerFutarchyService from '../services/HarbergerFutarchyService';
 import * as GoodsMarketService from '../services/GoodsMarketService';
+import * as MarketService from '../services/MarketService';
 
 export default {
     name: 'Games',
@@ -123,6 +126,8 @@ export default {
 
             if (type?.toString().toLowerCase() === 'goodsmarket') {
                 subPath = 'goods-market-results';
+            } else if (type?.toString().toLowerCase() === 'market') {
+                subPath = 'market-results';
             } else if (type?.toString().toLowerCase() === 'voting') {
                 subPath = 'analyse-voting';
             }
@@ -170,6 +175,8 @@ export default {
                     return await HarbergerFutarchyService.downloadAll(id);
                 case 'GoodsMarket':
                     return await GoodsMarketService.downloadAll(id);
+                case 'Market':
+                    return await MarketService.downloadAll(id);
                 default:
                     console.log(`Type not recognized (or TODO): ${type}`);
             }
