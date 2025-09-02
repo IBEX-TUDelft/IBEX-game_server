@@ -1,4 +1,4 @@
-import XLSX from 'xlsx';
+import * as XLSX from 'xlsx';
 import axios from "axios";
 import * as UtilityService from './UtilityService';
 import he from 'he';
