@@ -121,8 +121,8 @@ export default {
         return result;
     },
     list: async function(parameters) {
-        return await Database.execute(`SELECT g.id, g.title, g.created_at, g.updated_at, g.ended_at, game_data  
-            FROM games g ORDER BY id DESC LIMIT 50;`);
+        return await Database.execute(`SELECT g.id, g.title, g.created_at, g.updated_at, g.ended_at, gp.parameter_value as type
+            FROM games g JOIN game_parameters gp ON g.id = gp.game_id AND gp.parameter_key = 'game_type' ORDER BY id DESC LIMIT 50;`);
     },
     findOne: async function(gameId) {
         console.log('Game ID: ' + gameId + " Typeof: " + typeof gameId);

@@ -101,6 +101,16 @@ export default {
         async function listGames() {
             const records = await games.list();
 
+            console.log(records);
+
+            const typeMap = {
+                "voting": "Voting",
+                "futarchy": "Futarchy",
+                "harberger": "Harberger",
+                "market": "Market",
+                "goods-market": "GoodsMarket"
+            }
+
             const gs = gameManager.games.map(g => g.data).map(d => {
                 return {
                     "id": d.id,
@@ -119,7 +129,7 @@ export default {
                     continue;
                 }
 
-                try {
+                /*try {
                     const recordGameData = JSON.parse(r.game_data);
                     if (recordGameData != null) {
                         if (recordGameData.type != null) {
@@ -130,11 +140,13 @@ export default {
                             r.ended_at = recordGameData.endedAt;
                         }
                     }
-                } catch (errReadingData) { }
+                } catch (errReadingData) { }*/
 
+                r.type = typeMap[r.type];
 
                 if (r.type == null) {
-                    r.type = await gameRepository.getGameType(r.id);
+                    throw new Error(`Game ${r.id} has no type!`);
+                    //r.type = await gameRepository.getGameType(r.id);
                 }
 
                 console.log(r.type);

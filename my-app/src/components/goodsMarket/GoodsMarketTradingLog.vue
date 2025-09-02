@@ -60,7 +60,7 @@
 </template>
 
 <script>
-    import * as XLSX from "xlsx";
+    import * as GoodsMarketService from '../../services/GoodsMarketService';
     import dictionary from '../../assets/goods-market.json';
 
     export default {
@@ -129,49 +129,8 @@
 
                 return new Date(timestamp).toLocaleString(dictionary.parameters.format, options);
             },
-            exportXlsx() {
-                const self = this;
-
-                const wb = XLSX.utils.book_new();
-
-                const xls = [];
-
-                const headers = [
-                    'Time',
-                    'Round',
-                    'Actor',
-                    'Action',
-                    'Price',
-                    'Buyer',
-                    'Seller',
-                    'Best Bid',
-                    'Best Ask',
-                    'Book'
-                ];
-
-                xls.push(headers);
-
-                this.marketLog.forEach(r => {
-                    xls.push([
-                        self.formatTimestamp(r.time),
-                        r.round,
-                        r.actor == null ? '' : r.actor.number,
-                        r.action,
-                        r.price,
-                        r.buyer == null ? '' : r.buyer.number,
-                        r.seller == null ? '' : r.seller.number,
-                        r.bestBid,
-                        r.bestAsk,
-                        r.book
-                    ]);
-                });
-
-                /* convert state to workbook */
-                const ws = XLSX.utils.aoa_to_sheet(xls);
-                XLSX.utils.book_append_sheet(wb, ws, `Round ${1}`);
-
-                /* generate file and send to client */
-                XLSX.writeFile(wb, `${this.gameId}.market-log.xlsx`);
+            async exportXlsx() {
+                await GoodsMarketService.downloadMarketLog(this.gameId, this.marketLog);
             }
         },
         async mounted () {

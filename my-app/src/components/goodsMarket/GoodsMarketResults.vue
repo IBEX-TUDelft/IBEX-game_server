@@ -68,8 +68,8 @@
 </template>
 
 <script>
-    import * as XLSX from "xlsx";
     import dictionary from '../../assets/goods-market.json';
+    import * as GoodMarketService from '../../services/GoodsMarketService';
 
     export default {
         data() {
@@ -139,53 +139,8 @@
 
                 return new Date(timestamp).toLocaleString(dictionary.parameters.format, options);
             },
-            exportXlsx() {
-                const self = this;
-
-                const wb = XLSX.utils.book_new();
-
-                const xls = [];
-
-                const headers = [
-                    "Player",
-                    "High Quality Good Value per Unit",
-                    "Low Quality Good Value per Unit",
-                    "Initial Cash",
-                    "Initial High Quality Goods",
-                    "Initial Low Quality Goods",
-                    "Initial Total",
-                    "Final Cash",
-                    "Final High Quality Goods",
-                    "Final Low Quality Goods",
-                    "Final Total",
-                    "Profit"
-                ];
-
-                xls.push(headers);
-
-                self.results.forEach(r => {
-                    xls.push([
-                        r.number,
-                        self.highQualityValue,
-                        self.lowQualityValue,
-                        r.initialWallet.cash,
-                        r.initialWallet.goods.filter(g => g.quality === 'good').length,
-                        r.initialWallet.goods.filter(g => g.quality === 'bad').length,
-                        self.getWalletValue(r.initialWallet),
-                        r.finalWallet.cash,
-                        r.finalWallet.goods.filter(g => g.quality === 'good').length,
-                        r.finalWallet.goods.filter(g => g.quality === 'bad').length,
-                        self.getWalletValue(r.finalWallet),
-                        self.getWalletValue(r.finalWallet) - self.getWalletValue(r.initialWallet)
-                    ]);
-                });
-
-                /* convert state to workbook */
-                const ws = XLSX.utils.aoa_to_sheet(xls);
-                XLSX.utils.book_append_sheet(wb, ws, `Round ${1}`);
-
-                /* generate file and send to client */
-                XLSX.writeFile(wb, `${this.gameId}.results.xlsx`);
+            async exportXlsx() {
+                await GoodMarketService.downloadResults(this.gameId, this.results);
             }
         },
         async mounted () {
