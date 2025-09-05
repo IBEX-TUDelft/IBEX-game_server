@@ -44,9 +44,9 @@
                             <td>{{ player.signal }}</td>
                             <td>{{ results.phase[0].publicSignal }}</td>
                             <td>{{ realValue }}</td>
-                            <td>{{ player.wallet.balance }}</td>
-                            <td>{{ player.wallet.shares }}</td>
-                            <td>{{ (player.wallet.balance + player.wallet.shares * realValue).toFixed(2) }}</td>
+                            <td>{{ getPlayerWallet(player.number)?.balance }}</td>
+                            <td>{{ getPlayerWallet(player.number)?.shares }}</td>
+                            <td>{{ (getPlayerWallet(player.number)?.balance + getPlayerWallet(player.number)?.shares * realValue).toFixed(2) }}</td>
                             <td>{{ results.phase[2].profits.find(p => p.number === player.number)?.profit }}</td>
                         </tr>
                     </tbody>
@@ -75,6 +75,14 @@
         created() {
         },
         methods: {
+            getPlayerWallet(playerNumber) {
+                console.log('Wallets', this.results.phase[1].wallets);
+                if (this.results == null || this.results.phase == null || this.results.phase.length < 2 || this.results.phase[1].wallets == null) {
+                    return null;
+                }
+
+                return this.results.phase[1].wallets.find(w => w.number === playerNumber)?.wallet;
+            },
             formatNumber(num) {
                 if (num == null || typeof num != 'number') {
                     return num;

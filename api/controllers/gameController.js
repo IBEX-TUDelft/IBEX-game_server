@@ -417,21 +417,17 @@ export default {
                         continue;
                     }
 
-                    if (event.content?.type === "join") {
-                        let player;
+                    let player;
 
+                    if (event.content?.type === "join") {
                         if (game.data.parameters.game_type === "market") {
                             player = await MarketService.join(gameId, req.headers.authorization, event.content?.recovery);
                         } else if (game.data.parameters.game_type === "goods-market") {
                             player = await GoodsMarketService.join(gameId, req.headers.authorization, event.content?.recovery);
                         }
 
-                        if (player != null) {
-                            if (event.number != null) {
-                                player.number = event.number;
-                            } else {
-                                event.number = player.number;
-                            }
+                        if (player != null && event.number != null) {
+                            player.number = event.number;
                         }
                     }
 
@@ -439,7 +435,9 @@ export default {
                         "send": function () { }
                     };
 
-                    const player = game.data.players.find(p => p.number === event.number);
+                    if (player == null && event.number != null) {
+                        player = game.data.players.find(p => p.number === event.number);
+                    }
 
                     if (player == null) {
                         if (["market", "goods-market"].includes(game.data.parameters.game_type)) {
