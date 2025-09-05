@@ -273,13 +273,9 @@ export default {
         Controller.addGetRoute(app, '/api/v1/games/start', true, async (req, res) => {
             const gameId = parseInt(req.query.game_id);
 
-            console.log('BEFORE wssManager.startGame');
             wssManager.startGame(gameId);
 
-            console.log('BEFORE gameManager.startGame');
             const error = await gameManager.startGame(gameId);
-
-            console.log(error);
 
             if (error == null) {
                 Controller.handleSuccess(res, {}, 'Game started');

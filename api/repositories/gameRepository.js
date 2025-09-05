@@ -237,7 +237,7 @@ export default {
             endedAt = `'${endedAt}'`;
         }
 
-        return await new Promise((resolve, reject) => {
+        const gameId = await new Promise((resolve, reject) => {
             this.pool.query(`INSERT INTO games (
                 id,
                 title,
@@ -258,5 +258,39 @@ export default {
                 }
             );
         });
+
+        for (let key in data.parameters) {
+            const value = data.parameters[key];
+
+            let type = typeof value;
+
+            if (type === 'number' && !Number.isInteger(value)) {
+                type = 'float';
+            }
+
+            const query = `INSERT INTO game_parameters (
+                game_id,
+                parameter_key,
+                parameter_value,
+                parameter_type
+            ) VALUES (
+                ${gameId},
+                '${key}',
+                '${value}',
+                '${type}'
+            ) RETURNING id;`;
+
+            await new Promise((resolve, reject) => {
+                this.pool.query(query, (err, res) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res.rows[0].id);
+                    }
+                });
+            });
+        }
+
+        return gameId;
     },
 }
