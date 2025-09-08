@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node server.bundle.cjs",
     "build": "webpack",
-    "dev": "npx nodemon"
+    "dev": "npx nodemon",
+    "test": "NODE_OPTIONS='--loader ts-node/esm' mocha \"test/**/*.ts\" --detectOpenHandles --exit"
   },
   "repository": {
     "type": "git",
@@ -37,14 +38,17 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
-    "@types/node": "^24.3.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.3.1",
     "del": "^8.0.0",
     "fancy-log": "^2.0.0",
     "gulp": "^5.0.1",
     "gulp-zip": "^6.1.0",
+    "mocha": "^11.7.2",
     "nodemon": "^3.1.10",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "webpack": "^5.101.0",
     "webpack-cli": "^6.0.1",

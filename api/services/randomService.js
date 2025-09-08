@@ -30,7 +30,33 @@ function getLinearlyDistributedNumber(min, max) {
     return min + Math.random() * ( max - min );
 }
 
+/**
+ * 
+ * @param {number} min 
+ * @param {number} max 
+ * @param {Object} dataSource 
+ * @param {string} tag 
+ * @returns 
+ */
+function getLinearWithDataSource(min, max, dataSource, tag) {
+    if (dataSource != null) {
+        return dataSource[tag];
+    }
+
+    return getLinearlyDistributedNumber(min, max);
+}
+
+function getNormalWithDataSource(mean, stddev, dataSource, tag) {
+    if (dataSource != null) {
+        return dataSource[tag];
+    }
+
+    return getNormallyDistributedRandomNumber(mean, stddev);
+}
+
 export default {
     getNormallyDistributedRandomNumber,
-    getLinearlyDistributedNumber
+    getLinearlyDistributedNumber,
+    getLinearWithDataSource,
+    getNormalWithDataSource
 }

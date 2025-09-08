@@ -110,6 +110,24 @@
                     <input type="number" class="form-control" v-model="cash_per_player" name="cash_per_player" id="cash_per_player" aria-describedby="emailHelp" placeholder="6" />
                 </div>
             </div>
+
+            <b-row>
+                <CreateCol3>
+                    <label htmlFor="exampleInputEmail1">Transaction cost paid by sellers</label>
+                </CreateCol3>
+
+                <CreateCol3 class="form-group col-md-3 align-items-center">
+                    <input type="number" class="form-control" v-model="seller_transaction_cost" name="seller_transaction_cost" id="seller_transaction_cost" aria-describedby="emailHelp" placeholder="6" />
+                </CreateCol3>
+
+                <CreateCol3>
+                    <label htmlFor="exampleInputEmail1">Transaction cost paid by buyers</label>
+                </CreateCol3>
+
+                <CreateCol3 class="form-group col-md-3 align-items-center">
+                    <input type="number" class="form-control" v-model="buyer_transaction_cost" name="buyer_transaction_cost" id="buyer_transaction_cost" aria-describedby="emailHelp" placeholder="6" />
+                </CreateCol3>
+            </b-row>
         </b-col>
     </b-row>
 </template>
@@ -132,7 +150,9 @@ export default {
             high_quality_value: 70,
             high_quality_delta: 10,
             low_quality_value: 20,
-            low_quality_delta: 10
+            low_quality_delta: 10,
+            buyer_transaction_cost: 0.0,
+            seller_transaction_cost: 0.0
         }
     },
     components: {

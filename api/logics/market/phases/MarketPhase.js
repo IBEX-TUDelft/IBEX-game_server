@@ -156,7 +156,7 @@ class MarketPhase extends GamePhase {
                     }
 
                     if (next.quantity > quantity) {
-                        error = self.transferShares(sender, next.sender, quantity, next.price, order, sender);
+                        error = self.transferShares(sender, next.sender, quantity, next.price, order, sender, next);
                         if (error != null) {
                             return {
                                 "type": "error",
@@ -174,7 +174,7 @@ class MarketPhase extends GamePhase {
                         finished = true;
                         continue;
                     } else if (next.quantity == quantity) {
-                        error = self.transferShares(sender, next.sender, quantity, next.price, order, sender);
+                        error = self.transferShares(sender, next.sender, quantity, next.price, order, sender, next);
                         if (error != null) {
                             return {
                                 "type": "error",
@@ -192,7 +192,7 @@ class MarketPhase extends GamePhase {
                         finished = true;
                         continue;
                     } else {
-                        error = self.transferShares(sender, next.sender, next.quantity, next.price, order, sender);
+                        error = self.transferShares(sender, next.sender, next.quantity, next.price, order, sender, next);
                         if (error != null) {
                             return {
                                 "type": "error",
@@ -237,7 +237,7 @@ class MarketPhase extends GamePhase {
                     }
 
                     if (next.quantity > quantity) {
-                        error = self.transferShares(next.sender, sender, quantity, next.price, order, sender);
+                        error = self.transferShares(next.sender, sender, quantity, next.price, order, sender, next);
                         if (error != null) {
                             return {
                                 "type": "error",
@@ -255,7 +255,7 @@ class MarketPhase extends GamePhase {
                         finished = true;
                         continue;
                     } else if (next.quantity == quantity) {
-                        error = self.transferShares(next.sender, sender, quantity, next.price, order, sender);
+                        error = self.transferShares(next.sender, sender, quantity, next.price, order, sender, next);
                         if (error != null) {
                             return {
                                 "type": "error",
@@ -273,7 +273,7 @@ class MarketPhase extends GamePhase {
                         finished = true;
                         continue;
                     } else {
-                        error = self.transferShares(next.sender, sender, next.quantity, next.price, order, sender);
+                        error = self.transferShares(next.sender, sender, next.quantity, next.price, order, sender, next);
                         if (error != null) {
                             return {
                                 "type": "error",
@@ -305,7 +305,7 @@ class MarketPhase extends GamePhase {
         }
     }
 
-    transferShares (from, to, quantity, price, order, actor) {
+    transferShares (from, to, quantity, price, order, actor, next = null) {
         const self = this;
 
         const actorPlayer= this.game.players.find(p => p.number === actor); 
@@ -442,10 +442,10 @@ class MarketPhase extends GamePhase {
             }
         );
 
-        console.log(`Median last 7: ${medianLastSeven}`);
+        /*console.log(`Median last 7: ${medianLastSeven}`);
 
         console.log(fromPlayer);
-        console.log(toPlayer);
+        console.log(toPlayer);*/
     }
 
     removeOrder (id) {

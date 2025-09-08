@@ -6,6 +6,7 @@ const PhaseComplete = "phase-complete";
 const PlayerMessage = "player-message";
 const GameOver = "game-over";
 const ServerMessage = "server-message";
+const ResultsSaved = "results-saved";
 
 class AppTimer {
     id;
@@ -39,6 +40,13 @@ class AppEvents extends EventEmitter {
     constructor(gameId) {
         super();
         this.gameId = gameId;
+    }
+
+    async emitAsync(event, ...args) {
+        const listeners = this.listeners(event);
+        for (const listener of listeners) {
+            await listener(...args);
+        }
     }
 
     static get(gameId) {
@@ -103,5 +111,6 @@ export {
     PhaseComplete,
     PlayerMessage,
     ServerMessage,
-    GameOver
+    GameOver,
+    ResultsSaved
 };

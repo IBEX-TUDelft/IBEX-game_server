@@ -6,7 +6,7 @@ import GameService from "../services/gameService.js";
 import Utils from '../helpers/utils.js';
 import WS from '../helpers/websocket.js';
 import fs from 'fs';
-import { AppEvents, GameOver, PhaseBegins, PhaseComplete, PhaseTimeout } from '../helpers/AppEvents.js';
+import { AppEvents, GameOver, PhaseBegins, PhaseComplete, PhaseTimeout, ResultsSaved } from '../helpers/AppEvents.js';
 import { GameRecorder } from '../helpers/GameRecorder.js';
 
 export default class {
@@ -224,8 +224,7 @@ export default class {
         }
 
         AppEvents.get(this.data.id).addListener(PhaseTimeout, (data) => {
-            console.log(`Event ${PhaseTimeout} received with args:`);
-            console.log(data);
+            console.log(`Event ${PhaseTimeout} received with args: ${JSON.stringify(data)}`);
 
             if (data != null && data.phase != null && data.phase != this.data.currentRound.phase) {
                 console.log(`In phase ${this.data.currentRound.phase}, gotten a ${PhaseTimeout} event from a different phase: ${data.phase}`)
@@ -237,7 +236,6 @@ export default class {
 
         AppEvents.get(this.data.id).addListener(PhaseComplete, async (data) => {
             console.log(`Event ${PhaseComplete} received with args:`);
-            console.log(data);
 
             if (data != null && data.number != null && data.number != this.data.currentRound.phase) {
                 console.log(`In phase ${this.data.currentRound.phase}, gotten a ${PhaseComplete} event from a different phase: ${data.number}`)
@@ -259,8 +257,12 @@ export default class {
 
         this.data.results[this.data.results.length - 1].phase.push(this.data.currentPhase.results);
 
-        console.log(`Phase ${this.data.currentRound.phase} results:`);
-        console.log(this.data.currentPhase.results);
+        const event = {
+            "round": this.data.currentRound.number,
+            "phase": this.data.currentRound.phase
+        };
+
+        AppEvents.get(this.data.id).emit(ResultsSaved, event);
 
         await GameService.addPhaseData(
             this.data.currentRound.id,
@@ -431,7 +433,7 @@ export default class {
             await GameRepository.saveData(this.data.id, this.data);
             await GameRepository.endGame(this.data.id);
 
-            this.backup();
+            await this.backup();
 
             return;
         } else {
@@ -545,7 +547,7 @@ export default class {
         AppEvents.get(this.data.id).emit(PhaseBegins, {
             "phase": this.data.currentRound.phase,
             "round": this.data.currentRound.number
-         });
+        });
     }
 
     refreshWallet() {

@@ -12,9 +12,9 @@ export default class PostOrderHandler extends MessageHandler{
     action (ws, message, player, phase) {
         const order = message.order;
 
-        console.log(message);
+        /*console.log(message);
         console.log(order);
-        console.log(player);
+        console.log(player);*/
 
         if (order == null) {
             WS.error(ws, `Game ${message.gameId}: the order is null`);
@@ -91,7 +91,7 @@ export default class PostOrderHandler extends MessageHandler{
         }
 
         const nextOrder = {
-            "id": PostOrderHandler.nextOrderId++,
+            "id": PostOrderHandler.nextOrderId,
             "sender": player.number,
             "price": order.price,
             "quantity": order.quantity,
@@ -133,7 +133,7 @@ export default class PostOrderHandler extends MessageHandler{
         if (result.quantity > 0) {
             if (!order.now) {
                 const newOrder = {
-                    "id": nextOrder.id,
+                    "id": PostOrderHandler.nextOrderId++,
                     "sender": player.number,
                     "price": order.price,
                     "quantity": result.quantity,

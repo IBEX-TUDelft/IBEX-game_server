@@ -15,7 +15,7 @@ export default class PostOrderHandler extends MessageHandler {
         super('post-order', null, true);
     }
 
-    action (ws, message: PostOrderMessage, player: GoodsMarketPlayer, phase: MarketPhase) {
+    action(ws, message: PostOrderMessage, player: GoodsMarketPlayer, phase: MarketPhase) {
         const order = message.order;
 
         console.log('Message', message);
@@ -27,7 +27,7 @@ export default class PostOrderHandler extends MessageHandler {
             return;
         }
 
-        if (order.price  == null) {
+        if (order.price == null) {
             WS.sendEvent(
                 ws,
                 'order-refused',
@@ -99,14 +99,14 @@ export default class PostOrderHandler extends MessageHandler {
                 );
             }
 
-            if (player.wallet.cash < order.price) {
+            if (player.wallet.cash < order.price + phase.getBuyerFee()) {
                 return WS.sendEvent(
                     ws,
                     'order-refused',
                     {
-                        "message": `You don't have enough cash to place this bid`,
+                        "message": `You don't have enough cash to place this bid (consider also the transaction cost of ${phase.getBuyerFee()} per unit)`,
                         "placeholder": "insufficient-funds",
-                        "parameters": [order.price]
+                        "parameters": [order.price + phase.getBuyerFee()]
                     }
                 );
             }
@@ -115,7 +115,7 @@ export default class PostOrderHandler extends MessageHandler {
         const nextOrder = new GoodsMarketOrder(player.number, order.type, order.price);
 
         phase.orderList.push(nextOrder);
-        
+
         phase.results.log.push({
             "id": nextOrder.id,
             "time": Date.now(),
@@ -150,7 +150,7 @@ export default class PostOrderHandler extends MessageHandler {
 
                 phase.orders.push(newOrder);
 
-                phase.wss.broadcastEvent (
+                phase.wss.broadcastEvent(
                     phase.game.id,
                     "add-order",
                     {

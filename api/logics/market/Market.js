@@ -8,12 +8,12 @@ import WaitingPhase from './phases/WaitingPhase.js';
 
 export default class Market extends Logic {
 
-    constructor(data, record) {
+    constructor(data, record,dataSource = null) {
         super(data, [WaitingPhase, MarketPhase, ResultPhase], 'Market', record);
 
-        this.data.realValue = this.generateRealValue();
+        this.data.realValue = this.generateRealValue(dataSource, 'realValue');
 
-        this.data.publicSignal = this.generateSignal();
+        this.data.publicSignal = this.generateSignal(dataSource, 'publicSignal');
 
         console.log(`Market real value: ${this.data.realValue}`);
 
@@ -195,18 +195,22 @@ export default class Market extends Logic {
         }
     }
 
-    generateRealValue() {
+    generateRealValue(dataSource = null, tag = null) {
         if (this.data.parameters.distribution_type === 'linear') {
-            const value = randomService.getLinearlyDistributedNumber(
+            const value = randomService.getLinearWithDataSource(
                 this.data.parameters.linear_min,
-                this.data.parameters.linear_max
+                this.data.parameters.linear_max,
+                dataSource,
+                tag
             );
 
             return Math.round(value * 100) / 100;
         } else if (this.data.parameters.distribution_type === 'normal') {
-            const value = randomService.getNormallyDistributedRandomNumber(
+            const value = randomService.getNormalWithDataSource(
                 this.data.parameters.mean,
-                this.data.parameters.variance
+                this.data.parameters.variance,
+                dataSource,
+                tag
             );
 
             return Math.round(value * 100) / 100;
@@ -215,12 +219,13 @@ export default class Market extends Logic {
         }
     }
 
-    generateSignal() {
-        const absPercentageError = this.data.parameters.signal_error; //e.g.: 5
-
-        const percentageError = absPercentageError * ( 1 - Math.random() * 2 ); //given absPercentageError = 5, a range from -5 to 5
-
-        return Math.round( ( 100 + percentageError ) * this.data.realValue) / 100 ;
+    generateSignal(dataSource = null, tag = null) {
+        return randomService.getLinearWithDataSource(
+            this.data.realValue - this.data.parameters.signal_error,
+            this.data.realValue + this.data.parameters.signal_error,
+            dataSource,
+            tag
+        );
     }
 
     getStatistics() {

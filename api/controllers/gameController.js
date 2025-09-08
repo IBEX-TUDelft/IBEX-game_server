@@ -22,6 +22,7 @@ import Utils from '../helpers/utils.js';
 import { WebSocket } from 'ws';
 import{ MarketService } from '../services/MarketService.ts';
 import { GoodsMarketService } from '../services/GoodsMarketService.ts';
+import Market from '../logics/market/Market.js';
 const CHARACTERS = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
 function generateString(length) {
@@ -416,9 +417,9 @@ export default {
                     let player;
 
                     if (event.content?.type === "join") {
-                        if (game.data.parameters.game_type === "market") {
+                        if (game instanceof Market && game.data.parameters.game_type === "market") {
                             player = await MarketService.join(gameId, req.headers.authorization, event.content?.recovery);
-                        } else if (game.data.parameters.game_type === "goods-market") {
+                        } else if (game instanceof GoodsMarket && game.data.parameters.game_type === "goods-market") {
                             player = await GoodsMarketService.join(gameId, req.headers.authorization, event.content?.recovery);
                         }
 
@@ -611,13 +612,14 @@ export default {
             const gameId = parseInt(req.query.gameId);
 
             try {
-                const player = await MarketService.join(gameId, req.query.token.toString());
+                const player = await MarketService.join(gameId, req.query.token?.toString());
 
                 Controller.handleSuccess(res, {
                     "redirect": `/market/${gameId}/${player.recovery}`,
                     "player": player
                 }, 'Joined');
             } catch (error) {
+                console.error(`Error joining market game ${gameId}: ${error.message}`, error);
                 Controller.handleGenericError(res, `Error joining market game ${gameId}: ${error.message}`, 500);
             }
         });

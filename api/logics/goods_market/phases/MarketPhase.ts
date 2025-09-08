@@ -20,24 +20,24 @@ export default class MarketPhase extends JoinablePhase {
             price: number;
             time: number;
             good: GoodsMarketGood;
-        } [],
+        }[],
         wallets: {
             cash: number;
             goods: GoodsMarketGood[];
         }[];
         finalPrice: number | null;
     } = {
-        log: [],
-        wallets: [],
-        transactions: [],
-        finalPrice: null
-    }
+            log: [],
+            wallets: [],
+            transactions: [],
+            finalPrice: null
+        }
 
     constructor(game, wss, number: number) {
-        super (game, wss, [new PostOrderHandler(), new CancelOrderHandler(), new EndHandler()], null, number);
+        super(game, wss, [new PostOrderHandler(), new CancelOrderHandler(), new EndHandler()], null, number);
     }
 
-    async onExit () {
+    async onExit() {
         await super.onExit();
 
         this.results.wallets.push(...this.game.players.map((p: GoodsMarketPlayer) => {
@@ -56,7 +56,7 @@ export default class MarketPhase extends JoinablePhase {
         this.results.finalPrice = lastMovement.movement.price;
     }
 
-    async testComplete () {
+    async testComplete() {
         return this.complete;
     }
 
@@ -66,14 +66,14 @@ export default class MarketPhase extends JoinablePhase {
         return {
             "orders": self.orderList,
             "movements": self.movementList,
-            "tickers": self.movementList.map((m: { movement: { price: number, time: number }}) => ({
+            "tickers": self.movementList.map((m: { movement: { price: number, time: number } }) => ({
                 "price": m.movement.price,
                 "time": m.movement.time
             }))
         };
     }
 
-    getBestBid () {
+    getBestBid() {
         const bids = this.orders.filter(o => o.type === GoodsMarketOrderType.BID);
 
         if (bids == null || bids.length === 0) {
@@ -85,7 +85,7 @@ export default class MarketPhase extends JoinablePhase {
         return bestBid.price;
     }
 
-    getBestAsk () {
+    getBestAsk() {
         const asks = this.orders.filter(o => o.type === GoodsMarketOrderType.ASK);
 
         if (asks == null || asks.length === 0) {
@@ -97,7 +97,7 @@ export default class MarketPhase extends JoinablePhase {
         return bestAsk.price;
     }
 
-    printBook () {
+    printBook() {
         const self = this;
 
         return JSON.stringify({
@@ -106,7 +106,15 @@ export default class MarketPhase extends JoinablePhase {
         });
     }
 
-    fulfillOrder (order: GoodsMarketOrder, sender: number) {
+    getBuyerFee = () => {
+        return this.game.parameters.buyer_transaction_cost || 0;
+    }
+
+    getSellerFee = () => {
+        return this.game.parameters.seller_transaction_cost || 0;
+    }
+
+    fulfillOrder(order: GoodsMarketOrder, sender: number) {
         const self = this;
 
         let counterparts: GoodsMarketOrder[];
@@ -114,7 +122,7 @@ export default class MarketPhase extends JoinablePhase {
         let match: GoodsMarketOrder = null;
         let error = null;
 
-        switch(order.type) {
+        switch (order.type) {
             case GoodsMarketOrderType.ASK:
                 counterparts = this.orders.filter(o => o.type == GoodsMarketOrderType.BID && o.sender != sender);
                 counterparts.sort((a, b) => b.price - a.price);
@@ -193,11 +201,11 @@ export default class MarketPhase extends JoinablePhase {
         }
     }
 
-    transferShares (from: number, to: number, quantity: number, price: number, order: GoodsMarketOrder, actor: number) {
+    transferShares(from: number, to: number, quantity: number, price: number, order: GoodsMarketOrder, actor: number) {
         const self = this;
 
-        const actorPlayer: GoodsMarketPlayer = this.game.players.find((p : GoodsMarketPlayer) => p.number === actor); 
-        const fromPlayer: GoodsMarketPlayer = this.game.players.find((p : GoodsMarketPlayer) => p.number === from);
+        const actorPlayer: GoodsMarketPlayer = this.game.players.find((p: GoodsMarketPlayer) => p.number === actor);
+        const fromPlayer: GoodsMarketPlayer = this.game.players.find((p: GoodsMarketPlayer) => p.number === from);
 
         if (fromPlayer == null) {
             return `Player ${from} (from), not found`;
@@ -213,8 +221,12 @@ export default class MarketPhase extends JoinablePhase {
             return `Player ${from} (from), does not have any goods to participate in the transaction.`;
         }
 
-        if (toPlayer.wallet.cash < price) {
-            return `Player ${to} (to), does not have the funds to complete the operation: ${toPlayer.wallet.cash} < ${price}`;
+        if (fromPlayer.wallet.cash + price < this.getSellerFee()) {
+            return `Player ${from} (from), does not have the funds to complete the operation: ${fromPlayer.wallet.cash} + ${price} - ${this.getSellerFee()} < 0`;
+        }
+
+        if (toPlayer.wallet.cash < price + this.getBuyerFee()) {
+            return `Player ${to} (to), does not have the funds to complete the operation: ${toPlayer.wallet.cash} < ${price + this.getBuyerFee()}`;
         }
 
         console.debug(fromPlayer);
@@ -227,8 +239,8 @@ export default class MarketPhase extends JoinablePhase {
             goodIndex = 0;
         }
 
-        const soldGoods : GoodsMarketGood[] = fromPlayer.wallet.goods.splice(goodIndex, 1);
-        fromPlayer.wallet.cash += price;
+        const soldGoods: GoodsMarketGood[] = fromPlayer.wallet.goods.splice(goodIndex, 1);
+        fromPlayer.wallet.cash += (price - self.getSellerFee());
 
         const currentTime = Date.now();
 
@@ -265,15 +277,16 @@ export default class MarketPhase extends JoinablePhase {
                     "type": "sale",
                     "quantity": quantity,
                     "price": price,
-                    "total": quantity * price
+                    "fee": self.getSellerFee(),
+                    "total": quantity * price + self.getSellerFee()
                 },
                 "cash": fromPlayer.wallet.cash,
-                "goods" : fromPlayer.wallet.goods
+                "goods": fromPlayer.wallet.goods
             }
         );
 
         toPlayer.wallet.goods.push(...soldGoods);
-        toPlayer.wallet.cash -= price;
+        toPlayer.wallet.cash -= (price + this.getBuyerFee());
 
         this.wss.sendEvent(
             this.game.id,
@@ -283,9 +296,12 @@ export default class MarketPhase extends JoinablePhase {
                 "movement": {
                     "type": "purchase",
                     "price": price,
+                    "quantity": quantity,
+                    "fee": self.getBuyerFee(),
+                    "total": quantity * price + self.getBuyerFee()
                 },
                 "cash": toPlayer.wallet.cash,
-                "goods" : toPlayer.wallet.goods
+                "goods": toPlayer.wallet.goods
             }
         );
 
@@ -306,18 +322,18 @@ export default class MarketPhase extends JoinablePhase {
             "from": {
                 "number": fromPlayer.number,
                 "cash": fromPlayer.wallet.cash,
-                "goods" : fromPlayer.wallet.goods
+                "goods": fromPlayer.wallet.goods
             },
             "to": {
                 "number": toPlayer.number,
                 "cash": toPlayer.wallet.cash,
-                "goods" : toPlayer.wallet.goods
+                "goods": toPlayer.wallet.goods
             }
         });
 
         const medianLastSeven = self.medianLastSeven();
 
-        self.wss.broadcastEvent (
+        self.wss.broadcastEvent(
             self.game.id,
             "contract-fulfilled",
             {
@@ -329,13 +345,13 @@ export default class MarketPhase extends JoinablePhase {
             }
         );
 
-        console.log(`Median last 7: ${medianLastSeven}`);
+        /*console.log(`Median last 7: ${medianLastSeven}`);
 
         console.log(fromPlayer);
-        console.log(toPlayer);
+        console.log(toPlayer);*/
     }
 
-    removeOrder (id: number) {
+    removeOrder(id: number) {
         const order = this.orders.find(o => o.id == id);
 
         if (order == null) {
@@ -344,7 +360,7 @@ export default class MarketPhase extends JoinablePhase {
 
         this.orders.splice(this.orders.indexOf(order), 1);
 
-        this.wss.broadcastEvent (
+        this.wss.broadcastEvent(
             this.game.id,
             "delete-order",
             {
@@ -362,16 +378,16 @@ export default class MarketPhase extends JoinablePhase {
         if (values.length === 0) {
             return null;
         }
-        
-        values.sort(function(a,b){
-            return a-b;
+
+        values.sort(function (a, b) {
+            return a - b;
         });
 
         var half = Math.floor(values.length / 2);
-  
+
         if (values.length % 2)
             return values[half];
-        
+
         return (values[half - 1] + values[half]) / 2.0;
     }
 }

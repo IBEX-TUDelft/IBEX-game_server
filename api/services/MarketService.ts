@@ -11,12 +11,13 @@ import {
 import GameManagement from '../services/gameManager.js';
 import Utils from "../helpers/utils.js";
 import { v4 as uuidv4 } from 'uuid';
+import Market from '../logics/market/Market.js';
 
 const gameManager = GameManagement.get();
 
 export const MarketService = {
-    async join(gameId: number, token: string, recovery?: string): Promise<MarketPlayer> {
-        const game = gameManager.games.find(g => g.data.id === gameId);
+    async join(gameId: number, token: string, recovery?: string, dataSource?): Promise<MarketPlayer> {
+        const game: Market = gameManager.games.find(g => g.data.id === gameId);
 
         if (game == null) {
             throw new Error(`Game with id ${gameId} not found`);
@@ -111,7 +112,7 @@ export const MarketService = {
         player.recovery = recovery;
 
         while (
-            player.recovery === '' ||
+            player.recovery == null || player.recovery === '' ||
             gameData.players.find((p: MarketPlayer) => p.recovery === player.recovery) != null
         ) {
             player.recovery = uuidv4();
@@ -130,7 +131,7 @@ export const MarketService = {
         const knowsPrivateSignal = [MARKET_GAME_KNOWS_ALL, MARKET_GAME_PRIV_SIG_ONLY].includes(player.role);
 
         if (knowsPrivateSignal) {
-            player.signal = game.generateSignal();
+            player.signal = game.generateSignal(dataSource, `privateSignal_player_${player.number}`); //each player has a different private signal
         }
 
         if (player.role === MARKET_GAME_ADMIN) {

@@ -16,3 +16,4 @@ proof.js
 .env
 curl_examples.sh
 clean_run.sh
+extra-data

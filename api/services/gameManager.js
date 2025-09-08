@@ -10,14 +10,35 @@ import Market from '../logics/market/Market.js';
 import { GoodsMarket } from '../logics/goods_market/GoodsMarket.ts';
 import { resolve } from 'node:path';
 
+/**
+ * @import { Logic } from '../logics/Logic.js';
+ * @typedef {Object} GameManager
+ * @property {WebSocketManager} wssManager
+ * @property {Array<Logic>} games
+ * @property {boolean} inited
+ * @property {Function} startGame
+ * @property {Function} init
+ * @property {Function} handleMessage
+ * @property {Function} deleteGame
+ */
+
 export default {
+    /**
+     * @type {GameManager|null}
+     */
     instance: null,
+    /**
+     * @returns {GameManager}
+     */
     get() {
         if (this.instance == null) {
             this.instance = this.create();
         }
         return this.instance;
     },
+    /**
+     * @returns {GameManager}
+     */
     create() {
         if (this.instance != null) {
             return this.instance;
@@ -27,7 +48,7 @@ export default {
             wssManager: null,
             games: [],
             inited: false,
-            startGame: async function(gameId, record = true) {
+            startGame: async function(gameId, record = true, dataSource = null) {
                 console.log('GAMEMASTER Game ID: ' + gameId + " Typeof: " + typeof gameId);
 
                 if (this.games.find(g => g.data.id  == gameId) != null) {
@@ -142,11 +163,11 @@ export default {
                         await game.init();
                         break;
                     case 'market':
-                        game = new Market(gameData, record);
+                        game = new Market(gameData, record, dataSource);
                         await game.init();
                         break;
                     case 'goods-market':
-                        game = new GoodsMarket(gameData, record);
+                        game = new GoodsMarket(gameData, record, dataSource);
                         await game.init();
                         break;
                     default:

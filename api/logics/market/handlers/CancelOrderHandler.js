@@ -1,5 +1,6 @@
 import WS from '../../../helpers/websocket.js';
 import MessageHandler from '../../MessageHandler.js';
+import PostOrderHandler from './PostOrderHandler.js';
 
 export default class CancelOrderHandler extends MessageHandler {
 
@@ -21,7 +22,8 @@ export default class CancelOrderHandler extends MessageHandler {
         }
 
         phase.results.log.push({
-            "id": order.id,
+            "id": PostOrderHandler.nextLogEntryId++,
+            "orderId": order.id,
             "time": new Date(),
             "round": phase.game.currentRound.number,
             "phase": 6,

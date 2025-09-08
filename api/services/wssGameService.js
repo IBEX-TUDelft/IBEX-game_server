@@ -19,21 +19,24 @@ export default {
         console.log('Creating new WSS instance (CREATE)');
 
         this.instance =  {
-            wss: new WebSocketServer({ port: process.env.VUE_APP_WSS_PORT}),
+            wss: null,
             gameManager: null,
             games: [],
             interval: null,
             inited: false,
-            init: function (gameManager) {
+            init: function(gameManager) {
                 if (this.inited) {
                     return;
                 }
 
+                this.wss = new WebSocketServer({ port: process.env.VUE_APP_WSS_PORT});
+
                 this.gameManager = gameManager;
+
                 const wss = this.wss;
                 const self = this;
 
-                wss.on('connection', function connection(ws) {
+                this.wss.on('connection', function connection(ws) {
                     ws.isAlive = true;
                     ws.on('pong', () => {
                         ws.isAlive = true; 
@@ -119,7 +122,7 @@ export default {
                     }
                 });
             },
-            sendEvent(gameId, playerNumber, type, data) {
+            sendEvent: function (gameId, playerNumber, type, data) {
                 const game = this.games.find(g => g.id === gameId);
 
                 if (game == null) {
@@ -146,22 +149,22 @@ export default {
                     }
                 });
             },
-            broadcastInfo(id, message, role) {
+            broadcastInfo: function (id, message, role) {
                 this.broadcastMessage(id, "info", message, role);
             },
-            broadcastNotice(id, message, role) {
+            broadcastNotice: function (id, message, role) {
                 this.broadcastMessage(id, "notice", message, role);
             },
-            broadcastWarning(id, message, role) {
+            broadcastWarning: function (id, message, role) {
                 this.broadcastMessage(id, "warning", message, role);
             },
-            broadcastError(id, message, role) {
+            broadcastError: function (id, message, role) {
                 this.broadcastMessage(id, "error", message, role);
             },
-            broadcastFatal(id, message, role) {
+            broadcastFatal: function (id, message, role) {
                 this.broadcastMessage(id, "fatal", message, role);
             },
-            broadcastMessage: function(id, type, message, role) {
+            broadcastMessage: function (id, type, message, role) {
                 const game = this.games.find(g => g.id === id);
 
                 if (game == null) {
@@ -271,26 +274,35 @@ export default {
                 game.phase = phase;
             },
             shutdown: async function () {
-                console.log('Closing the WSS server ..')
+                if(this.wss == null || !(this.wss._server && this.wss._server.listening)) {
+                    return;
+                }
 
-                wss.clients.forEach(ws => {
+                console.log('Shutting down the WSS server connections');
+
+                this.wss.clients.forEach(ws => {
                     ws.terminate();
                 });
                 
                 if (this.interval != null) {
-                    clearInterval(interval);
+                    clearInterval(this.interval);
                 }
 
                 await new Promise((resolve, reject) => {
-                    wss.close((err) => {
+                    console.log('Closing the WSS server ..');
+
+                    this.wss.close((err) => {
                         if (err != null) {
+                            console.error('Error while closing the WSS server:', err);
                             reject(err);
                         } else {
-                            console.log('WSS server losed.');
+                            console.log('WSS server closed.');
                             resolve();
                         }
                     });
-                })
+                });
+
+                this.inited = false;
             }
         };
 

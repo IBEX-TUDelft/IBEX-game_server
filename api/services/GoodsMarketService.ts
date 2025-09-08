@@ -1,3 +1,4 @@
+import { get } from "http";
 import Utils from "../helpers/utils.js";
 import GoodsMarketGood from "../logics/goods_market/model/GoodsMarketGood.ts";
 import GoodsMarketPlayer from "../logics/goods_market/model/GoodsMarketPlayer.ts";
@@ -8,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 const gameManager = GameManagement.get();
 
 export const GoodsMarketService = {
-    async join(gameId: number, token: string, recovery?: string): Promise<GoodsMarketPlayer> {
+    async join(gameId: number, token: string, recovery?: string, dataSource?: any): Promise<GoodsMarketPlayer> {
         const game = gameManager.games.find(g => g.data.id === gameId);
 
         if (game == null) {
@@ -29,13 +30,9 @@ export const GoodsMarketService = {
 
         player = new GoodsMarketPlayer();
 
-        let verification;
+        player.number = gameData.players.length;
 
-        try {
-            verification = Utils.verifyJWT(token);
-        } catch (e) {
-            console.log('New unathenticated player');
-        }
+        let verification = GoodsMarketService.getVerification(token, player.number, dataSource);
 
         if (verification == null || verification.role != 0) {
             if (gameData.players.filter((p: GoodsMarketPlayer) => p.role === GoodsMarketAuthority.SELLER).length === 0) {
@@ -56,8 +53,8 @@ export const GoodsMarketService = {
                 }
             }
 
-            player.signals.highQualitySignal = this.getDeltaAdjustedValue(gameData.parameters.high_quality_value, gameData.parameters.high_quality_delta);
-            player.signals.lowQualitySignal = this.getDeltaAdjustedValue(gameData.parameters.low_quality_value, gameData.parameters.low_quality_delta);
+            player.signals.highQualitySignal = this.getDeltaAdjustedValue(gameData.parameters.high_quality_value, gameData.parameters.high_quality_delta, `hq_${player.number}`, dataSource);
+            player.signals.lowQualitySignal = this.getDeltaAdjustedValue(gameData.parameters.low_quality_value, gameData.parameters.low_quality_delta, `lq_${player.number}`, dataSource);
         } else {
             player.authority = GoodsMarketAuthority.ADMIN;
             player.role = verification.role;
@@ -104,15 +101,37 @@ export const GoodsMarketService = {
             goods: [...player.wallet.goods]
         };
 
-        player.number = gameData.players.length;
-
         gameData.players.push(player);
         gameData.assignedPlayers = gameData.players.length;
 
         return player;
     },
 
-    getDeltaAdjustedValue(value: number, delta: number): number {
+    getDeltaAdjustedValue(value: number, delta: number, tag: string, dataSource: any): number {
+        if (dataSource != null && dataSource[tag] != null) {
+            console.debug(`Found data source for tag ${tag}:`, dataSource[tag]);
+
+            return dataSource[tag];
+        }
+
         return Math.round(value * (100 - delta + Math.random() * delta * 2)) / 100;
+    },
+
+    getVerification(token: string, number: number, dataSource?: any): any {
+        const tag = `verification_${number}`;
+
+        if (dataSource != null && dataSource[tag] != null) {
+            console.debug(`Found data source for tag ${tag}:`, dataSource[tag]);
+
+            return dataSource[tag];
+        }
+
+        try {
+            return Utils.verifyJWT(token);
+        } catch (e) {
+            console.log('New unathenticated player');
+        }
+
+        return null;
     }
 }

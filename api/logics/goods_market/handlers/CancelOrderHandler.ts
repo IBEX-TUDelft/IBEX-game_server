@@ -16,6 +16,8 @@ export default class CancelOrderHandler extends MessageHandler {
     }
 
     action (ws, message: CancelOrderMessage, player: GoodsMarketPlayer, phase: MarketPhase) {
+        console.log(`Player ${player.number} requests to cancel order ${message.order.id}`);
+        
         const order = phase.orders.find(o => o.id === message.order.id);
 
         if (order == null) {

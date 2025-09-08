@@ -29,6 +29,8 @@ export default {
                 {key: "low_quality_value", type: "number", value: gameParameters.low_quality_value},
                 {key: "low_quality_delta", type: "number", value: gameParameters.low_quality_delta},
                 {key: "timer_phase_1", type: "number", value: gameParameters.timer_phase_1},
+                {key: "seller_transaction_cost", type: "float", value: gameParameters.seller_transaction_cost},
+                {key: "buyer_transaction_cost", type: "float", value: gameParameters.buyer_transaction_cost},
                 {key: "round_count", type: "number", value: 1},
                 {key: "practice_round", type: "boolean", value: false}
             ]
