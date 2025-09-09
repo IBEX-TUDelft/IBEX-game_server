@@ -1,4 +1,4 @@
-export default class MessageHandler {
+export class MessageHandler {
     
     type;
     role;

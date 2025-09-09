@@ -1,4 +1,4 @@
-import MessageHandler from "../../messaging/MessageHandler.ts";
+import { MessageHandler } from "../../messaging/MessageHandler.ts";
 import MarketPhase from "../phases/MarketPhase.ts";
 
 export default class EndHandler extends MessageHandler {

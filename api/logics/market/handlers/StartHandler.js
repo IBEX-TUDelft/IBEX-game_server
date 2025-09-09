@@ -1,4 +1,4 @@
-import MessageHandler from "../../messaging/MessageHandler.ts";
+import { MessageHandler } from "../../messaging/MessageHandler.ts";
 import { MARKET_GAME_ADMIN } from '../MarketPlayer.js';
 
 export default class StartHandler extends MessageHandler {

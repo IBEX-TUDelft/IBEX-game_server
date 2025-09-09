@@ -38,11 +38,11 @@
             </b-row>
 
             <b-row class="no-gutters" v-if="game.phase === 1">
-                <b-col class="col-6 p-5" style="text-align: right;">High Quality Median Valuation: <b>{{
+                <b-col class="col-6 p-5" style="text-align: right;">{{ resolvePlaceHolder('high-quality-median-valuation') }}: <b>{{
                     formatUs(player.signals.highQualitySignal) }}</b> <b-icon v-b-tooltip.hover
                         id="high-quality-median-valuation-id" icon="question-circle-fill"
                         variant="primary"></b-icon></b-col>
-                <b-col class="col-6 p-5" style="text-align: left;">Low Quality Median Valuation: <b>{{
+                <b-col class="col-6 p-5" style="text-align: left;">{{ resolvePlaceHolder('low-quality-median-valuation') }}: <b>{{
                     formatUs(player.signals.lowQualitySignal) }}</b> <b-icon v-b-tooltip.hover
                         id="low-quality-median-valuation-id" icon="question-circle-fill"
                         variant="primary"></b-icon></b-col>
