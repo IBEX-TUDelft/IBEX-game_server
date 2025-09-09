@@ -92,8 +92,6 @@ export default class Phase {
     }
 
     async onMessage(ws, message) {
-        console.log(this.handlers);
-
         let player = this.getPlayer(ws, message);
 
         AppEvents.get(this.game.id).emit(PlayerMessage, {

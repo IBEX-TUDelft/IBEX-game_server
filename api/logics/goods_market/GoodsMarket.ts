@@ -18,7 +18,7 @@ import ResultPhase from "./phases/ResultPhase.ts";
  */
 export class GoodsMarket extends Logic {
 
-    constructor(data, record) {
+    constructor(data, record: boolean = false) {
         super(data, [WaitingPhase, MarketPhase, ResultPhase], 'GoodsMarket', record);
 
         AppEvents.get(this.data.id).addListener(GameOver, () => {

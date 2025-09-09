@@ -13,7 +13,7 @@ export default class MessageHandler {
 
         this.role = role;
 
-        if ((typeof requiresAuthentication === "boolean") || (requiresAuthentication instanceof Boolean)) {
+        if (typeof requiresAuthentication === "boolean") {
             this.requiresAuthentication = requiresAuthentication;
         }
     }

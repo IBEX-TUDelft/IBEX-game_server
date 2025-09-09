@@ -71,7 +71,7 @@ export default class {
 
         const paymentTokens = [];
 
-        if (self.data.parameters.game_type != 'market') {
+        if (!['market', 'goods-market'].includes(self.data.parameters.game_type) ) {
             self.data.players.forEach(player => {
                 let paymentToken = self.generatePaymentToken();
                 

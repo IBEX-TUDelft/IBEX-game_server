@@ -1,5 +1,5 @@
 import WS from '../../../helpers/websocket.js';
-import MessageHandler from '../../MessageHandler.js';
+import MessageHandler from '../../messaging/MessageHandler.ts';
 import GoodsMarketPlayer from '../model/GoodsMarketPlayer.ts';
 import MarketPhase from '../phases/MarketPhase.ts';
 

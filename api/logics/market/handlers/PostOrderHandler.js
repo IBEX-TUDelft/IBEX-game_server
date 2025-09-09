@@ -1,5 +1,5 @@
 import WS from '../../../helpers/websocket.js';
-import MessageHandler from '../../MessageHandler.js';
+import MessageHandler from '../../messaging/MessageHandler.ts';
 
 export default class PostOrderHandler extends MessageHandler{
     constructor() {

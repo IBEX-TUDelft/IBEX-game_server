@@ -164,8 +164,6 @@ function compareResults(gameId: number, actual: any) {
     });
 }
 
-const gid = 392;
-
 async function execute(id: number) {
     try {
         SimulationService.init();

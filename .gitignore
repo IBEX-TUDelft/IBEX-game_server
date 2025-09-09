@@ -17,3 +17,6 @@ proof.js
 curl_examples.sh
 clean_run.sh
 extra-data
+generated
+schemas
+generate_from_schemas.ts

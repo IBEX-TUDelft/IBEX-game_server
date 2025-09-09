@@ -9,9 +9,9 @@ import GoodsMarketPlayer from "../model/GoodsMarketPlayer.ts";
 
 export default class MarketPhase extends JoinablePhase {
 
-    orderList = [];
-    movementList = [];
-    orders: GoodsMarketOrder[] = [];
+    orderList: any [];
+    movementList: any[];
+    orders: GoodsMarketOrder[];
     results: {
         log: any[];
         transactions: {
@@ -26,15 +26,20 @@ export default class MarketPhase extends JoinablePhase {
             goods: GoodsMarketGood[];
         }[];
         finalPrice: number | null;
-    } = {
+    };
+
+    constructor(game, wss, number: number) {
+        super(game, wss, [new PostOrderHandler(), new CancelOrderHandler(), new EndHandler()], null, number);
+
+        this.orderList = [];
+        this.movementList = [];
+        this.orders = [];
+        this.results = {
             log: [],
             wallets: [],
             transactions: [],
             finalPrice: null
-        }
-
-    constructor(game, wss, number: number) {
-        super(game, wss, [new PostOrderHandler(), new CancelOrderHandler(), new EndHandler()], null, number);
+        };
     }
 
     async onExit() {
@@ -106,11 +111,11 @@ export default class MarketPhase extends JoinablePhase {
         });
     }
 
-    getBuyerFee = () => {
+    getBuyerFee() {
         return this.game.parameters.buyer_transaction_cost || 0;
     }
 
-    getSellerFee = () => {
+    getSellerFee() {
         return this.game.parameters.seller_transaction_cost || 0;
     }
 
@@ -126,6 +131,11 @@ export default class MarketPhase extends JoinablePhase {
             case GoodsMarketOrderType.ASK:
                 counterparts = this.orders.filter(o => o.type == GoodsMarketOrderType.BID && o.sender != sender);
                 counterparts.sort((a, b) => b.price - a.price);
+
+                if(!order.now) {
+                    counterparts = counterparts
+                        .filter(bid => bid.price >= order.price);
+                }
 
                 if (counterparts.length == 0) {
                     console.log("No bids found");
@@ -163,6 +173,11 @@ export default class MarketPhase extends JoinablePhase {
 
                 match = counterparts[0];
 
+                if (!order.now) {
+                    counterparts = counterparts
+                        .filter(ask => ask.price <= order.price);
+                }
+                
                 if (counterparts.length == 0) {
                     console.log("No asks found");
 
