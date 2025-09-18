@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "GoodsMarketOrder",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "number"
+        },
+        "sender": {
+            "type": "number"
+        },
+        "type": {
+            "enum": ["bid", "ask"]
+        },
+        "price": {
+            "type": "number"
+        },
+        "timestamp": {
+            "type": "number"
+        },
+        "now": {
+            "type": "boolean"
+        },
+        "gameId": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "sender",
+        "type",
+        "price",
+        "now",
+        "gameId"
+    ],
+    "additionalProperties": false
+}

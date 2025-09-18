@@ -18,6 +18,6 @@ curl_examples.sh
 clean_run.sh
 extra-data
 generated
-schemas
+schemas-old
 generate_from_schemas.ts
 generate
