@@ -1,14 +1,23 @@
 {
   "type": "module",
   "scripts": {
-    "generate": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"ESNext\"}' node --loader ts-node/esm generate_from_schemas.ts"
+    "generate": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"ESNext\"}' node --loader ts-node/esm generate_from_schemas.ts",
+    "schema": "json2ts -i 'schemas/**/*.json' --declareExternallyReferenced=false -o generated/types",
+    "single": "json2ts -i schemas/UserMessage.json -i schemas/JoinMessage.json",
+    "trial": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"ESNext\"}' node --loader ts-node/esm generate/generate.ts",
+    "qt": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"ESNext\"}' node --loader ts-node/esm generate/qt.ts"
   },
   "dependencies": {
     "event-emitter": "^0.3.5",
-    "events": "^3.3.0"
+    "events": "^3.3.0",
+    "typescript-json-schema": "^0.65.1"
   },
   "devDependencies": {
+    "@apidevtools/json-schema-ref-parser": "^14.0.2",
+    "json-schema-to-typescript": "^15.0.4",
     "quicktype": "^23.2.6",
+    "quicktype-core": "^23.2.6",
+    "ts-morph": "^27.0.0",
     "typescript": "^5.9.2"
   }
 }

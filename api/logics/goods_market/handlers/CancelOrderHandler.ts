@@ -2,14 +2,10 @@ import WS from '../../../helpers/websocket.js';
 import { MessageHandler } from '../../messaging/MessageHandler.ts';
 import GoodsMarketPlayer from '../model/GoodsMarketPlayer.ts';
 import MarketPhase from '../phases/MarketPhase.ts';
+//import { CancelOrderMessage } from '../../../../generated/games/goods-market/messages/CancelOrderMessage';
+import { CancelOrderMessage } from '../../../../generated/games/goods_market/messages/CancelOrderMessage.ts';
 
-class CancelOrderMessage {
-    order: {
-        id: number;
-    };
-}
-
-export default class CancelOrderHandler extends MessageHandler {
+export default class CancelOrderHandler extends MessageHandler<CancelOrderMessage> {
 
     constructor() {
         super('cancel-order', null, true);

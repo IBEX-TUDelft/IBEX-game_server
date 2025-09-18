@@ -4,13 +4,14 @@ import GoodsMarketPlayer from '../model/GoodsMarketPlayer.ts';
 import GoodsMarketOrder from '../model/GoodsMarketOrder.ts';
 import { GoodsMarketOrderType } from '../model/GoodsMarketTypes.ts';
 import MarketPhase from '../phases/MarketPhase.ts';
+import { UserMessage } from '../../../../generated/UserMessage.ts';
 
-class PostOrderMessage {
+class PostOrderMessage implements UserMessage {
     gameId: string;
     order: GoodsMarketOrder;
 }
 
-export default class PostOrderHandler extends MessageHandler {
+export default class PostOrderHandler extends MessageHandler<PostOrderMessage> {
     constructor() {
         super('post-order', null, true);
     }

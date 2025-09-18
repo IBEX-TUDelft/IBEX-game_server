@@ -20,3 +20,4 @@ extra-data
 generated
 schemas
 generate_from_schemas.ts
+generate

@@ -1,4 +1,6 @@
-export class MessageHandler {
+import { UserMessage } from "../../../generated/UserMessage"
+
+export class MessageHandler<T extends UserMessage> {
     
     type;
     role;
@@ -18,7 +20,7 @@ export class MessageHandler {
         }
     }
 
-    action (ws, message, player, phase) {
+    action (ws, message: T, player, phase) {
         throw new Error('Method action must always be overwritten');
     }
 }

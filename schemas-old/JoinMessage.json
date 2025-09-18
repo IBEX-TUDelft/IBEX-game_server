@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JoinMessage",
+  "allOf": [
+    { "$ref": "schemas/UserMessage.json" },
+    {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "object",
+          "properties": {
+            "gameId": { "type": "number" },
+            "type": { "const": "join" },
+            "recovery": { "type": "string" }
+          },
+          "required": ["gameId", "type", "recovery"],
+          "additionalProperties": false
+        },
+        "type": {
+          "const": "message" 
+        }
+      },
+      "required": ["content", "type"],
+      "additionalProperties": false
+    }
+  ]
+}

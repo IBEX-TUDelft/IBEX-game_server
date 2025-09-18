@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "gaames_goodsa_maarket_messaages_CaancelOrderMessaage",
+  "title": "CancelOrderMessage",
+  "allOf": [
+    {
+      "$ref": "schemas/UserMessage.json"
+    },
+    {
+      "properties": {
+        "content": {
+          "type": "object",
+          "properties": {
+            "gameId": {
+              "type": "number"
+            },
+            "type": {
+              "const": "cancel-order"
+            },
+            "order": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "gameId",
+            "type",
+            "order"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": ["content"]
+    }
+  ]
+}
