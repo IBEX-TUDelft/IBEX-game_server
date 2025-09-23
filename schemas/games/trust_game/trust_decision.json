@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "trust_decision",
+    "type": "object",
+    "properties": {
+        "player_id": {
+            "type": "number"
+        },
+        "trustor_id": {
+            "type": "number"
+        },
+        "trusee_id": {
+            "type": "number"
+        },
+        "return_amount": {
+            "type": "number"
+        },
+        "timestamp": {
+            "type": "number"
+        },
+        "gameId": {
+            "type": "number"
+        },
+        "round": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "player_id",
+        "trustor_id",
+        "trustee_id",
+        "timestamp",
+        "return_amount",
+        "gameId",
+        "round"
+    ],
+    "additionalProperties": false
+}

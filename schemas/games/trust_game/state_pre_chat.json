@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "state_pre_chat",
+    "type": "object",
+    "properties": {
+        "game_id": {
+            "type": "number"
+        },
+        "round": {
+            "type": "number"
+        },
+        "matchGroup_id": {
+            "type": "number"
+        },
+        "trustor_id": {
+            "type": "number"
+        },
+        "trustee_id": {
+            "type": "number"
+        },
+        "trustee_type": {
+            "enum": ["Human_communication", "Human_no_communication", "AI_communication_1", "AI_communication_2", "AI_no_communication"]
+        },
+        "tokens_available": {
+            "type": "number"
+        },
+        "exchange_rate": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "game_id",
+        "round",
+        "matchGroup_id",
+        "trustor_id",
+        "trustee_id",
+        "trustee_type",
+        "tokens_available",
+        "exchange_rate"
+         ],
+    "additionalProperties": false
+}
+       
