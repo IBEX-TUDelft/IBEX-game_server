@@ -317,7 +317,7 @@ export default {
                                 color: "#fff",
                                 background: "#FF4560",
                             },
-                            text: resolvePlaceHolder('low-quality-median-valuation')
+                            text: this.resolvePlaceHolder('low-quality-median-valuation')
                         }
                     }, {
                         y: self.player?.signals?.highQualitySignal || 100,
@@ -328,7 +328,7 @@ export default {
                                 color: "#fff",
                                 background: "#00E396",
                             },
-                            text: resolvePlaceHolder('high-quality-median-valuation')
+                            text: this.resolvePlaceHolder('high-quality-median-valuation')
                         }
                     }]
                 }
