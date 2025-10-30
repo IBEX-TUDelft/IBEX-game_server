@@ -317,7 +317,7 @@ export default {
                                 color: "#fff",
                                 background: "#FF4560",
                             },
-                            text: this.resolvePlaceHolder('low-quality-median-valuation')
+                            text: 'Personal Low Valuation'
                         }
                     }, {
                         y: self.player?.signals?.highQualitySignal || 100,
@@ -328,7 +328,7 @@ export default {
                                 color: "#fff",
                                 background: "#00E396",
                             },
-                            text: this.resolvePlaceHolder('high-quality-median-valuation')
+                            text: 'Personal High Valuation'
                         }
                     }]
                 }
@@ -491,6 +491,9 @@ export default {
 
             self.chartOptions.annotations.yaxis[0].y = self.player?.signals?.lowQualitySignal || 0;
             self.chartOptions.annotations.yaxis[1].y = self.player?.signals?.highQualitySignal || 100;
+
+            self.chartOptions.annotations.yaxis[0].label.text = this.resolvePlaceHolder('low-quality-median-valuation')
+            self.chartOptions.annotations.yaxis[1].label.text = this.resolvePlaceHolder('high-quality-median-valuation')
 
             if (gameData.game.over != null) {
                 self.game.over = gameData.game.over;
