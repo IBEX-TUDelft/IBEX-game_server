@@ -544,6 +544,8 @@ export default {
 
                 self.timer.on = true;
             }
+
+            window.dispatchEvent(new Event('resize'));
         },
         openWebSocket() {
             const self = this;
