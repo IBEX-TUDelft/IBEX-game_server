@@ -1,7 +1,7 @@
 There are two ways to install the game server, a manual installation directly on the server, or an installation within a container. 
 Below both methods are explained.   
 The installation fixes interfaces and admin passwords, default passwords can be find below the installation instructions.
-The installation assumes 
+The installation assumes you are running on an up to date linux server.
 
 # Manual Setup IBEX Game server 
 
