@@ -349,8 +349,10 @@ export default {
     name: 'GoodsDoubleAuctionBoard',
     methods: {
         getTotalSocialProfit() {
-            return this.game.statistics.buyers.reduce((acc, buyer) => Math.round((acc + buyer.profit) * 100) / 100, 0) +
-                this.game.statistics.sellers.reduce((acc, seller) => Math.round((acc + seller.profit) * 100) / 100, 0);
+            const socialProfit = this.game.statistics.buyers?.reduce((acc, buyer) => Math.round((acc + buyer.profit) * 100) / 100, 0) +
+                this.game.statistics.sellers?.reduce((acc, seller) => Math.round((acc + seller.profit) * 100) / 100, 0);
+
+            return isNaN(socialProfit) ? 0 : socialProfit;
         },
         getToken() {
             return localStorage.getItem("token");

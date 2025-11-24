@@ -84,7 +84,7 @@ export default class Futarchy extends Logic {
         });
 
         const game = {
-            "ruleset": "Harberger",
+            "ruleset": "Futarchy",
             "id": self.data.id,
             "round": self.data.currentRound.number,
             "phase": self.data.currentRound.phase,

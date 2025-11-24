@@ -1058,6 +1058,8 @@
                         "type": "join",
                         "recovery": self.player.recovery
                     });
+
+                    EventService.emit('ws-connection-open');
                 }
 
                 this.connection.onclose = function() {
@@ -1081,12 +1083,12 @@
             },
             resolvePlaceHolder(placeholder, ...parameters) {
                 if (this.dictionary == null) {
-                    console.warn('No dictionary available');
+                    console.warn('No dictionary available. While lookign for ' + placeholder);
                     return placeholder;
                 }
 
                 if (this.dictionary.placeHolders == null) {
-                    console.warn('No placeholders in the dictionary');
+                    console.warn('No placeholders in the dictionary. While lookign for ' + placeholder);
                     return placeholder;
                 }
 
@@ -1326,7 +1328,7 @@
 
             self.formatService = new FormatService(self.format);
 
-            if (response.gameData != null) {
+            async function restoreRecoveredData() {
                 self.game.phase = response.gameData.game.phase;
                 self.game.ruleset = response.gameData.game.ruleset;
 
@@ -1357,12 +1359,32 @@
                 self.player.instructions = phaseInstructions;
             }
 
-            try {
-                self.openWebSocket();
-            } catch (err) {
-                console.log(err);
-            }
+            if (response.gameData != null) {
+                await restoreRecoveredData();
 
+                try {
+                    self.openWebSocket();
+                } catch (err) {
+                    console.log(err);
+                }
+            } else {
+                try {
+                    self.openWebSocket();
+                } catch (err) {
+                    console.log(err);
+                }
+
+                EventService.on('ws-connection-open', async () => {
+                    console.log('WEB SOCKET CONNECTION OPEN')
+                    response = await getGameStatus(this.$route.params.id, this.$route.params.recovery);
+
+                    if (response.gameData == null) {
+                        console.log('GAME DATA STILL NULL AFTER JOINING WITH PARAMS', this.$route.params.id, this.$route.params.recovery, response);
+                    } else {
+                        await restoreRecoveredData();
+                    }
+                })
+            }
         }
     }
 </script>
